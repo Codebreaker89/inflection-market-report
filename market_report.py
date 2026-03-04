@@ -61,23 +61,36 @@ SECTOR_ETFS = {
     "GDX":  "Gold Miners",
     "ICLN": "Clean Energy",
     "JETS": "Airlines",
+    "XHB":  "Homebuilders",
 }
 
 STOCK_UNIVERSE = {
+    # ── Core SPDR sectors ──────────────────────────────────────────
     "XLE":  ["XOM","CVX","COP","EOG","SLB","MPC","PSX","VLO","OXY","DVN",
              "HAL","BKR","FANG","KMI","WMB","EQT","TRGP","OKE"],
     "XLU":  ["NEE","SO","DUK","SRE","AEP","D","EXC","PCG","XEL","ED",
              "WEC","EIX","ETR","AWK","ES","PPL","AES","CNP","NI","CMS"],
     "XLK":  ["AAPL","MSFT","NVDA","AMD","AVGO","INTC","QCOM","CRM","ADBE","NOW","INTU"],
-    "SOXX": ["NVDA","AMD","AVGO","INTC","QCOM","AMAT","LRCX","KLAC","MU","TSM","SMCI"],
     "XLV":  ["JNJ","UNH","ABBV","MRK","LLY","PFE","TMO","ABT","MDT","ISRG","ELV"],
     "XLF":  ["JPM","BAC","WFC","GS","MS","BLK","C","AXP","COF","SCHW"],
     "XLY":  ["AMZN","TSLA","HD","MCD","NKE","SBUX","LOW","TJX","BKNG","RL","TPR"],
-    "XLC":  ["META","GOOGL","NFLX","DIS","VZ","T","EA"],
-    "XLI":  ["CAT","HON","UPS","RTX","LMT","DE","GE","NOC","EMR","ETN"],
-    "XLB":  ["LIN","APD","SHW","NEM","FCX","NUE","ALB","PKG"],
-    "IBB":  ["AMGN","GILD","BIIB","REGN","VRTX","MRNA"],
-    "XRT":  ["TGT","WMT","COST","TJX","ROST"],
+    "XLP":  ["PG","KO","PEP","MDLZ","CL","KMB","GIS","STZ","MO","PM","KDP","HSY"],
+    "XLC":  ["META","GOOGL","NFLX","DIS","VZ","T","EA","CHTR","TMUS","SNAP","PINS"],
+    "XLI":  ["CAT","HON","UPS","RTX","LMT","DE","GE","NOC","EMR","ETN","FDX","CSX"],
+    "XLB":  ["LIN","APD","SHW","NEM","FCX","NUE","ALB","PKG","DD","IP","ECL"],
+    "XLRE": ["PLD","AMT","CCI","EQIX","PSA","EQR","AVB","O","VICI","SPG","DLR","WY"],
+    # ── Thematic / sub-sector ──────────────────────────────────────
+    "SOXX": ["NVDA","AMD","AVGO","INTC","QCOM","AMAT","LRCX","KLAC","MU","TSM","SMCI"],
+    "IBB":  ["AMGN","GILD","BIIB","REGN","VRTX","MRNA","ILMN","BNTX","INCY","ALNY"],
+    "XRT":  ["TGT","WMT","COST","TJX","ROST","EBAY","W","ETSY"],
+    "KRE":  ["USB","PNC","TFC","RF","CFG","FITB","HBAN","KEY","MTB","ZION","WAL","COLB"],
+    "ITA":  ["LMT","RTX","NOC","GD","BA","TDG","HII","LHX","HWM","AXON","LDOS","CACI"],
+    "XOP":  ["XOM","CVX","COP","EOG","DVN","FANG","OXY","MRO","APA","OVV","SWN","RRC"],
+    "OIH":  ["SLB","HAL","BKR","NOV","FTI","WHD","PTEN","GTLS","OIS","DNOW"],
+    "GDX":  ["NEM","GOLD","AEM","WPM","FNV","KGC","AU","GFI","HL","AGI","EGO","OR"],
+    "ICLN": ["ENPH","FSLR","RUN","PLUG","BE","ARRY","CWEN","ORA","SEDG","NEP","HASI"],
+    "JETS": ["DAL","UAL","AAL","LUV","ALK","JBLU","RYAAY"],
+    "XHB":  ["DHI","LEN","PHM","TOL","NVR","MTH","KBH","MHO","SKY","LGIH","BLD"],
 }
 
 # Full company name lookup — shown in brackets next to ticker in reports
@@ -90,14 +103,20 @@ COMPANY_NAMES = {
     "SOXX":"iShares Semiconductors","XRT":"SPDR Retail ETF","IBB":"iShares Biotech",
     "KRE":"SPDR Reg. Banks","ITA":"iShares Aerospace/Defense","XOP":"SPDR Oil & Gas E&P",
     "OIH":"VanEck Oil Services","GDX":"VanEck Gold Miners",
-    "ICLN":"iShares Clean Energy","JETS":"US Global Jets ETF",
+    "ICLN":"iShares Clean Energy","JETS":"US Global Jets ETF","XHB":"SPDR Homebuilders",
     # Energy
     "XOM":"ExxonMobil","CVX":"Chevron","COP":"ConocoPhillips",
-    "EOG":"EOG Resources","SLB":"Schlumberger","MPC":"Marathon Petroleum",
+    "EOG":"EOG Resources","SLB":"SLB (Schlumberger)","MPC":"Marathon Petroleum",
     "PSX":"Phillips 66","VLO":"Valero Energy","OXY":"Occidental Petroleum",
     "DVN":"Devon Energy","HAL":"Halliburton","BKR":"Baker Hughes",
     "FANG":"Diamondback Energy","KMI":"Kinder Morgan","WMB":"Williams Cos.",
     "EQT":"EQT Corp","TRGP":"Targa Resources","OKE":"ONEOK",
+    # Oil & Gas E&P (additional)
+    "MRO":"Marathon Oil","APA":"APA Corp","OVV":"Ovintiv",
+    "SWN":"Southwestern Energy","RRC":"Range Resources",
+    # Oil Services
+    "NOV":"NOV Inc","FTI":"TechnipFMC","WHD":"Cactus Inc",
+    "PTEN":"Patterson-UTI","GTLS":"Chart Industries","OIS":"Oil States Intl","DNOW":"NOW Inc",
     # Utilities
     "NEE":"NextEra Energy","SO":"Southern Company","DUK":"Duke Energy",
     "SRE":"Sempra Energy","AEP":"Amer. Electric Power","D":"Dominion Energy",
@@ -123,34 +142,76 @@ COMPANY_NAMES = {
     "JPM":"JPMorgan Chase","BAC":"Bank of America","WFC":"Wells Fargo",
     "GS":"Goldman Sachs","MS":"Morgan Stanley","BLK":"BlackRock",
     "C":"Citigroup","AXP":"American Express","COF":"Capital One","SCHW":"Charles Schwab",
+    # Regional Banks
+    "USB":"US Bancorp","PNC":"PNC Financial","TFC":"Truist Financial",
+    "RF":"Regions Financial","CFG":"Citizens Financial","FITB":"Fifth Third Bancorp",
+    "HBAN":"Huntington Bancshares","KEY":"KeyCorp","MTB":"M&T Bank",
+    "ZION":"Zions Bancorp","WAL":"Western Alliance","COLB":"Columbia Banking",
     # Consumer Discretionary
     "AMZN":"Amazon","TSLA":"Tesla","HD":"Home Depot",
     "MCD":"McDonald's","NKE":"Nike","SBUX":"Starbucks",
     "LOW":"Lowe's","TJX":"TJX Companies","BKNG":"Booking Holdings",
     "RL":"Ralph Lauren","TPR":"Tapestry",
+    # Consumer Staples
+    "PG":"Procter & Gamble","KO":"Coca-Cola","PEP":"PepsiCo",
+    "MDLZ":"Mondelez Intl","CL":"Colgate-Palmolive","KMB":"Kimberly-Clark",
+    "GIS":"General Mills","STZ":"Constellation Brands","MO":"Altria",
+    "PM":"Philip Morris Intl","KDP":"Keurig Dr Pepper","HSY":"Hershey",
     # Communication Services
     "META":"Meta Platforms","GOOGL":"Alphabet","NFLX":"Netflix",
     "DIS":"Walt Disney","VZ":"Verizon","T":"AT&T","EA":"Electronic Arts",
+    "CHTR":"Charter Communications","TMUS":"T-Mobile","SNAP":"Snap","PINS":"Pinterest",
     # Industrials
     "CAT":"Caterpillar","HON":"Honeywell","UPS":"UPS",
     "RTX":"RTX Corp","LMT":"Lockheed Martin","DE":"John Deere",
     "GE":"GE Aerospace","NOC":"Northrop Grumman","EMR":"Emerson Electric","ETN":"Eaton Corp",
+    "FDX":"FedEx","CSX":"CSX Corp",
+    # Aerospace & Defense
+    "GD":"General Dynamics","BA":"Boeing","TDG":"TransDigm Group",
+    "HII":"Huntington Ingalls","LHX":"L3Harris Technologies",
+    "HWM":"Howmet Aerospace","AXON":"Axon Enterprise",
+    "LDOS":"Leidos Holdings","CACI":"CACI International",
     # Materials
     "LIN":"Linde","APD":"Air Products","SHW":"Sherwin-Williams",
     "DD":"DuPont","NEM":"Newmont","FCX":"Freeport-McMoRan",
     "NUE":"Nucor","ALB":"Albemarle","CE":"Celanese","PKG":"Packaging Corp",
+    "IP":"International Paper","ECL":"Ecolab",
+    # Real Estate
+    "PLD":"Prologis","AMT":"American Tower","CCI":"Crown Castle",
+    "EQIX":"Equinix","PSA":"Public Storage","EQR":"Equity Residential",
+    "AVB":"AvalonBay Communities","O":"Realty Income","VICI":"VICI Properties",
+    "SPG":"Simon Property Group","DLR":"Digital Realty","WY":"Weyerhaeuser",
     # Biotech
     "AMGN":"Amgen","GILD":"Gilead Sciences","BIIB":"Biogen",
     "REGN":"Regeneron","VRTX":"Vertex Pharma","MRNA":"Moderna",
-    "BNTX":"BioNTech","ILMN":"Illumina",
+    "BNTX":"BioNTech","ILMN":"Illumina","INCY":"Incyte","ALNY":"Alnylam Pharma",
     # Retail
     "COST":"Costco","WMT":"Walmart","TGT":"Target","ROST":"Ross Stores",
-    # Previous analysis stocks
+    "EBAY":"eBay","W":"Wayfair","ETSY":"Etsy",
+    # Gold Miners
+    "GOLD":"Barrick Gold","AEM":"Agnico Eagle","WPM":"Wheaton Precious Metals",
+    "FNV":"Franco-Nevada","KGC":"Kinross Gold","AU":"AngloGold Ashanti",
+    "GFI":"Gold Fields","HL":"Hecla Mining","AGI":"Alamos Gold",
+    "EGO":"Eldorado Gold","OR":"Osisko Royalties",
+    # Clean Energy
+    "ENPH":"Enphase Energy","FSLR":"First Solar","RUN":"Sunrun",
+    "PLUG":"Plug Power","BE":"Bloom Energy","ARRY":"Array Technologies",
+    "CWEN":"Clearway Energy","ORA":"Ormat Technologies",
+    "SEDG":"SolarEdge Technologies","NEP":"NextEra Energy Partners","HASI":"HA Sustainable",
+    # Airlines
+    "DAL":"Delta Air Lines","UAL":"United Airlines","AAL":"American Airlines",
+    "LUV":"Southwest Airlines","ALK":"Alaska Air Group","JBLU":"JetBlue Airways",
+    "RYAAY":"Ryanair Holdings",
+    # Homebuilders
+    "DHI":"D.R. Horton","LEN":"Lennar","PHM":"PulteGroup","TOL":"Toll Brothers",
+    "NVR":"NVR Inc","MTH":"Meritage Homes","KBH":"KB Home",
+    "MHO":"M/I Homes","SKY":"Skyline Champion","LGIH":"LGI Homes","BLD":"TopBuild Corp",
+    # Cybersecurity / other tech
+    "CRWD":"CrowdStrike","PANW":"Palo Alto Networks","ZS":"Zscaler",
+    "FTNT":"Fortinet","OKTA":"Okta","CYBR":"CyberArk",
     "LULU":"lululemon","CPRI":"Capri Holdings","PVH":"PVH Corp",
     "VFC":"VF Corporation","URBN":"Urban Outfitters",
     "WDAY":"Workday","TEAM":"Atlassian",
-    "CRWD":"CrowdStrike","PANW":"Palo Alto Networks","ZS":"Zscaler",
-    "FTNT":"Fortinet","OKTA":"Okta","CYBR":"CyberArk",
 }
 
 # StealthTrail parameters (tuned on SPY daily)
