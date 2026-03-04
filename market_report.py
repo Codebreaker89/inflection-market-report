@@ -498,6 +498,11 @@ def run_sector_rotation(spy_df):
         reason    = build_reason(quad, "N/A", st, alert, n_sigs, r1, is_sector=True)
         # QTA backtest
         qta       = backtest_qta(df, spy_df)
+        # RRG Trail — 8 weekly samples (every 5 bars) + current point
+        _trail_locs = list(range(-40, 0, 5))  # -40,-35,...,-5
+        trail = [(round(ratio.iloc[i], 3), round(mom.iloc[i], 3))
+                 for i in _trail_locs if abs(i) <= len(ratio)]
+        trail.append((round(ratio.iloc[-1], 3), round(mom.iloc[-1], 3)))
         results.append({
             "etf": etf, "name": name,
             "quad": quad, "rs_ratio": round(ratio.iloc[-1],3),
@@ -506,7 +511,7 @@ def run_sector_rotation(spy_df):
             "4f_alert": alert, "4f_n": n_sigs, "4f_flags": flags,
             "score": score, "alert": _sector_alert(score),
             "ret_1y": r1, "vol_bucket": vb, "ann_vol": av,
-            "reason": reason, "qta": qta,
+            "reason": reason, "qta": qta, "trail": trail,
         })
     results.sort(key=lambda x: x["score"], reverse=True)
     return results
@@ -595,12 +600,17 @@ def _fig_to_b64(fig):
     return base64.b64encode(buf.getvalue()).decode()
 
 def chart_rrg_scatter(sector_results):
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(12, 10))
     fig.patch.set_facecolor("#0a0f1e"); ax.set_facecolor("#111827")
-    ratios = [r["rs_ratio"] for r in sector_results]
-    moms   = [r["rs_mom"]   for r in sector_results]
-    xlim   = [min(min(ratios)-0.5, 99.0), max(max(ratios)+0.5, 101.0)]
-    ylim   = [min(min(moms)-0.5,   99.0), max(max(moms)+0.5,   101.0)]
+
+    # Compute axis limits from ALL trail points so nothing gets clipped
+    all_x = [pt[0] for r in sector_results for pt in r.get("trail", [(r["rs_ratio"], r["rs_mom"])])]
+    all_y = [pt[1] for r in sector_results for pt in r.get("trail", [(r["rs_ratio"], r["rs_mom"])])]
+    pad = 0.6
+    xlim = [min(min(all_x) - pad, 99.0), max(max(all_x) + pad, 101.0)]
+    ylim = [min(min(all_y) - pad, 99.0), max(max(all_y) + pad, 101.0)]
+
+    # Quadrant background shading + labels
     for (x1,x2),(y1,y2),col,lbl in [
         ((100,xlim[1]),(100,ylim[1]),"#10b981","Leading"),
         ((100,xlim[1]),(ylim[0],100),"#f59e0b","Weakening"),
@@ -609,25 +619,61 @@ def chart_rrg_scatter(sector_results):
     ]:
         ax.fill_between([x1,x2],[y1,y1],[y2,y2],color=col,alpha=0.07)
         ax.text((x1+x2)/2,(y1+y2)/2,lbl,ha="center",va="center",
-                fontsize=10,color=col,alpha=0.25,fontweight="bold")
+                fontsize=11,color=col,alpha=0.22,fontweight="bold")
     ax.axhline(100,color="white",lw=0.8,alpha=0.4)
     ax.axvline(100,color="white",lw=0.8,alpha=0.4)
+
+    # Draw trails then current dots on top
     for r in sector_results:
-        c = Q_COLORS.get(r["quad"],"#aaaaaa")
-        ax.scatter(r["rs_ratio"],r["rs_mom"],s=160,c=c,alpha=0.9,
-                   edgecolors="white",linewidths=0.5,zorder=4)
-        ax.annotate(r["etf"],(r["rs_ratio"],r["rs_mom"]),
-                    textcoords="offset points",xytext=(5,4),
-                    color="white",fontsize=8,fontweight="bold")
+        c     = Q_COLORS.get(r["quad"], "#aaaaaa")
+        trail = r.get("trail", [])
+        n     = len(trail)
+
+        if n >= 2:
+            # Fading trail lines — oldest segment is most transparent
+            for i in range(n - 1):
+                x0, y0 = trail[i]
+                x1, y1 = trail[i + 1]
+                # alpha ramps from 0.08 (oldest) to 0.55 (second-to-last)
+                alpha = 0.08 + 0.47 * (i / max(n - 2, 1))
+                lw    = 0.8 + 1.2 * (i / max(n - 2, 1))
+                ax.plot([x0, x1], [y0, y1], color=c, alpha=alpha,
+                        lw=lw, solid_capstyle="round", zorder=3)
+
+            # Small faded dots along the trail (skip the current endpoint)
+            for i, (tx, ty) in enumerate(trail[:-1]):
+                dot_alpha = 0.10 + 0.35 * (i / max(n - 2, 1))
+                ax.scatter(tx, ty, s=18, c=c, alpha=dot_alpha, zorder=3)
+
+            # Arrow from second-to-last → last point (shows direction of travel)
+            x0, y0 = trail[-2]
+            x1, y1 = trail[-1]
+            ax.annotate("", xy=(x1, y1), xytext=(x0, y0),
+                        arrowprops=dict(
+                            arrowstyle="-|>",
+                            color=c,
+                            lw=1.8,
+                            mutation_scale=12,
+                        ),
+                        zorder=5)
+
+        # Current position — large bright dot
+        ax.scatter(r["rs_ratio"], r["rs_mom"], s=180, c=c, alpha=0.95,
+                   edgecolors="white", linewidths=0.7, zorder=6)
+        ax.annotate(r["etf"], (r["rs_ratio"], r["rs_mom"]),
+                    textcoords="offset points", xytext=(6, 4),
+                    color="white", fontsize=8, fontweight="bold", zorder=7)
+
     ax.set_xlim(xlim); ax.set_ylim(ylim)
-    ax.set_xlabel("RS-Ratio  (>100 = outperforming SPY)",color="#9ca3af",fontsize=10)
-    ax.set_ylabel("RS-Momentum  (>100 = accelerating)",color="#9ca3af",fontsize=10)
+    ax.set_xlabel("RS-Ratio  (>100 = outperforming SPY)", color="#9ca3af", fontsize=10)
+    ax.set_ylabel("RS-Momentum  (>100 = accelerating)",   color="#9ca3af", fontsize=10)
     ax.tick_params(colors="#9ca3af")
     for sp in ax.spines.values(): sp.set_edgecolor("#374151")
-    handles = [mpatches.Patch(color=v,label=k) for k,v in Q_COLORS.items()]
-    ax.legend(handles=handles,facecolor="#111827",labelcolor="white",fontsize=9,loc="upper left")
-    ax.set_title("Live RRG Snapshot — All Sectors vs SPY",
-                 color="white",fontsize=13,pad=12,fontweight="bold")
+    handles = [mpatches.Patch(color=v, label=k) for k, v in Q_COLORS.items()]
+    ax.legend(handles=handles, facecolor="#111827", labelcolor="white",
+              fontsize=9, loc="upper left")
+    ax.set_title("Live RRG — All Sectors vs SPY  (trail = last 8 weeks)",
+                 color="white", fontsize=13, pad=12, fontweight="bold")
     return _fig_to_b64(fig)
 
 def chart_sector_scores(sector_results):
