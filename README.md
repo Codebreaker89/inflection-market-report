@@ -1,5 +1,12 @@
 # Daily Market Report — Sector Rotation + Stock Picks
 
+**🌐 Live Report:** [https://hdahake.github.io/inflection-market-report/market_report.html](https://hdahake.github.io/inflection-market-report/market_report.html)
+
+> Auto-generated every weekday at 9:00 AM EST via GitHub Actions.
+> To trigger manually: go to **Actions tab → Daily Market Report → Run workflow**.
+
+---
+
 A single Python script that runs every morning to produce a self-contained HTML dashboard covering:
 
 - **§1 Sector Rotation Alerts** — 21 sector ETFs scored via RRG + StealthTrail + 4-Factor confirmation → ROTATING / WATCH / AVOID

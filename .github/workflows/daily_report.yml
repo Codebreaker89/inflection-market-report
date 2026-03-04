@@ -1,0 +1,40 @@
+name: Daily Market Report
+
+on:
+  # Auto-run every weekday at 9:00 AM EST (14:00 UTC)
+  schedule:
+    - cron: '0 14 * * 1-5'
+
+  # Manual trigger — click "Run workflow" from any browser
+  workflow_dispatch:
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pandas numpy matplotlib yfinance
+
+      - name: Generate market report
+        run: python market_report.py
+
+      - name: Commit and publish report
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add -f market_report.html
+          git diff --staged --quiet && echo "No changes to report" || (
+            git commit -m "Market report: $(date +'%A %b %d, %Y')" &&
+            git push
+          )
