@@ -1,6 +1,6 @@
 # Daily Market Report — Sector Rotation + Stock Picks
 
-**🌐 Live Report:** [https://hdahake.github.io/inflection-market-report/market_report.html](https://hdahake.github.io/inflection-market-report/market_report.html)
+**🌐 Live Report:** [https://hdahake.github.io/inflection-market-report/](https://hdahake.github.io/inflection-market-report/)
 
 > Auto-generated every weekday at 9:00 AM EST via GitHub Actions.
 > To trigger manually: go to **Actions tab → Daily Market Report → Run workflow**.
