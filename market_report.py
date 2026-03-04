@@ -943,6 +943,22 @@ def generate_html_report(sector_results, drilldown, run_dt, data_as_of,
     rotating     = [r for r in sector_results if r["score"] >= SECTOR_DRILL_THRESHOLD]
     signal_summary_html = _build_signal_summary(drilldown)
 
+    # Build full-universe lookup map (all stocks, not just rotating sectors)
+    _stock_map = {}
+    for etf, tickers in STOCK_UNIVERSE.items():
+        sec_info = next((r for r in sector_results if r["etf"] == etf), None)
+        for ticker in tickers:
+            _stock_map[ticker.upper()] = {
+                "name":        COMPANY_NAMES.get(ticker, ticker),
+                "sector_etf":  etf,
+                "sector_name": SECTOR_ETFS.get(etf, etf),
+                "rotating":    bool(sec_info and sec_info["score"] >= SECTOR_DRILL_THRESHOLD),
+                "quad":        sec_info["quad"]  if sec_info else "Unknown",
+                "score":       sec_info["score"] if sec_info else 0,
+                "alert":       sec_info["alert"] if sec_info else "N/A",
+            }
+    stock_map_json = json.dumps(_stock_map)
+
     drill_html = ""
     for sec in rotating:
         etf  = sec["etf"]
@@ -1195,6 +1211,9 @@ def generate_html_report(sector_results, drilldown, run_dt, data_as_of,
 </div>
 
 <script>
+/* ── Full stock universe map (all sectors, injected from Python) ── */
+const STOCK_MAP = {stock_map_json};
+
 /* ── Stock Search ── */
 function searchStock() {{
   const raw = document.getElementById('stock-search').value.trim().toLowerCase();
@@ -1221,9 +1240,60 @@ function searchStock() {{
   }});
 
   if (matches.length === 0) {{
-    box.innerHTML = `<div style="color:#ef4444;font-size:13px;padding:4px 0">
-      No stock found for "<strong>${{raw}}</strong>" in the current report.
-      It may be in an AVOID sector (not drilled into) or not in our universe.</div>`;
+    /* Fall back to full universe map */
+    const query = raw.toUpperCase();
+    let foundKey = null, foundInfo = null;
+    for (const [ticker, info] of Object.entries(STOCK_MAP)) {{
+      if (ticker === query || ticker.startsWith(query) || info.name.toLowerCase().includes(raw)) {{
+        foundKey = ticker; foundInfo = info; break;
+      }}
+    }}
+    if (foundInfo) {{
+      const rotating  = foundInfo.rotating;
+      const statusBg  = rotating ? '#10b981' : '#6b7280';
+      const statusLbl = rotating ? 'ROTATING ★' : 'NOT ROTATING TODAY';
+      const quadColor = foundInfo.quad === 'Leading'   ? '#10b981'
+                      : foundInfo.quad === 'Improving' ? '#3b82f6'
+                      : foundInfo.quad === 'Weakening' ? '#f59e0b' : '#ef4444';
+      box.innerHTML = `
+        <div style="border-top:1px solid #1e3a5f;padding-top:14px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+            <span style="font-size:20px;font-weight:800;color:#f3f4f6">${{foundKey}}</span>
+            <span style="color:#9ca3af;font-size:13px">${{foundInfo.name}}</span>
+            <span style="background:${{statusBg}};color:#fff;padding:3px 10px;border-radius:6px;
+                         font-size:12px;font-weight:600">${{statusLbl}}</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">
+            <div style="background:#1f2937;border-radius:8px;padding:10px">
+              <div style="color:#6b7280;font-size:10px;text-transform:uppercase;letter-spacing:.5px">Sector ETF</div>
+              <div style="color:#f3f4f6;font-weight:600;margin-top:5px">${{foundInfo.sector_etf}}</div>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px">${{foundInfo.sector_name}}</div>
+            </div>
+            <div style="background:#1f2937;border-radius:8px;padding:10px">
+              <div style="color:#6b7280;font-size:10px;text-transform:uppercase;letter-spacing:.5px">RRG Quadrant</div>
+              <div style="color:${{quadColor}};font-weight:600;margin-top:5px">${{foundInfo.quad}}</div>
+            </div>
+            <div style="background:#1f2937;border-radius:8px;padding:10px">
+              <div style="color:#6b7280;font-size:10px;text-transform:uppercase;letter-spacing:.5px">Sector Score</div>
+              <div style="color:#f3f4f6;font-weight:600;margin-top:5px">${{foundInfo.score}} / 16</div>
+            </div>
+            <div style="background:#1f2937;border-radius:8px;padding:10px">
+              <div style="color:#6b7280;font-size:10px;text-transform:uppercase;letter-spacing:.5px">Alert</div>
+              <div style="color:#f3f4f6;font-weight:600;margin-top:5px">${{foundInfo.alert}}</div>
+            </div>
+          </div>
+          ${{!rotating ? `<div style="margin-top:12px;padding:10px 14px;background:#1f2937;border-radius:8px;
+              color:#f59e0b;font-size:12px;line-height:1.6">
+              ⚠ <strong>${{foundKey}}</strong> is in <strong>${{foundInfo.sector_etf}} (${{foundInfo.sector_name}})</strong>
+              which is currently in <strong style="color:${{quadColor}}">${{foundInfo.quad}}</strong> quadrant
+              and not meeting the rotation threshold today. Individual stock drill-down is only run
+              for rotating sectors. Check back when ${{foundInfo.sector_etf}} enters Leading/Improving.
+            </div>` : ''}}
+        </div>`;
+    }} else {{
+      box.innerHTML = `<div style="color:#ef4444;font-size:13px;padding:4px 0">
+        "<strong>${{raw}}</strong>" is not in our stock universe.</div>`;
+    }}
   }} else if (matches.length === 1) {{
     box.innerHTML = buildStockCard(matches[0]);
     matches[0].scrollIntoView({{behavior:'smooth', block:'center'}});
