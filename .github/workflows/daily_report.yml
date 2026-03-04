@@ -5,10 +5,6 @@ on:
   schedule:
     - cron: '0 14 * * 1-5'
 
-  # Runs on every push to main (used to trigger first run)
-  push:
-    branches: [ main ]
-
   # Manual trigger from GitHub Actions tab
   workflow_dispatch:
 
@@ -34,14 +30,10 @@ jobs:
       - name: Generate market report
         run: python market_report.py
 
-      - name: Rename to index.html for Pages
-        run: cp market_report.html index.html
-
-      - name: Deploy to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
-          publish_branch: gh-pages
-          include_files: index.html
-          commit_message: "Market report: ${{ github.run_number }}"
+      - name: Commit report to main branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f market_report.html
+          git diff --cached --quiet || git commit -m "chore: update market report [skip ci]"
+          git push

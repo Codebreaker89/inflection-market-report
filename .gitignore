@@ -1,9 +1,6 @@
 # Auto-downloaded market data (286MB — re-downloaded by market_report.py on first run)
 data/
 
-# Generated report output (regenerated each morning)
-market_report.html
-
 # macOS
 .DS_Store
 
