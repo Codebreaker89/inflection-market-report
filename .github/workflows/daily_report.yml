@@ -1,11 +1,11 @@
-name: Daily Market Report
+name: Daily Reports
 
 on:
-  # Auto-run every weekday at 9:00 AM EST (14:00 UTC)
+  # Weekdays at 11:10 Berlin time (CET = UTC+1 → 10:10 UTC)
   schedule:
-    - cron: '0 14 * * 1-5'
+    - cron: '10 10 * * 1-5'
 
-  # Manual trigger from GitHub Actions tab
+  # Manual trigger from the Actions tab
   workflow_dispatch:
 
 permissions:
@@ -24,16 +24,25 @@ jobs:
         with:
           python-version: '3.11'
 
+      # Combined install — market report deps + metal tracker deps
       - name: Install dependencies
-        run: pip install pandas numpy matplotlib yfinance
+        run: |
+          pip install pandas numpy matplotlib yfinance \
+                      feedparser beautifulsoup4 requests
 
+      # ── Report 1: sector rotation / stock picks ────────────────────────────
       - name: Generate market report
         run: python market_report.py
 
-      - name: Commit report to main branch
+      # ── Report 2: metal supply tracker ────────────────────────────────────
+      - name: Generate metal tracker
+        run: python metal_tracker.py
+
+      # ── Commit both HTMLs back to main ────────────────────────────────────
+      - name: Commit reports to main branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f market_report.html
-          git diff --cached --quiet || git commit -m "chore: update market report [skip ci]"
+          git add -f market_report.html metal_tracker.html
+          git diff --cached --quiet || git commit -m "chore: update reports [skip ci]"
           git push
