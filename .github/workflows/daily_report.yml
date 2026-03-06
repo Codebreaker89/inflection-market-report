@@ -1,9 +1,9 @@
 name: Daily Reports
 
 on:
-  # Weekdays at 11:10 Berlin time (CET = UTC+1 → 10:10 UTC)
+  # Weekdays at 8:00 AM Berlin time (CET = UTC+1 → 07:00 UTC)
   schedule:
-    - cron: '10 10 * * 1-5'
+    - cron: '0 7 * * 1-5'
 
   # Manual trigger from the Actions tab
   workflow_dispatch:
