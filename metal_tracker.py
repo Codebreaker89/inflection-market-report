@@ -269,10 +269,14 @@ def fetch_prices():
                 continue
             c    = hist["Close"]
             spot = float(c.iloc[-1])
+            p1d  = float(c.iloc[-2]) if len(c) >= 2 else spot
+            p7d  = float(c.iloc[max(0, len(c) - 8)])
             p1m  = float(c.iloc[max(0, len(c) - 22)])
             p2m  = float(c.iloc[max(0, len(c) - 43)])
             results.append({**m,
                 "spot":  round(spot, 2),
+                "ch1d":  round((spot - p1d) / p1d * 100, 1) if p1d else None,
+                "ch7d":  round((spot - p7d) / p7d * 100, 1) if p7d else None,
                 "ch1m":  round((spot - p1m) / p1m * 100, 1),
                 "ch2m":  round((spot - p2m) / p2m * 100, 1),
             })
@@ -495,7 +499,8 @@ tbody td.r{text-align:right;vertical-align:middle}tbody td.c{text-align:center;v
     </div>
     <div class="sec-body" id="body-prices">
       <table><thead><tr>
-        <th>Metal</th><th class="r">Spot</th><th class="r">1-Month &Delta;</th>
+        <th>Metal</th><th class="r">Spot</th><th class="r">1-Day &Delta;</th>
+        <th class="r">7-Day &Delta;</th><th class="r">1-Month &Delta;</th>
         <th class="r">2-Month &Delta;</th><th>Supply Intelligence</th>
       </tr></thead>
       <tbody id="priceBody"></tbody></table>
@@ -591,12 +596,14 @@ function renderPrices() {
     return '<tr data-metal="'+esc(m.name)+'">'
       + '<td><span class="m-name">'+esc(m.name)+'</span> <span class="m-sym">('+esc(m.symbol)+')</span>'+proxy+'</td>'
       + '<td class="r"><span class="spot">$'+fmtPrice(m.spot)+'</span><span class="unit">'+esc(m.unit)+'</span></td>'
+      + '<td class="r">'+chgSpan(m.ch1d)+'</td>'
+      + '<td class="r">'+chgSpan(m.ch7d)+'</td>'
       + '<td class="r">'+chgSpan(m.ch1m)+'</td>'
       + '<td class="r">'+chgSpan(m.ch2m)+'</td>'
       + '<td>'+brief+'</td>'
       + '</tr>';
   });
-  rows.push('<tr id="priceEmpty" class="hidden"><td colspan="5" style="text-align:center;padding:1.2rem;color:#484f58;">No price data for this metal (no exchange-traded futures).</td></tr>');
+  rows.push('<tr id="priceEmpty" class="hidden"><td colspan="7" style="text-align:center;padding:1.2rem;color:#484f58;">No price data for this metal (no exchange-traded futures).</td></tr>');
   document.getElementById('priceBody').innerHTML = rows.join('');
   document.getElementById('priceCount').textContent = PRICES.length+' metals';
 }
