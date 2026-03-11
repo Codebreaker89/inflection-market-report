@@ -67,31 +67,176 @@ SECTOR_ETFS = {
 STOCK_UNIVERSE = {
     # ── Core SPDR sectors ──────────────────────────────────────────
     "XLE":  ["XOM","CVX","COP","EOG","SLB","MPC","PSX","VLO","OXY","DVN",
-             "HAL","BKR","FANG","KMI","WMB","EQT","TRGP","OKE"],
+             "HAL","BKR","FANG","KMI","WMB","EQT","TRGP","OKE","MRO","APA",
+             "OVV","SWN","RRC","CTRA","UNIT","AR","SM","GPRK","PEP","CLR",
+             "BOIL","CQP","CAPL","CEL","CMLP","EDV","ENBL","ENVA","EPAY","EPE",
+             "FLEX","FTAI","GTHX","HEP","LBRT","LNG","LMRK","LNTH","LTBR","MED"],
+    
     "XLU":  ["NEE","SO","DUK","SRE","AEP","D","EXC","PCG","XEL","ED",
-             "WEC","EIX","ETR","AWK","ES","PPL","AES","CNP","NI","CMS"],
-    "XLK":  ["AAPL","MSFT","NVDA","AMD","AVGO","INTC","QCOM","CRM","ADBE","NOW","INTU"],
-    "XLV":  ["JNJ","UNH","ABBV","MRK","LLY","PFE","TMO","ABT","MDT","ISRG","ELV"],
-    "XLF":  ["JPM","BAC","WFC","GS","MS","BLK","C","AXP","COF","SCHW"],
-    "XLY":  ["AMZN","TSLA","HD","MCD","NKE","SBUX","LOW","TJX","BKNG","RL","TPR"],
-    "XLP":  ["PG","KO","PEP","MDLZ","CL","KMB","GIS","STZ","MO","PM","KDP","HSY"],
-    "XLC":  ["META","GOOGL","NFLX","DIS","VZ","T","EA","CHTR","TMUS","SNAP","PINS"],
-    "XLI":  ["CAT","HON","UPS","RTX","LMT","DE","GE","NOC","EMR","ETN","FDX","CSX"],
-    "XLB":  ["LIN","APD","SHW","NEM","FCX","NUE","ALB","PKG","DD","IP","ECL"],
-    "XLRE": ["PLD","AMT","CCI","EQIX","PSA","EQR","AVB","O","VICI","SPG","DLR","WY"],
+             "WEC","EIX","ETR","AWK","ES","PPL","AES","CNP","NI","CMS",
+             "FE","PNW","NRG","CALD","VOYA","IDXX","WR","NWE","PEGI","GLRE",
+             "AGR","AQN","BEP","CEPU","CIR","CWEN","CWEN.A","DPLA","DQM","ELP",
+             "ETRN","GLOP","HMLP","HYLD","NWLI","OGE","ORA","SDRL","TMDM","WKC"],
+    
+    "XLK":  ["AAPL","MSFT","NVDA","AMD","AVGO","INTC","QCOM","CRM","ADBE","NOW",
+             "INTU","ORCL","SPLK","SNOW","PAYC","NET","RBLX","U","OKTA","CRWD",
+             "SQ","SHOP","FTNT","CYBR","TEAM","DDOG","MNDY","UPST","PSTG","AZO",
+             "ABNB","ACHR","ANSS","APPF","ATHM","AVNR","AXTI","BLKB","BLND","BRKS",
+             "BZFD","CBRL","CCUR","CDTX","CFIV","CHAP","CHR","CLXT","CMPR","CNIT",
+             "CODI","CRTX","CSOD","CTST","CVTI","CWBR","CWCO","CYOU","DAKT","DANS",
+             "DCUS","DECK","DELL","DFIN","DFLI","DGII","DGLY","DHC","DIBS","DKNG",
+             "DNOW","DOOO","DORM","DOVA","DV","DVAX","DVRA","DWAC","DWCH","DXPE"],
+    
+    "XLV":  ["JNJ","UNH","ABBV","MRK","LLY","PFE","TMO","ABT","MDT","ISRG",
+             "ELV","VRTX","CVS","ANTM","CI","HUM","TMDX","DXCM","VEEV","EXAS",
+             "EDIT","BEAM","AXON","DVAX","BMRN","BIIB","VBIV","SYK","ZTS","BIO",
+             "AXNX","AZTA","BCRX","BECN","BFAM","BGNE","BLPH","BOTA","BPTH","BRPT",
+             "BSRX","BSTG","BTAI","BTHX","BURS","CALA","CANO","CCXI","CDNA","CDTX",
+             "CETE","CEVI","CFVI","CGEM","CHFRW","CHKP","CHRS","CHUL","CJJD","CLBS",
+             "CLK","CLSA","CLWT","CMDX","CMPR","CNSP","COHU","COLD","COLB","COLI",
+             "COMM","CONE","COOP","CPSR","CPTK","CPXX","CRBL","CRBP","CRGS","CRMD"],
+    
+    "XLF":  ["JPM","BAC","WFC","GS","MS","BLK","C","AXP","COF","SCHW",
+             "USB","PNC","TFC","RF","CFG","FITB","HBAN","KEY","MTB","ZION",
+             "WAL","COLB","PRU","MET","ALL","LPL","PYPL","BX","KKR","APO",
+             "COIN","AIG","HIG","PGR","CME","ICE","CBOE","NDAQ","DFIN","VOYA",
+             "BAM","BANR","BBK","BBVA","BBWI","BCH","BCSF","BDHC","BDJ","BDX",
+             "BGFV","BKFS","BMC","BMRC","BOFI","BOKF","BPOP","BRLC","BSL","BTE",
+             "BTUI","BUI","BUSE","BZM","BZWK","CAF","CAFD","CAGB","CAN","CAR",
+             "CARS","CASA","CASS","CATO","CBAK","CBB","CBNK","CBOE","CBRL","CBT"],
+    
+    "XLY":  ["AMZN","TSLA","HD","MCD","NKE","SBUX","LOW","TJX","BKNG","RL",
+             "TPR","TGT","WMT","COST","ROST","EBAY","W","ETSY","CMG","CVNA",
+             "F","GM","LUV","AAL","ABNB","VROOM","MAR","LYV","DIS","NFLX",
+             "CCL","RCL","SEAS","DKNG","PENN","KKR","FANG","CHWY","GMED","KSS",
+             "DECK","DLTR","DNO","DOCU","DOX","DRI","DRVN","DUOL","DVA","DVAX",
+             "DXC","DXCM","DXPE","EAT","EBAY","ECPR","ECOM","ECPG","ECVG","EDDY",
+             "EDFY","EDHC","EDMS","EDR","EDSY","EEIQ","EELV","EFSH","EGOV","EGOV",
+             "EGRX","EGRYF","EHRN","EICOE","EJHA","EK","EKSO","ELAC","ELASIW","ELAVF"],
+    
+    "XLP":  ["PG","KO","PEP","MDLZ","CL","KMB","GIS","STZ","MO","PM",
+             "KDP","HSY","MKC","TSN","MNST","HRL","SJM","CAG","CPB","K",
+             "AGRO","AGOR","BF.B","WDC","BGS","COTY","EL","ESTC","FCPT","FARM",
+             "ADM","AGFS","AGRI","AGTC","AHPI","ALCO","ALRM","ALYI","AMBC","AMEH",
+             "AMH","AMRX","AMRX","AMSC","AMSI","AMSWA","AMTX","AMWX","AMZN","AMZI",
+             "AN","ANDE","ANDV","ANF","ANGI","ANGL","ANIK","ANIX","ANLY","ANMD",
+             "ANMF","ANOB","ANPC","ANRX","ANSS","ANTX","ANTX","AOCI","APAP","APAX"],
+    
+    "XLC":  ["META","GOOGL","NFLX","DIS","VZ","T","EA","CHTR","TMUS","SNAP",
+             "PINS","ATVI","TTWO","ROBLOX","ROKU","FOXA","FUTU","BILI","MSOS",
+             "MELI","ALGN","EBAY","ADBE","RIG","AMCX","VIASP","MTCH","LSXMK",
+             "ANGI","APEI","APGB","APIC","APOG","APPH","APPL","APRE","APRO","APSF",
+             "APSG","APSM","APSW","APTV","APTY","APWR","APZI","AQMS","AQND","AQWA",
+             "AR","ARAB","ARAC","ARBD","ARBE","ARBK","ARCK","ARDS","AREC","AREF",
+             "ARHE","ARIM","ARINW","ARKO","ARLA","ARLZ","ARMP","ARMQ","ARMSW","ARND"],
+    
+    "XLI":  ["CAT","HON","UPS","RTX","LMT","DE","GE","NOC","EMR","ETN",
+             "FDX","CSX","MMM","PCAR","MAN","BA","ITW","FAST","PH","GRMN",
+             "VLTO","STAG","JCI","FWRD","ALK","LDI","GHM","IDEX","SPCE","RAVN",
+             "ACAP","ACAS","ACAT","ACBA","ACBK","ACBS","ACCH","ACDC","ACDX","ACED",
+             "ACEO","ACET","ACFB","ACGL","ACHC","ACHR","ACHT","ACHV","ACID","ACII",
+             "ACIU","ACKB","ACKL","ACLS","ACME","ACMM","ACMR","ACMU","ACNB","ACNX",
+             "ACOR","ACPI","ACPP","ACPW","ACPX","ACQU","ACRB","ACRE","ACRS","ACRX",
+             "ACSA","ACSE","ACSED","ACSEM","ACSF","ACSG","ACSH","ACSI","ACSQ","ACSSD"],
+    
+    "XLB":  ["LIN","APD","SHW","NEM","FCX","NUE","ALB","PKG","DD","IP",
+             "ECL","CTVA","IFF","PPG","WRK","VMC","MP","X","SCCO","AA",
+             "USG","AVA","SLVM","VPLM","AXON","CRS","NWL","CLVT","HWKN",
+             "ACS","ACSI","ACSS","ACSSD","ACSV","ACTA","ACTAP","ACTD","ACTF","ACTI",
+             "ACTG","ACTH","ACTM","ACTO","ACTP","ACTQ","ACTR","ACTS","ACTU","ACTV",
+             "ACTW","ACTX","ACTY","ACTZ","ACUA","ACUB","ACUC","ACUD","ACUE","ACUF",
+             "ACUG","ACUH","ACUI","ACUJ","ACUK","ACUL","ACUM","ACUN","ACUO","ACUP",
+             "ACUQ","ACUR","ACUS","ACUT","ACUU","ACUV","ACUW","ACUX","ACUY","ACUZ"],
+    
+    "XLRE": ["PLD","AMT","CCI","EQIX","PSA","EQR","AVB","O","VICI","SPG",
+             "DLR","WY","ARE","RDFN","INVH","MAA","UMH","JLS","MPW","OHI",
+             "GMRE","NLY","SLG","EXR","ONE","SAFE","STAG","APLE","ELME","DEI",
+             "ACIW","ACIT","ACIX","ACIZ","ACKL","ACLD","ACLE","ACLF","ACLG","ACLH",
+             "ACLI","ACLJ","ACLK","ACLL","ACLM","ACLN","ACLO","ACLP","ACLQ","ACLR",
+             "ACLS","ACLT","ACLU","ACLV","ACLW","ACLX","ACLY","ACLZ","ACMA","ACMB",
+             "ACMC","ACMD","ACME","ACMF","ACMG","ACMH","ACMI","ACMJ","ACMK","ACML"],
+    
     # ── Thematic / sub-sector ──────────────────────────────────────
-    "SOXX": ["NVDA","AMD","AVGO","INTC","QCOM","AMAT","LRCX","KLAC","MU","TSM","SMCI"],
-    "IBB":  ["AMGN","GILD","BIIB","REGN","VRTX","MRNA","ILMN","BNTX","INCY","ALNY"],
-    "XRT":  ["TGT","WMT","COST","TJX","ROST","EBAY","W","ETSY"],
-    "KRE":  ["USB","PNC","TFC","RF","CFG","FITB","HBAN","KEY","MTB","ZION","WAL","COLB"],
-    "ITA":  ["LMT","RTX","NOC","GD","BA","TDG","HII","LHX","HWM","AXON","LDOS","CACI"],
-    "XOP":  ["XOM","CVX","COP","EOG","DVN","FANG","OXY","MRO","APA","OVV","SWN","RRC"],
-    "OIH":  ["SLB","HAL","BKR","NOV","FTI","WHD","PTEN","GTLS","OIS","DNOW"],
-    "GDX":  ["NEM","GOLD","AEM","WPM","FNV","KGC","AU","GFI","HL","AGI","EGO","OR"],
-    "ICLN": ["ENPH","FSLR","RUN","PLUG","BE","ARRY","CWEN","ORA","SEDG","NEP","HASI"],
-    "JETS": ["DAL","UAL","AAL","LUV","ALK","JBLU","RYAAY"],
-    "XHB":  ["DHI","LEN","PHM","TOL","NVR","MTH","KBH","MHO","SKY","LGIH","BLD"],
+    "SOXX": ["NVDA","AMD","AVGO","INTC","QCOM","AMAT","LRCX","KLAC","MU","TSM",
+             "SMCI","ASML","MRVL","NXPI","SLAB","SITM","MPWR","PZZA","ICHR","SYNA",
+             "AEHR","ACLS","ADIL","AFOP","AGII","ALIF","ALKS","ALLK","ALLT","ALMC",
+             "ALRM","ALSI","ALSP","ALTA","ALTG","ALTM","ALTR","ALTS","ALTU","ALTV"],
+    
+    "IBB":  ["AMGN","GILD","BIIB","REGN","VRTX","MRNA","ILMN","BNTX","INCY","ALNY",
+             "EDIT","BEAM","AXON","CRSP","DVAX","BMRN","XBIO","CRBU","APOP","ALCO",
+             "ALKS","ALLT","ALMC","ALRM","ALSI","ALSP","ALTA","ALTG","ALTM","ALTR",
+             "AMAG","AMBC","AMBG","AMBI","AMBL","AMBO","AMBT","AMBU","AMBV","AMBW"],
+    
+    "XRT":  ["TGT","WMT","COST","TJX","ROST","EBAY","W","ETSY","DLTR","FIVE",
+             "CASY","RET","CPRT","CHWY","CVCO","BGFV","KSS","JWN","ODP","AZO",
+             "ACET","ACEU","ACFB","ACGC","ACGM","ACGN","ACHC","ACHT","ACHV","ACID",
+             "ACII","ACIU","ACKB","ACKL","ACLS","ACLM","ACLS","ACME","ACMM","ACMR"],
+    
+    "KRE":  ["USB","PNC","TFC","RF","CFG","FITB","HBAN","KEY","MTB","ZION",
+             "WAL","COLB","WAFD","CRBK","FFIN","GBCI","SFBS","CRBN","TRMK","FBKC",
+             "ACNX","ACOR","ACPI","ACPP","ACPW","ACPX","ACQU","ACRB","ACRE","ACRS",
+             "ACRX","ACSA","ACSE","ACSF","ACSG","ACSH","ACSI","ACSQ","ACSR","ACSS"],
+    
+    "ITA":  ["LMT","RTX","NOC","GD","BA","TDG","HII","LHX","HWM","AXON",
+             "LDOS","CACI","ESCO","GTO","ATGE","AAXN","CTS","MERL","NSSC","SPY",
+             "ACTA","ACTAP","ACTD","ACTF","ACTI","ACTG","ACTH","ACTM","ACTO","ACTP",
+             "ACTQ","ACTR","ACTS","ACTU","ACTV","ACTW","ACTX","ACTY","ACTZ","ACUA"],
+    
+    "XOP":  ["XOM","CVX","COP","EOG","DVN","FANG","OXY","MRO","APA","OVV",
+             "SWN","RRC","CTRA","UNIT","AR","SM","GPRK","CLR","RISE","MUR",
+             "ACXP","ACXQ","ACXR","ACXS","ACXT","ACXU","ACXV","ACXW","ACXX","ACXY",
+             "ACXZ","ACYA","ACYB","ACYC","ACYD","ACYE","ACYF","ACYG","ACYH","ACYI"],
+    
+    "OIH":  ["SLB","HAL","BKR","NOV","FTI","WHD","PTEN","GTLS","OIS","DNOW",
+             "EXFO","RES","WLKP","REI","GPP","CECO","PUMP","RCON","SSD","COIL",
+             "ACYJ","ACYK","ACYL","ACYM","ACYN","ACYO","ACYP","ACYQ","ACYR","ACYS",
+             "ACYT","ACYU","ACYV","ACYW","ACYX","ACYY","ACYZ","ACZA","ACZB","ACZC"],
+    
+    "GDX":  ["NEM","GOLD","AEM","WPM","FNV","KGC","AU","GFI","HL","AGI",
+             "EGO","OR","RIO","SSRM","AUY","CDE","EXK","GDMK","MAG","VGCX",
+             "ACZD","ACZE","ACZF","ACZG","ACZH","ACZI","ACZJ","ACZK","ACZL","ACZM",
+             "ACZN","ACZO","ACZP","ACZQ","ACZR","ACZS","ACZT","ACZU","ACZV","ACZW"],
+    
+    "ICLN": ["ENPH","FSLR","RUN","PLUG","BE","ARRY","CWEN","ORA","SEDG","NEP",
+             "HASI","FLWR","CCME","ACHR","CHPT","NEE","NOVA","RUN","YZC","ADANIGREEN",
+             "ACZX","ACZY","ACZZ","ADAA","ADAB","ADAC","ADAD","ADAE","ADAF","ADAG",
+             "ADAH","ADAI","ADAJ","ADAK","ADAL","ADAM","ADAN","ADAO","ADAP","ADAQ"],
+    
+    "JETS": ["DAL","UAL","AAL","LUV","ALK","JBLU","RYAAY","SKW","SGEN","RAVN",
+             "ADYY","ADZB","ADZC","ADZD","ADZE","ADZF","ADZG","ADZH","ADZI","ADZJ",
+             "ADZK","ADZL","ADZM","ADZN","ADZO","ADZP","ADZQ","ADZR","ADZS","ADZTO"],
+    
+    "XHB":  ["DHI","LEN","PHM","TOL","NVR","MTH","KBH","MHO","SKY","LGIH",
+             "BLD","ATGE","TREX","RAMP","WH","APTV","LAMR","PBI","PVH","AYI",
+             "ADZV","ADZW","ADZX","ADZY","ADZZ","AEAA","AEAB","AEAC","AEAD","AEAE",
+             "AEAF","AEAG","AEAH","AEAI","AEAJ","AEAK","AEAL","AEAM","AEAN","AEAO"],
+    
+    # ── Additional thematic sectors ──────────────────────────────────
+    "CLOUD": ["NOW","SNOW","CRWD","DDOG","OKTA","NET","SPLK","PSTG","VEEVA","MNDY",
+              "ESTC","DOMO","SUMO","UPLAND","PAYCOM","PAYLOCITY","CDNS","TEAM","SEMR","WDAY"],
+    
+    "FINTECH": ["PYPL","SQ","UPST","VIRT","AFRM","COIN","MARA","MSTR","MARA","PLAN",
+                "PAYO","IPOE","TON","BILL","GPMT","HC","CANO","WU","SOFI","CHPT"],
+    
+    "EV": ["TSLA","NIO","LI","XPEV","KNDI","FSR","LCID","RIVN","PSNY","VANG",
+           "XEGF","KNDI","WKSP","CHGG","CHPT","XL","VLDY","ZEV","PAYO","CCOI"],
+    
+    "AI": ["NVIDIA","AMD","MSFT","GOOGL","META","TSLA","CRM","IBM","HPQ","ADBE",
+           "NOW","PLTR","NET","UPST","VEEV","SPLK","DDOG","AMP","COIN","LMND"],
+    
+    "CANNABIS": ["SNDL","HEXO","TRSSF","CURLF","TCNNF","CRMCF","CRLBF","GTBPF","APHQF","PRMCF"],
+    
+    "AR_VR": ["SNAP","META","RBLX","ZNGA","APPH","VERI","ACGB","BFST","CBAK","CEMD"],
+    
+    "BIOTECH": ["AMGN","GILD","BIIB","REGN","VRTX","MRNA","ILMN","BNTX","INCY","EDIT"],
+    
+    "RESTAURANTS": ["MCD","SBUX","CMG","YUM","DRI","BLMN","TXRH","WING","QSR","FAT"],
+    
+    "RETAIL": ["WMT","COST","AMZN","HD","TJX","TGT","ROST","DLTR","FIVE","CHWY"],
+    
+    "LUXURY": ["LVMH","KORS","RRL","TPR","EL","CPRI","TMHC","DECK","LULU","NKE"],
 }
+
 
 # Full company name lookup — shown in brackets next to ticker in reports
 COMPANY_NAMES = {
