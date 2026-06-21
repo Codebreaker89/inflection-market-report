@@ -34,6 +34,56 @@
 
 ---
 
+## GitHub Setup
+
+### Repo
+`https://github.com/Codebreaker89/inflection-market-report` (private)
+
+The fire trading system lives here alongside the existing market report. GitHub Actions runs the daily scan automatically — no Mac needs to be on.
+
+### GitHub Secrets (required for email)
+Go to: repo → Settings → Secrets and variables → Actions
+
+| Secret name | Value |
+|---|---|
+| `GMAIL_USER` | `dahakehemant@gmail.com` |
+| `GMAIL_APP_PASSWORD` | your Gmail App Password |
+
+### Daily Schedule
+GitHub Actions workflow (`fire_scan.yml`) runs Mon–Fri at 9:00 AM UTC (10am CET / 11am CEST). Does: scan → history update → email send → commits `scan_history.csv` + `last_scan.json` back to repo.
+
+### Trigger Manually from GitHub
+```bash
+# Via CLI (requires gh installed)
+gh workflow run fire_scan.yml --repo Codebreaker89/inflection-market-report
+
+# Or via browser:
+# https://github.com/Codebreaker89/inflection-market-report/actions → Fire Daily Scan → Run workflow
+```
+
+### Setting Up on a New Mac
+```bash
+# 1. Clone the repo
+git clone https://github.com/Codebreaker89/inflection-market-report.git ~/Claude/Projects/fire
+
+# 2. Run setup (installs Python packages, creates config.py)
+cd ~/Claude/Projects/fire
+bash setup.sh
+
+# 3. Fill in Gmail App Password in config.py (only needed for local notify.py runs)
+#    GitHub Actions uses secrets — no config.py needed there
+```
+
+After step 3, the Mac can run scans locally. The scheduled daily scan + email already runs on GitHub Actions without any Mac involvement.
+
+### Personal Access Tokens
+Never commit tokens to the repo. If you need to push again:
+1. Generate at https://github.com/settings/tokens (check `repo` + `workflow` scopes)
+2. Use as: `git remote set-url origin https://Codebreaker89:TOKEN@github.com/...`
+3. Revoke the token immediately after pushing at https://github.com/settings/tokens
+
+---
+
 ## How the System Runs
 
 ### Fully Automatic (Mon–Fri 10am)
