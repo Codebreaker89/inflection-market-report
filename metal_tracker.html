@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Metal Supply Tracker</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d1117;color:#c9d1d9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.5}
+header{background:#161b22;border-bottom:1px solid #30363d;padding:9px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:30}
+header h1{font-size:13px;font-weight:700;color:#e6edf3;white-space:nowrap}
+header .ts{font-size:11px;color:#6e7681;flex:1}
+.hbadge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;white-space:nowrap}
+.hbadge.red{background:#3d0e0e;color:#f85149}.hbadge.dim{background:#21262d;color:#8b949e}
+.filter-strip{background:#0d1117;border-bottom:1px solid #21262d;padding:8px 18px;position:sticky;top:37px;z-index:29;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.filter-strip .label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#484f58;white-space:nowrap;margin-right:4px}
+.mf{font-size:11px;font-family:inherit;background:none;border:1px solid #21262d;color:#6e7681;padding:3px 10px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:all .12s}
+.mf:hover{border-color:#58a6ff;color:#c9d1d9}.mf.active{background:#1f3d6e;border-color:#388bfd;color:#e6edf3;font-weight:700}
+.page{padding:14px 18px 50px;max-width:1500px;margin:0 auto}
+.sec-block{margin-bottom:22px}
+.sec-head{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px 6px 0 0;cursor:pointer;user-select:none;border:1px solid transparent}
+.sec-head:hover{filter:brightness(1.1)}
+.sec-head .tog{font-size:10px;min-width:10px}.sec-head .stitle{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.sec-head .snote{font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;opacity:.65}.sec-head .scnt{margin-left:auto;font-size:11px;opacity:.6}
+.sec-prices{background:#0d1f35;border-color:#1e3d6e;color:#58a6ff}
+.sec-events{background:#2d0f0f;border-color:#5c1a1a;color:#f85149}
+.sec-stocks{background:#0d2e17;border-color:#1a5c30;color:#3fb950}
+.sec-body{border:1px solid #21262d;border-top:none;border-radius:0 0 6px 6px;overflow:hidden;overflow-x:auto}
+.sec-body.collapsed{display:none}
+table{width:100%;border-collapse:collapse}
+thead th{background:#161b22;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6e7681;padding:7px 11px;border-bottom:1px solid #21262d;white-space:nowrap;text-align:left}
+thead th.r{text-align:right}thead th.c{text-align:center}
+tbody tr{border-bottom:1px solid #161b22}tbody tr:last-child{border-bottom:none}
+tbody tr:hover td{background:#161b22}tbody td{padding:7px 11px;vertical-align:top}
+tbody td.r{text-align:right;vertical-align:middle}tbody td.c{text-align:center;vertical-align:middle}
+.chg{font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pos{color:#3fb950}.neg{color:#f85149}.neu{color:#6e7681}
+.m-name{font-weight:600;color:#e6edf3}.m-sym{color:#6e7681;font-size:11px}
+.spot{font-weight:600;color:#e6edf3;font-variant-numeric:tabular-nums}.unit{font-size:11px;color:#6e7681;display:block}
+.proxy-badge{font-size:10px;background:#1a2e1a;color:#3fb950;padding:1px 5px;border-radius:3px;margin-left:4px}
+.b-sent{font-size:11px;font-weight:700}.b-sent.up{color:#f85149}.b-sent.down{color:#3fb950}.b-sent.mix{color:#6e7681}
+.b-causes{font-size:11px;color:#58a6ff;margin-top:2px}.b-causes span{display:block}.b-causes span::before{content:"→ ";color:#30363d}
+.ev-tabs{display:flex;gap:5px;flex-wrap:wrap;padding:8px 11px;background:#0d1117;border-bottom:1px solid #21262d}
+.etab{font-size:11px;font-family:inherit;background:none;border:1px solid #21262d;color:#6e7681;padding:2px 9px;border-radius:4px;cursor:pointer;white-space:nowrap}
+.etab:hover{border-color:#58a6ff;color:#c9d1d9}.etab.active{border-color:#5c1a1a;background:#2d0f0f;color:#f85149}
+.ev-type{font-size:12px;font-weight:700;white-space:nowrap}.ev-ctry{font-size:12px;color:#8b949e}
+.ev-metal{font-size:12px;color:#8b949e}.ev-date{font-size:12px;color:#6e7681;white-space:nowrap}
+.ev-title a{color:#c9d1d9;text-decoration:none}.ev-title a:hover{color:#58a6ff}
+.ev-cause{font-size:11px;color:#58a6ff;margin-top:3px}.ev-cause::before{content:"↳ ";color:#30363d}
+.ev-src{font-size:11px;color:#484f58;margin-top:2px}
+.eff{font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;white-space:nowrap}
+.eff.up{background:#3d0e0e;color:#f85149}.eff.down{background:#0e2e1a;color:#3fb950}.eff.q{background:#1c1c2e;color:#a371f7}
+.c-red{color:#f85149}.c-orange{color:#d29922}.c-purple{color:#a371f7}.c-teal{color:#39c5cf}
+.c-yellow{color:#e3b341}.c-pink{color:#ec4899}.c-green{color:#3fb950}.c-lime{color:#7ee787}.c-gray{color:#6e7681}
+.metal-group td{background:#161b22!important;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#8b949e;padding:6px 11px;border-top:2px solid #21262d}
+.co-name{font-weight:600;color:#e6edf3}.co-tick{font-size:10px;color:#484f58;display:block}
+.co-ctry{font-size:12px;color:#8b949e}.co-exch{font-size:11px;color:#484f58}
+.hidden{display:none!important}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#30363d;border-radius:2px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>&#x2B21; Metal Supply Tracker</h1>
+  <span class="ts">Generated: <strong id="genTime"></strong></span>
+  <span class="hbadge red" id="upBadge"></span>
+  <span class="hbadge dim" id="totalBadge"></span>
+  <a href="market_report.html" style="font-size:11px;color:#58a6ff;text-decoration:none;border:1px solid #1e3d6e;padding:3px 10px;border-radius:4px;">&#8592; Market Report</a>
+</header>
+
+<div class="filter-strip">
+  <span class="label">Filter:</span>
+  <button class="mf active" data-metal="ALL"        onclick="setMetal(this)">All</button>
+  <button class="mf" data-metal="Gold"              onclick="setMetal(this)">Gold</button>
+  <button class="mf" data-metal="Silver"            onclick="setMetal(this)">Silver</button>
+  <button class="mf" data-metal="Copper"            onclick="setMetal(this)">Copper</button>
+  <button class="mf" data-metal="Aluminum"          onclick="setMetal(this)">Aluminum</button>
+  <button class="mf" data-metal="Steel"             onclick="setMetal(this)">Steel</button>
+  <button class="mf" data-metal="Nickel"            onclick="setMetal(this)">Nickel</button>
+  <button class="mf" data-metal="Zinc"              onclick="setMetal(this)">Zinc</button>
+  <button class="mf" data-metal="Platinum"          onclick="setMetal(this)">Platinum</button>
+  <button class="mf" data-metal="Palladium"         onclick="setMetal(this)">Palladium</button>
+  <button class="mf" data-metal="Rare Earths"       onclick="setMetal(this)">Rare Earths</button>
+  <button class="mf" data-metal="Lithium"           onclick="setMetal(this)">Lithium</button>
+  <button class="mf" data-metal="Cobalt"            onclick="setMetal(this)">Cobalt</button>
+  <button class="mf" data-metal="Crude Oil"         onclick="setMetal(this)">Crude Oil</button>
+</div>
+
+<div class="page">
+
+  <!-- PRICES -->
+  <div class="sec-block">
+    <div class="sec-head sec-prices" onclick="toggleSec('prices')">
+      <span class="tog" id="tog-prices">&#9660;</span>
+      <span class="stitle">Prices</span>
+      <span class="snote">spot &middot; 1-month &middot; 2-month &middot; supply intelligence</span>
+      <span class="scnt" id="priceCount"></span>
+    </div>
+    <div class="sec-body" id="body-prices">
+      <table><thead><tr>
+        <th>Metal</th><th class="r">Spot</th><th class="r">1-Day &Delta;</th>
+        <th class="r">7-Day &Delta;</th><th class="r">1-Month &Delta;</th>
+        <th class="r">2-Month &Delta;</th><th>Supply Intelligence</th>
+      </tr></thead>
+      <tbody id="priceBody"></tbody></table>
+    </div>
+  </div>
+
+  <!-- EVENTS -->
+  <div class="sec-block">
+    <div class="sec-head sec-events" onclick="toggleSec('events')">
+      <span class="tog" id="tog-events">&#9660;</span>
+      <span class="stitle">Supply Shock Events</span>
+      <span class="snote">Mining.com &middot; Kitco &middot; Mining Weekly &middot; 20 sources</span>
+      <span class="scnt" id="evCount"></span>
+    </div>
+    <div class="sec-body" id="body-events">
+      <div class="ev-tabs" id="evTabs"></div>
+      <table style="table-layout:fixed;">
+        <colgroup>
+          <col style="width:66px"><col style="width:170px"><col style="width:105px">
+          <col style="width:105px"><col style="width:auto"><col style="width:185px"><col style="width:85px">
+        </colgroup>
+        <thead><tr>
+          <th>Date</th><th>Event Type</th><th>Metal(s)</th><th>Country</th>
+          <th>Headline</th><th>Root Cause</th><th class="c">Effect</th>
+        </tr></thead>
+        <tbody id="evBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- STOCKS -->
+  <div class="sec-block">
+    <div class="sec-head sec-stocks" onclick="toggleSec('stocks')">
+      <span class="tog" id="tog-stocks">&#9660;</span>
+      <span class="stitle">Global Metal Company Stocks</span>
+      <span class="snote">major producers by metal &middot; 10-day &middot; 20-day &middot; 1M &middot; 2M</span>
+      <span class="scnt" id="stkCount"></span>
+    </div>
+    <div class="sec-body" id="body-stocks">
+      <table><thead><tr>
+        <th>Company</th><th>Country</th><th>Exchange</th>
+        <th class="r">10-Day &Delta;</th><th class="r">20-Day &Delta;</th>
+        <th class="r">1-Month &Delta;</th><th class="r">2-Month &Delta;</th>
+      </tr></thead>
+      <tbody id="stkBody"></tbody></table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Injected data ──────────────────────────────────────────────────────────
+const PRICES = [{"name": "Gold", "ticker": "GC=F", "unit": "$/troy oz", "symbol": "Au", "proxy": false, "spot": 4166.3, "ch1d": -1.4, "ch7d": 1.4, "ch1m": -8.1, "ch2m": -11.3}, {"name": "Silver", "ticker": "SI=F", "unit": "$/troy oz", "symbol": "Ag", "proxy": false, "spot": 64.66, "ch1d": -2.4, "ch7d": 0.1, "ch1m": -14.8, "ch2m": -15.4}, {"name": "Platinum", "ticker": "PL=F", "unit": "$/troy oz", "symbol": "Pt", "proxy": false, "spot": 1669.0, "ch1d": -2.1, "ch7d": -1.1, "ch1m": -14.4, "ch2m": -17.6}, {"name": "Palladium", "ticker": "PA=F", "unit": "$/troy oz", "symbol": "Pd", "proxy": false, "spot": 1262.5, "ch1d": -0.9, "ch7d": 2.6, "ch1m": -8.1, "ch2m": -17.6}, {"name": "Copper", "ticker": "HG=F", "unit": "$/lb", "symbol": "Cu", "proxy": false, "spot": 6.35, "ch1d": -0.4, "ch7d": 1.6, "ch1m": 0.9, "ch2m": 5.8}, {"name": "Aluminum", "ticker": "ALI=F", "unit": "$/lb", "symbol": "Al", "proxy": false, "spot": 3478.5, "ch1d": -5.8, "ch7d": -8.0, "ch1m": -11.1, "ch2m": -2.2}, {"name": "Steel (HRC)", "ticker": "HRC=F", "unit": "$/ton", "symbol": "Fe", "proxy": false, "spot": 1120.0, "ch1d": 0.0, "ch7d": -0.4, "ch1m": 3.7, "ch2m": 7.1}, {"name": "Crude Oil", "ticker": "CL=F", "unit": "$/barrel", "symbol": "Oil", "proxy": false, "spot": 75.88, "ch1d": -0.9, "ch7d": -15.7, "ch1m": -22.8, "ch2m": -17.6}, {"name": "Rare Earths", "ticker": "REMX", "unit": "$ (REMX ETF)", "symbol": "RE", "proxy": true, "spot": 95.55, "ch1d": -0.5, "ch7d": 8.5, "ch1m": 3.7, "ch2m": -7.3}, {"name": "Lithium", "ticker": "LIT", "unit": "$ (LIT ETF)", "symbol": "Li", "proxy": true, "spot": 82.15, "ch1d": -1.1, "ch7d": 4.5, "ch1m": 0.5, "ch2m": -0.9}, {"name": "Cobalt", "ticker": "VALE", "unit": "$ (Vale ADR)", "symbol": "Co", "proxy": true, "spot": 15.42, "ch1d": -0.7, "ch7d": 1.8, "ch1m": -3.7, "ch2m": -13.5}];
+const EVENTS = [{"title": "Alamos expects lower Q2 output on Young-Davidson mine disruptions", "source": "Mining.com", "link": "https://www.mining.com/alamos-expects-lower-q2-output-on-young-davidson-mine-disruptions/", "pub_str": "Jun 18", "pub_sort": 1781822889.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": null, "country": null}, {"title": "BHP takes $2.3B hit on Jansen potash mine as cost forecast swells again", "source": "Northern Miner", "link": "https://www.northernminer.com/news/bhp-takes-2-3b-hit-on-jansen-as-cost-forecast-swells-again/1003892262/", "pub_str": "Jun 18", "pub_sort": 1781818211.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": "cost forecast swells again", "country": null}, {"title": "Energy Fuels lands $725M Pentagon loan for rare earths", "source": "Northern Miner", "link": "https://www.northernminer.com/news/energy-fuels-lands-725m-pentagon-loan-for-rare-earths/1003892233/", "pub_str": "Jun 18", "pub_sort": 1781817900.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Rare Earths"], "cause": null, "country": null}, {"title": "Falco lifts Quebec gold-zinc project value to $3.3B", "source": "Northern Miner", "link": "https://www.northernminer.com/news/falco-lifts-quebec-gold-zinc-project-value-to-3-3b/1003892249/", "pub_str": "Jun 18", "pub_sort": 1781817643.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Gold", "Zinc"], "cause": null, "country": null}, {"title": "Trinity Metals doubles US tungsten concentrate supply to 20%", "source": "Mining.com", "link": "https://www.mining.com/trinity-metals-doubles-us-tungsten-concentrate-supply-to-20/", "pub_str": "Jun 18", "pub_sort": 1781817377.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": null, "country": null}, {"title": "Mining’s nuclear reality check: SMRs are still not on miners’ shopping lists", "source": "Mining.com", "link": "https://www.mining.com/minings-nuclear-reality-check-smrs-are-still-not-on-miners-shopping-lists/", "pub_str": "Jun 18", "pub_sort": 1781803850.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": null, "country": null}, {"title": "Centrus Energy, Oklo sign multi-year nuclear fuel deal", "source": "Mining.com", "link": "https://www.mining.com/centrus-energy-oklo-sign-multi-year-nuclear-fuel-deal/", "pub_str": "Jun 18", "pub_sort": 1781800884.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": null, "country": null}, {"title": "BHP takes $2.3B hit on Jansen as cost of potash mine swells again", "source": "Mining.com", "link": "https://www.mining.com/bhp-takes-2-3b-hit-on-jansen-as-cost-of-potash-mine-swells-again/", "pub_str": "Jun 18", "pub_sort": 1781796976.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": "cost of potash mine swells again", "country": null}, {"title": "Falco lifts Quebec gold-zinc project value to $2.4B", "source": "Mining.com", "link": "https://www.mining.com/falco-lifts-quebec-gold-zinc-project-value-to-2-4b/", "pub_str": "Jun 18", "pub_sort": 1781796220.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Gold", "Zinc"], "cause": null, "country": null}, {"title": "Endeavour Silver hints at mine-life extension in Mexico", "source": "Northern Miner", "link": "https://www.northernminer.com/news/endeavour-silver-hints-at-mine-life-extension-in-mexico/1003892245/", "pub_str": "Jun 18", "pub_sort": 1781795360.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Silver"], "cause": null, "country": "Mexico"}, {"title": "Sponsored: New Found shifts from discovery to steady gold production", "source": "Northern Miner", "link": "https://www.northernminer.com/stock-markets-investing/sponsored-newfound-gold-shifts-from-discovery-to-production/1003892251/", "pub_str": "Jun 18", "pub_sort": 1781787624.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Gold"], "cause": null, "country": null}, {"title": "Rio Tinto’s Oyu Tolgoi resumes exports after blockade", "source": "Northern Miner", "link": "https://www.northernminer.com/news/rio-tintos-oyu-tolgoi-resumes-exports-after-blockade/1003892237/", "pub_str": "Jun 18", "pub_sort": 1781786700.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Tin"], "cause": "blockade", "country": null}, {"title": "CMOC Congo Copper Mine Strike: Tenke Fungurume’s Supply Risk", "source": "Discovery Alert", "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxPTHdraS1wS2ZXdVRmNlBFQmVXOHA5MjRzVlRKVWM4aUVaeFQ2bnN4QWoxejhJLU14YWhoZFphazBEUmFOUkNtSm5wT2NzUjdSNld4RlRQeUZEYkJRQzJUOXplUGszekVpWVVmWmpzZFJFbGdScEJWc2d1ck03blVzRUpnekpXZkZSZXY5dg?oc=5", "pub_str": "Jun 15", "pub_sort": 1781542941.0, "etype": "Labor Strike", "color": "orange", "pressure": "UP", "metals": ["Copper"], "cause": null, "country": "Congo"}, {"title": "Why Surging Lithium Demand Is Outpacing America’s Supply Chain", "source": "Discovery Alert", "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPSGhWTHhTc3hNeDlKSUFPY0NsYWhqclVYaXlrbjNtWXhVMGxSdjExS1lhbjNaSV9NXzBFS0dkM05jTnBISUpROG42REZHT1NTWlQ4cFVSRHJ2VHY1VjVHZXpwcm1QazFjUTQzaWNvQWh3cTNscTN2TXV0WVU3V0hYdy0tc0JvdnRuNHQ1eHNWQmVnZw?oc=5", "pub_str": "Jun 10", "pub_sort": 1781074800.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Lithium"], "cause": null, "country": null}, {"title": "Camino Rojo Blockade Ends: Mexico Mine Resumes Operations 2026", "source": "Discovery Alert", "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQR0JvR1hBOTQxemtWOWN3RFFaNVdCTGFwbnJjNlhuVHdGY1BsQ2thMHYxNTZabm1qWkJQUnBXd3IxZTNjVHFhdUM3ZmZXallYQTNYQkhJU0FWbVJHSXlUWTMwczdOeFdUSkJiNTJXVjZjU2VaRlBUVXo5OWhIYXRYMTdjdzRQMl9DazNYUXJzY21BZw?oc=5", "pub_str": "Jun 05", "pub_sort": 1780642800.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": null, "country": "Mexico"}, {"title": "Analysis: China’s CO2 climbs 2% in early 2026 due to ‘wasted’ wind and solar", "source": "Carbon Brief", "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNQXZ2cEZjOGRrb2tISDlNcHdBcTY2a201V3k1VzN1cXdsVFZfRTcxWFA3OVlRWkx6Wjl2Z2JFR0tkVTViVG16ZHBfZ2I3clBLb0dRLW05TUI2Q1RfVnVpcEYtanVaTUJ6NEpNNjU3N3VTdTM0SVZDa18xbW9iZ29lOW4tRHZ6RXFKa1RFYW5HNXVoVG5RN01Edm9UQ0N0cDRRdXc?oc=5", "pub_str": "Jun 04", "pub_sort": 1780556400.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": "‘wasted’ wind and solar", "country": "China"}, {"title": "Glencore’s Cerrejón shutdown deepens pressure on Colombia coal", "source": "Mining.com", "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQSVJfSGJDUHlIdVJXTjBBTXdfOWZ6Yl9ZNThYT1NMb3dFb2Z2aWNHUUFJbXhOdnU4VENGTDdvTGlEbG5tQ0FoazYwQjJFMUFRYTE3V3d4M01TOGctU01tLUV2V3lOaXpkaEQ4LTdCOXVGRDVPMjBfNHk4MVpLRDlWajJ6dlJuamFveTRiQkhB?oc=5", "pub_str": "Jun 02", "pub_sort": 1780383600.0, "etype": "Plant/Smelter Closure", "color": "red", "pressure": "UP", "metals": ["Metals"], "cause": null, "country": "Colombia"}, {"title": "UK, EU and US sanctions on Russia", "source": "Fieldfisher", "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQRkR0OE4zakg3ajgzTUI1UTg0cnk5LUlWU3VfcmdYb3VwSWJYVE43U3lXWHBGb0Vza0huN2xZN1BOM1dtZFg5YWFSYUU4T3p2TlRuUUl4RlB2cDV1QjdNVGJ3SDRTOWZkUUFpMVByc1F5TV9GWHFNV2REempsczhtRlFzNUJKZ093WTJVX0I2bDlDRl9IbGJ2NjhPbXZHV3JZRWQ5cXpJakpWYlRSVnpOSGlJbw?oc=5", "pub_str": "Jun 01", "pub_sort": 1780297200.0, "etype": "Geopolitical", "color": "purple", "pressure": "?", "metals": ["Metals"], "cause": null, "country": "Russia"}, {"title": "Alcoa Aluminium Prices Surge on China Cuts and Hormuz Fears", "source": "Discovery Alert", "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxOclE5SXdaX1pWRVU0TkktMlE2YlZHR05yd3NFQ0g4QS1XVkY4SlVld1BqcDlyT1pJUWxOSFpEby1mTW5YSkNpLVpqdWZkeFZQbU80X1ZEVlJwVTFXQ2lpeWhxMWp4bVJ1TDdwSlc2ZVYtOURzZlg0UThUN3RDaUl5UnJkT25WMnZYR0dF?oc=5", "pub_str": "May 27", "pub_sort": 1779865200.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Aluminum"], "cause": null, "country": "China"}, {"title": "Top 5 Palladium and Platinum Producers by Country", "source": "Investing News Network", "link": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxQWm82N3NYbWZKMmU2LW8xV1VlREpuUUhqZlBIVkNFZFo2QTZjMjdpbWNSUjg0bzFIYVdnLXd3REVOUzBQVEFXLTNSbmk4RmxMRkpGa2szQktqbXB6R2l6ZjJxV3RsSDN6c05hanNWVWg5TjZIWHhSNVkwb0Z6akpBckw0c1BhOVJxSEdjWVhfd2F0aVdwTVprR2RwbXprRTZUZGdWc0pBRWl6UTRyc0dCZ3B1WTVmTXg3RkNWQ1dlRW5RMnZZYmNaWkFrM3FPSTZ1YkJhZFN3?oc=5", "pub_str": "May 27", "pub_sort": 1779865200.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Tin", "Platinum", "Palladium"], "cause": null, "country": null}, {"title": "US Tariffs on Russian Palladium: Market & Trade Implications", "source": "Discovery Alert", "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQV0owQmVBMzFXekhXajhfSnVRZXZlTE9QeHBfS2VGamJXNW0tRlBpV3RTbVNuZk5POFVFOEdwYnJQblZTc1ZEUmctc3Z5Skx3ZzFuNnRBYjNWVHF4VFdFdHpCRVpHR3hOV1MtV0FiWWltLWpibElNd01pMnFyZWZOaGsyS2luSHJ5X0xaWTFNUk5YTkFW?oc=5", "pub_str": "May 22", "pub_sort": 1779433200.0, "etype": "Geopolitical", "color": "purple", "pressure": "?", "metals": ["Palladium"], "cause": null, "country": "Russia"}, {"title": "Panic in the Steel Sector - Geopolitical Dependencies Threaten Production: Strategic Resources, ArcelorMittal, and thyssenkrupp in Focus", "source": "news.financial", "link": "https://news.google.com/rss/articles/CBMi9gFBVV95cUxObjNvNXg1dm5DdDdudlROTldOempkOXY0MDAzNG9EV0x6VFB0bEpCWEtyUjhnWVd2VTk3ZXdkX2ZhUFpWLVRUTzNWRTBOYnFwVmpvSXNkTUFxUldHZ09kX0wxRVpiY1Nlb0JrUl9kNVo5ZUhXYjUyaHlDNUMyc09qazBxS0FPSGZXZFJYTXpreThsWnI3Yms2QTVsWG9ydU43WnJFb2QyLXhiR0U2djZsaGNZSW5FUnZjbU5FdjJiMFBQTU1BY3dtSG9GWE94SWFrdmNHc3RxS3J6bGJZcm11MVh3b1c3c3Nhd1pTX3VDOVd0bjhZb1E?oc=5", "pub_str": "May 22", "pub_sort": 1779433200.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Steel"], "cause": null, "country": null}, {"title": "Inflation fears are rippling through industrial metals. Here's where prices could go next", "source": "CNBC", "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxQZ0tUUTNzQzRha2N6OU5SRHZ3cUF1cXRxeUJMWjRTY1lVQTZLTGFYQnBUNlNrUWtqa3JGRlNLeThyV3dIVlZQNElGWDJ0cFFjOXRCbU1DY3gycWRENTh1QU9MMkdpZzlvZlNXRHJISjdsQnRpRFpXMk1KS25Dd2QyeXAxaTVheGtsQWdz0gGQAUFVX3lxTE1rbWxUSGtnSUFKZ09WUkdKcUhfTDFCanJZU1liT0VUcTh4d0J0SEdLYzNscFZHalJ3NnNDeEVicVpmOVVDTjREUk5uRDBQWmM3SGh4Uy0yanBDMmhWalZ0bjRCdVZfYmZtTHdEbEJEb1BYY3M5X29rTXJiRkRuR0ZxcXYtVlFHUHpaZjNlaEtPQw?oc=5", "pub_str": "May 21", "pub_sort": 1779346800.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": null, "country": null}, {"title": "Japan’s Rare Earth Magnet Crisis: China’s 2026 Export Squeeze", "source": "Discovery Alert", "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQRU5JLWxkRS1RMlF5Um5QYnl2aGo0UmptVTFTLWlSa0wzUExtTFNLRXpZUk5JbWNGbHRDYV9uamFXX0xQQlpWeS1KcDdLU0xVQVk5dDlIbGMxLW5WdDh2UkhiZVZsRTJOOEhIT1N0V3AwbF9pTjRMeVkwVHhrb1dvOXh3eWQyX2Y1V3RBUUZ3?oc=5", "pub_str": "May 20", "pub_sort": 1779260400.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Rare Earths"], "cause": null, "country": "China"}, {"title": "Structural Supply Deficits Forecast to Continue Driving Platinum Group Metal Prices Higher", "source": "Medium", "link": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxNVmI5NDk5bFY3azlsanBVWTJHTzhNRzBsVXZhTHh2MS1WWHQ4THZaSDhjYWdtNVVneHdPd2FTMDR6R0YyRmJzR1hIaEZrRldXa2R3QW1ZUzlCUGdzN0o1bnNsZUJsLXJvZkxwRF9zcWNONDhPUXE1bUFuOEVJMUZVQmtwX1hTUS1ZMGlBZnZMdmJjZ3ZValdJRG5vTlY5UXg5NUFfUGg0U0dpUUpCb1R3YnBBQnlhUUdZLUo0MkNYUWR6LUZJOGQ3WGlPbzBQcW9UTnF2ME91bVpMdw?oc=5", "pub_str": "May 19", "pub_sort": 1779174000.0, "etype": "Supply Deficit", "color": "pink", "pressure": "UP", "metals": ["Tin", "Platinum"], "cause": null, "country": null}, {"title": "Platinum, rhodium to outperform palladium in 2026, Metals Focus forecasts", "source": "Mining.com", "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOXy14blZPTU51Z1V2QlhjeDRUVEJFaWNPUHpXS2kyLXFVLUxadHItdnBZbTllRWtkSGE0SF9CU0hVUFdPemZ5ZXhKX0RwODFOaGNxMGVpa3FDUFJKVnFUSzdqWFNuUXZoMTFfZS1hbWYydkJvcmViemRTa3dzOWtXV0RNUlNoM2tKdGJEN1VERkhydlVkVDVBTlJZbThnX3RL?oc=5", "pub_str": "May 18", "pub_sort": 1779087600.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Tin", "Platinum", "Palladium"], "cause": null, "country": null}, {"title": "Zambia reopens acid exports to Congo as global scramble for battery minerals intensifies", "source": "Business Insider Africa", "link": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxPNFp0bktBS0hJTDBjUFlZRG9xcXhXQ0lFR1lOa09MS29fYVlQSXhPLTdkbGVWRHJlcmdfZGltVF9XR05TUkFELS16SjRrczBJdEpMcXFJd196eHhIbXVVb1NUaGFfSm43blZ5U0NHZlpJWG43VjVhRFNMZ1B6ellneUVtNHpvZi0zUnNlM2t0ZC03ZGpHenNnSS1KNUJWNzBIQXNXclp0dXVOUkhrakpWZFl5QWdyRU1mTGJBelRFRENhZmZHSXNwNHE3bHl2dmJudHBqdGxfdw?oc=5", "pub_str": "May 18", "pub_sort": 1779087600.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": "global scramble for battery minerals intensifies", "country": "Congo"}, {"title": "Sulfuric acid prices surge as China bans exports, commodity supply faces worst crisis since 2008", "source": "eciks.org", "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQVnIzVmlBWk5CdGdWY3hKaXUyczlSdUtEajl2M096T3lmdUtyRlFPYjNtX1ZwQlIzTmlzUEl4eHU3N0s4UFh6bndsdFQwNEtiMl9EU0hBUHZKckJyblk2UnptN0o3V0ZYakpncXRQMV9oSDNINEUwMDBJTkVoN01aREdIZlRrMnBMTnZob21TTUtPMEhOb2ViZ0NRdmFTUTVQQWl6OGZTc3RQd2Z4Q1E?oc=5", "pub_str": "May 17", "pub_sort": 1779001200.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": "China bans exports", "country": "China"}, {"title": "Platinum to remain in deficit this year, while palladium, rhodium may record surpluses – Johnson Matthey", "source": "Mining Weekly", "link": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxPYnhhX3k1TjBEU3E0dzhPNUhrUFhUTk1uX0xNbDBvWVlDWWRTalY5R0Y4YnQ1OF9YcUVyUjVDdzZReVBsOFplc3M5OWxWVGRZT0VXR1BFVl8zcjdtc1NJVU5IMGdUSkxvTzlvT2lXdENfQmxmNkNsUGMwMDlweXRndFJvS2JxM3lkbHpNOHp4N0hMbDhQeWoxM2pFVHZ5Vzg2MkRKNUdXb09oazNvS1h6bHpsZVZXdkdQSlJwNTFNOEt5SXZwdXptYWZOVl95THp6eW5jX3RBbHBIM195ZllGcw?oc=5", "pub_str": "May 14", "pub_sort": 1778742000.0, "etype": "Supply Deficit", "color": "pink", "pressure": "UP", "metals": ["Tin", "Platinum", "Palladium"], "cause": null, "country": null}, {"title": "Pedal to the Metal 2026", "source": "Global Energy Monitor", "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFBXeklaS2ZkckJvWmxIS3BueHd4WmtEOGNOYUQ5OWwwWndSN1k3Nk9lSmFhVEZJR3NHeG1rdnJpeS01b28yXzJiOGs2VzhsRDFlclhBVWtET3o4OHl6ZHc3YU1mY2JHTjJJ?oc=5", "pub_str": "May 11", "pub_sort": 1778482153.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": null, "country": null}, {"title": "Copper and nickel prices surge as steel stays flat", "source": "MSN", "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPMm41ZzRHYlRRZ1lRTjY3clYzS0l1MklwUTVDU1EwSE14MWYtQ01ETGZjMGRNOGYteEVjazhCb0xpdmVsNWNVWnNodlJoNTZPZEdtTXF5bG1pUkhwcXhSbjBPTkRBVHZVRFZDR21wNU1QZnktRWxkVE00SFZ4MlAyMEFFTHl2RFJnUW9JdEF2REYwb2F2V2o0b01WM2l1LTY0bXVBTTIzUEZaTDl6UmpYd3otTGsxdkxHTDZN?oc=5", "pub_str": "May 08", "pub_sort": 1778223600.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Copper", "Nickel", "Steel"], "cause": "steel stays flat", "country": null}, {"title": "Barrick contractor to exit Mali, lay off more than 600 people", "source": "KITCO", "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOWjMySjlKUkZWeTZEV19YX1FGLXJvVXdDU0dUSmxXQUFMSWNuZ0hRNnVvajFWU2k3WmluODJjaThmT2s1ckE2MWJHcTFsUFk5YkFhYVVRSGpjVFlNbUR5dWdicWIyMk5RMEtEUTNsZXRFNEhDZWtkT0M3N1dLRHR3RGJqS3AwNUJScGxGVklYcC1WdXUxdE1iRklId195SjdU?oc=5", "pub_str": "May 07", "pub_sort": 1778137200.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": null, "country": "Mali"}, {"title": "Mining halted at Baowu-led Simandou site over pay dispute", "source": "Mining.com", "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxPNDg2TjZfOG9QQVFMU09PSUZ1Yk9jTmxOMk13QXlrbGlkRG1rRnhKMk1fZWFGVDJqMmRZeGdVOHUzWFVIdWtrakVaMVlycG0yek9palRsZTJuZVloRURMNmhGOURFY2NjZVdxVGZRcDNjNEtKXzRRa0ZoOW1oQ3dUb1hLeGlSTHRfQjl5OGdB?oc=5", "pub_str": "May 06", "pub_sort": 1778050800.0, "etype": "Plant/Smelter Closure", "color": "red", "pressure": "UP", "metals": ["Metals"], "cause": null, "country": null}, {"title": "The Iran conflict and Asian metals markets", "source": "Recycling Today", "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxONkVBUi03RDlkaWJueEhONU1wMkowZ01Rbm9uVWRMRW9ibVRsWTdBR3FSRzhWbXZLV29raG5Td3hRY1BQckt0WHhyc1l2SG5mUmdwNEpJU2JhM2k0eUlVUjNMVFlRaDVjWnZ3YVAtbVFXbnI5WlZpVjRJb2xKMTJobDNEdGZnNno0TVE?oc=5", "pub_str": "May 05", "pub_sort": 1777964400.0, "etype": "Geopolitical", "color": "purple", "pressure": "?", "metals": ["Metals"], "cause": null, "country": "Iran"}, {"title": "Mining’s biggest risk isn’t the disaster; it’s the stopwatch", "source": "Global Mining Review", "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPdWRiN2ZIX2lTTk5NWGxyVFlKalFjTEVkRFIyZVQ5RW5SNkhUZldvS0Eza3J6aXNUWWhfRnAwaVJ4RTRIVERCUk1reXA5RTctNnZsTlRLZlpZNXJzMmY0a1ptX3JfVlh1T0FacW5aRTBLZHQzRTluVXprRkRiZXB5OFcwcWJMcENjRFkxT0dGaktVVTltbHhtd08ya0FkbVZoYlhzVDZMVXFfNTFa0gGyAUFVX3lxTE1OVjh6U2hlX2NzLUplaTRPTDNSNjZRNDJaZjZUazZQU3NqeDQyVTl2U0t6UjlHWmRRLU8tNDVscHdxSDBSX0l1ZjB0Zjl3Unc3UnJ4aDlJMlNUdjl2QXQwRWhPaVpVN1BlZE92eVJ0TEF3N1JaUHF6M2JMbjl6RWhiazk4WEE3OGxzUU53cm5kZXRLVzdJOGlTellHR256QjBlZS0yWm9VcFE2ckJaNWNIdVE?oc=5", "pub_str": "May 01", "pub_sort": 1777618800.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": null, "country": null}, {"title": "America’s big new aluminum smelter is still waiting on a power deal", "source": "Canary Media", "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQQ0NFcXo2M3QwS2lRTDduZWRYeUdBMTdZamZwQUFacWRiWkJaWUVJQjBJTmljalpienlFZ1NHaktkSFY1OHgxTnNrTzlmZTdkcFdrbU1zNVl1NHRsQWJWN2dHUlhtNXd6Yy1sdTBEdm4yTlBnU3hUZ3VtdjZEbVgteWtzQjVNVHFSU0ExTVplYmlCQ2RTaDJnQw?oc=5", "pub_str": "Apr 30", "pub_sort": 1777532400.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Aluminum", "Tin"], "cause": null, "country": null}, {"title": "Geologic Hazards and Landslides", "source": "NC Dept. of Environmental Quality (.gov)", "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxOM0g5Y1VRcU1Wc1dRbVpQNVk0dmZjT2hLdHJiRk9fWExCYWM4TG9wUUZ6bFRQZ0RBYVhFMkNKeXNCcTVVelY2WTRtVVlMM0RpZXduTHVOenVkOXhMRjJRYXNHZGlvbDAzaV9qLTRfT0FJUjdSUC1zcWU3MmtuZzZKR3IyeE5jZmxqMWJ3dmdGU3Y3ZGY2Z0FoWkdISV93VDNkOEE2M3h0M2xSMS1PVkpweFdOb2tkemFQNHNOcUgyc1FWUU0?oc=5", "pub_str": "Apr 29", "pub_sort": 1777432853.0, "etype": "Natural Disaster", "color": "teal", "pressure": "UP", "metals": ["Metals"], "cause": null, "country": null}, {"title": "War squeezes global mining as diesel and acid supplies tighten", "source": "Mining.com", "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxPNFRrTU9LVVhyS0s4SXozajVzTzVzTUV4WV82MFluZnBJMHRzV2daY1RzeGpCSjN1MUlFdVlrZm1MZWVsMXM1RURvTVUzNEl4cmVHQlR5Z090a2IyRjE4bzFsMWlHd1NQbTZzWEFCUk5YdGw4MUd0SFBnYW1ITnpSUFp6SWpjQmNCdEVlMTdNMVRQLVd1?oc=5", "pub_str": "Apr 24", "pub_sort": 1777014000.0, "etype": "Geopolitical", "color": "purple", "pressure": "?", "metals": ["Metals"], "cause": "diesel and acid supplies tighten", "country": null}, {"title": "BMI revises lithium price forecast upwards amid tightening supply", "source": "Mining Weekly", "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxON29hT2NkeEZNcmExRkt5ZkhUWkVteWNVRXh1TWQ2bkZaN3hlLW1VXzJWUl9VRXlpUDFKX19sVVZVdkJQRTB3UWMwQ3dtckFETWxIWDNkZ3dNeko4aG5xTXJtMEZGRjctSW9ETlFMZ3NRU1JVRlRwY1EtcGVhWHBpd2pvand3dkpyaEtGSnNpNkZqLU1QTlFuTDM5ejhNbTAwM1d6eVRIY2xwc3E2ejJCSktkZw?oc=5", "pub_str": "Apr 24", "pub_sort": 1777014000.0, "etype": "Geopolitical", "color": "purple", "pressure": "?", "metals": ["Lithium"], "cause": "tightening supply", "country": null}, {"title": "How the Iran war is disrupting India's steel production amid fuel shortages and rising costs", "source": "The World Economic Forum", "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQdGxfZHNtUnZxZDE3MTZIWU1IQVJRazRGWHFXaXdoSmt1YTJZVHZiWS04MFBSeFpZazRZU0tYLTc3VW05Y2FmSDZObDVSOVF4ODE0b2MxVjlaVkl4dnlyX0hzN29sR2F1ZmhtLV93UlRlR3JGQzVEYVlab0YxenpjTEZTWmowYUNLYnBRME40NkxydC1YcU9fQUhzNkRLdUFPZVE?oc=5", "pub_str": "Apr 21", "pub_sort": 1776754800.0, "etype": "Geopolitical", "color": "purple", "pressure": "?", "metals": ["Tin", "Steel"], "cause": "fuel shortages and rising costs", "country": "India"}, {"title": "The Sobering Truth About Rare Earths", "source": "Time Magazine", "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPNU90bnRIekZmQ09Xdkh5MlFzMXNNSy1NbEZpSnJURTU2cW9qbGZSSlRpV1Q4ZldtZUtOOGNfT2V0UnZHS1ZwV2JOaGZWV3poQkw1OUZPYnUyckpTQl9XZGlTRkFIWmFFYnlya3d4emthTWdTbTd2TXMxbktqdHJPajg5ckUzWlIxR0szQ3dwdVdhcXdOaGNoMjkwMm0wY2FGOEJNUzlpb3FfUlJK?oc=5", "pub_str": "Apr 21", "pub_sort": 1776754800.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Rare Earths"], "cause": null, "country": null}, {"title": "Iran war and shrinking stocks spark a global aluminum crisis", "source": "IDNFinancials.com", "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNaWlTaDBqTFhJUjFGVnlhWllSeWRUNTZDVDdRUVVQcTNwNHJZTnFMenhfcXB5MHhZTGYtcXdpcjRiUmoyeW05WU1IQ0ROMldSZTJ1ckFULXQwTXNJZ242SmgzVEdIVklvZFRQc1hCWk05S0d4amVuakNfZ3daWlNVS1VoNHJrcGpyekplbzZwLW1lcGFtZ0JxLWdIMnFrOXFudWRqcGtRX0V4R1JmZ09N?oc=5", "pub_str": "Apr 20", "pub_sort": 1776668400.0, "etype": "Geopolitical", "color": "purple", "pressure": "?", "metals": ["Aluminum"], "cause": null, "country": "Iran"}, {"title": "BHP and Lundin Mining Hit Roadblock with Vicuña Project Suspension in San Juan", "source": "thedeepdive.ca", "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQRUNMd1dQYU9kcUhSQ09tWWU2YVhfcXFiMEt4bEtzRV9KWC1TVWRnMmt6a0wzcVpjRnUycmlDZ0l2dGRuQmUxN21SSWMxVXM4aDJ5X2RqUTgzQ2xRZVo2Z3h3b3QtbWJrSEV6bFFHaVpCZnZBTHZrYXBrRy0tVlNFaWRqTGlvajdPVl9lcHJNZTdxM2RyS0JJYXNKbDBIV0dQdERwZQ?oc=5", "pub_str": "Apr 17", "pub_sort": 1776409200.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": null, "country": null}, {"title": "Aluminium in crisis: war, tariffs and a market running on empty", "source": "Reuters", "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOYWJSZnNWN1lyMWJyS1ZROUhaTWsyUHM5U3FjQkprdi0ybWkyeXhhUm5GWmlBajZMOElHQlE3cF9UTDBBczJRZzJJNS1ZZjF2TGVJLUtnVW5SelRsRUQ2c294WHY3MURhS1BuY3gyemJHb09GNFR3Y2M0NG9Jd3lFdEp6N00zc2dIeDNjY09JNXJhX3k4clo2QUpLU2s4V1RUSTkxYWJQVGE?oc=5", "pub_str": "Apr 16", "pub_sort": 1776322800.0, "etype": "Geopolitical", "color": "purple", "pressure": "?", "metals": ["Aluminum"], "cause": null, "country": null}, {"title": "Congo copper and cobalt miners cut chemical use as Iran war disrupts supplies, sources say", "source": "Reuters", "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxPd2pUTDlLNzVDRjM5T2s4UkdPZm95TWpZNGhwWlJfYy1YblFTYzNsM2wyZVl0aEozYmlzT25jMlpabTRPbFFHT2pDODJYWnRDSmc3aUdxVzNNcl9SUWR0aV9maDU4WlBqdGtiR3dCcUhWalljSmxTY29GQm1TeDJMRHRBY19xT1MyajFVM1J4MzI1ZlNTWkxSWXpuY2U1T251WDktSno2NzJUTnlyMHltY3ZUYTBhUndsTTN0T0tQRUNvNmtTUFE?oc=5", "pub_str": "Apr 14", "pub_sort": 1776150000.0, "etype": "Geopolitical", "color": "purple", "pressure": "?", "metals": ["Copper", "Cobalt"], "cause": "Iran war disrupts supplies", "country": "Congo"}, {"title": "Iran war disrupts mining activities in DRC", "source": "TRT Afrika", "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE9IOXVza1ozSTkxYVk4NDFsVHJfdXJGUllyS3FfeG8yWjUtdzdsWEZYc2lvUzhrdTRjYTVHOTN3Zm5fVV9PRzdIc2l2aFRnQVVPVVVRX0pFNHNlYkRuN2lrSWtYWDY?oc=5", "pub_str": "Apr 13", "pub_sort": 1776113684.0, "etype": "Geopolitical", "color": "purple", "pressure": "?", "metals": ["Metals"], "cause": null, "country": "Iran"}, {"title": "Strait of Hormuz instability threatens critical raw materials supply", "source": "Anadolu Ajansı", "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxORHlGTGhTbnVCVnB4ZlFodTg1MDh1WTBGT1BVaGpkWVFEbnlaNFl0ZjlQeTVwU1hMejJaSktFYU1hNmR1amdPQ04yU2VrWGU3X213SFBya3lhclBhd09RUEdtWmtZUEo3WThhdGpLTHQwQTQ0U1FzLTRVWEJ2NFdsbVZ6MEpKcVVtVVkxUTZfd0NQRGJ4bjB1T2hfRmdWMy1IWWpZbExIY1J2Q0E0ZWc?oc=5", "pub_str": "Apr 13", "pub_sort": 1776063600.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": null, "country": null}, {"title": "Lithium Giant Calls a Bottom: SQM Forecasts $15–$18/kg Price Floor for 2026", "source": "NAI500", "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQOGxxTWVXVTkyRS1fYS1wVnpBUGxjaUpxVHdtTnZNenc4MGtSLVVXNExLNGRlelNybklVTTJVUHQ1aFczT2lMVV9mUzl1b1FxX0tKNnFKZjZmRXNjaXh1YXBTRDFoWGwya1FTM0pGaUtqWVhWbVYwemxsWWx6YmhZRDc5dHZmNUItWldRa2dWTGV4S2ZxMG9VQ0FELXgwRUNMZVBXWFVVcXM?oc=5", "pub_str": "Apr 13", "pub_sort": 1776063600.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Lithium"], "cause": null, "country": null}, {"title": "Hormuz and the Export of Chaos into Global Supply Chains", "source": "ORF Middle East", "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOeTNWd0JVOEQza1gtS195dU1EMURRZUlrcDRSN2NMLWZSQkRRejlTZXV2SWFfTVctN09KVkozY3ljdDhLZ1hKV05lazhCbVpoWHVLMl9yTWJmb3NIVUxiTUptOHNXVTl5TzItdGNycFFDNXRhaEFlYzl2bHZJbGRJdjBMSzZzbWxtSUlTM0Rwd25yUQ?oc=5", "pub_str": "Apr 03", "pub_sort": 1775199600.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": null, "country": null}, {"title": "Top Gulf aluminum producer EGA halted output after Iran strike", "source": "Mining.com", "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQbUltVlYwclZ6eW82T2hYMjZTUkhtSVFwWWpxSnM0MkpOaHMzcEo4RnR4OUtMR0lUMDNoYXZ6eVI0ZnV5bVVkOXJPMm1QOTRQOEhCWnpwdm1pUVpTWGpEOGRCdzY1MHNSWlJ1SGhKSFBsQUZtS0pvLXhVMk9qTV9TZmtNVlJfblN4ak1iMHJ5QXVlT2Zx?oc=5", "pub_str": "Apr 01", "pub_sort": 1775026800.0, "etype": "Plant/Smelter Closure", "color": "red", "pressure": "UP", "metals": ["Aluminum"], "cause": "Iran strike", "country": "Iran"}, {"title": "Aluminium in energy crossfire as Hormuz uncertainty drags on", "source": "Fastmarkets", "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQOVBkZlotV3Bsa2NUR3ZaZlJhVE5KTE9yVVZTOThCM2NFVFd3bDM0YzRhbjFITERFVExpbGFsRjh5dm44LUlsbkVSQ0pOdFFKVF9YX2RLMVhqRjg2WVkteGNkODJ5X19vLWh4YzhsdkdRSi0zZl9BMXZxMG5ZV19KVkU5UU9yQjNzekJIZEEwbE15U3ZtbWR5Z0dtQlVKMU0?oc=5", "pub_str": "Apr 01", "pub_sort": 1775026800.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Aluminum"], "cause": "Hormuz uncertainty drags on", "country": null}, {"title": "Beyond oil: 9 commodities impacted by the Strait of Hormuz crisis", "source": "The World Economic Forum", "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPcU51SVRBaUh5anFVNkh6QTQtblFvbnpuM2Z1T3lReVE5dWpRY014VXhTZmdVODlDUEV6ODVLVzR4N200elpxREJjN0pWSlE4U09tQVRVQmdrVmcwSXdKbUQxMDktcW9xVDZCX2hBclU2b1RIRlhZX19QZDBTV0toeWhNbndYQ1h6R1FHeGJwc3U4REVMMnR6R1p1OGd2X2M?oc=5", "pub_str": "Apr 01", "pub_sort": 1775026800.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": null, "country": null}, {"title": "Top Copper, Silver, And Gold Producers In Africa", "source": "Farmonaut", "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNVWRRMVc0UEtTbkpQR1dRc2MtTjM0QUVWRFJtSEF2RHhBS00tbnozWnktTFN3RG1VN21Vcl91NkFkX0EzZDk1bFI5MUxsRDhLQ0puVmhHNXhGUGk3QVhmZkJyZkNfckM4a3JhU2dRSHJDbnhsMDUxbk5iWklhSlkzZTlPUmlLUQ?oc=5", "pub_str": "Mar 31", "pub_sort": 1774981474.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Gold", "Silver", "Copper"], "cause": null, "country": null}, {"title": "The Silver Shortage is Real", "source": "Investorideas.com", "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNanVMWVgxaXJsbVh5Vk9UMkdwSGVra2xUeEMyTDhXeGlWeEw4Y2FOQWtpMkYyVWFJR0J6NTJUU1ZvWWNoc1Baa0owWVdxcnFVdXl2QzBLMHpGY3pVd19tSTh0NEFDNUpyTkdUT3pFdlduWGhvdVNFT1llbmtaWHlBSlR2anJaMGRwTlNGb3JadXpjWjhQUjZVWExfWGo5SGQyQVFnYmFJaw?oc=5", "pub_str": "Mar 20", "pub_sort": 1773990000.0, "etype": "Supply Deficit", "color": "pink", "pressure": "UP", "metals": ["Silver"], "cause": null, "country": null}, {"title": "Global race as market for high-grade iron ore grows", "source": "Institute for Energy Economics and Financial Analysis (IEEFA)", "link": "https://news.google.com/rss/articles/CBMie0FVX3lxTFB6aUhNal9fbHpxSk9tREctUTdyZXE0ZWNUcFpWRnBScHBOak1DMmhEeXg1dmZRZS1pMGV1Z3BxOGZTSmw2R1FlNHVSNVRmcnlMa2RtQUtSWm90c29PMktyMW9xdEpFYllOcHlJSXg0bWhKWm90bjhZQTRiZw?oc=5", "pub_str": "Mar 19", "pub_sort": 1773903600.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Steel"], "cause": "market for high", "country": null}, {"title": "Global high-grade iron ore market is set to grow", "source": "Institute for Energy Economics and Financial Analysis (IEEFA)", "link": "https://news.google.com/rss/articles/CBMiekFVX3lxTE1xTUdOeENETnd0ZUNLTU11SllhaUpqR1BKQ2dEbkw0M0lYUnpIdWpPWlZ2R3RYRUk0N2EzaktuUEZjOHFDREJiY1JQdThMX0NySUpQMnRoTDdwMUNhU3RhWlB6TjZsYnhVSWJrN1ZqUzgwbUg5YXJTU3Bn?oc=5", "pub_str": "Mar 19", "pub_sort": 1773903600.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Steel"], "cause": null, "country": null}, {"title": "Cobalt shortages driven by Congo curbs seen lasting through 2030", "source": "Mining.com", "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNZWNod0FTcHphSlFSeWNxVkF0bnE0cVpqS20yc0RNRkhmYjZfQzFlZFNIYm9feF8tRkhSZW5NRy1TTl9abXhxV3hzZG1xR0I2bzFhUUNDWG44ZEJCcngxTU1qVnRqVW9veGNPSEdjNG4wSDA4eWFsQXRYZUFfV244al9PTkloZkN3dllMcWsxYkJ6NGprUDlj?oc=5", "pub_str": "Mar 17", "pub_sort": 1773730800.0, "etype": "Supply Deficit", "color": "pink", "pressure": "UP", "metals": ["Cobalt", "Tin"], "cause": null, "country": "Congo"}, {"title": "Aluminum Rises as Major Smelter Slashes Output in Middle East", "source": "Bloomberg.com", "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOdTJNeE92cUdyeDZ0YkJUaFVNQVVrbFJhczVEc291OFMtblEwMkNOc1diY0NqVk44c0xodFNmb0c4ZWV3dmpwRkdjMnRSS09hd1VEVWJXdno0Z0VpSDNhal9yY2EzU1lpMi1VRm1yVjVHd3RQTnE4MndaQVltOFVaRW5OcFUwcXJkMTV1LW5nc1RsOFE5X0lkajB2aXViT2ZZeXdWRDY1YUV0Z1QwR0RDQzZ3?oc=5", "pub_str": "Mar 16", "pub_sort": 1773644400.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Aluminum"], "cause": "Major Smelter Slashes Output in Middle East", "country": null}, {"title": "Bahrain starts output cuts at world’s top aluminum smelter", "source": "Fortune", "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPSmRsczNiLUhYUjR0UlJYNmpOWW9KVzJobTg3QzdLMmlVcS0zOTVXZDZ0bzE0am1IOEpucXFiWjNCRkhza1FyWUpOcGEtQ3lTdzhNSklLTC02TkttWVJ1eVFJSGVIRHpuX09SWXRkSm4xR0xsSDBLMC1ocW1ndUwzWmYwb0c5Z283OHd2VFVfY0lvRlppNXBR?oc=5", "pub_str": "Mar 15", "pub_sort": 1773558000.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Aluminum"], "cause": null, "country": "Bahrain"}, {"title": "Workers strike at Glencore’s Australia refinery over pay dispute", "source": "Mining.com", "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxNVEpJRWhaek9uQmx4RkppMExveno2dnhvajQ1YXl4TjN1cnZtUl9TdWxkb05GS0Ezb1JCbmdFODdXODVySElqUmRaNEZxTjlnZDlhejQ5dnB0VzU3SGh5RGFfOEFnY0F2SUdzLU5nLVdiUWg5TThIU2syV2pQcDRSOWFObkF2N2t2clRtTmVmclI1Q2RleEE?oc=5", "pub_str": "Mar 13", "pub_sort": 1773385200.0, "etype": "Labor Strike", "color": "orange", "pressure": "UP", "metals": ["Metals"], "cause": null, "country": "Australia"}, {"title": "India's small steelmakers face production cuts amid LNG shortages due to Iran war", "source": "Reuters", "link": "https://news.google.com/rss/articles/CBMi6AFBVV95cUxPazVQRWZSbF9OZTkzVkQxNWVqdzh5cTF1VU5yTHppRDNjVHdrTTVZYk9VRTFLZzZUV09TTTRjT3RyVXNiLVgyRldVeUtLc2J6cG9PeDQ3eTRZdEltRkQ3bG9UZFNpVXJjLUV3TFJhWUxSNU02U3NOZGdwQjItVjd6MnJqb2tibjZ6bndCWVdtTjRTbU9SYm0xZDZMdGJiUWUySjhJcl9BVTZCSVJTYmZNMTBjRWlqNFIzY0l2ZVpZVGhEQTVJVUZJYWp6X3NxNW1Gemt5RnBoc29BMVltZzVLUnFLVlI3ZGhW?oc=5", "pub_str": "Mar 10", "pub_sort": 1773126000.0, "etype": "Geopolitical", "color": "purple", "pressure": "?", "metals": ["Steel"], "cause": "Iran war", "country": "India"}, {"title": "Lithium, Silver Deficits Loom Amid Mexico's Mining Constraints", "source": "Mexico Business News", "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPQ05hSzRyNUk5Ym1pM1g2aEgyYjJJbDNZTHpqMHVvLUpIZ0tkSldLTmhYeHVTa2Z3Ymx0YjFxQ1lXdkt6SUNRYXpqOFo2aklGaThTUjI3Y0JkQUQ1Y29IQzJjUFo5YW1HYmM2TkJkYTBYN29kOUV1RFVBQU5HMkJ2STBmZDRDc1ZmdjVld256ZGJqamlsNEx3SUhWekZYbEpmUGc?oc=5", "pub_str": "Mar 09", "pub_sort": 1773039600.0, "etype": "Supply Deficit", "color": "pink", "pressure": "UP", "metals": ["Silver", "Lithium"], "cause": "Mexico's Mining Constraints", "country": "Mexico"}, {"title": "Low-margin Successes: Russia has managed to partially offset the decline in oil exports with other commodity groups, but the scope for further gains is limited", "source": "Re: Russia", "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTE9IdnRZTVFXZ2lLa2ZSb2R0a0txdVVXUVNBX3B0TVBBS2VsNVUtbmRHajNueHhXTEhwemY2VzFRSG84UVVZM0VwYzFGdUZCNXNpMFE?oc=5", "pub_str": "Mar 08", "pub_sort": 1772933264.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Metals"], "cause": "managed to partially offset the decline in oil exports with o", "country": "Russia"}, {"title": "Green Hydrogen Can Help US Farmers & Fix Wind Power’s Curtailment Problem, Too", "source": "CleanTechnica", "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOeDlEdFlxal9TejUxc1BDTkc3UEk2RVlpNUJPdXVRaEhUZVpNeVFDVlVUTXl4YTlZNm9GTzFFNkFPa0F3X09NM1U1R2h1RWFfQWdaU1gxUFoxZ1F2S3Y1QkFhZDlQNW9zU0JDYTU2cnpkaEVZdm54OGJvVG5sTm9mUGdKMmMxa0NpQXc3TXlPUXJtcVNGOEpqYmNqdHNMampKS3BYa20xMHJWMzNJNnVFQV9B0gG6AUFVX3lxTE9FQUFVYjluZFgySjdmbnlGRkhIZjcwZ2lZWjRYbGg4TGtwSmFKR1Fka3NEWXJGdGJtaURhZXRFb1ZOR1ZvT3VHdnZZV2lJYWdjbG9nRkRacVd6d04zdUpEN0ptVzczdkl1QVdBRHNSNU5OdXhDQnl0V3JMclNpRmZ5TENmQnJVVUNUa2dPVWZWME5tci1hMm1iLWYxVFpSaVgxenFuenZ4TmxSSnB0amFuZ0ZGUUlpR1Q4QQ?oc=5", "pub_str": "Mar 06", "pub_sort": 1772784000.0, "etype": "Plant/Smelter Closure", "color": "red", "pressure": "UP", "metals": ["Rare Earths"], "cause": null, "country": null}, {"title": "QatarEnergy announces aluminium production halt at Qatalum amid Middle East crisis", "source": "Fastmarkets", "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxQTWN0ekU3cHNnbjBzaHM0TGI1anpwZVBDTWZEbUJxRng4bFBsQUp0dDdKNWdoUVBLVzA2SVRmcGgyQ3NnTjhqd0lOc3JhV2MzdW1ScUttaHM4SExUNHdVNEZrb0NDaTRXd0h1TTdPNUJVVDB3ZmtmeV9BNnBHWVplVHQwWjlxSmhzdWNwMlF4WlJwUWlYRVdocHRLU21xOEc4amRiMFAzT1FwekRPelZ3?oc=5", "pub_str": "Mar 05", "pub_sort": 1772697600.0, "etype": "Plant/Smelter Closure", "color": "red", "pressure": "UP", "metals": ["Aluminum"], "cause": "Middle East crisis", "country": "Qatar"}, {"title": "Qatar smelter shutdown exacerbates Iran war aluminium fears", "source": "Reuters", "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQNWRqZlNabS1POVFXRWRPQ0RRbTN4UVVaX2ZLMXdNNTAycFNBb0RQcW1rQ1kyTEppY1g1a2xWV3hkM2s3MVRSRVlhRUZWbE5iTkZfdDRHbURBZ0FGNGNQNFRRTWNJLTg2VUZLTEUtTlBEbTR5TURnRjd5WVVTblU2SERYMlZibVVPWkVYc0IyWGhBdkZjZFdZeUNSRkNLY05lSXZwS09aSXIyOHg3eW84b08zd3dBVVB6b3c?oc=5", "pub_str": "Mar 03", "pub_sort": 1772524800.0, "etype": "Plant/Smelter Closure", "color": "red", "pressure": "UP", "metals": ["Aluminum"], "cause": null, "country": "Qatar"}, {"title": "Norsk Hydro’s Qatar Aluminum Plant to Shut Down After Iran Attacks Cut off Gas Supply", "source": "WSJ", "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPSDVyajZnX1k3QXFzWFE2ZDVqOE9DQ2tlODcwdXl1SGk1RHlGenZFNDFBdEpPNUlUbThYZ25BNUlRNW9zVzFmYzMyYVdxakFiY1ktSWItaUpLOWdlVFpvWkZIeWFrY2JQX01RU2dKWEdPSF9qcFVXUEhudDZpWXE2MUNSZlFldEhMVGhOVUprMTlJbW5JSHRkSWlnazYwVGtuU2gtLVpyY1o0ZGtnUnY0SmczakUwcGx3WU9IR0RxTQ?oc=5", "pub_str": "Mar 03", "pub_sort": 1772524800.0, "etype": "Plant/Smelter Closure", "color": "red", "pressure": "UP", "metals": ["Aluminum"], "cause": "Iran Attacks Cut off Gas Supply", "country": "Qatar"}, {"title": "Top 10 Copper Producers by Country", "source": "Investing News Network", "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOMC1rcjJyQXJZSmlWQl9DZmU4TFpPQ29aOHd6U1RRSFl4RTZpQlV5dzJpSjhiNmhrNlBmVFpFQlFmSE9kUjBwS1RMZUk2aExnVGJXV1YxWmJlSkpiVnBVSnRQTGR4WC1Kbjk5WjZhR0pocGFOTks5Nk90SmJkNE1XaXNTaFZOaGVINGEzWWtEeWw5bUR5WEZXSTFENUZIVTF2UDBBNENoVjl4VGUyNHBOVGtQSmN0OTQ?oc=5", "pub_str": "Mar 03", "pub_sort": 1772524800.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Copper"], "cause": null, "country": null}, {"title": "Congo’s Cobalt Curbs Expose China’s Critical Metals Vulnerability", "source": "Modern Diplomacy", "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNRHFWV0xlcjhfN19JLUZlNFpIRWo5QUhQNU9GM0F4aDdkOGtUei12Q3A1eHlBUFJFM3JLeElXMmFxZHFzMlRFS1I4VUZsLW5sbXBDSXJIYlJRYnJTblo0T09HZnFBM1JvaWF6anlJUnY1T1UyM0pEMWpCcWJhQWpfM2dhY0VuVXVMcWg5YkRoWXZQRzFscVIyeEdfNW1LOG1VeFhNZA?oc=5", "pub_str": "Feb 25", "pub_sort": 1772006400.0, "etype": "General", "color": "gray", "pressure": "?", "metals": ["Cobalt"], "cause": null, "country": "China"}, {"title": "Another Nickel Mine Waste Landslide Leads to a Death in Indonesia", "source": "earthworks.org", "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQaXlqMFExeEh0Q1J6dUhlaVFRTm1Nc2NIRDVzVDhibWNiakVScUV5bTRkMTNrUVVvakVMWURkZEo0dnJQZ29CT2Z6TGhpeFdOM1NtamtiVkppR2wyZWZZMTFjdjVPMUN6NXVfWTZtYk9qb2lfRDFUWjN3X0NjYlo1NG9ScTdIN1lrN1phTnZ2bnBoYkxTWXZ4QVhn?oc=5", "pub_str": "Feb 23", "pub_sort": 1771833600.0, "etype": "Natural Disaster", "color": "teal", "pressure": "UP", "metals": ["Nickel", "Lead"], "cause": null, "country": "Indonesia"}];
+const STOCKS = {"Aluminum": [{"name": "Hindalco Industries", "ticker": "HINDALCO.NS", "country": "India", "exchange": "NSE", "price": 1010.0, "ch10d": -7.6, "ch20d": -8.9, "ch1m": -8.1, "ch2m": -2.9}, {"name": "Vedanta Ltd", "ticker": "VEDL.NS", "country": "India", "exchange": "NSE", "price": 300.8, "ch10d": -4.7, "ch20d": -8.8, "ch1m": -8.8, "ch2m": -60.3}, {"name": "NALCO", "ticker": "NATIONALUM.NS", "country": "India", "exchange": "NSE", "price": 376.0, "ch10d": -5.0, "ch20d": -8.1, "ch1m": -7.5, "ch2m": -13.3}, {"name": "Alcoa Corp", "ticker": "AA", "country": "USA", "exchange": "NYSE", "price": 59.37, "ch10d": -23.9, "ch20d": -7.4, "ch1m": -7.1, "ch2m": -10.6}, {"name": "Century Aluminum", "ticker": "CENX", "country": "USA", "exchange": "NASDAQ", "price": 51.71, "ch10d": -22.2, "ch20d": -12.0, "ch1m": -11.5, "ch2m": -15.7}, {"name": "Norsk Hydro", "ticker": "NHYDY", "country": "Norway", "exchange": "OTC", "price": 10.44, "ch10d": -18.4, "ch20d": -9.8, "ch1m": -7.0, "ch2m": -5.1}, {"name": "Rio Tinto", "ticker": "RIO", "country": "Australia/UK", "exchange": "NYSE", "price": 100.08, "ch10d": -5.0, "ch20d": -3.1, "ch1m": -0.8, "ch2m": 0.3}], "Copper": [{"name": "Freeport-McMoRan", "ticker": "FCX", "country": "USA", "exchange": "NYSE", "price": 68.68, "ch10d": -1.4, "ch20d": 12.8, "ch1m": 17.0, "ch2m": -2.1}, {"name": "Southern Copper", "ticker": "SCCO", "country": "Peru/USA", "exchange": "NYSE", "price": 192.93, "ch10d": -0.6, "ch20d": 10.8, "ch1m": 14.2, "ch2m": 2.7}, {"name": "Antofagasta", "ticker": "ANTO.L", "country": "Chile", "exchange": "LSE", "price": 4037.0, "ch10d": 1.7, "ch20d": 3.7, "ch1m": 5.6, "ch2m": 6.7}, {"name": "First Quantum Min.", "ticker": "FM.TO", "country": "Canada/Zambia", "exchange": "TSX", "price": 43.31, "ch10d": -5.4, "ch20d": 19.4, "ch1m": 21.8, "ch2m": 10.1}, {"name": "Ivanhoe Mines", "ticker": "IVN.TO", "country": "Canada/DRC", "exchange": "TSX", "price": 11.56, "ch10d": -7.7, "ch20d": 1.7, "ch1m": 2.7, "ch2m": -6.7}, {"name": "Hindalco (Cu)", "ticker": "HINDALCO.NS", "country": "India", "exchange": "NSE", "price": 1010.0, "ch10d": -7.6, "ch20d": -8.9, "ch1m": -8.1, "ch2m": -2.9}], "Gold": [{"name": "Newmont Corp", "ticker": "NEM", "country": "USA", "exchange": "NYSE", "price": 103.79, "ch10d": -4.2, "ch20d": -3.1, "ch1m": -1.0, "ch2m": -9.4}, {"name": "Barrick Gold", "ticker": "GOLD", "country": "Canada", "exchange": "NYSE", "price": 42.25, "ch10d": 3.1, "ch20d": 3.0, "ch1m": 7.0, "ch2m": -12.7}, {"name": "Agnico Eagle Mines", "ticker": "AEM", "country": "Canada", "exchange": "NYSE", "price": 166.66, "ch10d": -5.7, "ch20d": -6.2, "ch1m": -3.7, "ch2m": -22.8}, {"name": "Kinross Gold", "ticker": "KGC", "country": "Canada", "exchange": "NYSE", "price": 26.67, "ch10d": -6.7, "ch20d": -6.7, "ch1m": -2.7, "ch2m": -23.0}, {"name": "Gold Fields", "ticker": "GFI", "country": "South Africa", "exchange": "NYSE", "price": 38.6, "ch10d": -1.3, "ch20d": -5.1, "ch1m": -1.5, "ch2m": -20.9}, {"name": "AngloGold Ashanti", "ticker": "AU", "country": "South Africa", "exchange": "NYSE", "price": 90.87, "ch10d": -1.4, "ch20d": -0.9, "ch1m": 3.0, "ch2m": -13.6}, {"name": "Zijin Mining", "ticker": "ZIJMY", "country": "China", "exchange": "OTC", "price": 79.93, "ch10d": -4.4, "ch20d": -5.6, "ch1m": -3.6, "ch2m": -15.2}], "Silver": [{"name": "Wheaton Prec. Metals", "ticker": "WPM", "country": "Canada", "exchange": "NYSE", "price": 122.57, "ch10d": -4.6, "ch20d": -3.5, "ch1m": -1.1, "ch2m": -17.7}, {"name": "Pan American Silver", "ticker": "PAAS", "country": "Canada", "exchange": "NASDAQ", "price": 49.0, "ch10d": -7.6, "ch20d": -10.6, "ch1m": -7.3, "ch2m": -16.3}, {"name": "First Majestic Silver", "ticker": "AG", "country": "Canada/Mexico", "exchange": "NYSE", "price": 18.0, "ch10d": -9.0, "ch20d": -9.7, "ch1m": -4.2, "ch2m": -16.3}, {"name": "Coeur Mining", "ticker": "CDE", "country": "USA", "exchange": "NYSE", "price": 17.51, "ch10d": -5.2, "ch20d": -1.1, "ch1m": 4.6, "ch2m": -11.4}], "Steel": [{"name": "Tata Steel", "ticker": "TATASTEEL.NS", "country": "India", "exchange": "NSE", "price": 198.96, "ch10d": -1.8, "ch20d": -2.9, "ch1m": -2.6, "ch2m": -4.7}, {"name": "JSW Steel", "ticker": "JSWSTEEL.NS", "country": "India", "exchange": "NSE", "price": 1287.7, "ch10d": 0.3, "ch20d": 0.2, "ch1m": 0.5, "ch2m": 1.9}, {"name": "SAIL", "ticker": "SAIL.NS", "country": "India", "exchange": "NSE", "price": 180.05, "ch10d": -5.5, "ch20d": -10.5, "ch1m": -8.4, "ch2m": 2.2}, {"name": "ArcelorMittal", "ticker": "MT", "country": "Luxembourg", "exchange": "NYSE", "price": 63.41, "ch10d": -11.5, "ch20d": 0.4, "ch1m": 7.2, "ch2m": 1.8}, {"name": "Nucor Corporation", "ticker": "NUE", "country": "USA", "exchange": "NYSE", "price": 243.83, "ch10d": -7.0, "ch20d": 8.0, "ch1m": 10.0, "ch2m": 20.6}, {"name": "Posco Holdings", "ticker": "PKX", "country": "South Korea", "exchange": "NYSE", "price": 60.69, "ch10d": -9.0, "ch20d": -16.3, "ch1m": -18.3, "ch2m": -9.5}, {"name": "Steel Dynamics", "ticker": "STLD", "country": "USA", "exchange": "NASDAQ", "price": 249.91, "ch10d": -9.7, "ch20d": 9.5, "ch1m": 11.9, "ch2m": 19.4}], "Nickel": [{"name": "Vale S.A.", "ticker": "VALE", "country": "Brazil", "exchange": "NYSE", "price": 15.42, "ch10d": -2.2, "ch20d": -5.7, "ch1m": -3.7, "ch2m": -13.5}, {"name": "IGO Limited", "ticker": "IGO.AX", "country": "Australia", "exchange": "ASX", "price": 8.17, "ch10d": -11.8, "ch20d": -9.9, "ch1m": -3.2, "ch2m": -8.1}], "Zinc": [{"name": "Hindustan Zinc", "ticker": "HINDZINC.NS", "country": "India", "exchange": "NSE", "price": 563.55, "ch10d": -0.6, "ch20d": -10.9, "ch1m": -10.3, "ch2m": -5.1}, {"name": "Teck Resources", "ticker": "TECK", "country": "Canada", "exchange": "NYSE", "price": 64.36, "ch10d": -4.2, "ch20d": 5.3, "ch1m": 8.5, "ch2m": 9.0}], "Platinum/Palladium": [{"name": "Sibanye Stillwater", "ticker": "SBSW", "country": "South Africa", "exchange": "NYSE", "price": 9.67, "ch10d": -13.4, "ch20d": -18.3, "ch1m": -15.2, "ch2m": -28.3}, {"name": "Impala Platinum", "ticker": "IMPUY", "country": "South Africa", "exchange": "OTC", "price": 12.12, "ch10d": -8.9, "ch20d": -15.1, "ch1m": -12.2, "ch2m": -26.0}, {"name": "Anglo Amer. Platinum", "ticker": "ANGPY", "country": "South Africa", "exchange": "OTC", "price": 12.66, "ch10d": -3.6, "ch20d": -6.6, "ch1m": -3.8, "ch2m": -18.2}], "Rare Earths": [{"name": "MP Materials", "ticker": "MP", "country": "USA", "exchange": "NYSE", "price": 60.88, "ch10d": -7.0, "ch20d": 7.8, "ch1m": 10.8, "ch2m": -8.1}, {"name": "Energy Fuels", "ticker": "UUUU", "country": "USA", "exchange": "NYSE", "price": 16.56, "ch10d": -4.7, "ch20d": -1.3, "ch1m": 2.3, "ch2m": -23.0}, {"name": "Lynas Rare Earths", "ticker": "LYSCF", "country": "Australia", "exchange": "OTC", "price": 12.4, "ch10d": -7.7, "ch20d": -7.1, "ch1m": -3.7, "ch2m": -15.1}, {"name": "Iluka Resources", "ticker": "ILU.AX", "country": "Australia", "exchange": "ASX", "price": 7.82, "ch10d": -1.0, "ch20d": 2.2, "ch1m": 2.9, "ch2m": 2.1}], "Lithium": [{"name": "Albemarle Corp", "ticker": "ALB", "country": "USA", "exchange": "NYSE", "price": 160.35, "ch10d": -3.0, "ch20d": -5.6, "ch1m": -4.9, "ch2m": -17.5}, {"name": "SQM", "ticker": "SQM", "country": "Chile", "exchange": "NYSE", "price": 79.69, "ch10d": 2.6, "ch20d": -2.1, "ch1m": -0.9, "ch2m": -8.8}, {"name": "Pilbara Minerals", "ticker": "PILBF", "country": "Australia", "exchange": "OTC", "price": 4.3, "ch10d": -0.7, "ch20d": -0.5, "ch1m": 2.3, "ch2m": -0.4}, {"name": "Sigma Lithium", "ticker": "SGML", "country": "Brazil", "exchange": "NASDAQ", "price": 13.65, "ch10d": -7.3, "ch20d": -11.0, "ch1m": -8.7, "ch2m": -37.1}, {"name": "Lithium Americas", "ticker": "LAC", "country": "Canada", "exchange": "NYSE", "price": 4.37, "ch10d": -14.3, "ch20d": -8.2, "ch1m": -6.0, "ch2m": -12.2}], "Cobalt": [{"name": "Glencore", "ticker": "GLNCY", "country": "Switzerland", "exchange": "OTC", "price": 14.94, "ch10d": -8.8, "ch20d": -1.6, "ch1m": -0.5, "ch2m": 1.4}, {"name": "Vale S.A.", "ticker": "VALE", "country": "Brazil", "exchange": "NYSE", "price": 15.42, "ch10d": -2.2, "ch20d": -5.7, "ch1m": -3.7, "ch2m": -13.5}], "Diversified Miners": [{"name": "BHP Group", "ticker": "BHP", "country": "Australia", "exchange": "NYSE", "price": 87.87, "ch10d": -1.0, "ch20d": 5.2, "ch1m": 7.3, "ch2m": 10.4}, {"name": "Anglo American", "ticker": "NGLOY", "country": "UK", "exchange": "OTC", "price": 26.47, "ch10d": -4.2, "ch20d": 3.6, "ch1m": 6.4, "ch2m": 6.2}, {"name": "Vedanta Ltd", "ticker": "VEDL.NS", "country": "India", "exchange": "NSE", "price": 300.8, "ch10d": -4.7, "ch20d": -8.8, "ch1m": -8.8, "ch2m": -60.3}]};
+const BRIEFS = {"Gold": {"sentiment": "Mixed", "up": 0, "down": 0, "n": 4, "causes": []}, "Silver": {"sentiment": "Supply pressure ↑", "up": 2, "down": 0, "n": 4, "causes": ["Mexico's Mining Constraints"]}, "Platinum": {"sentiment": "Supply pressure ↑", "up": 2, "down": 0, "n": 4, "causes": []}, "Palladium": {"sentiment": "Supply pressure ↑", "up": 1, "down": 0, "n": 4, "causes": []}, "Copper": {"sentiment": "Supply pressure ↑", "up": 1, "down": 0, "n": 5, "causes": ["steel stays flat", "Iran war disrupts supplies"]}, "Aluminum": {"sentiment": "Supply pressure ↑", "up": 4, "down": 0, "n": 11, "causes": []}, "Steel (HRC)": {"sentiment": "Mixed", "up": 0, "down": 0, "n": 6, "causes": ["steel stays flat", "fuel shortages and rising costs"]}, "Rare Earths": {"sentiment": "Supply pressure ↑", "up": 1, "down": 0, "n": 4, "causes": []}, "Lithium": {"sentiment": "Supply pressure ↑", "up": 1, "down": 0, "n": 4, "causes": ["tightening supply", "Mexico's Mining Constraints"]}, "Cobalt": {"sentiment": "Supply pressure ↑", "up": 1, "down": 0, "n": 3, "causes": ["Iran war disrupts supplies"]}};
+const GENERATED  = "Jun 19, 2026 11:34 UTC";
+const UP_COUNT   = 16;
+const TOTAL      = 70;
+
+// ── State ──────────────────────────────────────────────────────────────────
+let activeMetal = 'ALL';
+let activeEtype = 'ALL';
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function chgSpan(v) {
+  if (v===null||v===undefined) return '<span style="color:#484f58">&#8212;</span>';
+  const cls = v>0?'pos':v<0?'neg':'neu';
+  const sign = v>0?'&#9650; +':v<0?'&#9660; ':'&#8211;';
+  return '<span class="chg '+cls+'">'+sign+v+'%</span>';
+}
+function chgCell(v) { return '<td class="r">'+chgSpan(v)+'</td>'; }
+function fmtPrice(n) {
+  return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+// ── Render prices ──────────────────────────────────────────────────────────
+function renderPrices() {
+  const rows = PRICES.map(m => {
+    const b = BRIEFS[m.name];
+    const proxy = m.proxy ? ' <span class="proxy-badge">ETF proxy</span>' : '';
+    let brief = '<span style="color:#484f58">&#8212;</span>';
+    if (b) {
+      const sc = b.sentiment.includes('pressure')?'up':b.sentiment.includes('easing')?'down':'mix';
+      const causes = b.causes.map(c=>'<span>'+esc(c)+'</span>').join('');
+      brief = '<span class="b-sent '+sc+'">'+esc(b.sentiment)+'</span>'
+            + '<span style="color:#484f58;font-size:11px;"> &middot; '+b.n+' event'+(b.n!==1?'s':'')+'</span>'
+            + (causes ? '<div class="b-causes">'+causes+'</div>' : '');
+    }
+    return '<tr data-metal="'+esc(m.name)+'">'
+      + '<td><span class="m-name">'+esc(m.name)+'</span> <span class="m-sym">('+esc(m.symbol)+')</span>'+proxy+'</td>'
+      + '<td class="r"><span class="spot">$'+fmtPrice(m.spot)+'</span><span class="unit">'+esc(m.unit)+'</span></td>'
+      + '<td class="r">'+chgSpan(m.ch1d)+'</td>'
+      + '<td class="r">'+chgSpan(m.ch7d)+'</td>'
+      + '<td class="r">'+chgSpan(m.ch1m)+'</td>'
+      + '<td class="r">'+chgSpan(m.ch2m)+'</td>'
+      + '<td>'+brief+'</td>'
+      + '</tr>';
+  });
+  rows.push('<tr id="priceEmpty" class="hidden"><td colspan="7" style="text-align:center;padding:1.2rem;color:#484f58;">No price data for this metal (no exchange-traded futures).</td></tr>');
+  document.getElementById('priceBody').innerHTML = rows.join('');
+  document.getElementById('priceCount').textContent = PRICES.length+' metals';
+}
+
+// ── Render events ──────────────────────────────────────────────────────────
+function renderEvents() {
+  // Build event-type filter tabs
+  const typeCounts = {};
+  EVENTS.forEach(ev => { typeCounts[ev.etype]=(typeCounts[ev.etype]||0)+1; });
+  const sorted = Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]);
+  let tabs = '<button class="etab active" data-et="ALL" onclick="filterEtype(this)">All</button>';
+  sorted.filter(([t])=>t!=='General').forEach(([t,c]) => {
+    tabs += '<button class="etab" data-et="'+esc(t)+'" onclick="filterEtype(this)">'+esc(t)+' ('+c+')</button>';
+  });
+  sorted.filter(([t])=>t==='General').forEach(([t,c]) => {
+    tabs += '<button class="etab" data-et="General" onclick="filterEtype(this)">Other ('+c+')</button>';
+  });
+  document.getElementById('evTabs').innerHTML = tabs;
+
+  const rows = EVENTS.map(ev => {
+    const cause = ev.cause
+      ? '<div class="ev-cause">'+esc(ev.cause)+'</div>'
+      : '<span style="color:#484f58">&#8212;</span>';
+    const src = ev.source ? '<div class="ev-src">'+esc(ev.source)+'</div>' : '';
+    const effCls = ev.pressure==='UP'?'up':ev.pressure==='DOWN'?'down':'q';
+    const effTxt = ev.pressure==='UP'?'Price &#8593;':ev.pressure==='DOWN'?'Price &#8595;':'Unclear';
+    const metalsAttr = JSON.stringify(ev.metals).replace(/"/g,'&quot;');
+    return '<tr data-et="'+esc(ev.etype)+'" data-metals=\''+JSON.stringify(ev.metals)+'\'>'
+      + '<td><span class="ev-date">'+esc(ev.pub_str)+'</span></td>'
+      + '<td><span class="ev-type c-'+esc(ev.color)+'">'+esc(ev.etype)+'</span></td>'
+      + '<td><span class="ev-metal">'+esc(ev.metals.join(', '))+'</span></td>'
+      + '<td><span class="ev-ctry">'+esc(ev.country||'&#8212;')+'</span></td>'
+      + '<td><div class="ev-title"><a href="'+esc(ev.link)+'" target="_blank" rel="noopener">'+esc(ev.title)+'</a></div>'+src+'</td>'
+      + '<td>'+cause+'</td>'
+      + '<td class="c"><span class="eff '+effCls+'">'+effTxt+'</span></td>'
+      + '</tr>';
+  });
+  rows.push('<tr id="evEmpty" class="hidden"><td colspan="7" style="text-align:center;padding:1.2rem;color:#484f58;">No events match this filter.</td></tr>');
+  document.getElementById('evBody').innerHTML = rows.join('');
+  document.getElementById('evCount').textContent = EVENTS.length+' events';
+}
+
+// ── Render stocks ──────────────────────────────────────────────────────────
+function renderStocks() {
+  const order = ['Aluminum','Copper','Gold','Silver','Steel','Nickel','Zinc',
+                 'Platinum/Palladium','Rare Earths','Lithium','Cobalt','Diversified Miners'];
+  let html = '';
+  let total = 0;
+  order.forEach(metal => {
+    const rows = STOCKS[metal];
+    if (!rows||!rows.length) return;
+    html += '<tr class="metal-group" data-group="'+esc(metal)+'"><td colspan="7">'+esc(metal)+'</td></tr>';
+    rows.forEach(co => {
+      total++;
+      html += '<tr>'
+        + '<td><span class="co-name">'+esc(co.name)+'</span><span class="co-tick">'+esc(co.ticker)+'</span></td>'
+        + '<td class="co-ctry">'+esc(co.country)+'</td>'
+        + '<td class="co-exch">'+esc(co.exchange)+'</td>'
+        + chgCell(co.ch10d)+chgCell(co.ch20d)+chgCell(co.ch1m)+chgCell(co.ch2m)
+        + '</tr>';
+    });
+  });
+  document.getElementById('stkBody').innerHTML = html;
+  document.getElementById('stkCount').textContent = total+' companies';
+}
+
+// ── Filters ────────────────────────────────────────────────────────────────
+function metalMatch(rowMetal, filter) {
+  if (filter==='ALL') return true;
+  const r=rowMetal.toLowerCase(), f=filter.toLowerCase();
+  return r===f||r.includes(f)||f.includes(r);
+}
+function eventMetalMatch(metalsJson, filter) {
+  if (filter==='ALL') return true;
+  try {
+    return JSON.parse(metalsJson||'[]').some(m=>metalMatch(m,filter));
+  } catch { return true; }
+}
+
+function setMetal(btn) {
+  document.querySelectorAll('.mf').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeMetal = btn.dataset.metal;
+  applyFilters();
+}
+function filterEtype(btn) {
+  document.querySelectorAll('.etab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeEtype = btn.dataset.et;
+  applyFilters();
+}
+function applyFilters() {
+  // Prices
+  let pv=0;
+  document.querySelectorAll('#priceBody tr[data-metal]').forEach(row=>{
+    const show=metalMatch(row.dataset.metal,activeMetal);
+    row.classList.toggle('hidden',!show);
+    if(show) pv++;
+  });
+  document.getElementById('priceEmpty').classList.toggle('hidden',pv>0);
+
+  // Events
+  let ev=0;
+  document.querySelectorAll('#evBody tr[data-et]').forEach(row=>{
+    const show=eventMetalMatch(row.dataset.metals,activeMetal)
+              &&(activeEtype==='ALL'||row.dataset.et===activeEtype);
+    row.classList.toggle('hidden',!show);
+    if(show) ev++;
+  });
+  document.getElementById('evEmpty').classList.toggle('hidden',ev>0);
+  document.getElementById('evCount').textContent=ev+' events';
+
+  // Stocks
+  let groupMatch=false, sv=0;
+  document.querySelectorAll('#stkBody tr').forEach(row=>{
+    if(row.classList.contains('metal-group')){
+      groupMatch=metalMatch(row.dataset.group||'',activeMetal);
+      row.classList.toggle('hidden',!groupMatch);
+    } else {
+      row.classList.toggle('hidden',!groupMatch);
+      if(groupMatch) sv++;
+    }
+  });
+  document.getElementById('stkCount').textContent=sv+' companies';
+}
+
+// ── Collapse ───────────────────────────────────────────────────────────────
+function toggleSec(id) {
+  const body=document.getElementById('body-'+id);
+  const tog=document.getElementById('tog-'+id);
+  const open=!body.classList.contains('collapsed');
+  body.classList.toggle('collapsed',open);
+  tog.innerHTML=open?'&#9654;':'&#9660;';
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('genTime').textContent  = GENERATED;
+  document.getElementById('upBadge').textContent  = UP_COUNT+' \u2191 pressure';
+  document.getElementById('totalBadge').textContent = TOTAL+' events';
+  renderPrices();
+  renderEvents();
+  renderStocks();
+});
+</script>
+</body>
+</html>
