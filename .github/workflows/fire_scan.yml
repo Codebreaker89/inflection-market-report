@@ -1,0 +1,50 @@
+name: Fire Daily Scan
+
+on:
+  schedule:
+    # 9:00 AM UTC = 10:00 AM CET / 11:00 AM CEST (Mon–Fri)
+    - cron: '0 9 * * 1-5'
+  workflow_dispatch:   # manual trigger: gh workflow run fire_scan.yml
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run scan (all 10 strategies)
+        run: python3 scan.py --no-backtest
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+
+      - name: Update scan history
+        run: python3 update_scan_history.py
+
+      - name: Send email digest
+        run: python3 notify.py --send
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+
+      - name: Commit updated data back to repo
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add scan_history.csv last_scan.json
+          git diff --staged --quiet || git commit -m "scan: $(date +%Y-%m-%d)"
+          git push

@@ -1,0 +1,1242 @@
+#!/usr/bin/env python3
+"""
+Trade Tracker  |  Momentum & Breakout Strategy Paper Portfolio
+──────────────────────────────────────────────────────────────
+python3 show_tracker.py                    # show full tracker
+python3 show_tracker.py --open             # open trades only
+python3 show_tracker.py --closed           # closed trades only
+python3 show_tracker.py add                # interactive: add a new trade
+python3 show_tracker.py add --ticker AMAT --date 2026-06-10 --price 185.50 \\
+        --strategy momentum --signals "MACD RSI50 · VOL ADX↑"
+
+Data file: trades.csv  (same folder as this script)
+Each trade = €1000 invested. Returns shown in both % and EUR.
+1-week = entry + 5 trading days. 2-week = entry + 10 trading days.
+If the exit date is in the future: shown as "not yet".
+If it falls on a holiday: yfinance skips it automatically (trading-day aligned).
+
+Analytics columns auto-populated at entry and when a trade closes:
+  rsi_at_entry/exit, adx_at_entry/exit, minervini_at_entry/exit,
+  vol_ratio_entry/exit, atr_ratio_entry, market_regime_entry, sector,
+  max_dd_1wk, exit_reason
+
+First run / if you see 401 errors:
+  pip3 install --upgrade yfinance requests pandas numpy
+"""
+
+import os, sys, csv, time, warnings, logging, contextlib, io, webbrowser
+from pathlib  import Path
+from datetime import datetime, date, timedelta
+from typing   import Optional
+
+import requests
+import numpy  as np
+import pandas as pd
+import yfinance as yf
+
+try:
+    from config import HOLD_DAYS, DEFAULT_HOLD_DAYS, STOP_LOSS_PCT
+except ImportError:
+    HOLD_DAYS = {}; DEFAULT_HOLD_DAYS = 7; STOP_LOSS_PCT = 0.03
+
+warnings.filterwarnings("ignore")
+logging.getLogger("yfinance").setLevel(logging.CRITICAL)
+
+HERE       = Path(__file__).parent
+TRADES_CSV = HERE / "trades.csv"
+INVEST_EUR = 1000.0
+
+def biz_days_add(start: date, n: int) -> date:
+    """Return date that is n business days after start."""
+    d, added = start, 0
+    while added < n:
+        d += timedelta(days=1)
+        if d.weekday() < 5:   # Mon–Fri
+            added += 1
+    return d
+
+def trade_hold_days(strategy: str) -> int:
+    return HOLD_DAYS.get(strategy, DEFAULT_HOLD_DAYS)
+
+def trade_stop_loss(buy_price: float) -> float:
+    return round(buy_price * (1 - STOP_LOSS_PCT), 4)
+
+@contextlib.contextmanager
+def _quiet():
+    devnull = open(os.devnull, "w"); old = sys.stderr; sys.stderr = devnull
+    try:    yield
+    finally: sys.stderr = old; devnull.close()
+
+
+# ── CURRENCY HELPERS ──────────────────────────────────────────────────────────
+
+SUFFIX_CCY = {
+    ".L":  "GBP",  ".DE": "EUR",  ".PA": "EUR",  ".AS": "EUR",
+    ".MC": "EUR",  ".MI": "EUR",  ".BR": "EUR",  ".LS": "EUR",
+    ".HE": "EUR",  ".SW": "CHF",  ".ST": "SEK",  ".CO": "DKK",
+    ".OL": "NOK",  ".TO": "CAD",
+}
+FX_PAIR = {          # yfinance symbol: 1 EUR = X local
+    "USD": "EURUSD=X",
+    "GBP": "EURGBP=X",
+    "CAD": "EURCAD=X",
+    "CHF": "EURCHF=X",
+    "SEK": "EURSEK=X",
+    "DKK": "EURDKK=X",
+    "NOK": "EURNOK=X",
+}
+
+# Exchange prefix (Google Finance / Bloomberg format) → yfinance suffix + currency
+_PREFIX_MAP = {
+    "ETR":    (".DE", "EUR"),   # XETRA Germany
+    "FRA":    (".DE", "EUR"),   # Frankfurt
+    "XETRA":  (".DE", "EUR"),
+    "EPA":    (".PA", "EUR"),   # Euronext Paris
+    "AMS":    (".AS", "EUR"),   # Amsterdam
+    "BIT":    (".MI", "EUR"),   # Milan
+    "BME":    (".MC", "EUR"),   # Madrid
+    "LON":    (".L",  "GBP"),   # London
+    "TSX":    (".TO", "CAD"),   # Toronto
+    "CVE":    (".TO", "CAD"),
+    "NYSE":   ("",    "USD"),
+    "NASDAQ": ("",    "USD"),
+    "NYSEARCA":("",   "USD"),
+}
+
+def _yf_ticker(ticker: str) -> str:
+    """Convert exchange:ticker → yfinance format. ETR:ENR → ENR.DE"""
+    if ":" in ticker:
+        prefix, base = ticker.split(":", 1)
+        sfx, _ = _PREFIX_MAP.get(prefix.upper(), ("", "USD"))
+        return base.strip() + sfx
+    return ticker
+
+def ticker_ccy(ticker: str) -> str:
+    """Currency of local price for a given ticker. Defaults to EUR."""
+    if ":" in ticker:
+        prefix, _ = ticker.split(":", 1)
+        _, ccy = _PREFIX_MAP.get(prefix.upper(), ("", "EUR"))
+        return ccy
+    for sfx, ccy in SUFFIX_CCY.items():
+        if ticker.upper().endswith(sfx):
+            return ccy
+    return "EUR"   # default: user inputs everything in EUR
+
+def fetch_fx_now(ccy: str) -> float:
+    if ccy == "EUR": return 1.0
+    pair = FX_PAIR.get(ccy)
+    if not pair: return 1.0
+    try:
+        with _quiet():
+            df = yf.download(pair, period="5d", interval="1d",
+                             progress=False, auto_adjust=True, threads=False)
+        if isinstance(df.columns, pd.MultiIndex): df.columns = df.columns.droplevel(1)
+        return float(df["Close"].dropna().iloc[-1])
+    except Exception:
+        return 1.0
+
+def fetch_fx_on_date(ccy: str, on_date: date) -> float:
+    if ccy == "EUR": return 1.0
+    pair = FX_PAIR.get(ccy)
+    if not pair: return fetch_fx_now(ccy)
+    try:
+        start = (on_date - timedelta(days=7)).strftime("%Y-%m-%d")
+        end   = (on_date + timedelta(days=1)).strftime("%Y-%m-%d")
+        with _quiet():
+            df = yf.download(pair, start=start, end=end, interval="1d",
+                             progress=False, auto_adjust=True, threads=False)
+        if isinstance(df.columns, pd.MultiIndex): df.columns = df.columns.droplevel(1)
+        df = df[df.index.date <= on_date]
+        if df.empty: return fetch_fx_now(ccy)
+        return float(df["Close"].dropna().iloc[-1])
+    except Exception:
+        return fetch_fx_now(ccy)
+
+
+# ── PRICE HELPERS ─────────────────────────────────────────────────────────────
+
+def fetch_price_history(ticker: str) -> Optional[pd.Series]:
+    """600-day close history for 1wk/2wk lookups. Normalises exchange:ticker format."""
+    yf_t = _yf_ticker(ticker)
+    try:
+        with _quiet():
+            df = yf.download(yf_t, period="600d", interval="1d",
+                             progress=False, auto_adjust=True, threads=False)
+        if isinstance(df.columns, pd.MultiIndex): df.columns = df.columns.droplevel(1)
+        s = df["Close"].dropna()
+        s.index = pd.to_datetime(s.index).date
+        return s
+    except Exception:
+        return None
+
+def price_on_or_before(series: pd.Series, target: date) -> Optional[float]:
+    candidates = [d for d in series.index if d <= target]
+    if not candidates: return None
+    return float(series[max(candidates)])
+
+def price_n_trading_days_after(series: pd.Series, entry: date, n: int):
+    trading_days = sorted(d for d in series.index if d > entry)
+    if len(trading_days) < n:
+        return None, None
+    target_date = trading_days[n - 1]
+    return float(series[target_date]), target_date
+
+def fetch_live_price(ticker: str) -> tuple[Optional[float], Optional[str]]:
+    """
+    Returns (price, currency) using the live quote.
+    Normalises exchange:ticker format (ETR:ENR → ENR.DE) before fetching.
+    If price currency differs from stored currency, caller must convert.
+    """
+    yf_t = _yf_ticker(ticker)      # normalise ETR:ENR → ENR.DE, etc.
+
+    def _normalise_ccy(p, ccy_raw):
+        """Convert pence (GBp/GBX) → pounds (GBP) by dividing by 100."""
+        if ccy_raw in ("GBp", "GBX", "GBx"):
+            return p / 100.0, "GBP"
+        return p, (ccy_raw.upper() if ccy_raw else None)
+
+    def _try(sym):
+        try:
+            with _quiet():
+                fi = yf.Ticker(sym).fast_info
+            p   = getattr(fi, "last_price",  None) or getattr(fi, "previous_close", None)
+            ccy = getattr(fi, "currency",    None)
+            if p and float(p) > 0:
+                return _normalise_ccy(float(p), ccy)
+        except Exception:
+            pass
+        # fallback: .history() bypasses bulk cache
+        try:
+            with _quiet():
+                df = yf.Ticker(sym).history(period="5d", interval="1d", auto_adjust=True)
+            if not df.empty:
+                p = float(df["Close"].dropna().iloc[-1])
+                try:
+                    with _quiet():
+                        ccy = getattr(yf.Ticker(sym).fast_info, "currency", None)
+                except Exception:
+                    ccy = None
+                return _normalise_ccy(p, ccy)
+        except Exception:
+            pass
+        return None, None
+
+    price, ccy = _try(yf_t)
+    if price is None:
+        return None, None
+    return price, ccy
+
+def fetch_company_name(ticker: str) -> str:
+    try:
+        with _quiet():
+            info = yf.Ticker(ticker).info
+        return info.get("shortName") or info.get("longName") or ticker
+    except Exception:
+        return ticker
+
+
+# ── CSV HELPERS ───────────────────────────────────────────────────────────────
+
+FIELDNAMES = [
+    # Core trade fields
+    "id", "entry_date", "ticker", "company", "currency",
+    "buy_price", "stop_loss_price", "fx_at_entry", "qty", "investment_eur",
+    "trade_type", "strategy", "hold_days", "target_exit_date",
+    "signals", "status", "actual_sell_date", "exit_price",
+    # Entry analytics (auto-populated when trade is added)
+    "rsi_at_entry", "adx_at_entry", "minervini_at_entry",
+    "vol_ratio_entry", "atr_ratio_entry",
+    "market_regime_entry", "sector",
+    # Exit analytics (auto-populated when trade closes)
+    "rsi_at_exit", "adx_at_exit", "minervini_at_exit", "vol_ratio_exit",
+    # Post-entry analytics
+    "max_dd_1wk",
+    # Manual close annotation
+    "exit_reason",
+]
+
+def load_trades() -> list[dict]:
+    if not TRADES_CSV.exists(): return []
+    with open(TRADES_CSV, newline="") as f:
+        reader = csv.DictReader(f, restval="")
+        rows = [r for r in reader if r.get("id","").strip()]
+    # backfill any missing columns (forward-compat for old CSVs)
+    for row in rows:
+        for fn in FIELDNAMES:
+            if fn not in row:
+                row[fn] = ""
+    return rows
+
+def save_trades(trades: list[dict]):
+    with open(TRADES_CSV, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=FIELDNAMES, extrasaction="ignore")
+        w.writeheader()
+        w.writerows(trades)
+
+def next_id(trades: list[dict]) -> str:
+    ids = [int(t["id"]) for t in trades if t.get("id","").isdigit()]
+    return str(max(ids) + 1) if ids else "1"
+
+
+# ── ANALYTICS HELPERS ─────────────────────────────────────────────────────────
+
+def _build_indicators_from_raw(raw: pd.DataFrame) -> pd.DataFrame:
+    """Inline indicator builder (mirrors momentum_scanner.build_indicators)."""
+    c, h, l, v = raw["Close"], raw["High"], raw["Low"], raw["Volume"]
+    def _ema(s, n): return s.ewm(span=n, adjust=False).mean()
+    def _sma(s, n): return s.rolling(n).mean()
+    def _rsi(s, n=14):
+        d = s.diff()
+        g = d.clip(lower=0).rolling(n).mean()
+        lo = (-d.clip(upper=0)).rolling(n).mean()
+        return 100 - 100 / (1 + g / lo.replace(0, np.nan))
+    def _macd(s):
+        m = _ema(s, 12) - _ema(s, 26)
+        return m, _ema(m, 9)
+    def _adx(high, low, close, n=14):
+        tr  = pd.concat([(high - low),
+                         (high - close.shift()).abs(),
+                         (low  - close.shift()).abs()], axis=1).max(axis=1)
+        atr = tr.ewm(alpha=1/n, adjust=False).mean()
+        up  = (high - high.shift()).clip(lower=0)
+        dn  = (low.shift() - low).clip(lower=0)
+        dmp = up.where(up > dn, 0).ewm(alpha=1/n, adjust=False).mean()
+        dmm = dn.where(dn > up, 0).ewm(alpha=1/n, adjust=False).mean()
+        dip = 100 * dmp / atr
+        dim = 100 * dmm / atr
+        dx  = 100 * (dip - dim).abs() / (dip + dim).replace(0, np.nan)
+        return dx.ewm(alpha=1/n, adjust=False).mean()
+
+    raw = raw.copy()
+    raw["sma50"]     = _sma(c, 50)
+    raw["sma150"]    = _sma(c, 150)
+    raw["sma200"]    = _sma(c, 200)
+    raw["ema9"]      = _ema(c, 9)
+    raw["ema21"]     = _ema(c, 21)
+    raw["rsi"]       = _rsi(c, 14)
+    raw["macd"], raw["macd_sig"] = _macd(c)
+    raw["macd_hist"] = raw["macd"] - raw["macd_sig"]
+    raw["adx"]       = _adx(h, l, c, 14)
+    raw["vol_ma20"]  = v.rolling(20).mean()
+    raw["52w_high"]  = c.rolling(252).max()
+    raw["52w_low"]   = c.rolling(252).min()
+    # ATR for atr_ratio
+    tr_s = pd.concat([(h-l), (h-c.shift()).abs(), (l-c.shift()).abs()], axis=1).max(axis=1)
+    raw["atr14"] = tr_s.ewm(alpha=1/14, adjust=False).mean()
+    return raw
+
+
+def _minervini_score(df: pd.DataFrame, idx: int) -> int:
+    row = df.iloc[idx]
+    return sum([
+        row["Close"]  > row["sma150"],
+        row["Close"]  > row["sma200"],
+        row["sma150"] > row["sma200"],
+        row["sma50"]  > row["sma150"],
+        row["Close"]  > row["sma50"],
+        row["Close"]  >= 1.30 * row["52w_low"],
+        row["Close"]  >= 0.75 * row["52w_high"],
+        row["sma200"] > df.iloc[idx - 20]["sma200"],
+    ])
+
+
+def fetch_indicators_at_date(ticker: str, on_date: date) -> dict:
+    """Return RSI, ADX, Minervini, vol_ratio, atr_ratio on a specific date."""
+    empty = {"rsi": "", "adx": "", "minervini": "", "vol_ratio": "", "atr_ratio": ""}
+    try:
+        start = (on_date - timedelta(days=420)).strftime("%Y-%m-%d")
+        end   = (on_date + timedelta(days=3)).strftime("%Y-%m-%d")
+        with _quiet():
+            raw = yf.download(ticker, start=start, end=end, interval="1d",
+                              progress=False, auto_adjust=True, threads=False)
+        if raw is None or len(raw) < 220: return empty
+        if isinstance(raw.columns, pd.MultiIndex): raw.columns = raw.columns.droplevel(1)
+        if not {"Open","High","Low","Close","Volume"}.issubset(raw.columns): return empty
+
+        df    = _build_indicators_from_raw(raw)
+        dates = pd.to_datetime(df.index).date
+        cands = [i for i, d in enumerate(dates) if d <= on_date]
+        if not cands: return empty
+        idx = max(cands)
+        if idx < 215: return empty
+
+        row      = df.iloc[idx]
+        vol_r    = float(row["Volume"]) / float(row["vol_ma20"]) if row["vol_ma20"] > 0 else 0
+        atr_now  = float(row["atr14"])
+        atr_prev = float(df.iloc[max(0, idx-20)]["atr14"])
+        atr_r    = round(atr_now / atr_prev, 3) if atr_prev > 0 else ""
+
+        return {
+            "rsi":       round(float(row["rsi"]),  1),
+            "adx":       round(float(row["adx"]),  1),
+            "minervini": _minervini_score(df, idx),
+            "vol_ratio": round(vol_r, 2),
+            "atr_ratio": atr_r,
+        }
+    except Exception:
+        return empty
+
+
+def fetch_market_regime(on_date: date) -> str:
+    """'BULL' if SPY above 50-day SMA on on_date, else 'BEAR'."""
+    try:
+        start = (on_date - timedelta(days=120)).strftime("%Y-%m-%d")
+        end   = (on_date + timedelta(days=3)).strftime("%Y-%m-%d")
+        with _quiet():
+            df = yf.download("SPY", start=start, end=end, interval="1d",
+                             progress=False, auto_adjust=True, threads=False)
+        if isinstance(df.columns, pd.MultiIndex): df.columns = df.columns.droplevel(1)
+        df["sma50"] = df["Close"].rolling(50).mean()
+        dates = pd.to_datetime(df.index).date
+        cands = [i for i, d in enumerate(dates) if d <= on_date]
+        if not cands: return ""
+        idx = max(cands)
+        row = df.iloc[idx]
+        if pd.isna(row["sma50"]): return ""
+        return "BULL" if row["Close"] > row["sma50"] else "BEAR"
+    except Exception:
+        return ""
+
+
+def fetch_sector(ticker: str) -> str:
+    try:
+        with _quiet():
+            info = yf.Ticker(ticker).info
+        return info.get("sector", "")
+    except Exception:
+        return ""
+
+
+def fetch_entry_analytics(ticker: str, entry_date: date, strategy: str) -> dict:
+    """
+    Single yfinance download → signals string + all entry indicator values.
+    Returns: {signals, rsi_at_entry, adx_at_entry, minervini_at_entry,
+              vol_ratio_entry, atr_ratio_entry}
+    """
+    result = {
+        "signals": "", "rsi_at_entry": "", "adx_at_entry": "",
+        "minervini_at_entry": "", "vol_ratio_entry": "", "atr_ratio_entry": "",
+    }
+    try:
+        start = (entry_date - timedelta(days=420)).strftime("%Y-%m-%d")
+        end   = (entry_date + timedelta(days=3)).strftime("%Y-%m-%d")
+        with _quiet():
+            raw = yf.download(ticker, start=start, end=end, interval="1d",
+                              progress=False, auto_adjust=True, threads=False)
+        if raw is None or len(raw) < 220: return result
+        if isinstance(raw.columns, pd.MultiIndex): raw.columns = raw.columns.droplevel(1)
+        if not {"Open","High","Low","Close","Volume"}.issubset(raw.columns): return result
+
+        dates = pd.to_datetime(raw.index).date
+        cands = [i for i, d in enumerate(dates) if d <= entry_date]
+        if not cands: return result
+        idx = max(cands)
+        if idx < 215: return result
+
+        sys.path.insert(0, str(HERE))
+
+        # Compute signals via appropriate scanner
+        if strategy == "breakout":
+            import breakout_scanner as bs
+            df_s = bs.build_indicators(raw.copy())
+            sig  = bs.score_row(df_s, idx)
+            if sig:
+                parts = " ".join(sig.get("coil_sigs", []))
+                if sig.get("break_sigs"):
+                    parts += " ▶ " + " ".join(sig["break_sigs"])
+                result["signals"] = parts
+        else:
+            import momentum_scanner as ms
+            df_s = ms.build_indicators(raw.copy())
+            sig  = ms.score_row(df_s, idx)
+            if sig:
+                parts = " ".join(sig.get("fresh", []))
+                if sig.get("conf"):
+                    parts += " · " + " ".join(sig["conf"])
+                result["signals"] = parts
+
+        # Compute indicator values (use our inline builder for atr14)
+        df = _build_indicators_from_raw(raw)
+        row     = df.iloc[idx]
+        vol_r   = float(row["Volume"]) / float(row["vol_ma20"]) if row["vol_ma20"] > 0 else 0
+        atr_now  = float(row["atr14"])
+        atr_prev = float(df.iloc[max(0, idx-20)]["atr14"])
+        atr_r    = round(atr_now / atr_prev, 3) if atr_prev > 0 else ""
+
+        result.update({
+            "rsi_at_entry":       round(float(row["rsi"]), 1),
+            "adx_at_entry":       round(float(row["adx"]), 1),
+            "minervini_at_entry": _minervini_score(df, idx),
+            "vol_ratio_entry":    round(vol_r, 2),
+            "atr_ratio_entry":    atr_r,
+        })
+    except Exception:
+        pass
+    return result
+
+
+def enrich_trades(trades: list[dict], price_cache: dict) -> bool:
+    """
+    Backfill missing analytics into existing trades (in-place).
+    Returns True if anything changed (caller should save_trades).
+    """
+    changed = False
+    for trade in trades:
+        ticker     = trade["ticker"]
+        entry_date = datetime.strptime(trade["entry_date"], "%Y-%m-%d").date()
+
+        # ── Entry indicator values ────────────────────────────────────────────
+        if not trade.get("rsi_at_entry"):
+            strategy = trade.get("strategy", "momentum")
+            print(f"  Enriching {ticker} entry analytics...", end=" ", flush=True)
+            analytics = fetch_entry_analytics(ticker, entry_date, strategy)
+            # only overwrite signals if not already set
+            if not trade.get("signals") and analytics.get("signals"):
+                trade["signals"] = analytics["signals"]
+            trade["rsi_at_entry"]       = analytics["rsi_at_entry"]
+            trade["adx_at_entry"]       = analytics["adx_at_entry"]
+            trade["minervini_at_entry"] = analytics["minervini_at_entry"]
+            trade["vol_ratio_entry"]    = analytics["vol_ratio_entry"]
+            trade["atr_ratio_entry"]    = analytics["atr_ratio_entry"]
+            print("✓")
+            changed = True
+
+        if not trade.get("market_regime_entry"):
+            trade["market_regime_entry"] = fetch_market_regime(entry_date)
+            changed = True
+
+        if not trade.get("sector"):
+            trade["sector"] = fetch_sector(ticker)
+            changed = True
+
+        # ── max_dd_1wk: fill once 5 trading days have passed ─────────────────
+        if not trade.get("max_dd_1wk"):
+            if ticker not in price_cache:
+                price_cache[ticker] = fetch_price_history(ticker)
+            hist = price_cache[ticker]
+            if hist is not None:
+                buy_price    = float(trade["buy_price"])
+                trading_days = sorted(d for d in hist.index if d > entry_date)
+                if len(trading_days) >= 5:
+                    prices = [float(hist[d]) for d in trading_days[:5]]
+                    min_p  = min(prices)
+                    trade["max_dd_1wk"] = round((min_p - buy_price) / buy_price * 100, 2)
+                    changed = True
+
+        # ── Exit indicator values (only for CLOSED trades) ────────────────────
+        if trade.get("status") == "CLOSED" and trade.get("actual_sell_date"):
+            if not trade.get("rsi_at_exit"):
+                actual_sell_date = datetime.strptime(trade["actual_sell_date"], "%Y-%m-%d").date()
+                print(f"  Enriching {ticker} exit analytics...", end=" ", flush=True)
+                ind = fetch_indicators_at_date(ticker, actual_sell_date)
+                trade["rsi_at_exit"]       = ind.get("rsi", "")
+                trade["adx_at_exit"]       = ind.get("adx", "")
+                trade["minervini_at_exit"] = ind.get("minervini", "")
+                trade["vol_ratio_exit"]    = ind.get("vol_ratio", "")
+                print("✓")
+                changed = True
+
+    return changed
+
+
+# ── ADD TRADE ─────────────────────────────────────────────────────────────────
+
+def add_trade_interactive(args: list[str]):
+    def _get(flag, prompt, default=""):
+        for i, a in enumerate(args):
+            if a == flag and i+1 < len(args): return args[i+1]
+        val = input(f"  {prompt} [{default}]: ").strip()
+        return val or default
+
+    print("\n  ── Add New Trade ──")
+    ticker     = _get("--ticker", "Ticker (e.g. AMAT, BP.L)").upper()
+    raw_date   = _get("--date",   "Entry date (YYYY-MM-DD)", date.today().strftime("%Y-%m-%d"))
+    strategy   = _get("--strategy", "Strategy  [momentum / breakout]", "momentum")
+    trade_type = _get("--type", "Trade type  [practice / real]", "practice").lower()
+    if trade_type not in ("practice", "real"): trade_type = "practice"
+
+    entry_date = datetime.strptime(raw_date, "%Y-%m-%d").date()
+    currency   = ticker_ccy(ticker)
+
+    print(f"\n  Fetching info for {ticker}...", end=" ", flush=True)
+    company = fetch_company_name(ticker)
+    print(company)
+
+    print(f"  Fetching FX rate (EUR → {currency}) on {entry_date}...", end=" ", flush=True)
+    fx = fetch_fx_on_date(currency, entry_date)
+    print(f"  1 EUR = {fx:.4f} {currency}")
+
+    print(f"\n  {ticker} ({company}) — entering price in {BOLD(currency)}.")
+    if currency != "EUR":
+        eur_example = 1000 * fx
+        print(f"  Enter the exact price in {currency},")
+        print(f"  OR type  EUR:<amount>  if you have the price in euros (e.g. EUR:180 = {180*fx:.2f} {currency})")
+    raw_price = _get("--price", f"Buy price (in {currency})")
+
+    if raw_price.upper().startswith("EUR:"):
+        eur_amount = float(raw_price.split(":")[1])
+        price = round(eur_amount * fx, 4)
+        print(f"  → {eur_amount} EUR × {fx:.4f} = {price} {currency}")
+    else:
+        price = float(raw_price)
+
+    # ── Investment amount ─────────────────────────────────────────────────────
+    raw_invest = _get("--invest", "Investment amount in EUR", str(int(INVEST_EUR)))
+    invest_eur = float(raw_invest)
+
+    # Allow user to specify qty directly instead
+    raw_qty = _get("--qty", "Qty (leave blank to auto-calculate from investment)", "")
+    if raw_qty:
+        qty        = float(raw_qty)
+        invest_eur = round(qty * price / fx, 2)
+    else:
+        qty = round(invest_eur * fx / price, 4)
+
+    # ── Auto-detect signals AND entry indicators in one fetch ─────────────────
+    manual_signals = None
+    for i, a in enumerate(args):
+        if a == "--signals" and i+1 < len(args):
+            manual_signals = args[i+1]
+
+    print(f"\n  Auto-detecting signals + entry indicators on {entry_date}...", end=" ", flush=True)
+    analytics = fetch_entry_analytics(ticker, entry_date, strategy)
+
+    if manual_signals is not None:
+        signals = manual_signals
+    else:
+        signals = analytics["signals"]
+        if signals:
+            print(f"  {signals}")
+        else:
+            print("  none detected (entry date may be outside signal window)")
+            signals = input("  Enter signals manually (or press Enter to skip): ").strip()
+
+    # ── Market regime ─────────────────────────────────────────────────────────
+    print(f"  Fetching market regime (SPY vs SMA50)...", end=" ", flush=True)
+    regime = fetch_market_regime(entry_date)
+    print(regime or "unknown")
+
+    # ── Sector ────────────────────────────────────────────────────────────────
+    print(f"  Fetching sector for {ticker}...", end=" ", flush=True)
+    sector = fetch_sector(ticker)
+    print(sector or "unknown")
+
+    # ── Summary ───────────────────────────────────────────────────────────────
+    eur_equiv = price / fx
+    rsi_str = str(analytics.get("rsi_at_entry") or "─")
+    adx_str = str(analytics.get("adx_at_entry") or "─")
+    m_str   = str(analytics.get("minervini_at_entry") or "─")
+    vr_str  = str(analytics.get("vol_ratio_entry") or "─")
+    ar_str  = str(analytics.get("atr_ratio_entry") or "─")
+
+    hold_d         = trade_hold_days(strategy)
+    target_exit    = biz_days_add(entry_date, hold_d)
+    stop_loss_px   = trade_stop_loss(price)
+
+    type_label = GRN("REAL") if trade_type == "real" else YLW("PRACTICE")
+    print(f"\n  ┌─ Trade Summary ────────────────────────────────────────────")
+    print(f"  │  Ticker:      {ticker}  ({company})   [{type_label}]")
+    print(f"  │  Entry date:  {entry_date}    Sector: {sector or '─'}    Regime: {regime or '─'}")
+    print(f"  │  Buy price:   {price} {currency}  =  €{eur_equiv:.2f} per share")
+    print(f"  │  Stop loss:   {stop_loss_px} {currency}  (-{STOP_LOSS_PCT*100:.0f}%)")
+    print(f"  │  FX rate:     1 EUR = {fx:.4f} {currency}  (on entry date)")
+    print(f"  │  Quantity:    {qty} shares  (€{invest_eur:.2f} invested)")
+    print(f"  │  Strategy:    {strategy}  |  Hold: {hold_d} days  |  Target exit: {target_exit}")
+    print(f"  │  Signals:     {signals or '—'}")
+    print(f"  │  Indicators:  RSI={rsi_str}  ADX={adx_str}  Minervini={m_str}/8  VolRatio={vr_str}  ATRratio={ar_str}")
+    print(f"  └────────────────────────────────────────────────────────────")
+
+    confirm = input("\n  Add this trade? [Y/n]: ").strip().lower()
+    if confirm == "n":
+        print("  Cancelled."); return
+
+    trades = load_trades()
+    trades.append({
+        "id":                  next_id(trades),
+        "entry_date":          entry_date.strftime("%Y-%m-%d"),
+        "ticker":              ticker,
+        "company":             company,
+        "currency":            currency,
+        "buy_price":           price,
+        "stop_loss_price":     stop_loss_px,
+        "fx_at_entry":         round(fx, 6),
+        "qty":                 qty,
+        "investment_eur":      invest_eur,
+        "trade_type":          trade_type,
+        "strategy":            strategy,
+        "hold_days":           hold_d,
+        "target_exit_date":    target_exit.strftime("%Y-%m-%d"),
+        "signals":             signals,
+        "status":              "OPEN",
+        "actual_sell_date":    "",
+        "exit_price":          "",
+        # entry analytics
+        "rsi_at_entry":        analytics.get("rsi_at_entry", ""),
+        "adx_at_entry":        analytics.get("adx_at_entry", ""),
+        "minervini_at_entry":  analytics.get("minervini_at_entry", ""),
+        "vol_ratio_entry":     analytics.get("vol_ratio_entry", ""),
+        "atr_ratio_entry":     analytics.get("atr_ratio_entry", ""),
+        "market_regime_entry": regime,
+        "sector":              sector,
+        # exit analytics (empty at entry)
+        "rsi_at_exit":         "",
+        "adx_at_exit":         "",
+        "minervini_at_exit":   "",
+        "vol_ratio_exit":      "",
+        "max_dd_1wk":          "",
+        "exit_reason":         "",
+    })
+    save_trades(trades)
+    print(f"\n  ✅  Trade #{trades[-1]['id']} added to trades.csv")
+
+
+# ── ANSI COLORS ───────────────────────────────────────────────────────────────
+
+_color = sys.stdout.isatty() and not os.environ.get("NO_COLOR")
+def _c(code, text): return f"\033[{code}m{text}\033[0m" if _color else text
+GRN  = lambda t: _c("32", t);  RED  = lambda t: _c("31", t)
+YLW  = lambda t: _c("33", t);  CYN  = lambda t: _c("36", t)
+BOLD = lambda t: _c("1",  t);  DIM  = lambda t: _c("2",  t)
+MAG  = lambda t: _c("35", t)
+
+def _pct(v):
+    if v is None: return DIM("   ─  ")
+    return GRN(f"+{v:.1f}%") if v >= 0 else RED(f"{v:.1f}%")
+
+def _eur(v):
+    if v is None: return DIM("    ─   ")
+    return GRN(f"+€{v:.0f}") if v >= 0 else RED(f"-€{abs(v):.0f}")
+
+def _status(s):
+    if s == "OPEN":   return GRN("OPEN  ")
+    if s == "CLOSED": return DIM("CLOSED")
+    return YLW(s[:6])
+
+def _regime(s):
+    if s == "BULL": return GRN("BULL")
+    if s == "BEAR": return RED("BEAR")
+    return DIM(s or "─")
+
+
+# ── COMPUTE ONE TRADE ROW ─────────────────────────────────────────────────────
+
+def compute_row(trade: dict, price_cache: dict, fx_cache: dict) -> dict:
+    ticker     = trade["ticker"]
+    entry_date = datetime.strptime(trade["entry_date"], "%Y-%m-%d").date()
+    buy_price  = float(trade["buy_price"])
+    fx_entry   = float(trade["fx_at_entry"])
+    qty        = float(trade["qty"])
+    ccy        = trade["currency"]
+    status     = trade["status"]
+
+    if ticker not in price_cache:
+        price_cache[ticker] = fetch_price_history(ticker)
+    hist = price_cache[ticker]
+
+    if ccy not in fx_cache:
+        fx_cache[ccy] = fetch_fx_now(ccy)
+    fx_now = fx_cache[ccy]
+
+    def to_eur(local_price, fx): return local_price / fx if fx else None
+    def pnl_eur(exit_price_local, fx_exit):
+        if exit_price_local is None: return None
+        exit_eur  = exit_price_local / fx_exit
+        entry_eur = buy_price / fx_entry
+        return round((exit_eur - entry_eur) * qty, 2)
+    def ret_pct(exit_p):
+        if exit_p is None: return None
+        return round((exit_p - buy_price) / buy_price * 100, 2)
+
+    result = dict(trade)
+
+    # ── Current price (live quote for OPEN; exit price for CLOSED) ───────────
+    if status == "CLOSED" and trade.get("exit_price"):
+        curr_price = float(trade["exit_price"])
+    else:
+        raw_price, fetched_ccy = fetch_live_price(ticker)
+        # If yfinance returned the price in a different currency than stored,
+        # convert to stored currency using spot FX so ret_pct is apples-to-apples
+        if raw_price is not None and fetched_ccy and fetched_ccy != ccy:
+            fx_fetched = fetch_fx_now(fetched_ccy)   # 1 EUR = X fetched_ccy
+            fx_stored  = fetch_fx_now(ccy)            # 1 EUR = X stored_ccy
+            # convert: price_stored = price_fetched / fx_fetched * fx_stored
+            curr_price = raw_price / fx_fetched * fx_stored if fx_fetched else raw_price
+        else:
+            curr_price = raw_price
+
+    result["current_price"] = curr_price
+    result["ret_now_pct"]   = ret_pct(curr_price)
+    result["pnl_now_eur"]   = pnl_eur(curr_price, fx_now)
+    # EUR-denominated prices for display
+    result["buy_eur"]     = round(buy_price / fx_entry, 2)
+    result["current_eur"] = round(curr_price / fx_now, 2) if curr_price is not None else None
+
+    # ── 1-week exit ───────────────────────────────────────────────────────────
+    if status == "CLOSED" and trade.get("actual_sell_date"):
+        exit_d = datetime.strptime(trade["actual_sell_date"], "%Y-%m-%d").date()
+        p1 = price_on_or_before(hist, exit_d) if hist is not None else (
+             float(trade["exit_price"]) if trade.get("exit_price") else None)
+        d1 = exit_d
+    elif hist is not None:
+        p1, d1 = price_n_trading_days_after(hist, entry_date, 5)
+    else:
+        p1, d1 = None, None
+
+    result["price_1wk"]   = p1
+    result["date_1wk"]    = d1.strftime("%Y-%m-%d") if d1 else None
+    result["ret_1wk_pct"] = ret_pct(p1)
+    fx1 = fetch_fx_on_date(ccy, d1) if (p1 is not None and d1 is not None and ccy != "EUR") else fx_now
+    result["pnl_1wk_eur"] = pnl_eur(p1, fx1) if p1 else None
+
+    # ── 2-week exit ───────────────────────────────────────────────────────────
+    if hist is not None and status != "CLOSED":
+        p2, d2 = price_n_trading_days_after(hist, entry_date, 10)
+    else:
+        p2, d2 = None, None
+
+    result["price_2wk"]   = p2
+    result["date_2wk"]    = d2.strftime("%Y-%m-%d") if d2 else None
+    result["ret_2wk_pct"] = ret_pct(p2)
+    fx2 = fetch_fx_on_date(ccy, d2) if (p2 is not None and d2 is not None and ccy != "EUR") else fx_now
+    result["pnl_2wk_eur"] = pnl_eur(p2, fx2) if p2 else None
+
+    # ── max_dd_1wk (live, for display — already persisted by enrich_trades) ───
+    if not result.get("max_dd_1wk") and hist is not None:
+        trading_days = sorted(d for d in hist.index if d > entry_date)
+        if len(trading_days) >= 5:
+            prices = [float(hist[d]) for d in trading_days[:5]]
+            min_p  = min(prices)
+            result["max_dd_1wk"] = round((min_p - buy_price) / buy_price * 100, 2)
+
+    return result
+
+
+# ── DISPLAY ───────────────────────────────────────────────────────────────────
+
+W = 112
+
+def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
+    if filter_status:
+        rows = [r for r in rows if r["status"] == filter_status]
+
+    now      = datetime.now().strftime("%Y-%m-%d  %H:%M")
+    open_n   = sum(1 for r in rows if r["status"] == "OPEN")
+    closed_n = sum(1 for r in rows if r["status"] == "CLOSED")
+    total_inv= sum(float(r["investment_eur"]) for r in rows)
+
+    all_now   = [r["pnl_now_eur"] for r in rows if r.get("pnl_now_eur") is not None]
+    total_pnl = sum(all_now) if all_now else None
+
+    print()
+    print("╔" + "═"*(W-2) + "╗")
+    print("║" + f"  📊  TRADE TRACKER  ·  {now}  ·  {open_n} open  ·  {closed_n} closed".ljust(W-2) + "║")
+    inv_line = f"  Total invested: €{total_inv:.0f}"
+    if total_pnl is not None:
+        pnl_s = (GRN(f"+€{total_pnl:.0f}") if total_pnl >= 0 else RED(f"-€{abs(total_pnl):.0f}"))
+        inv_line += f"  ·  Total P&L now: {pnl_s}"
+    print("║" + inv_line.ljust(W-2) + "║")
+    print("╚" + "═"*(W-2) + "╝")
+
+    if not rows:
+        print(DIM("  No trades found. Add one with: python3 show_tracker.py add"))
+        return
+
+    strategies = list(dict.fromkeys(r["strategy"] for r in rows))
+
+    for strat in strategies:
+        strat_rows = [r for r in rows if r["strategy"] == strat]
+        label = {"momentum": "🟢  MOMENTUM SCANNER", "breakout": "🔭  BREAKOUT SCANNER"}.get(strat, strat.upper())
+        print(f"\n  {BOLD(label)}")
+        print()
+
+        hdr = (f"  {'#':>2}  {'TICKER':<8}  {'COMPANY':<22}  {'ENTRY':<10}  "
+               f"{'BUY €':>7}  {'NOW €':>7}  {'QTY':>6}  {'INV€':>6}  "
+               f"{'1WK%':>6}  {'1WK€':>7}  "
+               f"{'2WK%':>6}  {'2WK€':>7}  "
+               f"{'NOW%':>6}  {'NOW€':>7}  {'STATUS':<8}  {'TYPE':<8}  STRAT")
+        print(BOLD(hdr))
+        print("  " + "─"*(W-2))
+
+        for r in strat_rows:
+            buy_e = f"€{r['buy_eur']:.2f}"    if r.get("buy_eur")     else f"{float(r['buy_price']):.2f}"
+            now_e = f"€{r['current_eur']:.2f}" if r.get("current_eur") else "─"
+            ticker_s = BOLD(f"{r['ticker']:<8}")
+            co_s     = f"{str(r['company'])[:22]:<22}"
+
+            tt = r.get("trade_type", "practice")
+            type_badge = GRN("REAL    ") if tt == "real" else YLW("PRACTICE")
+            strat_val = r.get("strategy", "")
+            strat_s   = CYN("MOMENTUM") if strat_val == "momentum" else MAG("BREAKOUT") if strat_val == "breakout" else DIM(strat_val[:8])
+            inv_e = f"€{float(r['investment_eur']):.0f}" if r.get("investment_eur") else "─"
+            row_line = (f"  {r['id']:>2}  {ticker_s}  {co_s}  {r['entry_date']:<10}  "
+                        f"{buy_e:>7}  {now_e:>7}  {float(r['qty']):>6.2f}  {inv_e:>6}  "
+                        f"{_pct(r.get('ret_1wk_pct')):>6}  {_eur(r.get('pnl_1wk_eur')):>7}  "
+                        f"{_pct(r.get('ret_2wk_pct')):>6}  {_eur(r.get('pnl_2wk_eur')):>7}  "
+                        f"{_pct(r.get('ret_now_pct')):>6}  {_eur(r.get('pnl_now_eur')):>7}  "
+                        f"{_status(r['status'])}  {type_badge}  {strat_s}")
+            print(row_line)
+
+            # Sub-row 1: signals + exit info + stop/target dates
+            sub1_parts = []
+            sig_text = str(r.get("signals", "")).strip()
+            if sig_text:
+                sub1_parts.append(CYN(sig_text[:65]))
+            if r.get("stop_loss_price"):
+                sub1_parts.append(RED(f"SL {r['stop_loss_price']}"))
+            if r.get("target_exit_date"):
+                sub1_parts.append(DIM(f"exit→{r['target_exit_date']}"))
+            if r["status"] == "CLOSED" and r.get("actual_sell_date"):
+                exit_s = f"sold {r['actual_sell_date']} @ {r.get('exit_price','─')}"
+                if r.get("exit_reason"):
+                    exit_s += f"  [{r['exit_reason']}]"
+                sub1_parts.append(DIM(exit_s))
+            if sub1_parts:
+                print("     " + DIM("  ·  ").join(sub1_parts))
+
+            # Sub-row 2: entry analytics — only show populated fields
+            reg = r.get("market_regime_entry", "")
+            sec = str(r.get("sector", "")).strip()[:16]
+            try:
+                dd = float(r.get("max_dd_1wk") or "")
+            except (ValueError, TypeError):
+                dd = None
+            ana = []
+            if r.get("rsi_at_entry"):        ana.append(f"RSI {r['rsi_at_entry']}")
+            if r.get("adx_at_entry"):        ana.append(f"ADX {r['adx_at_entry']}")
+            if r.get("minervini_at_entry"):  ana.append(f"M {r['minervini_at_entry']}/8")
+            if r.get("vol_ratio_entry"):     ana.append(f"Vol× {r['vol_ratio_entry']}")
+            if reg:                          ana.append(_regime(reg))
+            if sec:                          ana.append(f"[{sec}]")
+            if dd is not None:
+                dd_s = RED(f"MaxDD {dd:.1f}%") if dd < 0 else GRN(f"MaxDD {dd:.1f}%")
+                ana.append(dd_s)
+            if ana:
+                print(DIM("     ") + DIM("  ·  ").join(ana))
+
+            # Sub-row 3: exit analytics (only if closed and populated)
+            if r["status"] == "CLOSED" and r.get("rsi_at_exit"):
+                ex_ana = []
+                if r.get("rsi_at_exit"):      ex_ana.append(f"RSI {r['rsi_at_exit']}")
+                if r.get("adx_at_exit"):      ex_ana.append(f"ADX {r['adx_at_exit']}")
+                if r.get("minervini_at_exit"): ex_ana.append(f"M {r['minervini_at_exit']}/8")
+                if r.get("vol_ratio_exit"):    ex_ana.append(f"Vol× {r['vol_ratio_exit']}")
+                if ex_ana:
+                    print(DIM("     exit→  ") + DIM("  ·  ").join(ex_ana))
+            print()
+
+        # Strategy sub-total
+        s_pnls = [r["pnl_now_eur"] for r in strat_rows if r.get("pnl_now_eur") is not None]
+        if s_pnls:
+            sp = sum(s_pnls)
+            print(f"  {DIM(strat + ' total now:')}  {_eur(sp)}")
+
+    print(f"\n  " + "─"*(W-2))
+    print(DIM("  Columns: 1WK%/2WK% = 5/10 trading days.  NOW% = unrealised.  "
+              "EUR P&L accounts for FX at exit date."))
+    print(DIM("  MaxDD = worst intra-week close vs entry price.  "
+              "Regime = SPY vs 50 SMA at entry."))
+    print(DIM("  To add: python3 show_tracker.py add"))
+    print(DIM("  To close: edit trades.csv → status=CLOSED, actual_sell_date, exit_price, exit_reason"))
+    print("╚" + "═"*(W-2) + "╝\n")
+
+
+# ── HTML DASHBOARD ────────────────────────────────────────────────────────────
+
+def _fmt_cell(v, is_pct=False, is_eur=False):
+    """Return (display_str, css_class) for a numeric value."""
+    if v is None or v == "": return "─", ""
+    try:
+        f = float(v)
+    except (ValueError, TypeError):
+        return str(v), ""
+    if is_pct or is_eur:
+        css = "pos" if f >= 0 else "neg"
+        sign = "+" if f >= 0 else ""
+        if is_eur:
+            return f"{sign}€{f:.0f}", css
+        return f"{sign}{f:.1f}%", css
+    return str(v), ""
+
+def _kpi_html(label, rows_subset):
+    inv  = sum(float(r["investment_eur"]) for r in rows_subset)
+    pnls = [r["pnl_now_eur"] for r in rows_subset if r.get("pnl_now_eur") is not None]
+    pnl  = sum(pnls) if pnls else None
+    pc   = "pos" if (pnl or 0) >= 0 else "neg"
+    ps   = (f"+€{pnl:.0f}" if pnl and pnl >= 0 else f"-€{abs(pnl):.0f}" if pnl else "─")
+    on   = sum(1 for r in rows_subset if r["status"] == "OPEN")
+    cl   = sum(1 for r in rows_subset if r["status"] == "CLOSED")
+    return f"""
+    <div class="kpi-group">
+      <div class="kpi-group-label">{label}</div>
+      <div class="kpi-row">
+        <div class="kpi-box"><div class="kpi-label">Invested</div><div class="kpi-value">€{inv:.0f}</div></div>
+        <div class="kpi-box"><div class="kpi-label">P&L Now</div><div class="kpi-value {pc}">{ps}</div></div>
+        <div class="kpi-box"><div class="kpi-label">Open</div><div class="kpi-value">{on}</div></div>
+        <div class="kpi-box"><div class="kpi-label">Closed</div><div class="kpi-value">{cl}</div></div>
+      </div>
+    </div>"""
+
+def generate_dashboard(rows: list[dict], filter_status=None):
+    """Write dashboard.html and open in default browser."""
+    if filter_status:
+        rows = [r for r in rows if r["status"] == filter_status]
+
+    now_str      = datetime.now().strftime("%Y-%m-%d %H:%M")
+    practice_rows = [r for r in rows if r.get("trade_type", "practice") == "practice"]
+    real_rows     = [r for r in rows if r.get("trade_type", "practice") == "real"]
+
+    kpi_practice = _kpi_html("🟡 PRACTICE", practice_rows) if practice_rows else ""
+    kpi_real     = _kpi_html("🟢 REAL",     real_rows)     if real_rows     else ""
+
+    def trade_rows_html(strategy_rows):
+        html = ""
+        for r in strategy_rows:
+            status_cls = "open" if r["status"] == "OPEN" else "closed"
+
+            def p(key, is_pct=False, is_eur=False):
+                val = r.get(key)
+                s, cls = _fmt_cell(val, is_pct=is_pct, is_eur=is_eur)
+                if cls:
+                    return f'<span class="{cls}">{s}</span>'
+                return s
+
+            # EUR prices
+            buy_e   = f"€{r['buy_eur']:.2f}"     if r.get("buy_eur")     else f"€{float(r['buy_price']):.2f}"
+            now_e   = f"€{r['current_eur']:.2f}"  if r.get("current_eur") else "─"
+            qty_s   = f"{float(r['qty']):.2f}"
+            invest_s = f"€{float(r['investment_eur']):.0f}" if r.get("investment_eur") else "─"
+
+            regime    = r.get("market_regime_entry", "")
+            regime_cls= "pos" if regime == "BULL" else ("neg" if regime == "BEAR" else "")
+            regime_s  = f'<span class="{regime_cls}">{regime or "─"}</span>' if regime_cls else (regime or "─")
+
+            try:
+                dd = float(r.get("max_dd_1wk") or "")
+                dd_cls = "neg" if dd < 0 else "pos"
+                dd_s   = f'<span class="{dd_cls}">{dd:+.1f}%</span>'
+            except (ValueError, TypeError):
+                dd_s = "─"
+
+            signals   = r.get("signals", "") or "─"
+            exit_info = ""
+            if r["status"] == "CLOSED" and r.get("actual_sell_date"):
+                reason = f" ({r['exit_reason']})" if r.get("exit_reason") else ""
+                exit_info = f"Closed {r['actual_sell_date']} @ {r.get('exit_price','─')}{reason}"
+
+            html += f"""
+            <tr class="trade-row {status_cls}">
+              <td>{r['id']}</td>
+              <td class="ticker">{r['ticker']}</td>
+              <td>{str(r.get('company',''))[:24]}</td>
+              <td>{r['entry_date']}</td>
+              <td>{str(r.get('sector',''))[:16] or '─'}</td>
+              <td>{regime_s}</td>
+              <td>{buy_e}</td>
+              <td>{now_e}</td>
+              <td>{qty_s}</td>
+              <td>{invest_s}</td>
+              <td>{p('ret_1wk_pct', is_pct=True)}</td>
+              <td>{p('pnl_1wk_eur', is_eur=True)}</td>
+              <td>{p('ret_2wk_pct', is_pct=True)}</td>
+              <td>{p('pnl_2wk_eur', is_eur=True)}</td>
+              <td>{p('ret_now_pct', is_pct=True)}</td>
+              <td>{p('pnl_now_eur', is_eur=True)}</td>
+              <td>{r.get('rsi_at_entry') or '─'}</td>
+              <td>{r.get('adx_at_entry') or '─'}</td>
+              <td>{r.get('minervini_at_entry') or '─'}/8</td>
+              <td>{r.get('vol_ratio_entry') or '─'}</td>
+              <td>{dd_s}</td>
+              <td class="signals">{signals}</td>
+              <td class="{status_cls}-badge">{r['status']}</td>
+              <td class="type-{'real' if r.get('trade_type','practice') == 'real' else 'practice'}-badge">{(r.get('trade_type') or 'practice').upper()}</td>
+              <td class="strat-{'momentum' if r.get('strategy')=='momentum' else 'breakout'}-badge">{(r.get('strategy') or '─').upper()}</td>
+            </tr>
+            <tr class="detail-row">
+              <td colspan="25" class="detail-cell">
+                1wk→{r.get('date_1wk') or 'not yet'} &nbsp;·&nbsp;
+                2wk→{r.get('date_2wk') or 'not yet'}
+                {'&nbsp;·&nbsp;' + exit_info if exit_info else ''}
+                {'&nbsp;·&nbsp;Exit: RSI=' + str(r.get('rsi_at_exit','─')) +
+                 ' ADX=' + str(r.get('adx_at_exit','─')) +
+                 ' M=' + str(r.get('minervini_at_exit','─')) + '/8'
+                 if r.get('rsi_at_exit') else ''}
+              </td>
+            </tr>"""
+        return html
+
+    strategies   = list(dict.fromkeys(r["strategy"] for r in rows))
+    sections_html = ""
+    for strat in strategies:
+        label     = "🟢 MOMENTUM SCANNER" if strat == "momentum" else "🔭 BREAKOUT SCANNER"
+        s_rows    = [r for r in rows if r["strategy"] == strat]
+        s_pnls    = [r["pnl_now_eur"] for r in s_rows if r.get("pnl_now_eur") is not None]
+        s_total   = sum(s_pnls) if s_pnls else None
+        s_cls     = "pos" if (s_total or 0) >= 0 else "neg"
+        s_str     = (f"+€{s_total:.0f}" if s_total and s_total >= 0 else
+                     f"-€{abs(s_total):.0f}" if s_total else "")
+
+        sections_html += f"""
+        <h2>{label} <span class="strat-pnl {s_cls}">{s_str}</span></h2>
+        <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th title="Trade ID">#</th>
+              <th title="Exchange ticker symbol">Ticker</th>
+              <th title="Company name">Company</th>
+              <th title="Date position was opened">Entry</th>
+              <th title="GICS sector from yfinance">Sector</th>
+              <th title="BULL = SPY above 50-day SMA on entry date; BEAR = below">Regime</th>
+              <th title="Entry price converted to EUR">Buy €</th>
+              <th title="Current live price converted to EUR">Now €</th>
+              <th title="Number of shares held">Qty</th>
+              <th title="Total EUR invested in this position">Invest€</th>
+              <th title="Return % after 5 trading days">1WK%</th>
+              <th title="EUR profit/loss after 5 trading days">1WK€</th>
+              <th title="Return % after 10 trading days">2WK%</th>
+              <th title="EUR profit/loss after 10 trading days">2WK€</th>
+              <th title="Current unrealised return %">NOW%</th>
+              <th title="Current unrealised EUR profit/loss">NOW€</th>
+              <th title="RSI(14) on entry date — 50–70 is healthy momentum zone">RSI</th>
+              <th title="ADX(14) on entry — ≥22 required, ≥25 = strong trend">ADX</th>
+              <th title="Minervini Trend Template score out of 8 — ≥6 for momentum, ≥5 for breakout">M</th>
+              <th title="Volume on entry ÷ 20-day avg — &gt;1.5 = institutional interest">VolX</th>
+              <th title="Worst close in first 5 trading days vs entry price (%)">MaxDD</th>
+              <th title="Technical signals that fired at entry">Signals</th>
+              <th title="OPEN or CLOSED">Status</th>
+              <th title="REAL = live money; PRACTICE = paper trade">Type</th>
+              <th title="Scanner strategy used: MOMENTUM or BREAKOUT">Strat</th>
+            </tr>
+          </thead>
+          <tbody>
+            {trade_rows_html(s_rows)}
+          </tbody>
+        </table>
+        </div>"""
+
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trade Tracker</title>
+<style>
+  :root {{
+    --bg:       #0f1117;
+    --surface:  #1a1d27;
+    --border:   #2a2d3a;
+    --text:     #e0e2ec;
+    --dim:      #6b7280;
+    --pos:      #22c55e;
+    --neg:      #ef4444;
+    --accent:   #6366f1;
+    --warn:     #f59e0b;
+  }}
+  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+  body {{ background: var(--bg); color: var(--text); font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; padding: 24px; }}
+  header {{ display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }}
+  header h1 {{ font-size: 20px; color: var(--text); }}
+  .meta {{ color: var(--dim); font-size: 12px; margin-top: 4px; }}
+  .kpi-section {{ display: flex; gap: 32px; flex-wrap: wrap; }}
+  .kpi-group {{ background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; }}
+  .kpi-group-label {{ font-size: 12px; font-weight: bold; letter-spacing: 0.05em; margin-bottom: 10px; color: var(--text); }}
+  .kpi-row {{ display: flex; gap: 16px; }}
+  .kpi-box {{ background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 10px 16px; min-width: 90px; }}
+  .kpi-label {{ color: var(--dim); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }}
+  .kpi-value {{ font-size: 20px; font-weight: bold; margin-top: 3px; }}
+  h2 {{ font-size: 14px; margin: 28px 0 10px; color: var(--text); letter-spacing: 0.03em; }}
+  .strat-pnl {{ font-size: 13px; margin-left: 10px; }}
+  .table-wrap {{ overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }}
+  table {{ width: 100%; border-collapse: collapse; }}
+  thead tr {{ background: var(--surface); }}
+  th {{ padding: 8px 10px; text-align: right; color: var(--dim); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; border-bottom: 1px solid var(--border); }}
+  th:nth-child(1), th:nth-child(2), th:nth-child(3), th:nth-child(4), th:nth-child(5), th:nth-child(6) {{ text-align: left; }}
+  td {{ padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }}
+  td:nth-child(1), td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6) {{ text-align: left; }}
+  .trade-row:hover td {{ background: #1e2130; }}
+  .trade-row.closed {{ opacity: 0.6; }}
+  .detail-row td {{ font-size: 11px; color: var(--dim); padding: 2px 10px 8px; }}
+  .detail-cell {{ text-align: left !important; }}
+  .ticker {{ font-weight: bold; color: var(--accent); }}
+  .signals {{ color: var(--dim); font-size: 11px; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }}
+  .pos {{ color: var(--pos); }}
+  .neg {{ color: var(--neg); }}
+  .open-badge   {{ color: var(--pos); font-weight: bold; }}
+  .closed-badge {{ color: var(--dim); }}
+  .real-badge     {{ color: var(--pos); font-weight: bold; font-size: 11px; }}
+  .practice-badge {{ color: var(--warn); font-size: 11px; }}
+  .strat-momentum-badge {{ color: var(--pos); font-size: 10px; font-weight: bold; letter-spacing: .5px; }}
+  .strat-breakout-badge {{ color: #b57bee; font-size: 10px; font-weight: bold; letter-spacing: .5px; }}
+  .footer {{ margin-top: 32px; color: var(--dim); font-size: 11px; border-top: 1px solid var(--border); padding-top: 12px; }}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>📊 Trade Tracker</h1>
+    <div class="meta">Updated: {now_str}</div>
+  </div>
+</header>
+<div class="kpi-section">
+  {kpi_practice}
+  {kpi_real}
+</div>
+
+{sections_html}
+
+<div class="footer">
+  ⚠ Not financial advice.
+  &nbsp;·&nbsp; M = Minervini Trend Template /8
+  &nbsp;·&nbsp; MaxDD = worst intra-week close vs entry
+  &nbsp;·&nbsp; Regime = SPY vs 50 SMA at entry
+  &nbsp;·&nbsp; Returns in local currency %; EUR P&amp;L uses FX at exit date
+</div>
+</body>
+</html>"""
+
+    out = HERE / "dashboard.html"
+    out.write_text(html, encoding="utf-8")
+    webbrowser.open(out.as_uri())
+    print(f"  Dashboard → {out}")
+
+
+# ── MAIN ─────────────────────────────────────────────────────────────────────
+
+def main():
+    args = sys.argv[1:]
+
+    if args and args[0] == "add":
+        add_trade_interactive(args[1:])
+        return
+
+    filter_status = None
+    if "--open"   in args: filter_status = "OPEN"
+    if "--closed" in args: filter_status = "CLOSED"
+
+    trades = load_trades()
+    if not trades:
+        print("\n  No trades yet. Add one with:\n"
+              "  python3 show_tracker.py add\n")
+        return
+
+    print(f"\n  Loading prices for {len(trades)} trade(s)...", flush=True)
+    t0          = time.time()
+    price_cache = {}
+    fx_cache    = {}
+
+    # Backfill any missing analytics (first-time enrichment for old trades)
+    changed = enrich_trades(trades, price_cache)
+    if changed:
+        save_trades(trades)
+
+    rows = [compute_row(t, price_cache, fx_cache) for t in trades]
+    print(f"  Done in {time.time()-t0:.1f}s\n")
+
+    print_tracker(rows, filter_status)
+
+    if "--no-browser" not in args:
+        generate_dashboard(rows, filter_status)
+
+
+if __name__ == "__main__":
+    main()
