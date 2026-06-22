@@ -550,10 +550,34 @@ def add_trade_interactive(args: list[str]):
         val = input(f"  {prompt} [{default}]: ").strip()
         return val or default
 
+    ALL_STRATEGIES = [
+        "momentum", "breakout", "pocket_pivot", "connors_rsi2", "ema_ribbon",
+        "nr7", "bb_squeeze", "high_tight_flag", "analyst_upgrade",
+        "signal_velocity", "chokepoint_inflection", "stage4_short",
+        "defensive_rotation",
+    ]
+
     print("\n  ── Add New Trade ──")
-    ticker     = _get("--ticker", "Ticker (e.g. AMAT, BP.L)").upper()
-    raw_date   = _get("--date",   "Entry date (YYYY-MM-DD)", date.today().strftime("%Y-%m-%d"))
-    strategy   = _get("--strategy", "Strategy  [momentum / breakout]", "momentum")
+    ticker   = _get("--ticker", "Ticker (e.g. AMAT, BP.L)").upper()
+    raw_date = _get("--date",   "Entry date (YYYY-MM-DD)", date.today().strftime("%Y-%m-%d"))
+
+    # Strategy: numbered list if not passed via --strategy flag
+    strategy = None
+    for i, a in enumerate(args):
+        if a == "--strategy" and i+1 < len(args):
+            strategy = args[i+1]; break
+    if not strategy:
+        print("\n  Strategy:")
+        for idx, s in enumerate(ALL_STRATEGIES, 1):
+            print(f"    {idx:>2}. {s}")
+        raw_s = input("  Pick number (or type name) [1]: ").strip()
+        if raw_s.isdigit() and 1 <= int(raw_s) <= len(ALL_STRATEGIES):
+            strategy = ALL_STRATEGIES[int(raw_s) - 1]
+        elif raw_s in ALL_STRATEGIES:
+            strategy = raw_s
+        else:
+            strategy = ALL_STRATEGIES[0]
+
     trade_type = _get("--type", "Trade type  [practice / real]", "practice").lower()
     if trade_type not in ("practice", "real"): trade_type = "practice"
 
