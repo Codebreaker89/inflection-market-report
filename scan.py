@@ -35,6 +35,8 @@ from high_tight_flag_scanner import scan as scan_htf
 from analyst_upgrade_scanner import scan as scan_analyst_upgrade
 from signal_velocity_scanner      import scan as scan_signal_velocity
 from chokepoint_inflection_scanner import scan as scan_chokepoint
+from stage4_short_scanner          import scan as scan_stage4_short
+from defensive_rotation_scanner    import scan as scan_defensive_rotation
 from show_tracker                  import add_trade_interactive
 
 # ANSI helpers (inline — no shared module dependency)
@@ -57,7 +59,8 @@ def wr_fmt(v):
 # ── STRATEGY REGISTRY ─────────────────────────────────────────────────────────
 ALL_STRATEGIES = ["momentum", "breakout", "pocket_pivot", "connors_rsi2",
                   "ema_ribbon", "nr7", "bb_squeeze", "high_tight_flag",
-                  "analyst_upgrade", "signal_velocity", "chokepoint_inflection"]
+                  "analyst_upgrade", "signal_velocity", "chokepoint_inflection",
+                  "stage4_short", "defensive_rotation"]
 
 SCANNER_MAP = {
     "momentum":        scan_momentum,
@@ -71,6 +74,8 @@ SCANNER_MAP = {
     "analyst_upgrade":      scan_analyst_upgrade,
     "signal_velocity":      scan_signal_velocity,
     "chokepoint_inflection": scan_chokepoint,
+    "stage4_short":          scan_stage4_short,
+    "defensive_rotation":    scan_defensive_rotation,
 }
 
 STRATEGY_LABELS = {
@@ -85,6 +90,8 @@ STRATEGY_LABELS = {
     "analyst_upgrade": "📊  ANALYST UPGRADE  (≥3 firms upgrade in 5 days, tier-1 required)",
     "signal_velocity":       "⚙️   SIGNAL VELOCITY  (TV-style indicator convergence acceleration)",
     "chokepoint_inflection": "🌐  CHOKEPOINT INFLECTION  (macro event → commodity spike → correlated stock lag)",
+    "stage4_short":          "🔻  STAGE 4 SHORT  (Weinstein/Minervini — confirmed distribution, failed rally entry)",
+    "defensive_rotation":    "🛡️   DEFENSIVE ROTATION  (Faber — sector ETF outperforms SPY >3% + accelerating → stock leaders)",
 }
 
 STRATEGY_DESCRIPTIONS = {
@@ -161,6 +168,24 @@ STRATEGY_DESCRIPTIONS = {
         "  commodity move). Minervini ≥4 + price>SMA50 hard filters. Score = corr × lag gap.\n"
         "  Hold 5 days. Zero signals on calm days is correct — fires only on genuine macro events."
     ),
+    "stage4_short": (
+        "SHORT ONLY. Finds stocks in confirmed Stage 4 distribution (Weinstein) ready to\n"
+        "  fall further. Hard filters: full bearish SMA stack (price<SMA50<SMA150<SMA200),\n"
+        "  SMA200 declining, price ≤70% of 52w high, ADX≥20, market cap>$500M, no biotech,\n"
+        "  no earnings within 5 days. Entry trigger: failed rally (stock bounced toward SMA\n"
+        "  then got rejected) OR new 20-day low OR distribution cluster (3+ heavy vol down\n"
+        "  days). Backtest return = short return (positive = stock fell as expected).\n"
+        "  Hold 7 days. Works in bear AND bull markets — finds individual stock blow-ups."
+    ),
+    "defensive_rotation": (
+        "Fires when institutional money rotates from growth into defensive sectors. Step 1:\n"
+        "  XLU/XLP/XLV/GLD each checked — ETF must outperform SPY by >3% over 20 days AND\n"
+        "  recent 5d outperformance must exceed prior 5d (accelerating). Step 2: within\n"
+        "  confirmed rotating sectors, scans ~100 known defensive names for individual leaders\n"
+        "  (stock must outperform its own sector ETF, price>SMA50, RSI 35–70). Zero signals\n"
+        "  on most bull days — correct. Fires in late-cycle bear market transitions.\n"
+        "  Hold 10 days. Source: Meb Faber 'GTAA', sector rotation academic literature."
+    ),
 }
 
 HOLD_DAYS_MAP = {
@@ -175,6 +200,8 @@ HOLD_DAYS_MAP = {
     "analyst_upgrade": 7,
     "signal_velocity":       5,
     "chokepoint_inflection": 5,
+    "stage4_short":          7,
+    "defensive_rotation":    10,
 }
 
 W = 110
@@ -295,6 +322,8 @@ def _print_matrix(results_by_strategy: dict, strategies: list):
         "analyst_upgrade": "ANUPGRD",
         "signal_velocity":       "SIGVEL",
         "chokepoint_inflection": "CHKPNT",
+        "stage4_short":          "S4SHORT",
+        "defensive_rotation":    "DEFROT",
     }
     cols = [col_labels.get(s, s[:6].upper()) for s in strategies]
     col_w = [max(len(c), 6) for c in cols]

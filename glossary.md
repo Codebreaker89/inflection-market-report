@@ -18,6 +18,8 @@
 | **analyst_upgrade_scanner.py** | Scanner: Analyst Upgrade Cluster — ≥3 distinct firms upgrade to Buy-equivalent in 5 days, ≥1 tier-1, no earnings gap-up contamination. Uses yfinance recommendations API. Hold 7d. |
 | **signal_velocity_scanner.py** | Scanner: Signal Velocity — TradingView-style 15-indicator net score accelerating ≥6 points over 3 consecutive days. Catches inflection points before crossovers confirm. Hold 5d. |
 | **chokepoint_inflection_scanner.py** | Scanner: Chokepoint Inflection — macro event → commodity/cyclical spike → correlated stock lag detector. 11-commodity basket, news-confirmed, 60d rolling correlation >0.55, strict lag filter. Hold 5d. |
+| **stage4_short_scanner.py** | Scanner: Stage 4 Short (SHORT ONLY) — Weinstein/Minervini confirmed distribution. Full bearish SMA stack, SMA200 declining, price ≤70% of 52w high, ADX≥20, market cap>$500M, no biotech, no earnings within 5d. Entry: failed rally or new 20d low or distribution cluster. Hold 7d. |
+| **defensive_rotation_scanner.py** | Scanner: Defensive Rotation — detects institutional rotation into XLU/XLP/XLV/GLD (>3% 20d outperformance vs SPY + accelerating), then finds individual stock leaders within those sectors. Hold 10d. |
 | **show_tracker.py** | Portfolio tracker — shows open/closed trades with live P&L, stop loss, hold days. Generates `tracker.html`. |
 | **notify.py** | Daily email digest — fetches live prices, checks alerts (stop loss, hold expired, profit target, earnings), sends HTML email. |
 | **update_scan_history.py** | Appends today's scan results to `scan_history.csv` and backfills d5/d10 returns for past rows. |
@@ -179,7 +181,7 @@ open ~/Claude/Projects/fire/scan_history.csv    # historical dataset
 - **qty** — Shares purchased (= 1000 EUR × fx_at_entry ÷ buy_price)
 - **investment_eur** — Amount invested in EUR (default €1000, can vary)
 - **trade_type** — `practice` (paper trade) or `real` (actual money)
-- **strategy** — which scanner flagged it: `momentum`, `breakout`, `pocket_pivot`, `connors_rsi2`, `ema_ribbon`, `nr7`, `bb_squeeze`, `high_tight_flag`, `analyst_upgrade`, `signal_velocity`, `chokepoint_inflection`
+- **strategy** — which scanner flagged it: `momentum`, `breakout`, `pocket_pivot`, `connors_rsi2`, `ema_ribbon`, `nr7`, `bb_squeeze`, `high_tight_flag`, `analyst_upgrade`, `signal_velocity`, `chokepoint_inflection`, `stage4_short`, `defensive_rotation`
 - **hold_days** — planned hold duration in calendar days (varies by strategy)
 - **stop_loss_price** — price at which to exit to limit loss (= buy_price × 0.97)
 - **target_exit_date** — planned exit date (entry + hold_days business days)
@@ -382,6 +384,108 @@ The scanner replicates TradingView's technical summary using 15 indicators. Each
 - **net_score** / **velocity** — Raw stat fields for analysis
 
 **Signal fires when:** net_score ≥ 3 AND velocity ≥ 6 AND 3 consecutive days of increase AND net_score ≤ 12 (not already maxed)
+
+---
+
+## Defensive Rotation Scanner (`defensive_rotation_scanner.py`)
+
+Fires when institutional money is measurably rotating into defensive sectors. Two-stage process: confirm rotation at the ETF level first, then find the individual stock leaders getting the most flows.
+
+### Sectors Monitored
+
+| ETF | Sector | Why it rotates in |
+|---|---|---|
+| `XLU` | Utilities | Rate cut expectations, risk-off sentiment, inflation hedging |
+| `XLP` | Consumer Staples | Bear market safety trade, recession resilience |
+| `XLV` | Healthcare | Recession-proof earnings, defensive growth |
+| `GLD` | Gold | Dollar weakness, inflation spike, geopolitical fear |
+
+### Rotation Detection (Step 1)
+
+Both conditions must be true simultaneously for a sector to be "active":
+
+1. **20-day outperformance > 3%** — sector ETF's 20d return exceeds SPY's 20d return by at least 3 percentage points. Eliminates noise — this is a meaningful sustained shift.
+2. **Acceleration** — the sector's outperformance over the most recent 5 days is greater than its outperformance in the 5 days before that. The rotation must be *speeding up*, not fading.
+
+Zero signals on most bull market days — this is correct behaviour.
+
+### Individual Stock Selection (Step 2)
+
+Scans ~100 known defensive names across the active sectors. Hard filters:
+
+- **Price > SMA50** — stock is in its own uptrend within the sector
+- **Stock 20d return > sector ETF 20d return** — outperforming the sector itself (the leader, not the laggard)
+- **RSI 35–70** — momentum present but not overbought
+- **ADX > 12** — some directional trend
+- **Volume > 0.8× average** — at least baseline participation
+
+### Fresh Signal Tags
+
+- **`ROT:XLU`** (or XLP/XLV/GLD) — which sector rotation triggered this
+- **`ETF+X%vsS&P`** — how much the sector ETF has outperformed SPY (e.g. `ETF+4.2%vsS&P`)
+
+### Confirmation Tags (conf column)
+
+- **`RS+X%`** — stock outperforms SPY by X% over 20 days
+- **`vsETF+X%`** — stock outperforms its own sector ETF by X% over 20 days (most important — this is what makes it a leader)
+- **VOL↑** — volume > 1.2× average (institutions buying this name)
+- **MACD+** — MACD histogram positive
+- **>SMA200** — price above the 200d SMA (trend intact)
+- **52wHI** — within 10% of 52-week high (showing relative strength)
+- **M≥3** — Minervini-lite score ≥3 (defensives rarely score 6+ on the full template)
+
+### Hold Period
+
+10 days. Defensive rotations move slowly — they're driven by portfolio rebalancing, not momentum. Give it time.
+
+---
+
+## Stage 4 Short Scanner (`stage4_short_scanner.py`)
+
+**SHORT ONLY.** Finds stocks in confirmed institutional distribution where the downtrend is structurally established and a fresh entry trigger has just fired. Based on Stan Weinstein's Stage Analysis and Minervini's short SEPA methodology.
+
+### Hard Filters (all must pass — zero exceptions)
+
+| Filter | Threshold | Reason |
+|---|---|---|
+| Full bearish SMA stack | price < SMA50 < SMA150 | Confirms downtrend across all timeframes |
+| SMA200 declining | SMA200 < SMA200 (20d ago) | Structural bear trend, not a dip |
+| Distribution depth | price ≤ 70% of 52-week high | Real distribution, not a brief pullback |
+| Trend strength | ADX ≥ 20 | Downtrend is real, not sideways chop |
+| Market cap | > $500M | Avoid short squeeze risk on small floats |
+| Sector | Not biotech / pharma | Binary FDA gap risk — never short these |
+| Earnings | No earnings within 5 days | Earnings gaps can go either way |
+
+### Entry Triggers (at least one must fire within last 3 days)
+
+- **FAIL-SMA50** — Price bounced toward the declining SMA50 (within 3%), got rejected, closed back below. This is the highest-conviction entry — stock showed it can't rally.
+- **FAIL-SMA150** — Same rejection pattern at the SMA150 (medium-term ceiling).
+- **20dLOW** — New 20-day closing low. Downtrend momentum resuming after a brief pause.
+- **DIST** — Distribution cluster: ≥3 above-average-volume down-days in the last 10 sessions. Institutions actively selling.
+
+### Confirmation Signals (conf column)
+
+- **VOLdist** — Down-day volume / up-day volume > 1.3 in last 10 sessions (more volume on selling than buying)
+- **RS-** — Stock underperforming its local benchmark by >5% over 63 days (relative weakness)
+- **RSI<40** — RSI below 40 (momentum clearly bearish)
+- **MACD-** — MACD histogram negative (momentum direction confirmed down)
+- **DeathX** — Death cross (SMA50 crossed below SMA200) occurred within the last 40 days — recent structural shift
+- **52wLow** — Price within 15% of 52-week low (gravity pulling lower)
+- **BEAR-MKT** — SPY is below its 200d SMA (broad market in bear regime — tailwind for shorts)
+
+### Score Column
+
+Count of confirmation signals (0–7). Higher score = more institutional evidence of selling. Minimum recommendation: score ≥ 3 before acting.
+
+### Backtest Return Convention
+
+For shorts, **positive backtest return = stock fell** (profitable short). A win rate of 60%+ with positive average is the target.
+
+### Risk Notes
+
+- Always use a **stop loss above the nearest declining SMA** (SMA50 is the first ceiling). If price closes above SMA50, exit immediately — the thesis is broken.
+- **Bear market regime** (`BEAR-MKT` in conf) adds conviction. Shorting individual stocks in a bull market requires higher score (≥4) due to index tailwind.
+- Minervini column (M) shows inverse Weinstein score (0–7): higher = more bearish structure confirmed.
 
 ---
 
