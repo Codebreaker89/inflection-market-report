@@ -20,7 +20,7 @@
 | **chokepoint_inflection_scanner.py** | Scanner: Chokepoint Inflection — macro event → commodity/cyclical spike → correlated stock lag detector. 11-commodity basket, news-confirmed, 60d rolling correlation >0.55, strict lag filter. Hold 5d. |
 | **stage4_short_scanner.py** | Scanner: Stage 4 Short (SHORT ONLY) — Weinstein/Minervini confirmed distribution. Full bearish SMA stack, SMA200 declining, price ≤70% of 52w high, ADX≥20, market cap>$500M, no biotech, no earnings within 5d. Entry: failed rally or new 20d low or distribution cluster. Hold 7d. |
 | **defensive_rotation_scanner.py** | Scanner: Defensive Rotation — detects institutional rotation into XLU/XLP/XLV/GLD (>3% 20d outperformance vs SPY + accelerating), then finds individual stock leaders within those sectors. Hold 10d. |
-| **show_tracker.py** | Portfolio tracker — shows open/closed trades with live P&L, stop loss, hold days. Generates `tracker.html`. |
+| **show_tracker.py** | Portfolio tracker — shows open/closed trades with live P&L, stop loss, hold days. Generates `tracker.html`. Subcommands: `add` (new trade), `close` (close existing trade interactively). |
 | **notify.py** | Daily email digest — fetches live prices, checks alerts (stop loss, hold expired, profit target, earnings), sends HTML email. |
 | **update_scan_history.py** | Appends today's scan results to `scan_history.csv` and backfills d5/d10 returns for past rows. |
 | **config.py** | Credentials and parameters: Gmail App Password, stop loss %, profit target %, hold days per strategy. |
@@ -95,6 +95,8 @@ Never commit tokens to the repo. If you need to push again:
 | Scan + history + email preview | `cd ~/Claude/Projects/fire && python3 scan.py --no-backtest && python3 update_scan_history.py && python3 notify.py` |
 | Full run (scan + history + send email) | `cd ~/Claude/Projects/fire && python3 scan.py --no-backtest && python3 update_scan_history.py && python3 notify.py --send` |
 | Open portfolio tracker | `cd ~/Claude/Projects/fire && python3 show_tracker.py && open tracker.html` |
+| Add a trade | `cd ~/Claude/Projects/fire && python3 show_tracker.py add` |
+| Close a trade | `cd ~/Claude/Projects/fire && python3 show_tracker.py close` |
 | Open email preview | `open ~/Claude/Projects/fire/digest_preview.html` |
 | Open historical dataset | `open ~/Claude/Projects/fire/scan_history.csv` |
 | Trigger scheduled job manually | `launchctl kickstart gui/$(id -u)/com.hemant.tradedigest` |
