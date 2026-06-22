@@ -298,6 +298,9 @@ def score_row(df: pd.DataFrame, idx: int,
 
     adx_val = float(row["adx"])
 
+    # Hard ADX cap — already strongly trending = not coiling
+    if adx_val > 35: return None
+
     # ── COIL SIGNALS ─────────────────────────────────────────────────────────
 
     # 1. ATR contraction: recent 5-bar ATR < ATR_CONTRACT × prior 15-bar ATR
@@ -381,15 +384,21 @@ def score_row(df: pd.DataFrame, idx: int,
     total_score = coil_score + break_score * 2  # break signals weighted double
     phase       = "BREAK" if (break_score >= 2 and total_score >= MIN_BREAK_SCORE) else "COIL"
 
+    coil_list  = [k for k, v in coil_signals.items() if v]
+    break_list = [k for k, v in break_signals.items() if v]
     return {
         "score":        total_score,
         "phase":        phase,
-        "coil_sigs":    [k for k, v in coil_signals.items() if v],
-        "break_sigs":   [k for k, v in break_signals.items() if v],
+        "coil_sigs":    coil_list,
+        "break_sigs":   break_list,
+        # unified scan.py display keys
+        "fresh":        ([phase] + break_list) if break_list else [phase],
+        "conf":         coil_list,
         "minervini":    m,
         "rsi":          round(float(row["rsi"]),  1),
         "adx":          round(adx_val,            1),
         "price":        round(float(row["Close"]),2),
+        "vol_ratio":    round(float(row["Volume"]) / float(row["vol_ma20"]), 2) if float(row["vol_ma20"]) > 0 else 0,
         "atr_ratio":    atr_ratio,
         "vol_5d_ratio": vol_ratio_5d,
         "pivot_high":   round(pivot_high,         2),
