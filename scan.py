@@ -33,8 +33,9 @@ from nr7_scanner             import scan as scan_nr7
 from bb_squeeze_scanner      import scan as scan_bb_squeeze
 from high_tight_flag_scanner import scan as scan_htf
 from analyst_upgrade_scanner import scan as scan_analyst_upgrade
-from signal_velocity_scanner import scan as scan_signal_velocity
-from show_tracker            import add_trade_interactive
+from signal_velocity_scanner      import scan as scan_signal_velocity
+from chokepoint_inflection_scanner import scan as scan_chokepoint
+from show_tracker                  import add_trade_interactive
 
 # ANSI helpers (inline — no shared module dependency)
 import os as _os
@@ -56,7 +57,7 @@ def wr_fmt(v):
 # ── STRATEGY REGISTRY ─────────────────────────────────────────────────────────
 ALL_STRATEGIES = ["momentum", "breakout", "pocket_pivot", "connors_rsi2",
                   "ema_ribbon", "nr7", "bb_squeeze", "high_tight_flag",
-                  "analyst_upgrade", "signal_velocity"]
+                  "analyst_upgrade", "signal_velocity", "chokepoint_inflection"]
 
 SCANNER_MAP = {
     "momentum":        scan_momentum,
@@ -67,8 +68,9 @@ SCANNER_MAP = {
     "nr7":             scan_nr7,
     "bb_squeeze":      scan_bb_squeeze,
     "high_tight_flag": scan_htf,
-    "analyst_upgrade": scan_analyst_upgrade,
-    "signal_velocity": scan_signal_velocity,
+    "analyst_upgrade":      scan_analyst_upgrade,
+    "signal_velocity":      scan_signal_velocity,
+    "chokepoint_inflection": scan_chokepoint,
 }
 
 STRATEGY_LABELS = {
@@ -81,7 +83,8 @@ STRATEGY_LABELS = {
     "bb_squeeze":      "🔲  BB SQUEEZE  (TTM Squeeze — Bollinger / John Carter)",
     "high_tight_flag": "🚀  HIGH TIGHT FLAG  (Minervini / O'Neil — pole + flag)",
     "analyst_upgrade": "📊  ANALYST UPGRADE  (≥3 firms upgrade in 5 days, tier-1 required)",
-    "signal_velocity": "⚙️   SIGNAL VELOCITY  (TV-style indicator convergence acceleration)",
+    "signal_velocity":       "⚙️   SIGNAL VELOCITY  (TV-style indicator convergence acceleration)",
+    "chokepoint_inflection": "🌐  CHOKEPOINT INFLECTION  (macro event → commodity spike → correlated stock lag)",
 }
 
 STRATEGY_DESCRIPTIONS = {
@@ -148,6 +151,16 @@ STRATEGY_DESCRIPTIONS = {
         "  flipping bullish simultaneously. Catches transitions BEFORE crossovers confirm.\n"
         "  Hold 5 days. Inspired by TradingView technical summary rate-of-change."
     ),
+    "chokepoint_inflection": (
+        "Macro event → commodity/cyclical spike → correlated stock lag detector.\n"
+        "  Step 1: 11-ticker basket (crude, gas, copper, gold, wheat, aluminium, uranium,\n"
+        "  metals, semiconductors, rare earths, dry bulk) fires when 5d return >4% AND\n"
+        "  accelerating. Step 2: yfinance news headlines confirm macro keyword (war, sanctions,\n"
+        "  shortage, strait, embargo, chip, rare earth…). Step 3: stocks with 60d rolling\n"
+        "  correlation >0.55 to the commodity that have NOT yet moved (stock 5d ret <15% of\n"
+        "  commodity move). Minervini ≥4 + price>SMA50 hard filters. Score = corr × lag gap.\n"
+        "  Hold 5 days. Zero signals on calm days is correct — fires only on genuine macro events."
+    ),
 }
 
 HOLD_DAYS_MAP = {
@@ -160,7 +173,8 @@ HOLD_DAYS_MAP = {
     "bb_squeeze":      7,
     "high_tight_flag": 10,
     "analyst_upgrade": 7,
-    "signal_velocity": 5,
+    "signal_velocity":       5,
+    "chokepoint_inflection": 5,
 }
 
 W = 110
@@ -279,7 +293,8 @@ def _print_matrix(results_by_strategy: dict, strategies: list):
         "bb_squeeze":      "BBSQZ",
         "high_tight_flag": "HTF",
         "analyst_upgrade": "ANUPGRD",
-        "signal_velocity": "SIGVEL",
+        "signal_velocity":       "SIGVEL",
+        "chokepoint_inflection": "CHKPNT",
     }
     cols = [col_labels.get(s, s[:6].upper()) for s in strategies]
     col_w = [max(len(c), 6) for c in cols]

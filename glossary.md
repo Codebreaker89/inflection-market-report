@@ -17,6 +17,7 @@
 | **high_tight_flag_scanner.py** | Scanner: High Tight Flag (Minervini / O'Neil) — stock up ≥90% in ≤8 weeks then consolidates ≤25%. Rare, high-conviction. Hold 10d. |
 | **analyst_upgrade_scanner.py** | Scanner: Analyst Upgrade Cluster — ≥3 distinct firms upgrade to Buy-equivalent in 5 days, ≥1 tier-1, no earnings gap-up contamination. Uses yfinance recommendations API. Hold 7d. |
 | **signal_velocity_scanner.py** | Scanner: Signal Velocity — TradingView-style 15-indicator net score accelerating ≥6 points over 3 consecutive days. Catches inflection points before crossovers confirm. Hold 5d. |
+| **chokepoint_inflection_scanner.py** | Scanner: Chokepoint Inflection — macro event → commodity/cyclical spike → correlated stock lag detector. 11-commodity basket, news-confirmed, 60d rolling correlation >0.55, strict lag filter. Hold 5d. |
 | **show_tracker.py** | Portfolio tracker — shows open/closed trades with live P&L, stop loss, hold days. Generates `tracker.html`. |
 | **notify.py** | Daily email digest — fetches live prices, checks alerts (stop loss, hold expired, profit target, earnings), sends HTML email. |
 | **update_scan_history.py** | Appends today's scan results to `scan_history.csv` and backfills d5/d10 returns for past rows. |
@@ -178,7 +179,7 @@ open ~/Claude/Projects/fire/scan_history.csv    # historical dataset
 - **qty** — Shares purchased (= 1000 EUR × fx_at_entry ÷ buy_price)
 - **investment_eur** — Amount invested in EUR (default €1000, can vary)
 - **trade_type** — `practice` (paper trade) or `real` (actual money)
-- **strategy** — which scanner flagged it: `momentum`, `breakout`, `pocket_pivot`, `connors_rsi2`, `ema_ribbon`, `nr7`, `bb_squeeze`, `high_tight_flag`, `analyst_upgrade`, `signal_velocity`
+- **strategy** — which scanner flagged it: `momentum`, `breakout`, `pocket_pivot`, `connors_rsi2`, `ema_ribbon`, `nr7`, `bb_squeeze`, `high_tight_flag`, `analyst_upgrade`, `signal_velocity`, `chokepoint_inflection`
 - **hold_days** — planned hold duration in calendar days (varies by strategy)
 - **stop_loss_price** — price at which to exit to limit loss (= buy_price × 0.97)
 - **target_exit_date** — planned exit date (entry + hold_days business days)
@@ -381,6 +382,64 @@ The scanner replicates TradingView's technical summary using 15 indicators. Each
 - **net_score** / **velocity** — Raw stat fields for analysis
 
 **Signal fires when:** net_score ≥ 3 AND velocity ≥ 6 AND 3 consecutive days of increase AND net_score ≤ 12 (not already maxed)
+
+---
+
+## Chokepoint Inflection Scanner (`chokepoint_inflection_scanner.py`)
+
+Macro-driven strategy. Fires only when a real geopolitical/supply event is moving a commodity AND correlated stocks haven't yet responded.
+
+### Commodity Basket (11 instruments)
+
+| Ticker | Name | Example triggers |
+|---|---|---|
+| `CL=F` | Crude Oil | Hormuz closure, OPEC cut, Iran sanctions |
+| `NG=F` | Natural Gas | Russia pipeline, European winter shortage |
+| `HG=F` | Copper | Chilean mine strike, China EV demand surge |
+| `GC=F` | Gold | Rate cut fears, war escalation, safe haven |
+| `ZW=F` | Wheat | Black Sea disruption, Ukraine conflict, drought |
+| `ALI=F` | Aluminum | Russian smelter sanctions, energy price spike |
+| `URA` | Uranium ETF | Nuclear policy shift, Kazakh supply cut |
+| `XME` | Metals & Mining | Broad commodity shock, tariff shock |
+| `SOXX` | Semiconductors | Taiwan strait tension, ASML export ban, China chip restrictions |
+| `REMX` | Rare Earths | China export ban on critical minerals, EV battery shortage |
+| `BDRY` | Dry Bulk Shipping | Suez/Panama canal blockage, port congestion surge |
+
+### How the Signal Fires
+
+1. **Commodity inflects:** 5-day return > 4% AND today's momentum is higher than 3 days ago (accelerating — not just a one-day spike)
+2. **News confirms:** yfinance headline scan for macro keywords (war, sanctions, shortage, embargo, strait, chip, rare earth, etc.) within the last 5 days
+3. **Stock not yet repriced:** 60-day rolling correlation to the commodity > 0.55 AND stock's 5d return < 15% of the commodity's 5d move (strict lag filter)
+4. **Quality filters:** Minervini ≥ 4, price > SMA50
+
+### Fresh Signal Tags
+
+- **`CP:CL=F`** — Triggered by crude oil chokepoint (ticker shown)
+- **`+X.X%`** — How much the commodity has moved in 5 days (e.g. `+6.2%`)
+
+### Confirmation Tags (conf column)
+
+- **CORR>0.7** — 60d correlation to the commodity exceeds 0.70 (very tight relationship)
+- **VOL1.5x** — Stock volume > 1.5× average (first buyers arriving)
+- **M≥5** — Minervini score ≥5 (strong trend structure)
+- **ADX>15** — Some directional trend present
+
+### Score Logic
+
+`score = correlation × lag_gap × 100`, capped at 10. Higher score = tighter corr + bigger lag = more potential catch-up.
+
+### Key stat fields
+
+- **commodity** — which commodity triggered (e.g. `SOXX`)
+- **commodity_name** — human label (e.g. `Semiconductors`)
+- **comm_ret_5d** — commodity 5d return (%)
+- **stock_5d_ret** — stock's own 5d return (%) — should be much lower
+- **lag_gap** — difference: comm_ret − stock_ret (the catch-up potential)
+- **correlation** — 60d rolling correlation to the commodity
+
+### Zero Signals is Normal
+
+This scanner fires only when a genuine macro event hits. On quiet days you will see 0 results — that is correct behaviour. Do not lower thresholds just to generate signals.
 
 ---
 
