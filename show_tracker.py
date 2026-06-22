@@ -871,7 +871,21 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
 
     for strat in strategies:
         strat_rows = [r for r in rows if r["strategy"] == strat]
-        label = {"momentum": "🟢  MOMENTUM SCANNER", "breakout": "🔭  BREAKOUT SCANNER"}.get(strat, strat.upper())
+        label = {
+            "momentum":             "🟢  MOMENTUM  (O'Neil / IBD crossover signals)",
+            "breakout":             "🔭  BREAKOUT  (VCP / coil pre-breakout)",
+            "pocket_pivot":         "🟠  POCKET PIVOT  (Morales & Kacher)",
+            "connors_rsi2":         "🔵  CONNORS RSI(2)  (mean reversion in uptrend)",
+            "ema_ribbon":           "🟣  EMA RIBBON  (8/13/21/34/55 expansion pullback)",
+            "nr7":                  "⚡  NR7  (Toby Crabel — narrowest range compression)",
+            "bb_squeeze":           "🔲  BB SQUEEZE  (TTM Squeeze — Bollinger / John Carter)",
+            "high_tight_flag":      "🚀  HIGH TIGHT FLAG  (Minervini / O'Neil — pole + flag)",
+            "analyst_upgrade":      "📊  ANALYST UPGRADE  (≥3 firms upgrade in 5 days, tier-1 required)",
+            "signal_velocity":      "⚙️   SIGNAL VELOCITY  (TV-style indicator convergence acceleration)",
+            "chokepoint_inflection":"🌐  CHOKEPOINT INFLECTION  (macro event → commodity spike → stock lag)",
+            "stage4_short":         "🔻  STAGE 4 SHORT  (Weinstein/Minervini — confirmed distribution)",
+            "defensive_rotation":   "🛡️   DEFENSIVE ROTATION  (Faber — sector ETF outperforms SPY → stock leaders)",
+        }.get(strat, strat.upper())
         print(f"\n  {BOLD(label)}")
         print()
 
@@ -892,7 +906,22 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
             tt = r.get("trade_type", "practice")
             type_badge = GRN("REAL    ") if tt == "real" else YLW("PRACTICE")
             strat_val = r.get("strategy", "")
-            strat_s   = CYN("MOMENTUM") if strat_val == "momentum" else MAG("BREAKOUT") if strat_val == "breakout" else DIM(strat_val[:8])
+            _strat_badges = {
+                "momentum":              CYN("MNTM    "),
+                "breakout":              MAG("BRKOUT  "),
+                "pocket_pivot":          _c("33","PP      "),
+                "connors_rsi2":          _c("36","RSI2    "),
+                "ema_ribbon":            _c("35","EMARIBN "),
+                "nr7":                   _c("33","NR7     "),
+                "bb_squeeze":            _c("36","BBSQZ   "),
+                "high_tight_flag":       _c("32","HTF     "),
+                "analyst_upgrade":       _c("34","ANUPGRD "),
+                "signal_velocity":       _c("35","SIGVEL  "),
+                "chokepoint_inflection": _c("31","CHKPNT  "),
+                "stage4_short":          _c("31","S4SHORT "),
+                "defensive_rotation":    _c("32","DEFROT  "),
+            }
+            strat_s = _strat_badges.get(strat_val, DIM(f"{strat_val[:8]:<8}"))
             inv_e = f"€{float(r['investment_eur']):.0f}" if r.get("investment_eur") else "─"
             row_line = (f"  {r['id']:>2}  {ticker_s}  {co_s}  {r['entry_date']:<10}  "
                         f"{buy_e:>7}  {now_e:>7}  {float(r['qty']):>6.2f}  {inv_e:>6}  "
