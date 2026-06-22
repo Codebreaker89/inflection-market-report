@@ -8,6 +8,8 @@ python3 show_tracker.py --closed           # closed trades only
 python3 show_tracker.py add                # interactive: add a new trade
 python3 show_tracker.py add --ticker AMAT --date 2026-06-10 --price 185.50 \\
         --strategy momentum --signals "MACD RSI50 · VOL ADX↑"
+python3 show_tracker.py close              # interactive: close an open trade
+python3 show_tracker.py close --id 3 --date 2026-06-22 --price 190.00 --reason 1wk_auto
 
 Data file: trades.csv  (same folder as this script)
 Each trade = €1000 invested. Returns shown in both % and EUR.
@@ -936,7 +938,7 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
     print(DIM("  MaxDD = worst intra-week close vs entry price.  "
               "Regime = SPY vs 50 SMA at entry."))
     print(DIM("  To add: python3 show_tracker.py add"))
-    print(DIM("  To close: edit trades.csv → status=CLOSED, actual_sell_date, exit_price, exit_reason"))
+    print(DIM("  To close a trade: python3 show_tracker.py close"))
     print("╚" + "═"*(W-2) + "╝\n")
 
 
@@ -1200,6 +1202,102 @@ def generate_dashboard(rows: list[dict], filter_status=None):
     print(f"  Dashboard → {out}")
 
 
+# ── CLOSE TRADE ───────────────────────────────────────────────────────────────
+
+def close_trade_interactive(args: list[str]):
+    def _get(flag, prompt, default=""):
+        for i, a in enumerate(args):
+            if a == flag and i+1 < len(args): return args[i+1]
+        val = input(f"  {prompt} [{default}]: ").strip()
+        return val or default
+
+    trades = load_trades()
+    open_trades = [t for t in trades if t.get("status") == "OPEN"]
+    if not open_trades:
+        print("\n  No open trades to close."); return
+
+    print("\n  ── Close a Trade ──")
+    print(f"\n  Open positions:")
+    for t in open_trades:
+        print(f"    #{t['id']:>3}  {t['ticker']:<10}  entry={t['entry_date']}  "
+              f"strategy={t['strategy']}  buy={t['buy_price']} {t['currency']}")
+
+    raw_id = _get("--id", "\n  Trade # to close").strip()
+    try:
+        trade_id = int(raw_id)
+    except ValueError:
+        print("  Invalid ID."); return
+
+    trade = next((t for t in trades if str(t.get("id")) == str(trade_id)), None)
+    if not trade:
+        print(f"  Trade #{trade_id} not found."); return
+    if trade.get("status") == "CLOSED":
+        print(f"  Trade #{trade_id} is already CLOSED."); return
+
+    ticker    = trade["ticker"]
+    currency  = trade.get("currency", "USD")
+    buy_price = float(trade.get("buy_price", 0))
+    qty       = float(trade.get("qty", 0))
+    fx_entry  = float(trade.get("fx_at_entry", 1))
+    invest_eur = float(trade.get("investment_eur", 0))
+
+    raw_date = _get("--date", "Close date (YYYY-MM-DD)", date.today().strftime("%Y-%m-%d"))
+    sell_date = datetime.strptime(raw_date, "%Y-%m-%d").date()
+
+    raw_price = _get("--price", f"Exit price (in {currency})")
+    if raw_price.upper().startswith("EUR:"):
+        fx_exit   = fetch_fx_on_date(currency, sell_date)
+        eur_amt   = float(raw_price.split(":")[1])
+        exit_price = round(eur_amt * fx_exit, 4)
+        print(f"  → {eur_amt} EUR × {fx_exit:.4f} = {exit_price} {currency}")
+    else:
+        exit_price = float(raw_price)
+
+    exit_reasons = ["1wk_auto", "2wk_auto", "manual_stop", "manual_target", "news_exit"]
+    print(f"\n  Exit reason options: {', '.join(exit_reasons)}")
+    exit_reason = _get("--reason", "Exit reason", "1wk_auto")
+
+    # P&L summary
+    pnl_ccy   = round((exit_price - buy_price) * qty, 2)
+    pnl_pct   = round((exit_price - buy_price) / buy_price * 100, 2) if buy_price else 0
+    fx_exit_r = fetch_fx_on_date(currency, sell_date)
+    pnl_eur   = round(pnl_ccy / fx_exit_r, 2) if fx_exit_r else 0
+
+    pnl_str = GRN(f"+{pnl_pct}%  +{pnl_ccy} {currency}  +€{pnl_eur}") if pnl_pct >= 0 \
+              else RED(f"{pnl_pct}%  {pnl_ccy} {currency}  €{pnl_eur}")
+
+    print(f"\n  ┌─ Close Summary ────────────────────────────────────────────")
+    print(f"  │  Ticker:      {ticker}  (Trade #{trade_id})")
+    print(f"  │  Entry:       {trade['entry_date']}  @  {buy_price} {currency}")
+    print(f"  │  Exit:        {sell_date}  @  {exit_price} {currency}")
+    print(f"  │  P&L:         {pnl_str}")
+    print(f"  │  Exit reason: {exit_reason}")
+    print(f"  └────────────────────────────────────────────────────────────")
+
+    confirm = input("\n  Close this trade? [Y/n]: ").strip().lower()
+    if confirm == "n":
+        print("  Cancelled."); return
+
+    # Update trade record
+    trade["status"]          = "CLOSED"
+    trade["actual_sell_date"] = sell_date.strftime("%Y-%m-%d")
+    trade["exit_price"]      = exit_price
+    trade["exit_reason"]     = exit_reason
+
+    # Auto-populate exit indicators
+    print(f"\n  Fetching exit indicators for {ticker} on {sell_date}...", end=" ", flush=True)
+    ind = fetch_indicators_at_date(ticker, sell_date)
+    trade["rsi_at_exit"]       = ind.get("rsi", "")
+    trade["adx_at_exit"]       = ind.get("adx", "")
+    trade["minervini_at_exit"] = ind.get("minervini", "")
+    trade["vol_ratio_exit"]    = ind.get("vol_ratio", "")
+    print("✓")
+
+    save_trades(trades)
+    result = GRN("WIN ✅") if pnl_pct >= 0 else RED("LOSS ❌")
+    print(f"\n  Trade #{trade_id} closed — {result}  {pnl_str}")
+
+
 # ── MAIN ─────────────────────────────────────────────────────────────────────
 
 def main():
@@ -1207,6 +1305,10 @@ def main():
 
     if args and args[0] == "add":
         add_trade_interactive(args[1:])
+        return
+
+    if args and args[0] == "close":
+        close_trade_interactive(args[1:])
         return
 
     filter_status = None
