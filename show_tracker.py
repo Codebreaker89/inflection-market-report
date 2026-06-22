@@ -1122,7 +1122,21 @@ def generate_dashboard(rows: list[dict], filter_status=None):
     strategies   = list(dict.fromkeys(r["strategy"] for r in rows))
     sections_html = ""
     for strat in strategies:
-        label     = "🟢 MOMENTUM SCANNER" if strat == "momentum" else "🔭 BREAKOUT SCANNER"
+        label = {
+            "momentum":              "🟢 MOMENTUM  (O'Neil / IBD)",
+            "breakout":              "🔭 BREAKOUT  (VCP / Minervini)",
+            "pocket_pivot":          "🟠 POCKET PIVOT  (Morales & Kacher)",
+            "connors_rsi2":          "🔵 CONNORS RSI(2)  (mean reversion)",
+            "ema_ribbon":            "🟣 EMA RIBBON  (8/13/21/34/55)",
+            "nr7":                   "⚡ NR7  (Toby Crabel)",
+            "bb_squeeze":            "🔲 BB SQUEEZE  (TTM / John Carter)",
+            "high_tight_flag":       "🚀 HIGH TIGHT FLAG  (Minervini / O'Neil)",
+            "analyst_upgrade":       "📊 ANALYST UPGRADE  (≥3 firms, tier-1)",
+            "signal_velocity":       "⚙️ SIGNAL VELOCITY  (indicator convergence)",
+            "chokepoint_inflection": "🌐 CHOKEPOINT INFLECTION  (macro → commodity → stock)",
+            "stage4_short":          "🔻 STAGE 4 SHORT  (Weinstein / Minervini)",
+            "defensive_rotation":    "🛡️ DEFENSIVE ROTATION  (Faber sector rotation)",
+        }.get(strat, strat.upper())
         s_rows    = [r for r in rows if r["strategy"] == strat]
         s_pnls    = [r["pnl_now_eur"] for r in s_rows if r.get("pnl_now_eur") is not None]
         s_total   = sum(s_pnls) if s_pnls else None
