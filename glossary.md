@@ -20,6 +20,8 @@
 | **chokepoint_inflection_scanner.py** | Scanner: Chokepoint Inflection — macro event → commodity/cyclical spike → correlated stock lag detector. 11-commodity basket, news-confirmed, 60d rolling correlation >0.55, strict lag filter. Hold 5d. |
 | **stage4_short_scanner.py** | Scanner: Stage 4 Short (SHORT ONLY) — Weinstein/Minervini confirmed distribution. Full bearish SMA stack, SMA200 declining, price ≤70% of 52w high, ADX≥20, market cap>$500M, no biotech, no earnings within 5d. Entry: failed rally or new 20d low or distribution cluster. Hold 7d. |
 | **defensive_rotation_scanner.py** | Scanner: Defensive Rotation — detects institutional rotation into XLU/XLP/XLV/GLD (>3% 20d outperformance vs SPY + accelerating), then finds individual stock leaders within those sectors. Hold 10d. |
+| **cup_handle_scanner.py** | Scanner: Cup & Handle (O'Neil/IBD) — rounded base 12-35% deep over 30-200 days, tight handle ≤12% in upper half of cup, price within 3% of pivot. Minervini ≥5. Hold 10d. |
+| **power_earnings_gap_scanner.py** | Scanner: Power Earnings Gap (Gil Morales) — stock gaps ≥8% on earnings with 2× volume, gap not filled, not extended >20%. Tagged EG✓ (earnings verified) or EG~ (pattern only). Hold 10d. |
 | **show_tracker.py** | Portfolio tracker — shows open/closed trades with live P&L, stop loss, hold days. Generates `tracker.html`. Subcommands: `add` (new trade), `close` (close existing trade interactively). |
 | **notify.py** | Daily email digest — fetches live prices, checks alerts (stop loss, hold expired, profit target, earnings), sends HTML email. |
 | **update_scan_history.py** | Appends today's scan results to `scan_history.csv` and backfills d5/d10 returns for past rows. |
@@ -183,7 +185,7 @@ open ~/Claude/Projects/fire/scan_history.csv    # historical dataset
 - **qty** — Shares purchased (= 1000 EUR × fx_at_entry ÷ buy_price)
 - **investment_eur** — Amount invested in EUR (default €1000, can vary)
 - **trade_type** — `practice` (paper trade) or `real` (actual money)
-- **strategy** — which scanner flagged it: `momentum`, `breakout`, `pocket_pivot`, `connors_rsi2`, `ema_ribbon`, `nr7`, `bb_squeeze`, `high_tight_flag`, `analyst_upgrade`, `signal_velocity`, `chokepoint_inflection`, `stage4_short`, `defensive_rotation`
+- **strategy** — which scanner flagged it: `momentum`, `breakout`, `pocket_pivot`, `connors_rsi2`, `ema_ribbon`, `nr7`, `bb_squeeze`, `high_tight_flag`, `analyst_upgrade`, `signal_velocity`, `chokepoint_inflection`, `stage4_short`, `defensive_rotation`, `cup_handle`, `power_earnings_gap`
 - **hold_days** — planned hold duration in calendar days (varies by strategy)
 - **stop_loss_price** — price at which to exit to limit loss (= buy_price × 0.97)
 - **target_exit_date** — planned exit date (entry + hold_days business days)
@@ -546,6 +548,81 @@ Macro-driven strategy. Fires only when a real geopolitical/supply event is movin
 ### Zero Signals is Normal
 
 This scanner fires only when a genuine macro event hits. On quiet days you will see 0 results — that is correct behaviour. Do not lower thresholds just to generate signals.
+
+---
+
+## Cup & Handle Scanner (`cup_handle_scanner.py`)
+
+Classic O'Neil base pattern. One of the most reliable continuation setups in all of swing trading literature.
+
+### Cup Criteria (all must pass)
+| Parameter | Value | Reason |
+|---|---|---|
+| Depth | 12–35% from left lip to cup low | Shallow = no base, deep = too damaged |
+| Duration | 30–200 trading days | 6 weeks to ~9 months |
+| Shape | Rounded — cup low in middle 60% of duration | Filters V-bottoms (panic selloffs don't form proper bases) |
+| Right lip recovery | Within 5% of left lip | Stock must recover fully before handle forms |
+
+### Handle Criteria (all must pass)
+| Parameter | Value |
+|---|---|
+| Duration | 5–25 trading days |
+| Depth | ≤ 12% from handle high to low |
+| Position | Upper half of cup (handle low above cup midpoint) |
+| Volume | Drying up vs 20-day average (no distribution) |
+
+### Entry Zone
+Price within 3% below the **pivot** (= handle high). This is the buy point — not after the breakout is obvious.
+
+### Fresh Signal Tags
+- **`C&H`** — Cup and Handle pattern confirmed
+- **`PIV@X`** — Pivot price (e.g. `PIV@185.40`) — this is your buy point
+
+### Confirmation Tags
+- **`CUP X%`** — Cup depth percentage
+- **`HDL X%`** — Handle depth percentage (tighter = better)
+- **`VOLdry`** — Handle volume below 85% of 20d average
+- **`MACD+`** — MACD histogram positive
+- **`RSI50-70`** — RSI in momentum zone
+- **`M≥6`** — Minervini ≥6
+- **`VOL1.5x`** — Today's volume elevated (institutions arriving)
+
+---
+
+## Power Earnings Gap Scanner (`power_earnings_gap_scanner.py`)
+
+Gil Morales / IBD strategy. When a company reports strong earnings and institutions rush in, the stock gaps up powerfully and continues higher for days to weeks.
+
+### Hard Conditions (all must pass)
+1. **Gap ≥ 8%** — open at least 8% above prior day's close on the gap day
+2. **Volume ≥ 2×** average on gap day (3× required if earnings not verified)
+3. **Gap occurred within last 5 trading days**
+4. **Gap not filled** — today's price still above gap day's low (buyers defending)
+5. **Not extended** — price ≤ 20% above gap day's close (not chasing)
+6. **Pre-gap uptrend** — price was above SMA50 before the gap
+
+### Earnings Verification
+- `EG✓` — gap day confirmed to match an earnings release date (via yfinance)
+- `EG~` — gap detected by pattern (8%+ gap + high volume) but earnings date not confirmed; requires 3× volume as higher bar
+
+### Fresh Signal Tags
+- **`EG✓`** or **`EG~`** — earnings gap verified or pattern-only
+- **`+X%GAP`** — gap size (e.g. `+14.2%GAP`)
+
+### Confirmation Tags
+- **`GAP8-15%`** / **`GAP15-25%`** / **`GAP>25%`** — gap size tier
+- **`VOLXx`** — volume ratio on gap day (e.g. `VOL3.2x`)
+- **`HELD`** — gap not filled (always shown when signal fires)
+- **`TIGHT`** — post-gap consolidation range < 8% (stock digesting gains, not volatile)
+- **`RSI50-75`** — RSI in healthy momentum zone
+- **`MACD+`** — MACD histogram positive
+- **`M≥5`** — Minervini score ≥5
+- **`EG✓`** — earnings confirmed by yfinance data
+
+### Risk Notes
+- Do NOT buy if gap is already filling (price below gap day low) — that's a failed gap
+- Do NOT buy if >20% above gap close — risk/reward too poor
+- Best entries: 1-3 days after the gap, when stock consolidates tightly in a small range
 
 ---
 

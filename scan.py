@@ -37,6 +37,8 @@ from signal_velocity_scanner      import scan as scan_signal_velocity
 from chokepoint_inflection_scanner import scan as scan_chokepoint
 from stage4_short_scanner          import scan as scan_stage4_short
 from defensive_rotation_scanner    import scan as scan_defensive_rotation
+from cup_handle_scanner            import scan as scan_cup_handle
+from power_earnings_gap_scanner    import scan as scan_peg
 from show_tracker                  import add_trade_interactive
 
 # ANSI helpers (inline — no shared module dependency)
@@ -60,7 +62,8 @@ def wr_fmt(v):
 ALL_STRATEGIES = ["momentum", "breakout", "pocket_pivot", "connors_rsi2",
                   "ema_ribbon", "nr7", "bb_squeeze", "high_tight_flag",
                   "analyst_upgrade", "signal_velocity", "chokepoint_inflection",
-                  "stage4_short", "defensive_rotation"]
+                  "stage4_short", "defensive_rotation",
+                  "cup_handle", "power_earnings_gap"]
 
 SCANNER_MAP = {
     "momentum":        scan_momentum,
@@ -76,6 +79,8 @@ SCANNER_MAP = {
     "chokepoint_inflection": scan_chokepoint,
     "stage4_short":          scan_stage4_short,
     "defensive_rotation":    scan_defensive_rotation,
+    "cup_handle":            scan_cup_handle,
+    "power_earnings_gap":    scan_peg,
 }
 
 STRATEGY_LABELS = {
@@ -92,6 +97,8 @@ STRATEGY_LABELS = {
     "chokepoint_inflection": "🌐  CHOKEPOINT INFLECTION  (macro event → commodity spike → correlated stock lag)",
     "stage4_short":          "🔻  STAGE 4 SHORT  (Weinstein/Minervini — confirmed distribution, failed rally entry)",
     "defensive_rotation":    "🛡️   DEFENSIVE ROTATION  (Faber — sector ETF outperforms SPY >3% + accelerating → stock leaders)",
+    "cup_handle":            "☕  CUP & HANDLE  (O'Neil / IBD — rounded base + tight handle at pivot)",
+    "power_earnings_gap":    "⚡  POWER EARNINGS GAP  (Gil Morales — 8%+ gap on earnings, 2× volume, gap held)",
 }
 
 STRATEGY_DESCRIPTIONS = {
@@ -186,6 +193,22 @@ STRATEGY_DESCRIPTIONS = {
         "  on most bull days — correct. Fires in late-cycle bear market transitions.\n"
         "  Hold 10 days. Source: Meb Faber 'GTAA', sector rotation academic literature."
     ),
+    "cup_handle": (
+        "Detects the classic Cup & Handle base pattern near the pivot breakout point.\n"
+        "  Cup: 12–35% depth, 30–200 days duration, rounded bottom (low in middle 60% of\n"
+        "  cup duration — filters V-bottoms), right lip within 5% of left lip. Handle:\n"
+        "  5–25 days, ≤12% depth, sits in upper half of cup, volume drying up. Entry:\n"
+        "  price within 3% below handle high (pivot). Minervini ≥5, price >SMA50+SMA200.\n"
+        "  Hold 10 days. Source: William O'Neil 'How to Make Money in Stocks' — IBD."
+    ),
+    "power_earnings_gap": (
+        "Stocks that gap ≥8% on earnings with 2× volume — institutional validation of\n"
+        "  fundamentals. Three conditions must all hold: (1) Gap fired within last 5 days,\n"
+        "  (2) price still above gap day's low (gap not filled = buyers defending), (3) stock\n"
+        "  not extended >20% above gap close. Earnings verified via yfinance; unverified gaps\n"
+        "  require 3× volume. Tagged EG✓ (confirmed) or EG~ (pattern-only).\n"
+        "  Hold 10 days. Source: Gil Morales 'Power Earnings Gaps', IBD gap-up research."
+    ),
 }
 
 HOLD_DAYS_MAP = {
@@ -202,6 +225,8 @@ HOLD_DAYS_MAP = {
     "chokepoint_inflection": 5,
     "stage4_short":          7,
     "defensive_rotation":    10,
+    "cup_handle":            10,
+    "power_earnings_gap":    10,
 }
 
 W = 110
@@ -324,6 +349,8 @@ def _print_matrix(results_by_strategy: dict, strategies: list):
         "chokepoint_inflection": "CHKPNT",
         "stage4_short":          "S4SHORT",
         "defensive_rotation":    "DEFROT",
+        "cup_handle":            "C&H",
+        "power_earnings_gap":    "PEG",
     }
     cols = [col_labels.get(s, s[:6].upper()) for s in strategies]
     col_w = [max(len(c), 6) for c in cols]

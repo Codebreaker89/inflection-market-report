@@ -554,7 +554,7 @@ def add_trade_interactive(args: list[str]):
         "momentum", "breakout", "pocket_pivot", "connors_rsi2", "ema_ribbon",
         "nr7", "bb_squeeze", "high_tight_flag", "analyst_upgrade",
         "signal_velocity", "chokepoint_inflection", "stage4_short",
-        "defensive_rotation",
+        "defensive_rotation", "cup_handle", "power_earnings_gap",
     ]
 
     print("\n  ── Add New Trade ──")
@@ -885,6 +885,8 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
             "chokepoint_inflection":"🌐  CHOKEPOINT INFLECTION  (macro event → commodity spike → stock lag)",
             "stage4_short":         "🔻  STAGE 4 SHORT  (Weinstein/Minervini — confirmed distribution)",
             "defensive_rotation":   "🛡️   DEFENSIVE ROTATION  (Faber — sector ETF outperforms SPY → stock leaders)",
+            "cup_handle":           "☕  CUP & HANDLE  (O'Neil / IBD — rounded base + tight handle at pivot)",
+            "power_earnings_gap":   "⚡  POWER EARNINGS GAP  (Gil Morales — 8%+ gap on earnings, 2× volume, gap held)",
         }.get(strat, strat.upper())
         print(f"\n  {BOLD(label)}")
         print()
@@ -920,6 +922,8 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
                 "chokepoint_inflection": _c("31","CHKPNT  "),
                 "stage4_short":          _c("31","S4SHORT "),
                 "defensive_rotation":    _c("32","DEFROT  "),
+                "cup_handle":            _c("33","C&H     "),
+                "power_earnings_gap":    _c("33","PEG     "),
             }
             strat_s = _strat_badges.get(strat_val, DIM(f"{strat_val[:8]:<8}"))
             inv_e = f"€{float(r['investment_eur']):.0f}" if r.get("investment_eur") else "─"
@@ -1136,6 +1140,8 @@ def generate_dashboard(rows: list[dict], filter_status=None):
             "chokepoint_inflection": "🌐 CHOKEPOINT INFLECTION  (macro → commodity → stock)",
             "stage4_short":          "🔻 STAGE 4 SHORT  (Weinstein / Minervini)",
             "defensive_rotation":    "🛡️ DEFENSIVE ROTATION  (Faber sector rotation)",
+            "cup_handle":            "☕ CUP & HANDLE  (O'Neil / IBD)",
+            "power_earnings_gap":    "⚡ POWER EARNINGS GAP  (Gil Morales)",
         }.get(strat, strat.upper())
         s_rows    = [r for r in rows if r["strategy"] == strat]
         s_pnls    = [r["pnl_now_eur"] for r in s_rows if r.get("pnl_now_eur") is not None]
