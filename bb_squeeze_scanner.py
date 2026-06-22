@@ -103,6 +103,9 @@ def _score(df: pd.DataFrame, idx: int) -> Optional[dict]:
 
     if not _squeeze_fired(df, idx): return None
 
+    # Hard filter: must be above 200d SMA — no downtrending stocks
+    if c <= float(row["sma200"]): return None
+
     rsi = float(row["rsi"]); adx = float(row["adx"])
     if pd.isna(rsi) or pd.isna(adx): return None
 
@@ -119,7 +122,6 @@ def _score(df: pd.DataFrame, idx: int) -> Optional[dict]:
     vol_ratio  = float(row["Volume"]) / vol_ma if vol_ma > 0 else 0
     bb_width   = float(row["bb_width"])
     bw_min_6m  = float(row["bb_width_6m_min"])
-    # squeeze intensity: how close to 6-month low is the width?
     intensity  = 1.0 - (bb_width / bw_min_6m) if bw_min_6m > 0 else 0.0
 
     conf = {
@@ -130,6 +132,7 @@ def _score(df: pd.DataFrame, idx: int) -> Optional[dict]:
         "MACD+":    float(row["macd_hist"]) > 0,
     }
     score = sum(conf.values())
+    if score < 2: return None   # need at least some confirmation
 
     return {
         "score": score, "fresh": ["BB-SQZ"], "conf": [k for k, v in conf.items() if v],
