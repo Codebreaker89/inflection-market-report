@@ -84,6 +84,25 @@ Never commit tokens to the repo. If you need to push again:
 
 ---
 
+## Quick Commands Cheatsheet
+
+| What | Command |
+|---|---|
+| Scan + update history | `cd ~/Claude/Projects/fire && python3 scan.py --no-backtest && python3 update_scan_history.py` |
+| Scan + history + email preview | `cd ~/Claude/Projects/fire && python3 scan.py --no-backtest && python3 update_scan_history.py && python3 notify.py` |
+| Full run (scan + history + send email) | `cd ~/Claude/Projects/fire && python3 scan.py --no-backtest && python3 update_scan_history.py && python3 notify.py --send` |
+| Open portfolio tracker | `cd ~/Claude/Projects/fire && python3 show_tracker.py && open tracker.html` |
+| Open email preview | `open ~/Claude/Projects/fire/digest_preview.html` |
+| Open historical dataset | `open ~/Claude/Projects/fire/scan_history.csv` |
+| Trigger scheduled job manually | `launchctl kickstart gui/$(id -u)/com.hemant.tradedigest` |
+| Monitor scheduled job log | `tail -f ~/Claude/Projects/fire/notify.log` |
+| Push changes to GitHub | `cd ~/Claude/Projects/fire && git add . && git commit -m "update" && git push` |
+| Trigger GitHub Actions manually | `gh workflow run fire_scan.yml --repo Codebreaker89/inflection-market-report` |
+
+> **Note:** Always press **Enter** (blank) at the "Add to tracker?" prompt when running `scan.py` in a chain — otherwise the `&&` chain pauses waiting for input.
+
+---
+
 ## How the System Runs
 
 ### Fully Automatic (Mon–Fri 10am)
