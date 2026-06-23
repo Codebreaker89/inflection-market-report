@@ -27,7 +27,7 @@ First run / if you see 401 errors:
   pip3 install --upgrade yfinance requests pandas numpy
 """
 
-import os, sys, csv, time, warnings, logging, contextlib, io, webbrowser
+import os, sys, csv, time, warnings, logging, contextlib, io, webbrowser, re
 from pathlib  import Path
 from datetime import datetime, date, timedelta
 from typing   import Optional
@@ -1194,7 +1194,22 @@ def _risk_html_section(rows: list[dict]) -> str:
 
 # ── DISPLAY ───────────────────────────────────────────────────────────────────
 
-W = 98
+W = 98   # global terminal width used by risk + tracker
+
+_ANSI_RE = re.compile(r'\033\[[0-9;]*m')
+
+def _vlen(s: str) -> int:
+    return len(_ANSI_RE.sub('', s))
+
+def _rj(s: str, w: int) -> str:
+    return ' ' * max(w - _vlen(s), 0) + s
+
+def _lj(s: str, w: int) -> str:
+    return s + ' ' * max(w - _vlen(s), 0)
+
+# Column widths
+_CW = dict(num=2, ticker=9, mkt=3, company=20, entry=10,
+           buy=8, now=8, inv=5, pct=7, eur=7, type_=4)
 
 _STRAT_LABEL = {
     "momentum":             "🟢  MOMENTUM",
@@ -1218,6 +1233,44 @@ _THEME_EMOJI_T = {
     "AI/Semi":"🔴","AI-Infra":"🟠","Industrials":"🟢",
     "EU-Energy":"🔵","Materials":"⚪","Healthcare":"🩷","Consumer":"🟡","Other":"·",
 }
+
+def _row(*cells) -> str:
+    """Join pre-padded cells with │ borders."""
+    return "  │ " + " │ ".join(cells) + " │"
+
+def _hdr_row() -> str:
+    c = _CW
+    return _row(
+        _rj("#",       c['num']),
+        _lj("TICKER",  c['ticker']),
+        _rj("MKT",     c['mkt']),
+        _lj("COMPANY", c['company']),
+        _lj("ENTRY",   c['entry']),
+        _rj("BUY €",   c['buy']),
+        _rj("NOW €",   c['now']),
+        _rj("INV€",    c['inv']),
+        _rj("NOW%",    c['pct']),
+        _rj("NOW€",    c['eur']),
+        _lj("TYPE",    c['type_']),
+    )
+
+def _rule(char="─") -> str:
+    c = _CW
+    total = (c['num']+c['ticker']+c['mkt']+c['company']+c['entry'] +
+             c['buy']+c['now']+c['inv']+c['pct']+c['eur']+c['type_'] + 11*3 + 4)
+    return "  ├" + char * (total - 4) + "┤"
+
+def _top_rule() -> str:
+    c = _CW
+    total = (c['num']+c['ticker']+c['mkt']+c['company']+c['entry'] +
+             c['buy']+c['now']+c['inv']+c['pct']+c['eur']+c['type_'] + 11*3 + 4)
+    return "  ┌" + "─" * (total - 4) + "┐"
+
+def _bot_rule() -> str:
+    c = _CW
+    total = (c['num']+c['ticker']+c['mkt']+c['company']+c['entry'] +
+             c['buy']+c['now']+c['inv']+c['pct']+c['eur']+c['type_'] + 11*3 + 4)
+    return "  └" + "─" * (total - 4) + "┘"
 
 def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
     if filter_status:
@@ -1243,11 +1296,10 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
     if not rows:
         print(DIM("  No trades. Add: python3 show_tracker.py add")); return
 
-    HDR = (f"  {'#':>2}  {'TICKER':<9} {'MKT':>3}  {'COMPANY':<20}  {'ENTRY':<10}"
-           f"  {'BUY €':>8}  {'NOW €':>8}  {'INV€':>5}"
-           f"  {'NOW%':>6}  {'NOW€':>6}  TYPE")
-    SEP = "  " + "─" * (W - 4)
-    DOT = DIM("  " + "╌" * (W - 4))
+    c = _CW
+    hdr  = BOLD(_hdr_row())
+    sep  = _rule("─")
+    thick = _rule("═")
 
     strategies = list(dict.fromkeys(r["strategy"] for r in rows))
 
@@ -1255,12 +1307,14 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
         strat_rows = [r for r in rows if r["strategy"] == strat]
         label = _STRAT_LABEL.get(strat, strat.upper())
         print(f"\n  {BOLD(label)}")
-        print(BOLD(HDR))
-        print(SEP)
+        print(_top_rule())
+        print(hdr)
+        print(thick)
 
-        for r in strat_rows:
-            buy_e   = f"€{r['buy_eur']:.2f}"      if r.get("buy_eur")         else f"€{float(r['buy_price']):.2f}"
-            now_e   = f"€{r['current_eur']:.2f}"   if r.get("current_eur")     else "─"
+        for idx, r in enumerate(strat_rows):
+            # ── Values ────────────────────────────────────────────────────────
+            buy_e   = f"€{r['buy_eur']:.2f}"     if r.get("buy_eur")         else f"€{float(r['buy_price']):.2f}"
+            now_e   = f"€{r['current_eur']:.2f}"  if r.get("current_eur")     else "─"
             inv_e   = f"€{float(r['investment_eur']):.0f}" if r.get("investment_eur") else "─"
             now_pct = r.get("ret_now_pct")
             now_eur = r.get("pnl_now_eur")
@@ -1270,15 +1324,27 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
                        else RED(f"{now_eur:+.0f}€") if now_eur else DIM("─"))
             tt      = r.get("trade_type", "practice")
             type_s  = GRN("REAL") if tt == "real" else YLW("PRAC")
-            mkt_s   = DIM(f"{ticker_market(r['ticker']):>3}")
-            co_s    = f"{str(r.get('company',''))[:20]:<20}"
-            ticker_s = BOLD(f"{r['ticker']:<9}")
+            mkt_s   = DIM(ticker_market(r['ticker']))
+            co_s    = str(r.get('company',''))[:c['company']]
+            theme   = _classify_theme(r["ticker"], r.get("sector", ""))
+            theme_s = _THEME_EMOJI_T.get(theme, "·") + " " + theme
 
-            print(f"  {r['id']:>2}  {ticker_s} {mkt_s}  {co_s}  {r['entry_date']}"
-                  f"  {buy_e:>8}  {now_e:>8}  {inv_e:>5}"
-                  f"  {str(pct_s):>6}  {str(eur_s):>6}  {type_s}")
+            # ── Main row ──────────────────────────────────────────────────────
+            print(_row(
+                _rj(str(r['id']),        c['num']),
+                _lj(BOLD(r['ticker']),   c['ticker']),
+                _rj(mkt_s,               c['mkt']),
+                _lj(co_s,                c['company']),
+                r['entry_date'],
+                _rj(buy_e,               c['buy']),
+                _rj(now_e,               c['now']),
+                _rj(inv_e,               c['inv']),
+                _rj(pct_s,               c['pct']),
+                _rj(eur_s,               c['eur']),
+                _lj(type_s,              c['type_']),
+            ))
 
-            # Sub-row A: signals · stop · exit/sold
+            # ── Sub-row A: stop · exit · sold ─────────────────────────────────
             s1 = []
             sig_text = str(r.get("signals", "")).strip()
             if sig_text:                    s1.append(CYN(sig_text[:55]))
@@ -1291,11 +1357,9 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
             if s1:
                 print("     " + DIM("  ·  ").join(s1))
 
-            # Sub-row B: analytics + theme
-            reg   = r.get("market_regime_entry", "")
-            sec   = str(r.get("sector", "")).strip()[:14]
-            theme = _classify_theme(r["ticker"], r.get("sector", ""))
-            theme_s = _THEME_EMOJI_T.get(theme, "·") + " " + theme
+            # ── Sub-row B: analytics + theme ──────────────────────────────────
+            reg = r.get("market_regime_entry", "")
+            sec = str(r.get("sector", "")).strip()[:14]
             try:    dd = float(r.get("max_dd_1wk") or "")
             except: dd = None
             ana = []
@@ -1310,7 +1374,7 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
             ana.append(DIM(theme_s))
             print(DIM("     ") + DIM("  ·  ").join(ana))
 
-            # Sub-row C: 1WK/2WK if populated
+            # ── Sub-row C: 1WK/2WK if populated ──────────────────────────────
             perf = []
             if r.get("ret_1wk_pct") is not None:
                 perf.append(f"1WK {_pct(r['ret_1wk_pct'])} {_eur(r.get('pnl_1wk_eur'))}")
@@ -1319,7 +1383,7 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
             if perf:
                 print(DIM("     ") + DIM("  ·  ").join(perf))
 
-            # Sub-row D: exit analytics (closed only)
+            # ── Sub-row D: exit analytics (closed only) ───────────────────────
             if r["status"] == "CLOSED" and r.get("rsi_at_exit"):
                 ex_ana = []
                 if r.get("rsi_at_exit"):       ex_ana.append(f"RSI {r['rsi_at_exit']}")
@@ -1329,18 +1393,23 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
                 if ex_ana:
                     print(DIM("     exit→  ") + DIM("  ·  ").join(ex_ana))
 
-            print(DOT)
+            # ── Row separator ─────────────────────────────────────────────────
+            if idx < len(strat_rows) - 1:
+                print(sep)
+
+        print(_bot_rule())
 
         # Strategy sub-total
         s_pnls = [r["pnl_now_eur"] for r in strat_rows if r.get("pnl_now_eur") is not None]
         if s_pnls:
             sp  = sum(s_pnls)
             col = GRN if sp >= 0 else RED
-            print(f"  {DIM(strat + ' total:')}  {col(_eur(sp))}\n")
+            print(f"  {DIM(strat + ' total:')}  {col(_eur(sp))}")
 
-    print("  " + "─" * (W - 4))
-    print(DIM("  NOW% = unrealised.  1WK/2WK shown when available.  add · close · risk subcommands available."))
-    print("╚" + "═"*(W-2) + "╝\n")
+    print()
+    print(DIM("  NOW% = unrealised.  1WK/2WK shown when populated.  "
+              "add · close · risk subcommands available."))
+    print()
 
 # ── HTML DASHBOARD ────────────────────────────────────────────────────────────
 
