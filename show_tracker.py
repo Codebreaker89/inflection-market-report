@@ -869,6 +869,50 @@ MAX_POSITIONS   = 5
 TRIM_THRESHOLD  = 5.0    # % → trim half, trail rest
 CLOSE_THRESHOLD = 8.0    # % → close position
 STOP_THRESHOLD  = -3.0   # % → stop breached
+AI_CORR_WARN    = 0.40   # fraction → warn if AI/Semi+AI-Infra > 40% of open positions
+
+# Thematic basket map — tickers not listed fall back to GICS sector heuristic
+_THEME_TICKERS: dict[str, str] = {
+    # AI/Semi — chips, memory, analog, EDA
+    "NVDA":"AI/Semi","AMD":"AI/Semi","INTC":"AI/Semi","MRVL":"AI/Semi",
+    "SNDK":"AI/Semi","ADI":"AI/Semi","MCHP":"AI/Semi","ON":"AI/Semi",
+    "IFX.DE":"AI/Semi","STM.PA":"AI/Semi","ASML.AS":"AI/Semi","TXN":"AI/Semi",
+    "LRCX":"AI/Semi","AMAT":"AI/Semi","KLAC":"AI/Semi","TSM":"AI/Semi",
+    "MU":"AI/Semi","QCOM":"AI/Semi","ARM":"AI/Semi","AVGO":"AI/Semi",
+    "NXPI":"AI/Semi","SWKS":"AI/Semi","MXIM":"AI/Semi","SLAB":"AI/Semi",
+    # AI-Infra — datacenter power, networking, servers
+    "VRT":"AI-Infra","ETN":"AI-Infra","PWR":"AI-Infra","SMCI":"AI-Infra",
+    "HPE":"AI-Infra","CSCO":"AI-Infra","GLW":"AI-Infra","DELL":"AI-Infra",
+    "ANET":"AI-Infra","CEG":"AI-Infra","VST":"AI-Infra","NRG":"AI-Infra",
+    "EMR":"AI-Infra","EATON":"AI-Infra","FLEX":"AI-Infra","JNPR":"AI-Infra",
+    # Industrials (non-AI)
+    "CAT":"Industrials","GWW":"Industrials","DE":"Industrials","MMM":"Industrials",
+    "HON":"Industrials","ITW":"Industrials","PH":"Industrials","ROK":"Industrials",
+    "IR":"Industrials","XYL":"Industrials","FLS":"Industrials","AME":"Industrials",
+    # EU Energy / Transition
+    "ETR:ENR":"EU-Energy","ENR.DE":"EU-Energy","ENGI.PA":"EU-Energy",
+    "ENEL.MI":"EU-Energy","IBE.MC":"EU-Energy","RWE.DE":"EU-Energy",
+    "EONGn.DE":"EU-Energy","NG.L":"EU-Energy","SSE.L":"EU-Energy",
+    # Materials / Commodities
+    "GLEN.L":"Materials","BHP":"Materials","RIO":"Materials","FCX":"Materials",
+    "NEM":"Materials","GOLD":"Materials","AA":"Materials","VALE":"Materials",
+    # Healthcare
+    "CRL":"Healthcare","ILMN":"Healthcare","TMO":"Healthcare","DHR":"Healthcare",
+    "ISRG":"Healthcare","UNH":"Healthcare","JNJ":"Healthcare","ABT":"Healthcare",
+}
+
+def _classify_theme(ticker: str, sector: str = "") -> str:
+    t = ticker.upper()
+    if t in _THEME_TICKERS:
+        return _THEME_TICKERS[t]
+    s = sector.lower()
+    if "technology" in s or "semiconductor" in s: return "AI/Semi"
+    if "industrial"  in s:  return "Industrials"
+    if "material"    in s:  return "Materials"
+    if "health"      in s:  return "Healthcare"
+    if "energy"      in s:  return "EU-Energy"
+    if "consumer"    in s:  return "Consumer"
+    return "Other"
 
 def _risk_data(rows: list[dict]) -> dict:
     """Compute all risk metrics from enriched rows."""
@@ -896,6 +940,15 @@ def _risk_data(rows: list[dict]) -> dict:
         sec = str(r.get("sector", "")).strip() or "Unknown"
         sector_counts[sec] = sector_counts.get(sec, 0) + 1
 
+    # Thematic basket breakdown
+    theme_counts: dict[str, list] = {}
+    for r in open_rows:
+        theme = _classify_theme(r["ticker"], r.get("sector", ""))
+        theme_counts.setdefault(theme, []).append(r["ticker"])
+    ai_corr_n   = len(theme_counts.get("AI/Semi", [])) + len(theme_counts.get("AI-Infra", []))
+    ai_corr_pct = ai_corr_n / total_open if total_open else 0.0
+    ai_corr_flag = ai_corr_pct > AI_CORR_WARN
+
     # Portfolio weekly drawdown flag
     total_invested = sum(float(r.get("investment_eur", 0)) for r in open_rows)
     pnls = [r["pnl_now_eur"] for r in open_rows if r.get("pnl_now_eur") is not None]
@@ -907,6 +960,8 @@ def _risk_data(rows: list[dict]) -> dict:
         open_rows=open_rows, total_open=total_open,
         close_now=close_now, trim_now=trim_now, watching=watching,
         stops_breached=stops_breached, sector_counts=sector_counts,
+        theme_counts=theme_counts, ai_corr_n=ai_corr_n,
+        ai_corr_pct=ai_corr_pct, ai_corr_flag=ai_corr_flag,
         total_invested=total_invested, total_pnl=total_pnl,
         weekly_dd_pct=weekly_dd_pct, weekly_dd_flag=weekly_dd_flag,
     )
@@ -975,6 +1030,32 @@ def print_risk(rows: list[dict]):
 
     print("╠" + "═"*(W2-2) + "╣")
 
+    # Thematic correlation
+    ai_pct_s = f"{d['ai_corr_pct']*100:.0f}%"
+    theme_header = f"  THEMATIC EXPOSURE  (AI correlation: {d['ai_corr_n']}/{d['total_open']} = {ai_pct_s})"
+    if d['ai_corr_flag']:
+        theme_header += "  ← " + RED(f"⚠ AI/SEMI+INFRA CONCENTRATED  (>{int(AI_CORR_WARN*100)}%)")
+    else:
+        theme_header += "  ← " + GRN("OK")
+    print("║" + BOLD("  THEMATIC EXPOSURE").ljust(W2+8) + "║")
+    _THEME_EMOJI = {"AI/Semi":"🔴","AI-Infra":"🟠","Industrials":"🟢",
+                    "EU-Energy":"🔵","Materials":"⚪","Healthcare":"🩷","Consumer":"🟡","Other":"⬜"}
+    max_tc = max(len(v) for v in d['theme_counts'].values()) if d['theme_counts'] else 1
+    for theme, tickers in sorted(d['theme_counts'].items(), key=lambda kv: -len(kv[1])):
+        bar  = "█" * int(len(tickers) / max_tc * 16)
+        pct  = len(tickers) / d['total_open'] * 100 if d['total_open'] else 0
+        warn = ""
+        if theme in ("AI/Semi", "AI-Infra") and d['ai_corr_flag']:
+            warn = RED("  ⚠")
+        emoji = _THEME_EMOJI.get(theme, "⬜")
+        line  = f"  {emoji} {theme:<18}  {len(tickers):>2}  ({pct:.0f}%)  {bar}  {', '.join(tickers)}"
+        print("║" + (line + warn).ljust(W2+20) + "║")
+    if d['ai_corr_flag']:
+        warn_line = f"  ⚠ {d['ai_corr_n']} of {d['total_open']} positions correlated to AI capex narrative — diversify or size down"
+        print("║" + RED(warn_line).ljust(W2+20) + "║")
+
+    print("╠" + "═"*(W2-2) + "╣")
+
     # All open P&L sorted
     print("║" + BOLD("  ALL OPEN POSITIONS  (sorted by P&L)").ljust(W2+8) + "║")
     for r in sorted(d['open_rows'], key=lambda x: (x.get('ret_now_pct') or 0), reverse=True):
@@ -1038,6 +1119,29 @@ def _risk_html_section(rows: list[dict]) -> str:
           <td class="{cls}">{warn}</td>
         </tr>"""
 
+    # Thematic exposure
+    _THEME_EMOJI = {"AI/Semi":"🔴","AI-Infra":"🟠","Industrials":"🟢",
+                    "EU-Energy":"🔵","Materials":"⚪","Healthcare":"🩷","Consumer":"🟡","Other":"⬜"}
+    ai_corr_banner = ""
+    if d['ai_corr_flag']:
+        ai_corr_banner = (f' <span style="color:#c0392b;font-size:10px;font-weight:700;">'
+                          f'⚠ {d["ai_corr_n"]}/{d["total_open"]} = {d["ai_corr_pct"]*100:.0f}% AI-correlated</span>')
+    else:
+        ai_corr_banner = (f' <span style="color:var(--pos);font-size:10px;">'
+                          f'{d["ai_corr_n"]}/{d["total_open"]} AI-corr · OK</span>')
+    theme_rows = ""
+    _TC = {"AI/Semi":"#c0392b","AI-Infra":"#b7590a","Industrials":"#1a7f4b",
+           "EU-Energy":"#1a5a8a","Materials":"#888","Healthcare":"#a855f7","Consumer":"#d97706","Other":"#888"}
+    for theme, tickers in sorted(d['theme_counts'].items(), key=lambda kv: -len(kv[1])):
+        pct  = len(tickers) / d['total_open'] * 100 if d['total_open'] else 0
+        col  = _TC.get(theme, "#888")
+        warn_cls = "neg" if theme in ("AI/Semi","AI-Infra") and d['ai_corr_flag'] else ""
+        emoji = _THEME_EMOJI.get(theme, "⬜")
+        theme_rows += (f'<tr><td class="{warn_cls}">{emoji} {theme}</td>'
+                       f'<td style="text-align:center;color:{col};font-weight:700">{len(tickers)}</td>'
+                       f'<td style="text-align:center;color:{col}">{pct:.0f}%</td>'
+                       f'<td style="font-size:10px;color:var(--dim)">{", ".join(tickers)}</td></tr>')
+
     # All positions P&L
     pos_rows = ""
     for r in sorted(d['open_rows'], key=lambda x: (x.get('ret_now_pct') or 0), reverse=True):
@@ -1073,6 +1177,11 @@ def _risk_html_section(rows: list[dict]) -> str:
           <div class="risk-panel-title">Sector Concentration</div>
           <table><thead><tr><th>Sector</th><th>#</th><th>Bar</th><th></th></tr></thead>
           <tbody>{sec_rows}</tbody></table>
+        </div>
+        <div class="risk-panel">
+          <div class="risk-panel-title">Thematic Exposure{ai_corr_banner}</div>
+          <table><thead><tr><th>Theme</th><th>#</th><th>%</th><th>Tickers</th></tr></thead>
+          <tbody>{theme_rows}</tbody></table>
         </div>
         <div class="risk-panel">
           <div class="risk-panel-title">All Open Positions (by P&L)</div>
