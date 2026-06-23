@@ -186,40 +186,51 @@ def price_n_trading_days_after(series: pd.Series, entry: date, n: int):
 
 def fetch_live_price(ticker: str) -> tuple[Optional[float], Optional[str]]:
     """
-    Returns (price, currency) using the live quote.
-    Normalises exchange:ticker format (ETR:ENR → ENR.DE) before fetching.
-    If price currency differs from stored currency, caller must convert.
+    Returns (price, currency) — freshest available price at any time.
+
+    Priority:
+      1. pre_market_price  — if pre-market session is active
+      2. last_price        — live during regular session or after-hours
+      3. previous_close    — fallback if above are unavailable
+      4. history()         — last resort
     """
-    yf_t = _yf_ticker(ticker)      # normalise ETR:ENR → ENR.DE, etc.
+    yf_t = _yf_ticker(ticker)
 
     def _normalise_ccy(p, ccy_raw):
-        """Convert pence (GBp/GBX) → pounds (GBP) by dividing by 100."""
         if ccy_raw in ("GBp", "GBX", "GBx"):
             return p / 100.0, "GBP"
         return p, (ccy_raw.upper() if ccy_raw else None)
 
     def _try(sym):
+        tk = yf.Ticker(sym)
         try:
             with _quiet():
-                fi = yf.Ticker(sym).fast_info
-            p   = getattr(fi, "last_price",  None) or getattr(fi, "previous_close", None)
-            ccy = getattr(fi, "currency",    None)
+                fi = tk.fast_info
+            ccy = getattr(fi, "currency", None)
+            # 1. Pre-market (most current if available)
+            p = getattr(fi, "pre_market_price", None)
+            if p and float(p) > 0:
+                return _normalise_ccy(float(p), ccy)
+            # 2. Last price (live / after-hours)
+            p = getattr(fi, "last_price", None)
+            if p and float(p) > 0:
+                return _normalise_ccy(float(p), ccy)
+            # 3. Previous close
+            p = getattr(fi, "previous_close", None)
             if p and float(p) > 0:
                 return _normalise_ccy(float(p), ccy)
         except Exception:
-            pass
-        # fallback: .history() bypasses bulk cache
+            ccy = None
+
+        # 4. history() last resort
         try:
             with _quiet():
-                df = yf.Ticker(sym).history(period="5d", interval="1d", auto_adjust=True)
+                df = tk.history(period="5d", interval="1d",
+                                auto_adjust=True, prepost=True)
             if not df.empty:
                 p = float(df["Close"].dropna().iloc[-1])
-                try:
-                    with _quiet():
-                        ccy = getattr(yf.Ticker(sym).fast_info, "currency", None)
-                except Exception:
-                    ccy = None
-                return _normalise_ccy(p, ccy)
+                if p > 0:
+                    return _normalise_ccy(p, ccy)
         except Exception:
             pass
         return None, None
