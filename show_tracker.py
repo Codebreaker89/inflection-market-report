@@ -10,6 +10,7 @@ python3 show_tracker.py add --ticker AMAT --date 2026-06-10 --price 185.50 \\
         --strategy momentum --signals "MACD RSI50 · VOL ADX↑"
 python3 show_tracker.py close              # interactive: close an open trade
 python3 show_tracker.py close --id 3 --date 2026-06-22 --price 190.00 --reason 1wk_auto
+python3 show_tracker.py risk               # risk module: position limits, P&L tiers, stops, sector breakdown
 
 Data file: trades.csv  (same folder as this script)
 Each trade = €1000 invested. Returns shown in both % and EUR.
@@ -837,6 +838,226 @@ def compute_row(trade: dict, price_cache: dict, fx_cache: dict) -> dict:
     return result
 
 
+# ── RISK MODULE ───────────────────────────────────────────────────────────────
+
+MAX_POSITIONS   = 5
+TRIM_THRESHOLD  = 5.0    # % → trim half, trail rest
+CLOSE_THRESHOLD = 8.0    # % → close position
+STOP_THRESHOLD  = -3.0   # % → stop breached
+
+def _risk_data(rows: list[dict]) -> dict:
+    """Compute all risk metrics from enriched rows."""
+    open_rows = [r for r in rows if r.get("status") == "OPEN"]
+    total_open = len(open_rows)
+
+    # PnL tiers
+    close_now, trim_now, watching, stops_breached = [], [], [], []
+    for r in open_rows:
+        pct = r.get("ret_now_pct")
+        if pct is None:
+            continue
+        if pct >= CLOSE_THRESHOLD:
+            close_now.append(r)
+        elif pct >= TRIM_THRESHOLD:
+            trim_now.append(r)
+        elif pct > 0:
+            watching.append(r)
+        if pct <= STOP_THRESHOLD:
+            stops_breached.append(r)
+
+    # Sector breakdown
+    sector_counts: dict[str, int] = {}
+    for r in open_rows:
+        sec = str(r.get("sector", "")).strip() or "Unknown"
+        sector_counts[sec] = sector_counts.get(sec, 0) + 1
+
+    # Portfolio weekly drawdown flag
+    total_invested = sum(float(r.get("investment_eur", 0)) for r in open_rows)
+    pnls = [r["pnl_now_eur"] for r in open_rows if r.get("pnl_now_eur") is not None]
+    total_pnl = sum(pnls) if pnls else 0.0
+    weekly_dd_pct = (total_pnl / total_invested * 100) if total_invested > 0 else 0.0
+    weekly_dd_flag = weekly_dd_pct <= -5.0
+
+    return dict(
+        open_rows=open_rows, total_open=total_open,
+        close_now=close_now, trim_now=trim_now, watching=watching,
+        stops_breached=stops_breached, sector_counts=sector_counts,
+        total_invested=total_invested, total_pnl=total_pnl,
+        weekly_dd_pct=weekly_dd_pct, weekly_dd_flag=weekly_dd_flag,
+    )
+
+
+def print_risk(rows: list[dict]):
+    """Terminal risk module: python3 show_tracker.py risk"""
+    d = _risk_data(rows)
+    now_str = datetime.now().strftime("%Y-%m-%d  %H:%M")
+    W2 = 80
+
+    print()
+    print("╔" + "═"*(W2-2) + "╗")
+    print("║" + BOLD(f"  🛡️  RISK MODULE  ·  {now_str}").ljust(W2+8) + "║")
+    print("╠" + "═"*(W2-2) + "╣")
+
+    # Rule 1: Position limit
+    pos_line = f"  POSITIONS: {d['total_open']} open"
+    if d['total_open'] > MAX_POSITIONS:
+        pos_line += f"  ← " + RED(f"OVER LIMIT ({MAX_POSITIONS} max)")
+    else:
+        pos_line += f"  ← " + GRN(f"OK (max {MAX_POSITIONS})")
+    print("║" + pos_line.ljust(W2+8) + "║")
+
+    # Weekly drawdown flag
+    if d['weekly_dd_flag']:
+        dd_line = f"  WEEKLY DD: {d['weekly_dd_pct']:+.1f}%  ← " + RED("⚠ PAUSE NEW ENTRIES (>5% portfolio loss)")
+    else:
+        pnl_s = GRN(f"{d['weekly_dd_pct']:+.1f}%") if d['total_pnl'] >= 0 else RED(f"{d['weekly_dd_pct']:+.1f}%")
+        dd_line = f"  WEEKLY DD: {d['weekly_dd_pct']:+.1f}%  ← " + GRN("OK")
+    print("║" + dd_line.ljust(W2+12) + "║")
+
+    print("╠" + "═"*(W2-2) + "╣")
+
+    # Rule 3: Profit take alerts
+    print("║" + BOLD("  TAKE PROFIT ALERTS").ljust(W2+8) + "║")
+    if not d['close_now'] and not d['trim_now']:
+        print("║" + DIM("  — none —").ljust(W2) + "║")
+    for r in sorted(d['close_now'], key=lambda x: x.get('ret_now_pct', 0), reverse=True):
+        line = f"  🔴 CLOSE   {r['ticker']:<8}  {r.get('ret_now_pct', 0):+.1f}%  (>{CLOSE_THRESHOLD}% target reached)"
+        print("║" + RED(line).ljust(W2+20) + "║")
+    for r in sorted(d['trim_now'], key=lambda x: x.get('ret_now_pct', 0), reverse=True):
+        line = f"  🟡 TRIM ½  {r['ticker']:<8}  {r.get('ret_now_pct', 0):+.1f}%  (>{TRIM_THRESHOLD}% — trail remaining)"
+        print("║" + YLW(line).ljust(W2+20) + "║")
+
+    print("╠" + "═"*(W2-2) + "╣")
+
+    # Rule 4: Stop breaches
+    print("║" + BOLD("  STOP LOSS BREACHED  (<-3%)").ljust(W2+8) + "║")
+    if not d['stops_breached']:
+        print("║" + GRN("  — none —").ljust(W2+8) + "║")
+    for r in sorted(d['stops_breached'], key=lambda x: x.get('ret_now_pct', 0)):
+        line = f"  🔴 STOP    {r['ticker']:<8}  {r.get('ret_now_pct', 0):+.1f}%  SL={r.get('stop_loss_price', '─')}"
+        print("║" + RED(line).ljust(W2+20) + "║")
+
+    print("╠" + "═"*(W2-2) + "╣")
+
+    # Rule 2: Sector breakdown
+    print("║" + BOLD("  SECTOR BREAKDOWN").ljust(W2+8) + "║")
+    max_count = max(d['sector_counts'].values()) if d['sector_counts'] else 1
+    for sec, cnt in sorted(d['sector_counts'].items(), key=lambda x: -x[1]):
+        bar = "█" * int(cnt / max_count * 20)
+        warn = RED("  ⚠ concentrated") if cnt >= 3 else ""
+        line = f"  {sec:<20}  {cnt:>2}  {bar}"
+        print("║" + (line + warn).ljust(W2+20) + "║")
+
+    print("╠" + "═"*(W2-2) + "╣")
+
+    # All open P&L sorted
+    print("║" + BOLD("  ALL OPEN POSITIONS  (sorted by P&L)").ljust(W2+8) + "║")
+    for r in sorted(d['open_rows'], key=lambda x: (x.get('ret_now_pct') or 0), reverse=True):
+        pct = r.get('ret_now_pct')
+        peur = r.get('pnl_now_eur')
+        pct_s = _pct(pct)
+        eur_s = _eur(peur)
+        td = r.get('target_exit_date', '─') or '─'
+        print(f"║    {r['ticker']:<8}  {pct_s}  {eur_s}   exit→{td}  [{r.get('sector','─')[:14]}]")
+
+    print("╠" + "═"*(W2-2) + "╣")
+    total_s = GRN(f"+€{d['total_pnl']:.0f}") if d['total_pnl'] >= 0 else RED(f"-€{abs(d['total_pnl']):.0f}")
+    print(f"║  Total unrealised P&L: {total_s}   Invested: €{d['total_invested']:.0f}")
+    print("╚" + "═"*(W2-2) + "╝\n")
+
+
+def _risk_html_section(rows: list[dict]) -> str:
+    """Returns an HTML <section> for the risk module, to embed in dashboard."""
+    d = _risk_data(rows)
+
+    pos_cls   = "neg" if d['total_open'] > MAX_POSITIONS else "pos"
+    pos_label = f"⚠ {d['total_open']}/{MAX_POSITIONS} — OVER LIMIT" if d['total_open'] > MAX_POSITIONS else f"{d['total_open']}/{MAX_POSITIONS} — OK"
+
+    dd_cls   = "neg" if d['weekly_dd_flag'] else "pos"
+    dd_label = f"⚠ {d['weekly_dd_pct']:+.1f}% — PAUSE NEW ENTRIES" if d['weekly_dd_flag'] else f"{d['weekly_dd_pct']:+.1f}% — OK"
+
+    total_cls = "pos" if d['total_pnl'] >= 0 else "neg"
+    total_s   = f"+€{d['total_pnl']:.0f}" if d['total_pnl'] >= 0 else f"-€{abs(d['total_pnl']):.0f}"
+
+    # Take profit rows
+    tp_rows = ""
+    for r in sorted(d['close_now'] + d['trim_now'], key=lambda x: x.get('ret_now_pct', 0), reverse=True):
+        pct = r.get('ret_now_pct', 0)
+        if pct >= CLOSE_THRESHOLD:
+            action = '<span class="risk-close">🔴 CLOSE</span>'
+        else:
+            action = '<span class="risk-trim">🟡 TRIM ½</span>'
+        tp_rows += f"<tr><td class='ticker'>{r['ticker']}</td><td class='pos'>+{pct:.1f}%</td><td>{action}</td><td>{r.get('target_exit_date','─')}</td></tr>"
+    if not tp_rows:
+        tp_rows = "<tr><td colspan='4' style='color:var(--dim)'>— no take-profit alerts —</td></tr>"
+
+    # Stop breach rows
+    sl_rows = ""
+    for r in sorted(d['stops_breached'], key=lambda x: x.get('ret_now_pct', 0)):
+        pct = r.get('ret_now_pct', 0)
+        sl_rows += f"<tr><td class='ticker'>{r['ticker']}</td><td class='neg'>{pct:.1f}%</td><td class='neg'>🔴 STOP BREACHED</td><td>{r.get('stop_loss_price','─')}</td></tr>"
+    if not sl_rows:
+        sl_rows = "<tr><td colspan='4' style='color:var(--pos)'>— no stop breaches —</td></tr>"
+
+    # Sector breakdown
+    max_c = max(d['sector_counts'].values()) if d['sector_counts'] else 1
+    sec_rows = ""
+    for sec, cnt in sorted(d['sector_counts'].items(), key=lambda x: -x[1]):
+        bar_w = int(cnt / max_c * 120)
+        warn  = " ⚠" if cnt >= 3 else ""
+        cls   = "neg" if cnt >= 3 else "dim"
+        sec_rows += f"""<tr>
+          <td>{sec}</td>
+          <td style="text-align:center">{cnt}</td>
+          <td><div style="height:10px;width:{bar_w}px;background:var(--accent);border-radius:3px;display:inline-block"></div></td>
+          <td class="{cls}">{warn}</td>
+        </tr>"""
+
+    # All positions P&L
+    pos_rows = ""
+    for r in sorted(d['open_rows'], key=lambda x: (x.get('ret_now_pct') or 0), reverse=True):
+        pct  = r.get('ret_now_pct')
+        peur = r.get('pnl_now_eur')
+        pct_cls = "pos" if (pct or 0) >= 0 else "neg"
+        pct_s   = f"+{pct:.1f}%" if pct is not None and pct >= 0 else (f"{pct:.1f}%" if pct is not None else "─")
+        eur_s   = f"+€{peur:.0f}" if peur is not None and peur >= 0 else (f"-€{abs(peur):.0f}" if peur is not None else "─")
+        sec     = str(r.get('sector','─'))[:16] or '─'
+        td      = r.get('target_exit_date','─') or '─'
+        pos_rows += f"<tr><td class='ticker'>{r['ticker']}</td><td class='{pct_cls}'>{pct_s}</td><td class='{pct_cls}'>{eur_s}</td><td>{sec}</td><td>{td}</td></tr>"
+
+    return f"""
+    <section class="risk-module">
+      <h2>🛡️ RISK MODULE</h2>
+      <div class="risk-kpi-row">
+        <div class="risk-kpi"><div class="kpi-label">Positions</div><div class="kpi-value {pos_cls}">{pos_label}</div></div>
+        <div class="risk-kpi"><div class="kpi-label">Portfolio P&L</div><div class="kpi-value {total_cls}">{total_s} / €{d['total_invested']:.0f}</div></div>
+        <div class="risk-kpi"><div class="kpi-label">Weekly DD Flag</div><div class="kpi-value {dd_cls}">{dd_label}</div></div>
+      </div>
+      <div class="risk-grid">
+        <div class="risk-panel">
+          <div class="risk-panel-title">Take Profit Alerts</div>
+          <table><thead><tr><th>Ticker</th><th>Now%</th><th>Action</th><th>Exit Date</th></tr></thead>
+          <tbody>{tp_rows}</tbody></table>
+        </div>
+        <div class="risk-panel">
+          <div class="risk-panel-title">Stop Loss Breaches</div>
+          <table><thead><tr><th>Ticker</th><th>Now%</th><th>Status</th><th>SL Price</th></tr></thead>
+          <tbody>{sl_rows}</tbody></table>
+        </div>
+        <div class="risk-panel">
+          <div class="risk-panel-title">Sector Concentration</div>
+          <table><thead><tr><th>Sector</th><th>#</th><th>Bar</th><th></th></tr></thead>
+          <tbody>{sec_rows}</tbody></table>
+        </div>
+        <div class="risk-panel">
+          <div class="risk-panel-title">All Open Positions (by P&L)</div>
+          <table><thead><tr><th>Ticker</th><th>Now%</th><th>P&L €</th><th>Sector</th><th>Exit Date</th></tr></thead>
+          <tbody>{pos_rows}</tbody></table>
+        </div>
+      </div>
+    </section>"""
+
+
 # ── DISPLAY ───────────────────────────────────────────────────────────────────
 
 W = 112
@@ -996,6 +1217,7 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
               "Regime = SPY vs 50 SMA at entry."))
     print(DIM("  To add: python3 show_tracker.py add"))
     print(DIM("  To close a trade: python3 show_tracker.py close"))
+    print(DIM("  Risk dashboard:   python3 show_tracker.py risk"))
     print("╚" + "═"*(W-2) + "╝\n")
 
 
@@ -1035,7 +1257,7 @@ def _kpi_html(label, rows_subset):
       </div>
     </div>"""
 
-def generate_dashboard(rows: list[dict], filter_status=None):
+def generate_dashboard(rows: list[dict], filter_status=None, show_risk=False):
     """Write dashboard.html and open in default browser."""
     if filter_status:
         rows = [r for r in rows if r["status"] == filter_status]
@@ -1046,6 +1268,7 @@ def generate_dashboard(rows: list[dict], filter_status=None):
 
     kpi_practice = _kpi_html("🟡 PRACTICE", practice_rows) if practice_rows else ""
     kpi_real     = _kpi_html("🟢 REAL",     real_rows)     if real_rows     else ""
+    risk_section = _risk_html_section(rows) if show_risk else ""
 
     def trade_rows_html(strategy_rows):
         html = ""
@@ -1243,6 +1466,20 @@ def generate_dashboard(rows: list[dict], filter_status=None):
   .strat-momentum-badge {{ color: var(--pos); font-size: 10px; font-weight: bold; letter-spacing: .5px; }}
   .strat-breakout-badge {{ color: #b57bee; font-size: 10px; font-weight: bold; letter-spacing: .5px; }}
   .footer {{ margin-top: 32px; color: var(--dim); font-size: 11px; border-top: 1px solid var(--border); padding-top: 12px; }}
+  /* ── Risk Module ── */
+  .risk-module {{ margin: 28px 0 8px; }}
+  .risk-module h2 {{ font-size: 15px; font-weight: bold; margin-bottom: 14px; color: var(--text); }}
+  .risk-kpi-row {{ display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }}
+  .risk-kpi {{ background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 18px; min-width: 240px; }}
+  .risk-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }}
+  .risk-panel {{ background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; overflow-x: auto; }}
+  .risk-panel-title {{ font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); margin-bottom: 10px; }}
+  .risk-panel table {{ width: 100%; border-collapse: collapse; }}
+  .risk-panel th {{ font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--dim); padding: 4px 8px; border-bottom: 1px solid var(--border); text-align: left; }}
+  .risk-panel td {{ font-size: 12px; padding: 5px 8px; border-bottom: 1px solid var(--border); }}
+  .risk-close {{ color: var(--neg); font-weight: bold; }}
+  .risk-trim  {{ color: var(--warn); font-weight: bold; }}
+  .dim {{ color: var(--dim); }}
 </style>
 </head>
 <body>
@@ -1256,6 +1493,8 @@ def generate_dashboard(rows: list[dict], filter_status=None):
   {kpi_practice}
   {kpi_real}
 </div>
+
+{risk_section}
 
 {sections_html}
 
@@ -1382,6 +1621,19 @@ def main():
 
     if args and args[0] == "close":
         close_trade_interactive(args[1:])
+        return
+
+    if args and args[0] == "risk":
+        trades = load_trades()
+        if not trades:
+            print("\n  No trades yet.\n"); return
+        print(f"\n  Loading prices...", flush=True)
+        t0 = time.time()
+        price_cache, fx_cache = {}, {}
+        rows = [compute_row(t, price_cache, fx_cache) for t in trades]
+        print(f"  Done in {time.time()-t0:.1f}s")
+        print_risk(rows)
+        generate_dashboard(rows, show_risk=True)
         return
 
     filter_status = None

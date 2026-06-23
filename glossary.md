@@ -22,7 +22,7 @@
 | **defensive_rotation_scanner.py** | Scanner: Defensive Rotation — detects institutional rotation into XLU/XLP/XLV/GLD (>3% 20d outperformance vs SPY + accelerating), then finds individual stock leaders within those sectors. Hold 10d. |
 | **cup_handle_scanner.py** | Scanner: Cup & Handle (O'Neil/IBD) — rounded base 12-35% deep over 30-200 days, tight handle ≤12% in upper half of cup, price within 3% of pivot. Minervini ≥5. Hold 10d. |
 | **power_earnings_gap_scanner.py** | Scanner: Power Earnings Gap (Gil Morales) — stock gaps ≥8% on earnings with 2× volume, gap not filled, not extended >20%. Tagged EG✓ (earnings verified) or EG~ (pattern only). Hold 10d. |
-| **show_tracker.py** | Portfolio tracker — shows open/closed trades with live P&L, stop loss, hold days. Generates `tracker.html`. Subcommands: `add` (new trade), `close` (close existing trade interactively). |
+| **show_tracker.py** | Portfolio tracker — shows open/closed trades with live P&L, stop loss, hold days. Generates `dashboard.html`. Subcommands: `add` (new trade), `close` (close existing trade interactively), `risk` (risk module: position limits, P&L tiers, stops, sector breakdown). |
 | **notify.py** | Daily email digest — fetches live prices, checks alerts (stop loss, hold expired, profit target, earnings), sends HTML email. |
 | **update_scan_history.py** | Appends today's scan results to `scan_history.csv` and backfills d5/d10 returns for past rows. |
 | **config.py** | Credentials and parameters: Gmail App Password, stop loss %, profit target %, hold days per strategy. |
@@ -99,6 +99,7 @@ Never commit tokens to the repo. If you need to push again:
 | Open portfolio tracker | `cd ~/Claude/Projects/fire && python3 show_tracker.py && open tracker.html` |
 | Add a trade | `cd ~/Claude/Projects/fire && python3 show_tracker.py add` |
 | Close a trade | `cd ~/Claude/Projects/fire && python3 show_tracker.py close` |
+| Risk dashboard | `cd ~/Claude/Projects/fire && python3 show_tracker.py risk` |
 | Open email preview | `open ~/Claude/Projects/fire/digest_preview.html` |
 | Open historical dataset | `open ~/Claude/Projects/fire/scan_history.csv` |
 | Trigger scheduled job manually | `launchctl kickstart gui/$(id -u)/com.hemant.tradedigest` |
