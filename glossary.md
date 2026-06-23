@@ -55,7 +55,7 @@ Go to: repo → Settings → Secrets and variables → Actions
 | `GMAIL_APP_PASSWORD` | your Gmail App Password |
 
 ### Daily Schedule
-GitHub Actions workflow (`fire_scan.yml`) runs Mon–Fri at 9:00 AM UTC (10am CET / 11am CEST). Does: scan → history update → email send → commits `scan_history.csv` + `last_scan.json` back to repo.
+GitHub Actions workflow (`fire_scan.yml`) runs Mon–Fri at 14:00 UTC (16:00 CEST / 15:00 BST / 10:00 EDT) — during the US–EU market overlap window. Does: scan → history update → email send → commits `scan_history.csv` + `last_scan.json` back to repo.
 
 ### Trigger Manually from GitHub
 ```bash

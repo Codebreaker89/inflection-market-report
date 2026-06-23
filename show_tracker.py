@@ -114,6 +114,17 @@ def _yf_ticker(ticker: str) -> str:
         return base.strip() + sfx
     return ticker
 
+def ticker_market(ticker: str) -> str:
+    """Return short market label: US, UK, DE, FR, NL, IT, ES, CH, CA."""
+    if ":" in ticker:
+        prefix = ticker.split(":")[0].upper()
+        return {"ETR":"DE","FRA":"DE","XETRA":"DE","EPA":"FR","AMS":"NL",
+                "BIT":"IT","BME":"ES","LON":"UK","TSX":"CA","CVE":"CA"}.get(prefix,"US")
+    for sfx, mkt in {".L":"UK",".DE":"DE",".PA":"FR",".AS":"NL",
+                     ".MI":"IT",".MC":"ES",".SW":"CH",".TO":"CA"}.items():
+        if ticker.upper().endswith(sfx): return mkt
+    return "US"
+
 def ticker_ccy(ticker: str) -> str:
     """Currency of local price for a given ticker. Defaults to EUR."""
     if ":" in ticker:
@@ -1126,7 +1137,7 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
         print(f"\n  {BOLD(label)}")
         print()
 
-        hdr = (f"  {'#':>2}  {'TICKER':<8}  {'COMPANY':<22}  {'ENTRY':<10}  "
+        hdr = (f"  {'#':>2}  {'TICKER':<8}  {'MKT':<4}  {'COMPANY':<22}  {'ENTRY':<10}  "
                f"{'BUY €':>7}  {'NOW €':>7}  {'QTY':>6}  {'INV€':>6}  "
                f"{'1WK%':>6}  {'1WK€':>7}  "
                f"{'2WK%':>6}  {'2WK€':>7}  "
@@ -1162,7 +1173,8 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
             }
             strat_s = _strat_badges.get(strat_val, DIM(f"{strat_val[:8]:<8}"))
             inv_e = f"€{float(r['investment_eur']):.0f}" if r.get("investment_eur") else "─"
-            row_line = (f"  {r['id']:>2}  {ticker_s}  {co_s}  {r['entry_date']:<10}  "
+            mkt_s = DIM(f"{ticker_market(r['ticker']):<4}")
+            row_line = (f"  {r['id']:>2}  {ticker_s}  {mkt_s}  {co_s}  {r['entry_date']:<10}  "
                         f"{buy_e:>7}  {now_e:>7}  {float(r['qty']):>6.2f}  {inv_e:>6}  "
                         f"{_pct(r.get('ret_1wk_pct')):>6}  {_eur(r.get('pnl_1wk_eur')):>7}  "
                         f"{_pct(r.get('ret_2wk_pct')):>6}  {_eur(r.get('pnl_2wk_eur')):>7}  "
@@ -1319,10 +1331,12 @@ def generate_dashboard(rows: list[dict], filter_status=None, show_risk=False):
                 reason = f" ({r['exit_reason']})" if r.get("exit_reason") else ""
                 exit_info = f"Closed {r['actual_sell_date']} @ {r.get('exit_price','─')}{reason}"
 
+            mkt_label = ticker_market(r['ticker'])
             html += f"""
             <tr class="trade-row {status_cls}">
               <td>{r['id']}</td>
               <td class="ticker">{r['ticker']}</td>
+              <td><span class="mkt-badge mkt-{mkt_label.lower()}">{mkt_label}</span></td>
               <td>{str(r.get('company',''))[:24]}</td>
               <td>{r['entry_date']}</td>
               <td>{str(r.get('sector',''))[:16] or '─'}</td>
@@ -1348,7 +1362,7 @@ def generate_dashboard(rows: list[dict], filter_status=None, show_risk=False):
               <td class="strat-{'momentum' if r.get('strategy')=='momentum' else 'breakout'}-badge">{(r.get('strategy') or '─').upper()}</td>
             </tr>
             <tr class="detail-row">
-              <td colspan="25" class="detail-cell">
+              <td colspan="26" class="detail-cell">
                 1wk→{r.get('date_1wk') or 'not yet'} &nbsp;·&nbsp;
                 2wk→{r.get('date_2wk') or 'not yet'}
                 {'&nbsp;·&nbsp;' + exit_info if exit_info else ''}
@@ -1395,6 +1409,7 @@ def generate_dashboard(rows: list[dict], filter_status=None, show_risk=False):
             <tr>
               <th title="Trade ID">#</th>
               <th title="Exchange ticker symbol">Ticker</th>
+              <th title="Market / exchange">Mkt</th>
               <th title="Company name">Company</th>
               <th title="Date position was opened">Entry</th>
               <th title="GICS sector from yfinance">Sector</th>
@@ -1434,73 +1449,99 @@ def generate_dashboard(rows: list[dict], filter_status=None, show_risk=False):
 <title>Trade Tracker</title>
 <style>
   :root {{
-    --bg:       #0f1117;
-    --surface:  #1a1d27;
-    --border:   #2a2d3a;
-    --text:     #e0e2ec;
-    --dim:      #6b7280;
-    --pos:      #22c55e;
-    --neg:      #ef4444;
-    --accent:   #6366f1;
-    --warn:     #f59e0b;
+    --bg:      #0d0f18;
+    --surface: #13151f;
+    --card:    #181b28;
+    --border:  #232637;
+    --text:    #d4d6e3;
+    --dim:     #555a72;
+    --pos:     #34d399;
+    --neg:     #f87171;
+    --accent:  #818cf8;
+    --warn:    #fbbf24;
+    --muted:   #9ca3af;
   }}
   * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-  body {{ background: var(--bg); color: var(--text); font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; padding: 24px; }}
-  header {{ display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }}
-  header h1 {{ font-size: 20px; color: var(--text); }}
-  .meta {{ color: var(--dim); font-size: 12px; margin-top: 4px; }}
-  .kpi-section {{ display: flex; gap: 32px; flex-wrap: wrap; }}
-  .kpi-group {{ background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; }}
-  .kpi-group-label {{ font-size: 12px; font-weight: bold; letter-spacing: 0.05em; margin-bottom: 10px; color: var(--text); }}
-  .kpi-row {{ display: flex; gap: 16px; }}
-  .kpi-box {{ background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 10px 16px; min-width: 90px; }}
-  .kpi-label {{ color: var(--dim); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }}
-  .kpi-value {{ font-size: 20px; font-weight: bold; margin-top: 3px; }}
-  h2 {{ font-size: 14px; margin: 28px 0 10px; color: var(--text); letter-spacing: 0.03em; }}
-  .strat-pnl {{ font-size: 13px; margin-left: 10px; }}
-  .table-wrap {{ overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }}
+  body {{ background: var(--bg); color: var(--text); font-family: 'SF Mono','Fira Code','Cascadia Code',monospace; font-size: 11px; padding: 20px 24px; line-height: 1.45; }}
+
+  /* ── Header ── */
+  header {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }}
+  header h1 {{ font-size: 15px; font-weight: 700; letter-spacing: .03em; color: var(--text); }}
+  header h1 span {{ color: var(--accent); }}
+  .meta {{ color: var(--dim); font-size: 10px; margin-top: 3px; }}
+
+  /* ── KPI cards ── */
+  .kpi-section {{ display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }}
+  .kpi-group {{ background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }}
+  .kpi-group-label {{ font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); margin-bottom: 10px; }}
+  .kpi-row {{ display: flex; gap: 10px; }}
+  .kpi-box {{ background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 8px 14px; min-width: 80px; }}
+  .kpi-label {{ color: var(--dim); font-size: 9px; text-transform: uppercase; letter-spacing: .05em; }}
+  .kpi-value {{ font-size: 16px; font-weight: 700; margin-top: 2px; }}
+
+  /* ── Section headers ── */
+  h2 {{ font-size: 11px; font-weight: 700; margin: 22px 0 8px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }}
+  h2::before {{ content: ''; display: block; width: 3px; height: 14px; background: var(--accent); border-radius: 2px; }}
+  .strat-pnl {{ font-size: 11px; font-weight: 600; }}
+
+  /* ── Table ── */
+  .table-wrap {{ overflow-x: auto; border-radius: 7px; border: 1px solid var(--border); margin-bottom: 4px; }}
   table {{ width: 100%; border-collapse: collapse; }}
   thead tr {{ background: var(--surface); }}
-  th {{ padding: 8px 10px; text-align: right; color: var(--dim); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; border-bottom: 1px solid var(--border); }}
-  th:nth-child(1), th:nth-child(2), th:nth-child(3), th:nth-child(4), th:nth-child(5), th:nth-child(6) {{ text-align: left; }}
-  td {{ padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }}
-  td:nth-child(1), td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6) {{ text-align: left; }}
-  .trade-row:hover td {{ background: #1e2130; }}
-  .trade-row.closed {{ opacity: 0.6; }}
-  .detail-row td {{ font-size: 11px; color: var(--dim); padding: 2px 10px 8px; }}
+  th {{ padding: 6px 8px; text-align: right; color: var(--dim); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; border-bottom: 1px solid var(--border); }}
+  th:nth-child(1),th:nth-child(2),th:nth-child(3),th:nth-child(4),th:nth-child(5),th:nth-child(6),th:nth-child(7) {{ text-align: left; }}
+  td {{ padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; font-size: 11px; }}
+  td:nth-child(1),td:nth-child(2),td:nth-child(3),td:nth-child(4),td:nth-child(5),td:nth-child(6),td:nth-child(7) {{ text-align: left; }}
+  .trade-row:hover td {{ background: #1a1d2e; }}
+  .trade-row.closed {{ opacity: 0.5; }}
+  .detail-row td {{ font-size: 10px; color: var(--dim); padding: 1px 8px 7px; }}
   .detail-cell {{ text-align: left !important; }}
-  .ticker {{ font-weight: bold; color: var(--accent); }}
-  .signals {{ color: var(--dim); font-size: 11px; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }}
+
+  /* ── Cells ── */
+  .ticker {{ font-weight: 700; color: var(--accent); font-size: 11px; }}
+  .signals {{ color: var(--dim); font-size: 10px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }}
   .pos {{ color: var(--pos); }}
   .neg {{ color: var(--neg); }}
-  .open-badge   {{ color: var(--pos); font-weight: bold; }}
-  .closed-badge {{ color: var(--dim); }}
-  .real-badge     {{ color: var(--pos); font-weight: bold; font-size: 11px; }}
-  .practice-badge {{ color: var(--warn); font-size: 11px; }}
-  .strat-momentum-badge {{ color: var(--pos); font-size: 10px; font-weight: bold; letter-spacing: .5px; }}
-  .strat-breakout-badge {{ color: #b57bee; font-size: 10px; font-weight: bold; letter-spacing: .5px; }}
-  .footer {{ margin-top: 32px; color: var(--dim); font-size: 11px; border-top: 1px solid var(--border); padding-top: 12px; }}
+
+  /* ── Badges ── */
+  .open-badge   {{ color: var(--pos); font-weight: 700; font-size: 10px; }}
+  .closed-badge {{ color: var(--dim); font-size: 10px; }}
+  .real-badge     {{ background: #14532d; color: var(--pos); font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; }}
+  .practice-badge {{ background: #451a03; color: var(--warn); font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; }}
+  .strat-momentum-badge,.strat-breakout-badge {{ font-size: 9px; font-weight: 700; letter-spacing: .4px; color: var(--accent); }}
+  .mkt-badge {{ display: inline-block; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; letter-spacing: .04em; }}
+  .mkt-us  {{ background:#1e3a5f; color:#60a5fa; }}
+  .mkt-uk  {{ background:#3b1f2b; color:#f9a8d4; }}
+  .mkt-de  {{ background:#1a2e1a; color:#86efac; }}
+  .mkt-fr  {{ background:#1e1b3a; color:#a5b4fc; }}
+  .mkt-nl  {{ background:#1e1b3a; color:#a5b4fc; }}
+  .mkt-ch  {{ background:#2e1a1a; color:#fca5a5; }}
+  .mkt-ca  {{ background:#1e2e20; color:#6ee7b7; }}
+
+  /* ── Footer ── */
+  .footer {{ margin-top: 24px; color: var(--dim); font-size: 10px; border-top: 1px solid var(--border); padding-top: 10px; line-height: 1.8; }}
+
   /* ── Risk Module ── */
-  .risk-module {{ margin: 28px 0 8px; }}
-  .risk-module h2 {{ font-size: 15px; font-weight: bold; margin-bottom: 14px; color: var(--text); }}
-  .risk-kpi-row {{ display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }}
-  .risk-kpi {{ background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 18px; min-width: 240px; }}
-  .risk-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }}
-  .risk-panel {{ background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; overflow-x: auto; }}
-  .risk-panel-title {{ font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); margin-bottom: 10px; }}
+  .risk-module {{ margin: 4px 0 20px; }}
+  .risk-module h2 {{ font-size: 11px; }}
+  .risk-kpi-row {{ display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }}
+  .risk-kpi {{ background: var(--card); border: 1px solid var(--border); border-radius: 7px; padding: 10px 14px; min-width: 220px; }}
+  .risk-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }}
+  .risk-panel {{ background: var(--card); border: 1px solid var(--border); border-radius: 7px; padding: 12px; overflow-x: auto; }}
+  .risk-panel-title {{ font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--dim); margin-bottom: 8px; }}
   .risk-panel table {{ width: 100%; border-collapse: collapse; }}
-  .risk-panel th {{ font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--dim); padding: 4px 8px; border-bottom: 1px solid var(--border); text-align: left; }}
-  .risk-panel td {{ font-size: 12px; padding: 5px 8px; border-bottom: 1px solid var(--border); }}
-  .risk-close {{ color: var(--neg); font-weight: bold; }}
-  .risk-trim  {{ color: var(--warn); font-weight: bold; }}
+  .risk-panel th {{ font-size: 9px; font-weight: 700; text-transform: uppercase; color: var(--dim); padding: 3px 7px; border-bottom: 1px solid var(--border); text-align: left; }}
+  .risk-panel td {{ font-size: 10px; padding: 4px 7px; border-bottom: 1px solid var(--border); }}
+  .risk-close {{ color: var(--neg); font-weight: 700; }}
+  .risk-trim  {{ color: var(--warn); font-weight: 700; }}
   .dim {{ color: var(--dim); }}
 </style>
 </head>
 <body>
 <header>
   <div>
-    <h1>📊 Trade Tracker</h1>
-    <div class="meta">Updated: {now_str}</div>
+    <h1>📊 Trade <span>Tracker</span></h1>
+    <div class="meta">Updated: {now_str} &nbsp;·&nbsp; All prices live via yfinance &nbsp;·&nbsp; EUR P&L uses spot FX</div>
   </div>
 </header>
 <div class="kpi-section">
@@ -1673,10 +1714,11 @@ def main():
     rows = [compute_row(t, price_cache, fx_cache) for t in trades]
     print(f"  Done in {time.time()-t0:.1f}s\n")
 
+    print_risk(rows)
     print_tracker(rows, filter_status)
 
     if "--no-browser" not in args:
-        generate_dashboard(rows, filter_status)
+        generate_dashboard(rows, filter_status, show_risk=True)
 
 
 if __name__ == "__main__":

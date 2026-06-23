@@ -2,8 +2,9 @@ name: Fire Daily Scan
 
 on:
   schedule:
-    # 9:00 AM UTC = 10:00 AM CET / 11:00 AM CEST (Mon–Fri)
-    - cron: '0 9 * * 1-5'
+    # 14:00 UTC = 16:00 CEST = 15:00 BST = 10:00 EDT
+    # US–EU overlap window: US opens 13:30 UTC, EU closes 15:30 UTC
+    - cron: '0 14 * * 1-5'
   workflow_dispatch:   # manual trigger: gh workflow run fire_scan.yml
 
 jobs:
