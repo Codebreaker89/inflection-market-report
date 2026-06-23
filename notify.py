@@ -210,11 +210,21 @@ _C_ROW1  = "#f7f8fa"
 _C_BORD  = "#e0e4ea"
 
 _STRAT_COLORS = {
-    "momentum":     ("#1a4a8a", "#dbeafe"),
-    "breakout":     ("#4a1a8a", "#ede9fe"),
-    "pocket_pivot": ("#7a4a00", "#fef3c7"),
-    "connors_rsi2": ("#005a6e", "#cffafe"),
-    "ema_ribbon":   ("#135e2e", "#dcfce7"),
+    "momentum":              ("#1a4a8a", "#dbeafe"),
+    "breakout":              ("#4a1a8a", "#ede9fe"),
+    "pocket_pivot":          ("#7a4a00", "#fef3c7"),
+    "connors_rsi2":          ("#005a6e", "#cffafe"),
+    "ema_ribbon":            ("#135e2e", "#dcfce7"),
+    "nr7":                   ("#4a4a00", "#fefce8"),
+    "bb_squeeze":            ("#003d6e", "#e0f0ff"),
+    "high_tight_flag":       ("#6e0a00", "#ffe4e1"),
+    "analyst_upgrade":       ("#006e3d", "#d1fae5"),
+    "signal_velocity":       ("#6e006e", "#fce7f3"),
+    "chokepoint_inflection": ("#005e5e", "#ccfbf1"),
+    "stage4_short":          ("#8a0000", "#fee2e2"),
+    "defensive_rotation":    ("#1a5a00", "#ecfccb"),
+    "cup_handle":            ("#003e8a", "#dbeafe"),
+    "power_earnings_gap":    ("#7a2200", "#ffedd5"),
 }
 
 def _c(val, good_if_pos=True):
@@ -363,8 +373,23 @@ def _build_matrix_html() -> str:
     if not all_tickers:
         return ""
 
-    col_labels = {"momentum":"MNTM","breakout":"BREAK","pocket_pivot":"PP",
-                  "connors_rsi2":"RSI2","ema_ribbon":"RIBBON"}
+    col_labels = {
+        "momentum":              "MNTM",
+        "breakout":              "BREAK",
+        "pocket_pivot":          "PP",
+        "connors_rsi2":          "RSI2",
+        "ema_ribbon":            "RIBBON",
+        "nr7":                   "NR7",
+        "bb_squeeze":            "BBSQ",
+        "high_tight_flag":       "HTF",
+        "analyst_upgrade":       "UPGRD",
+        "signal_velocity":       "SVEL",
+        "chokepoint_inflection": "CHOK",
+        "stage4_short":          "S4SH",
+        "defensive_rotation":    "DEFR",
+        "cup_handle":            "C&H",
+        "power_earnings_gap":    "PEG",
+    }
     sorted_t   = sorted(all_tickers.items(), key=lambda kv: -len(kv[1]))
 
     # header
@@ -403,6 +428,136 @@ def _build_matrix_html() -> str:
     return (f'<br>{_section_head("🎯","Cross-Strategy Matrix",f"last scan {scan_date}","#6d28d9")}'
             f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:12px;">'
             f'<thead><tr>{th_row}</tr></thead><tbody>{rows}</tbody></table>{note}')
+
+
+def _build_scanner_results_html() -> str:
+    """Per-strategy detailed scanner results table from last_scan.json."""
+    scan_json = HERE / "last_scan.json"
+    if not scan_json.exists():
+        return ""
+    try:
+        import json
+        data      = json.loads(scan_json.read_text())
+        scan_date = data.get("scan_date", "unknown")
+        strategies = data.get("strategies", [])
+        rbs        = data.get("results_by_strategy", {})
+    except Exception:
+        return ""
+
+    active = [(s, rbs[s]) for s in strategies if rbs.get(s)]
+    if not active:
+        return (f'<br>{_section_head("📡","Scanner Results","no signals today","#888888")}'
+                f'<p style="color:{_C_DIM};font-size:12px;font-style:italic;padding:8px 0;">'
+                f'No strategies fired on {scan_date}.</p>')
+
+    total_hits = sum(len(r) for _, r in active)
+    html = f'<br>{_section_head("📡","Scanner Results",f"scan {scan_date} · {len(active)} strategies fired · {total_hits} total signals","#1a5a8a")}'
+    html += _kpi_table([
+        ("Strategies Fired", str(len(active)), "#1a5a8a"),
+        ("Total Signals",    str(total_hits),   _C_BODY),
+        ("Scan Date",        scan_date,          _C_DIM),
+    ])
+
+    for strat, results in active:
+        is_short = "short" in strat
+        fg, bg_badge = _STRAT_COLORS.get(strat, ("#333333", "#eeeeee"))
+        strat_label  = strat.upper().replace("_", " ")
+
+        wrs  = [r["wr"]  for r in results if r.get("wr")  is not None]
+        avgs = [r["avg"] for r in results if r.get("avg") is not None]
+        bt_note = ""
+        if wrs:
+            bt_note = (f'backtest avg: {sum(wrs)/len(wrs):.0f}% win · '
+                       f'{sum(avgs)/len(avgs):+.1f}% return')
+
+        html += (f'<table width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;margin-bottom:0;">'
+                 f'<tr><td style="background:{bg_badge};border-left:4px solid {fg};'
+                 f'padding:6px 10px;border-radius:3px 3px 0 0;">'
+                 f'<span style="font-size:11px;font-weight:700;color:{fg};'
+                 f'letter-spacing:.05em;text-transform:uppercase;">'
+                 f'{strat_label} &nbsp;·&nbsp; {len(results)} signal(s)</span>'
+                 + (f'<span style="font-size:10px;color:{fg};margin-left:12px;">{bt_note}</span>' if bt_note else "")
+                 + f'</td></tr></table>')
+
+        thead = (f'<table width="100%" cellpadding="0" cellspacing="0" '
+                 f'style="border-collapse:collapse;font-size:11px;{_FONT}">'
+                 '<thead><tr>'
+                 + _th("Ticker", "left")
+                 + _th("Mkt",   "center")
+                 + _th("Scr",   "center", title="Scanner score")
+                 + _th("Price", "right")
+                 + _th("RSI",   "right")
+                 + _th("ADX",   "right")
+                 + _th("M/8",   "right",  title="Minervini score /8")
+                 + _th("Vol×",  "right",  title="Volume ratio vs 20d avg")
+                 + _th("Signals/Context", "left")
+                 + _th("WR%",   "right",  title="Backtest win rate")
+                 + _th("Avg%",  "right",  title="Backtest avg return")
+                 + '</tr></thead><tbody>')
+
+        rows = ""
+        sorted_results = sorted(results, key=lambda x: -(x.get("score") or 0))[:15]
+        for i, r in enumerate(sorted_results):
+            bg      = _C_ROW1 if i % 2 else _C_ROW0
+            score_v = r.get("score") or 0
+            rsi_v   = r.get("rsi")
+            adx_v   = r.get("adx")
+            price_v = r.get("price")
+            vol_v   = r.get("vol_ratio")
+            m_v     = r.get("minervini")
+            wr_v    = r.get("wr")
+            avg_v   = r.get("avg")
+            mkt     = r.get("mkt", "US")
+            fresh   = r.get("fresh") or []
+            conf    = r.get("conf")  or []
+
+            # Build compact signal string
+            sigs = []
+            if r.get("phase"):            sigs.append(r["phase"])
+            if r.get("pole_return"):      sigs.append(f"pole+{r['pole_return']:.0f}%")
+            if r.get("pct_from_piv") is not None: sigs.append(f"piv{r['pct_from_piv']:+.1f}%")
+            if r.get("velocity") is not None:     sigs.append(f"vel{r['velocity']:+.1f}")
+            if r.get("pct_52w_hi") is not None:   sigs.append(f"52w-{r['pct_52w_hi']:.0f}%")
+            if r.get("cup_depth_pct"):            sigs.append(f"cup{r['cup_depth_pct']:.0f}%")
+            if r.get("compression"):              sigs.append(f"NR{r['compression']:.0f}%")
+            if r.get("squeeze_intensity"):        sigs.append(f"sq{r['squeeze_intensity']:.2f}")
+            if r.get("net_score") is not None:    sigs.append(f"net{r['net_score']:+d}")
+            for sig in fresh[:3]:
+                if sig not in sigs: sigs.append(sig)
+            if not sigs:
+                sigs = conf[:3]
+            sigs_str = " · ".join(str(s) for s in sigs[:5]) or "─"
+
+            score_c = _C_POS if score_v >= 6 else (_C_WARN if score_v >= 4 else _C_DIM)
+            rsi_c   = (_C_WARN if rsi_v and rsi_v > 70
+                       else (_C_POS if rsi_v and rsi_v < 40 else _C_BODY))
+            vol_c   = _C_POS if (vol_v or 0) >= 1.5 else _C_DIM
+            m_c     = _C_POS if (m_v or 0) >= 6 else _C_DIM
+            tick_c  = _C_NEG if is_short else _C_BODY
+
+            rows += "<tr>"
+            rows += _td(f'<b style="color:{tick_c}">{r["ticker"]}</b>', "left", bg=bg)
+            rows += _td(
+                f'<span style="background:#f0f4ff;color:#334;border-radius:3px;'
+                f'padding:1px 5px;font-size:10px;">{mkt}</span>',
+                "center", bg=bg)
+            rows += _td(str(score_v), "center", score_c, bold=True, bg=bg)
+            rows += _td(f'${price_v:.2f}' if price_v else "─", "right", _C_DIM, bg=bg)
+            rows += _td(f'{rsi_v:.0f}' if rsi_v else "─", "right", rsi_c, bg=bg)
+            rows += _td(f'{adx_v:.0f}' if adx_v else "─", "right", _C_DIM, bg=bg)
+            rows += _td(f'{int(m_v)}/8' if m_v is not None else "─", "right", m_c, bg=bg)
+            rows += _td(f'{vol_v:.1f}×' if vol_v else "─", "right", vol_c, bg=bg)
+            rows += _td(sigs_str, "left", _C_DIM, bg=bg,
+                        extra="font-size:10px;max-width:220px;overflow:hidden;")
+            rows += _td(f'{wr_v:.0f}%' if wr_v is not None else "─",
+                        "right", _C_POS if (wr_v or 0) >= 60 else _C_DIM, bg=bg)
+            rows += _td(_pct(avg_v) if avg_v is not None else "─",
+                        "right", _c(avg_v) if avg_v is not None else _C_DIM, bg=bg)
+            rows += "</tr>"
+
+        html += thead + rows + "</tbody></table>"
+
+    return html
 
 
 def build_email(trades: list[dict]) -> str:
@@ -541,7 +696,10 @@ def build_email(trades: list[dict]) -> str:
             weekly_html = (f'<br>{_section_head("📅","Week Closed Trades",f"{week_start} → {TODAY}","#2c3e50")}'
                            + thead + rows + '</tbody></table>')
 
-    # ── Section 4: Cross-strategy matrix ─────────────────────────────────────
+    # ── Section 4: Scanner results (per-strategy detail) ─────────────────────
+    scanner_html = _build_scanner_results_html()
+
+    # ── Section 5: Cross-strategy matrix ─────────────────────────────────────
     matrix_html = _build_matrix_html()
 
     # ── Top-level KPI bar ─────────────────────────────────────────────────────
@@ -598,6 +756,8 @@ def build_email(trades: list[dict]) -> str:
   {snapshot_html}
 
   {weekly_html}
+
+  {scanner_html}
 
   {matrix_html}
 
