@@ -812,8 +812,11 @@ def compute_row(trade: dict, price_cache: dict, fx_cache: dict) -> dict:
     # ── 1-week exit ───────────────────────────────────────────────────────────
     if status == "CLOSED" and trade.get("actual_sell_date"):
         exit_d = datetime.strptime(trade["actual_sell_date"], "%Y-%m-%d").date()
-        p1 = price_on_or_before(hist, exit_d) if hist is not None else (
-             float(trade["exit_price"]) if trade.get("exit_price") else None)
+        # Use stored exit_price (same currency as buy_price) — NOT history,
+        # which returns the stock's native currency and causes FX mismatch
+        # when buy_price was stored as EUR-converted (e.g. MCHP stored in EUR).
+        p1 = float(trade["exit_price"]) if trade.get("exit_price") else (
+             price_on_or_before(hist, exit_d) if hist is not None else None)
         d1 = exit_d
     elif hist is not None:
         p1, d1 = price_n_trading_days_after(hist, entry_date, 5)
