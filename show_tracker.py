@@ -1207,8 +1207,8 @@ def _rj(s: str, w: int) -> str:
 def _lj(s: str, w: int) -> str:
     return s + ' ' * max(w - _vlen(s), 0)
 
-# Column widths
-_CW = dict(num=2, ticker=9, mkt=3, company=20, entry=10,
+# Column widths  (ticker includes [MKT] suffix, e.g. "MRVL [US]" = 13)
+_CW = dict(num=2, ticker=13, company=20, entry=10,
            buy=8, now=8, inv=5, pct=7, eur=7, type_=4)
 
 _STRAT_LABEL = {
@@ -1238,39 +1238,33 @@ def _row(*cells) -> str:
     """Join pre-padded cells with │ borders."""
     return "  │ " + " │ ".join(cells) + " │"
 
+def _table_width() -> int:
+    c = _CW
+    return c['num']+c['ticker']+c['company']+c['entry']+c['buy']+c['now']+c['inv']+c['pct']+c['eur']+c['type_'] + 10*3 + 4
+
 def _hdr_row() -> str:
     c = _CW
     return _row(
-        _rj("#",       c['num']),
-        _lj("TICKER",  c['ticker']),
-        _rj("MKT",     c['mkt']),
-        _lj("COMPANY", c['company']),
-        _lj("ENTRY",   c['entry']),
-        _rj("BUY €",   c['buy']),
-        _rj("NOW €",   c['now']),
-        _rj("INV€",    c['inv']),
-        _rj("NOW%",    c['pct']),
-        _rj("NOW€",    c['eur']),
-        _lj("TYPE",    c['type_']),
+        _rj("#",           c['num']),
+        _lj("TICKER [MKT]",c['ticker']),
+        _lj("COMPANY",     c['company']),
+        _lj("ENTRY",       c['entry']),
+        _rj("BUY €",       c['buy']),
+        _rj("NOW €",       c['now']),
+        _rj("INV€",        c['inv']),
+        _rj("NOW%",        c['pct']),
+        _rj("NOW€",        c['eur']),
+        _lj("TYPE",        c['type_']),
     )
 
 def _rule(char="─") -> str:
-    c = _CW
-    total = (c['num']+c['ticker']+c['mkt']+c['company']+c['entry'] +
-             c['buy']+c['now']+c['inv']+c['pct']+c['eur']+c['type_'] + 11*3 + 4)
-    return "  ├" + char * (total - 4) + "┤"
+    return "  ├" + char * (_table_width() - 4) + "┤"
 
 def _top_rule() -> str:
-    c = _CW
-    total = (c['num']+c['ticker']+c['mkt']+c['company']+c['entry'] +
-             c['buy']+c['now']+c['inv']+c['pct']+c['eur']+c['type_'] + 11*3 + 4)
-    return "  ┌" + "─" * (total - 4) + "┐"
+    return "  ┌" + "─" * (_table_width() - 4) + "┐"
 
 def _bot_rule() -> str:
-    c = _CW
-    total = (c['num']+c['ticker']+c['mkt']+c['company']+c['entry'] +
-             c['buy']+c['now']+c['inv']+c['pct']+c['eur']+c['type_'] + 11*3 + 4)
-    return "  └" + "─" * (total - 4) + "┘"
+    return "  └" + "─" * (_table_width() - 4) + "┘"
 
 def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
     if filter_status:
@@ -1322,26 +1316,26 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
                        else RED(f"{now_pct:+.1f}%") if now_pct else DIM("─"))
             eur_s   = (GRN(f"{now_eur:+.0f}€") if now_eur and now_eur >= 0
                        else RED(f"{now_eur:+.0f}€") if now_eur else DIM("─"))
-            tt      = r.get("trade_type", "practice")
-            type_s  = GRN("REAL") if tt == "real" else YLW("PRAC")
-            mkt_s   = DIM(ticker_market(r['ticker']))
-            co_s    = str(r.get('company',''))[:c['company']]
-            theme   = _classify_theme(r["ticker"], r.get("sector", ""))
-            theme_s = _THEME_EMOJI_T.get(theme, "·") + " " + theme
+            tt       = r.get("trade_type", "practice")
+            type_s   = GRN("REAL") if tt == "real" else YLW("PRAC")
+            mkt      = ticker_market(r['ticker'])
+            tick_mkt = BOLD(r['ticker']) + DIM(f" [{mkt}]")
+            co_s     = str(r.get('company',''))[:c['company']]
+            theme    = _classify_theme(r["ticker"], r.get("sector", ""))
+            theme_s  = _THEME_EMOJI_T.get(theme, "·") + " " + theme
 
             # ── Main row ──────────────────────────────────────────────────────
             print(_row(
-                _rj(str(r['id']),        c['num']),
-                _lj(BOLD(r['ticker']),   c['ticker']),
-                _rj(mkt_s,               c['mkt']),
-                _lj(co_s,                c['company']),
+                _rj(str(r['id']),   c['num']),
+                _lj(tick_mkt,       c['ticker']),
+                _lj(co_s,           c['company']),
                 r['entry_date'],
-                _rj(buy_e,               c['buy']),
-                _rj(now_e,               c['now']),
-                _rj(inv_e,               c['inv']),
-                _rj(pct_s,               c['pct']),
-                _rj(eur_s,               c['eur']),
-                _lj(type_s,              c['type_']),
+                _rj(buy_e,          c['buy']),
+                _rj(now_e,          c['now']),
+                _rj(inv_e,          c['inv']),
+                _rj(pct_s,          c['pct']),
+                _rj(eur_s,          c['eur']),
+                _lj(type_s,         c['type_']),
             ))
 
             # ── Sub-row A: stop · exit · sold ─────────────────────────────────
