@@ -48,8 +48,10 @@ HOLD_DAYS    = 10
 MAX_WORKERS  = 25
 FRESH_WINDOW = 3
 
-# Strict rotation threshold: sector ETF must beat SPY by this margin (20d)
-ROTATION_THRESHOLD = 0.03   # 3 percentage points
+# Rotation threshold: sector ETF must beat SPY by this margin (10d)
+# Lowered 3% → 1.5% + window 20d → 10d to catch early-stage rotations
+ROTATION_THRESHOLD = 0.015  # 1.5 percentage points
+ROTATION_WINDOW    = 10     # trading days for outperformance measurement
 
 # ── Sector definitions ────────────────────────────────────────────────────────
 
@@ -88,6 +90,34 @@ SECTORS = {
             "GFI", "HMY", "AU", "OR", "FNV", "RGLD",
         ],
         "tickers_intl": [],
+    },
+    # ── EU defensive ETFs (STOXX Europe 600 sub-indices, Xetra-listed) ────────
+    "EXV1.DE": {
+        "name": "EU Utilities",
+        "tickers_us": [],
+        "tickers_intl": [
+            "ENEL.MI", "ENGI.PA", "IBE.MC", "RWE.DE", "EONGn.DE",
+            "EDP.LS", "VIE.PA", "SSE.L", "NG.L", "SVT.L", "UU.L",
+            "ELE.MC", "RED.MC", "BKW.SW",
+        ],
+    },
+    "EXH1.DE": {
+        "name": "EU Healthcare",
+        "tickers_us": [],
+        "tickers_intl": [
+            "ROG.SW", "NOVN.SW", "AZN.L", "GSK.L", "SAN.PA",
+            "BAYN.DE", "SHL.DE", "FRE.DE", "SOON.SW", "GIVN.SW",
+            "COHU.DE", "FME.DE", "EVO.DE",
+        ],
+    },
+    "EXH3.DE": {
+        "name": "EU Consumer Staples",
+        "tickers_us": [],
+        "tickers_intl": [
+            "NESN.SW", "UNA.AS", "ULVR.L", "DGE.L", "BATS.L",
+            "HEIN.AS", "BN.PA", "CPR.MI", "LONN.SW", "ABI.BR",
+            "TREIF.SW", "BEIA.AS", "DANO.PA",
+        ],
     },
 }
 
@@ -129,38 +159,40 @@ def _fetch_etf(ticker: str, period: str = "60d") -> Optional[pd.Series]:
 def detect_rotating_sectors(spy_prices: pd.Series) -> dict:
     """
     Returns dict of sector_etf → rotation_info for confirmed rotating sectors.
-    Strict: 20d outperformance > 3% AND recent 5d outperformance > prior 5d.
+    Gate: 10d outperformance > 1.5% AND recent 5d outperformance > prior 5d.
+    EU ETFs compared against SPY-equivalent (price-based approximation).
     """
     rotating = {}
+    W = ROTATION_WINDOW + 1   # iloc offset for W trading days back
 
-    spy_20d  = float(spy_prices.iloc[-1] / spy_prices.iloc[-21] - 1) if len(spy_prices) >= 21 else 0
+    spy_nd   = float(spy_prices.iloc[-1] / spy_prices.iloc[-W]  - 1) if len(spy_prices) >= W  else 0
     spy_5d_r = float(spy_prices.iloc[-1] / spy_prices.iloc[-6]  - 1) if len(spy_prices) >= 6  else 0
     spy_5d_p = float(spy_prices.iloc[-6] / spy_prices.iloc[-11] - 1) if len(spy_prices) >= 11 else 0
 
     for etf_ticker in SECTORS:
         etf = _fetch_etf(etf_ticker, period="60d")
-        if etf is None or len(etf) < 21: continue
+        if etf is None or len(etf) < W: continue
 
-        etf_20d  = float(etf.iloc[-1] / etf.iloc[-21] - 1)
+        etf_nd   = float(etf.iloc[-1] / etf.iloc[-W] - 1)
         etf_5d_r = float(etf.iloc[-1] / etf.iloc[-6]  - 1) if len(etf) >= 6  else 0
         etf_5d_p = float(etf.iloc[-6] / etf.iloc[-11] - 1) if len(etf) >= 11 else 0
 
-        rel_20d       = etf_20d  - spy_20d     # 20d relative perf vs SPY
-        rel_5d_recent = etf_5d_r - spy_5d_r   # recent 5d relative perf
-        rel_5d_prior  = etf_5d_p - spy_5d_p   # prior 5d relative perf
+        rel_nd        = etf_nd   - spy_nd      # 10d relative perf vs SPY
+        rel_5d_recent = etf_5d_r - spy_5d_r    # recent 5d relative perf
+        rel_5d_prior  = etf_5d_p - spy_5d_p    # prior 5d relative perf
 
-        # Strict gate: >3% outperformance over 20 days
-        if rel_20d < ROTATION_THRESHOLD: continue
+        # Gate: >1.5% outperformance over 10 days
+        if rel_nd < ROTATION_THRESHOLD: continue
         # Acceleration gate: recent 5d better than prior 5d
         if rel_5d_recent <= rel_5d_prior: continue
 
         rotating[etf_ticker] = {
-            "name":         SECTORS[etf_ticker]["name"],
-            "rel_20d":      round(rel_20d * 100, 2),
-            "rel_5d":       round(rel_5d_recent * 100, 2),
-            "etf_20d_ret":  round(etf_20d * 100, 2),
-            "spy_20d_ret":  round(spy_20d * 100, 2),
-            "etf_prices":   etf,
+            "name":        SECTORS[etf_ticker]["name"],
+            "rel_nd":      round(rel_nd * 100, 2),
+            "rel_5d":      round(rel_5d_recent * 100, 2),
+            "etf_nd_ret":  round(etf_nd * 100, 2),
+            "spy_nd_ret":  round(spy_nd * 100, 2),
+            "etf_prices":  etf,
         }
 
     return rotating
@@ -222,15 +254,17 @@ def score_stock(ticker: str, sector_etf: str, rotation_info: dict,
                                   spy_prices.rename("spy")], axis=1).dropna()
         if len(aligned) < 21: return None
 
-        stock_20d = float(aligned["s"].iloc[-1] / aligned["s"].iloc[-21] - 1)
-        etf_20d   = float(aligned["e"].iloc[-1] / aligned["e"].iloc[-21] - 1)
-        spy_20d   = float(aligned["spy"].iloc[-1] / aligned["spy"].iloc[-21] - 1)
+        W = ROTATION_WINDOW + 1
+        if len(aligned) < W: return None
+        stock_nd = float(aligned["s"].iloc[-1] / aligned["s"].iloc[-W] - 1)
+        etf_nd   = float(aligned["e"].iloc[-1] / aligned["e"].iloc[-W] - 1)
+        spy_nd   = float(aligned["spy"].iloc[-1] / aligned["spy"].iloc[-W] - 1)
 
         # Hard filter: stock must outperform its own sector ETF
-        if stock_20d <= etf_20d: return None
+        if stock_nd <= etf_nd: return None
 
-        rs_vs_spy    = stock_20d - spy_20d
-        rs_vs_sector = stock_20d - etf_20d
+        rs_vs_spy    = stock_nd - spy_nd
+        rs_vs_sector = stock_nd - etf_nd
 
         # ── Scoring ───────────────────────────────────────────────────────────
         sma200    = float(row["sma200"]) if not pd.isna(row["sma200"]) else 0
@@ -247,8 +281,8 @@ def score_stock(ticker: str, sector_etf: str, rotation_info: dict,
         ])
 
         conf_flags = {
-            f"RS+{round(rs_vs_spy*100,1)}%":    rs_vs_spy > 0.02,   # beats SPY by 2%+
-            f"vsETF+{round(rs_vs_sector*100,1)}%": rs_vs_sector > 0.01,
+            f"RS+{round(rs_vs_spy*100,1)}%":    rs_vs_spy > 0.01,   # beats SPY by 1%+
+            f"vsETF+{round(rs_vs_sector*100,1)}%": rs_vs_sector > 0.005,
             "VOL↑":     vol_ratio > 1.2,
             "MACD+":    macd_h > 0,
             ">SMA200":  c > sma200 if sma200 > 0 else False,
@@ -269,15 +303,15 @@ def score_stock(ticker: str, sector_etf: str, rotation_info: dict,
             "sector":       rotation_info["name"],
             "sector_etf":   sector_etf,
             "score":        score,
-            "fresh":        [fresh_tag, f"ETF+{rotation_info['rel_20d']}%vsS&P"],
+            "fresh":        [fresh_tag, f"ETF+{rotation_info['rel_nd']}%vsS&P"],
             "conf":         [k for k, v in conf_flags.items() if v],
             "rsi":          round(rsi, 1),
             "adx":          round(adx, 1),
             "vol_ratio":    round(vol_ratio, 2),
             "minervini":    m,
             "price":        round(c, 2),
-            "rs_vs_spy":    round(rs_vs_spy * 100, 2),
-            "rs_vs_sector": round(rs_vs_sector * 100, 2),
+            "rs_vs_spy":    round(rs_vs_spy  * 100, 2),
+            "rs_vs_sector": round(rs_vs_sector* 100, 2),
             "mkt":          mkt,
             "hold_days":    HOLD_DAYS,
         }
