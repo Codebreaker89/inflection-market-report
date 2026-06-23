@@ -971,7 +971,7 @@ def print_risk(rows: list[dict]):
     """Terminal risk module: python3 show_tracker.py risk"""
     d = _risk_data(rows)
     now_str = datetime.now().strftime("%Y-%m-%d  %H:%M")
-    W2 = 80
+    W2 = W   # match tracker width
 
     print()
     print("╔" + "═"*(W2-2) + "╗")
@@ -1194,17 +1194,39 @@ def _risk_html_section(rows: list[dict]) -> str:
 
 # ── DISPLAY ───────────────────────────────────────────────────────────────────
 
-W = 112
+W = 98
+
+_STRAT_LABEL = {
+    "momentum":             "🟢  MOMENTUM",
+    "breakout":             "🔭  BREAKOUT",
+    "pocket_pivot":         "🟠  POCKET PIVOT",
+    "connors_rsi2":         "🔵  CONNORS RSI(2)",
+    "ema_ribbon":           "🟣  EMA RIBBON",
+    "nr7":                  "⚡  NR7",
+    "bb_squeeze":           "🔲  BB SQUEEZE",
+    "high_tight_flag":      "🚀  HIGH TIGHT FLAG",
+    "analyst_upgrade":      "📊  ANALYST UPGRADE",
+    "signal_velocity":      "⚙️   SIGNAL VELOCITY",
+    "chokepoint_inflection":"🌐  CHOKEPOINT INFLECTION",
+    "stage4_short":         "🔻  STAGE 4 SHORT",
+    "defensive_rotation":   "🛡️   DEFENSIVE ROTATION",
+    "cup_handle":           "☕  CUP & HANDLE",
+    "power_earnings_gap":   "⚡  POWER EARNINGS GAP",
+}
+
+_THEME_EMOJI_T = {
+    "AI/Semi":"🔴","AI-Infra":"🟠","Industrials":"🟢",
+    "EU-Energy":"🔵","Materials":"⚪","Healthcare":"🩷","Consumer":"🟡","Other":"·",
+}
 
 def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
     if filter_status:
         rows = [r for r in rows if r["status"] == filter_status]
 
-    now      = datetime.now().strftime("%Y-%m-%d  %H:%M")
-    open_n   = sum(1 for r in rows if r["status"] == "OPEN")
-    closed_n = sum(1 for r in rows if r["status"] == "CLOSED")
-    total_inv= sum(float(r["investment_eur"]) for r in rows)
-
+    now       = datetime.now().strftime("%Y-%m-%d  %H:%M")
+    open_n    = sum(1 for r in rows if r["status"] == "OPEN")
+    closed_n  = sum(1 for r in rows if r["status"] == "CLOSED")
+    total_inv = sum(float(r["investment_eur"]) for r in rows)
     all_now   = [r["pnl_now_eur"] for r in rows if r.get("pnl_now_eur") is not None]
     total_pnl = sum(all_now) if all_now else None
 
@@ -1213,148 +1235,112 @@ def print_tracker(rows: list[dict], filter_status: Optional[str] = None):
     print("║" + f"  📊  TRADE TRACKER  ·  {now}  ·  {open_n} open  ·  {closed_n} closed".ljust(W-2) + "║")
     inv_line = f"  Total invested: €{total_inv:.0f}"
     if total_pnl is not None:
-        pnl_s = (GRN(f"+€{total_pnl:.0f}") if total_pnl >= 0 else RED(f"-€{abs(total_pnl):.0f}"))
-        inv_line += f"  ·  Total P&L now: {pnl_s}"
+        pnl_s = GRN(f"+€{total_pnl:.0f}") if total_pnl >= 0 else RED(f"-€{abs(total_pnl):.0f}")
+        inv_line += f"  ·  P&L: {pnl_s}"
     print("║" + inv_line.ljust(W-2) + "║")
     print("╚" + "═"*(W-2) + "╝")
 
     if not rows:
-        print(DIM("  No trades found. Add one with: python3 show_tracker.py add"))
-        return
+        print(DIM("  No trades. Add: python3 show_tracker.py add")); return
+
+    HDR = (f"  {'#':>2}  {'TICKER':<9} {'MKT':>3}  {'COMPANY':<20}  {'ENTRY':<10}"
+           f"  {'BUY €':>8}  {'NOW €':>8}  {'INV€':>5}"
+           f"  {'NOW%':>6}  {'NOW€':>6}  TYPE")
+    SEP = "  " + "─" * (W - 4)
+    DOT = DIM("  " + "╌" * (W - 4))
 
     strategies = list(dict.fromkeys(r["strategy"] for r in rows))
 
     for strat in strategies:
         strat_rows = [r for r in rows if r["strategy"] == strat]
-        label = {
-            "momentum":             "🟢  MOMENTUM  (O'Neil / IBD crossover signals)",
-            "breakout":             "🔭  BREAKOUT  (VCP / coil pre-breakout)",
-            "pocket_pivot":         "🟠  POCKET PIVOT  (Morales & Kacher)",
-            "connors_rsi2":         "🔵  CONNORS RSI(2)  (mean reversion in uptrend)",
-            "ema_ribbon":           "🟣  EMA RIBBON  (8/13/21/34/55 expansion pullback)",
-            "nr7":                  "⚡  NR7  (Toby Crabel — narrowest range compression)",
-            "bb_squeeze":           "🔲  BB SQUEEZE  (TTM Squeeze — Bollinger / John Carter)",
-            "high_tight_flag":      "🚀  HIGH TIGHT FLAG  (Minervini / O'Neil — pole + flag)",
-            "analyst_upgrade":      "📊  ANALYST UPGRADE  (≥3 firms upgrade in 5 days, tier-1 required)",
-            "signal_velocity":      "⚙️   SIGNAL VELOCITY  (TV-style indicator convergence acceleration)",
-            "chokepoint_inflection":"🌐  CHOKEPOINT INFLECTION  (macro event → commodity spike → stock lag)",
-            "stage4_short":         "🔻  STAGE 4 SHORT  (Weinstein/Minervini — confirmed distribution)",
-            "defensive_rotation":   "🛡️   DEFENSIVE ROTATION  (Faber — sector ETF outperforms SPY → stock leaders)",
-            "cup_handle":           "☕  CUP & HANDLE  (O'Neil / IBD — rounded base + tight handle at pivot)",
-            "power_earnings_gap":   "⚡  POWER EARNINGS GAP  (Gil Morales — 8%+ gap on earnings, 2× volume, gap held)",
-        }.get(strat, strat.upper())
+        label = _STRAT_LABEL.get(strat, strat.upper())
         print(f"\n  {BOLD(label)}")
-        print()
-
-        hdr = (f"  {'#':>2}  {'TICKER':<8}  {'MKT':<4}  {'COMPANY':<22}  {'ENTRY':<10}  "
-               f"{'BUY €':>7}  {'NOW €':>7}  {'QTY':>6}  {'INV€':>6}  "
-               f"{'1WK%':>6}  {'1WK€':>7}  "
-               f"{'2WK%':>6}  {'2WK€':>7}  "
-               f"{'NOW%':>6}  {'NOW€':>7}  {'STATUS':<8}  {'TYPE':<8}  STRAT")
-        print(BOLD(hdr))
-        print("  " + "─"*(W-2))
+        print(BOLD(HDR))
+        print(SEP)
 
         for r in strat_rows:
-            buy_e = f"€{r['buy_eur']:.2f}"    if r.get("buy_eur")     else f"{float(r['buy_price']):.2f}"
-            now_e = f"€{r['current_eur']:.2f}" if r.get("current_eur") else "─"
-            ticker_s = BOLD(f"{r['ticker']:<8}")
-            co_s     = f"{str(r['company'])[:22]:<22}"
+            buy_e   = f"€{r['buy_eur']:.2f}"      if r.get("buy_eur")         else f"€{float(r['buy_price']):.2f}"
+            now_e   = f"€{r['current_eur']:.2f}"   if r.get("current_eur")     else "─"
+            inv_e   = f"€{float(r['investment_eur']):.0f}" if r.get("investment_eur") else "─"
+            now_pct = r.get("ret_now_pct")
+            now_eur = r.get("pnl_now_eur")
+            pct_s   = (GRN(f"{now_pct:+.1f}%") if now_pct and now_pct >= 0
+                       else RED(f"{now_pct:+.1f}%") if now_pct else DIM("─"))
+            eur_s   = (GRN(f"{now_eur:+.0f}€") if now_eur and now_eur >= 0
+                       else RED(f"{now_eur:+.0f}€") if now_eur else DIM("─"))
+            tt      = r.get("trade_type", "practice")
+            type_s  = GRN("REAL") if tt == "real" else YLW("PRAC")
+            mkt_s   = DIM(f"{ticker_market(r['ticker']):>3}")
+            co_s    = f"{str(r.get('company',''))[:20]:<20}"
+            ticker_s = BOLD(f"{r['ticker']:<9}")
 
-            tt = r.get("trade_type", "practice")
-            type_badge = GRN("REAL    ") if tt == "real" else YLW("PRACTICE")
-            strat_val = r.get("strategy", "")
-            _strat_badges = {
-                "momentum":              CYN("MNTM    "),
-                "breakout":              MAG("BRKOUT  "),
-                "pocket_pivot":          _c("33","PP      "),
-                "connors_rsi2":          _c("36","RSI2    "),
-                "ema_ribbon":            _c("35","EMARIBN "),
-                "nr7":                   _c("33","NR7     "),
-                "bb_squeeze":            _c("36","BBSQZ   "),
-                "high_tight_flag":       _c("32","HTF     "),
-                "analyst_upgrade":       _c("34","ANUPGRD "),
-                "signal_velocity":       _c("35","SIGVEL  "),
-                "chokepoint_inflection": _c("31","CHKPNT  "),
-                "stage4_short":          _c("31","S4SHORT "),
-                "defensive_rotation":    _c("32","DEFROT  "),
-                "cup_handle":            _c("33","C&H     "),
-                "power_earnings_gap":    _c("33","PEG     "),
-            }
-            strat_s = _strat_badges.get(strat_val, DIM(f"{strat_val[:8]:<8}"))
-            inv_e = f"€{float(r['investment_eur']):.0f}" if r.get("investment_eur") else "─"
-            mkt_s = DIM(f"{ticker_market(r['ticker']):<4}")
-            row_line = (f"  {r['id']:>2}  {ticker_s}  {mkt_s}  {co_s}  {r['entry_date']:<10}  "
-                        f"{buy_e:>7}  {now_e:>7}  {float(r['qty']):>6.2f}  {inv_e:>6}  "
-                        f"{_pct(r.get('ret_1wk_pct')):>6}  {_eur(r.get('pnl_1wk_eur')):>7}  "
-                        f"{_pct(r.get('ret_2wk_pct')):>6}  {_eur(r.get('pnl_2wk_eur')):>7}  "
-                        f"{_pct(r.get('ret_now_pct')):>6}  {_eur(r.get('pnl_now_eur')):>7}  "
-                        f"{_status(r['status'])}  {type_badge}  {strat_s}")
-            print(row_line)
+            print(f"  {r['id']:>2}  {ticker_s} {mkt_s}  {co_s}  {r['entry_date']}"
+                  f"  {buy_e:>8}  {now_e:>8}  {inv_e:>5}"
+                  f"  {str(pct_s):>6}  {str(eur_s):>6}  {type_s}")
 
-            # Sub-row 1: signals + exit info + stop/target dates
-            sub1_parts = []
+            # Sub-row A: signals · stop · exit/sold
+            s1 = []
             sig_text = str(r.get("signals", "")).strip()
-            if sig_text:
-                sub1_parts.append(CYN(sig_text[:65]))
-            if r.get("stop_loss_price"):
-                sub1_parts.append(RED(f"SL {r['stop_loss_price']}"))
-            if r.get("target_exit_date"):
-                sub1_parts.append(DIM(f"exit→{r['target_exit_date']}"))
+            if sig_text:                    s1.append(CYN(sig_text[:55]))
+            if r.get("stop_loss_price"):    s1.append(RED(f"SL {r['stop_loss_price']}"))
+            if r.get("target_exit_date"):   s1.append(DIM(f"exit→{r['target_exit_date']}"))
             if r["status"] == "CLOSED" and r.get("actual_sell_date"):
-                exit_s = f"sold {r['actual_sell_date']} @ {r.get('exit_price','─')}"
-                if r.get("exit_reason"):
-                    exit_s += f"  [{r['exit_reason']}]"
-                sub1_parts.append(DIM(exit_s))
-            if sub1_parts:
-                print("     " + DIM("  ·  ").join(sub1_parts))
+                ex = f"sold {r['actual_sell_date']} @ {r.get('exit_price','─')}"
+                if r.get("exit_reason"): ex += f"  [{r['exit_reason']}]"
+                s1.append(DIM(ex))
+            if s1:
+                print("     " + DIM("  ·  ").join(s1))
 
-            # Sub-row 2: entry analytics — only show populated fields
-            reg = r.get("market_regime_entry", "")
-            sec = str(r.get("sector", "")).strip()[:16]
-            try:
-                dd = float(r.get("max_dd_1wk") or "")
-            except (ValueError, TypeError):
-                dd = None
+            # Sub-row B: analytics + theme
+            reg   = r.get("market_regime_entry", "")
+            sec   = str(r.get("sector", "")).strip()[:14]
+            theme = _classify_theme(r["ticker"], r.get("sector", ""))
+            theme_s = _THEME_EMOJI_T.get(theme, "·") + " " + theme
+            try:    dd = float(r.get("max_dd_1wk") or "")
+            except: dd = None
             ana = []
-            if r.get("rsi_at_entry"):        ana.append(f"RSI {r['rsi_at_entry']}")
-            if r.get("adx_at_entry"):        ana.append(f"ADX {r['adx_at_entry']}")
-            if r.get("minervini_at_entry"):  ana.append(f"M {r['minervini_at_entry']}/8")
-            if r.get("vol_ratio_entry"):     ana.append(f"Vol× {r['vol_ratio_entry']}")
-            if reg:                          ana.append(_regime(reg))
-            if sec:                          ana.append(f"[{sec}]")
+            if r.get("rsi_at_entry"):       ana.append(f"RSI {r['rsi_at_entry']}")
+            if r.get("adx_at_entry"):       ana.append(f"ADX {r['adx_at_entry']}")
+            if r.get("minervini_at_entry"): ana.append(f"M {r['minervini_at_entry']}/8")
+            if r.get("vol_ratio_entry"):    ana.append(f"Vol× {r['vol_ratio_entry']}")
+            if reg:                         ana.append(_regime(reg))
+            if sec:                         ana.append(f"[{sec}]")
             if dd is not None:
-                dd_s = RED(f"MaxDD {dd:.1f}%") if dd < 0 else GRN(f"MaxDD {dd:.1f}%")
-                ana.append(dd_s)
-            if ana:
-                print(DIM("     ") + DIM("  ·  ").join(ana))
+                ana.append(RED(f"MaxDD {dd:.1f}%") if dd < 0 else GRN(f"MaxDD {dd:.1f}%"))
+            ana.append(DIM(theme_s))
+            print(DIM("     ") + DIM("  ·  ").join(ana))
 
-            # Sub-row 3: exit analytics (only if closed and populated)
+            # Sub-row C: 1WK/2WK if populated
+            perf = []
+            if r.get("ret_1wk_pct") is not None:
+                perf.append(f"1WK {_pct(r['ret_1wk_pct'])} {_eur(r.get('pnl_1wk_eur'))}")
+            if r.get("ret_2wk_pct") is not None:
+                perf.append(f"2WK {_pct(r['ret_2wk_pct'])} {_eur(r.get('pnl_2wk_eur'))}")
+            if perf:
+                print(DIM("     ") + DIM("  ·  ").join(perf))
+
+            # Sub-row D: exit analytics (closed only)
             if r["status"] == "CLOSED" and r.get("rsi_at_exit"):
                 ex_ana = []
-                if r.get("rsi_at_exit"):      ex_ana.append(f"RSI {r['rsi_at_exit']}")
-                if r.get("adx_at_exit"):      ex_ana.append(f"ADX {r['adx_at_exit']}")
+                if r.get("rsi_at_exit"):       ex_ana.append(f"RSI {r['rsi_at_exit']}")
+                if r.get("adx_at_exit"):       ex_ana.append(f"ADX {r['adx_at_exit']}")
                 if r.get("minervini_at_exit"): ex_ana.append(f"M {r['minervini_at_exit']}/8")
                 if r.get("vol_ratio_exit"):    ex_ana.append(f"Vol× {r['vol_ratio_exit']}")
                 if ex_ana:
                     print(DIM("     exit→  ") + DIM("  ·  ").join(ex_ana))
-            print()
+
+            print(DOT)
 
         # Strategy sub-total
         s_pnls = [r["pnl_now_eur"] for r in strat_rows if r.get("pnl_now_eur") is not None]
         if s_pnls:
-            sp = sum(s_pnls)
-            print(f"  {DIM(strat + ' total now:')}  {_eur(sp)}")
+            sp  = sum(s_pnls)
+            col = GRN if sp >= 0 else RED
+            print(f"  {DIM(strat + ' total:')}  {col(_eur(sp))}\n")
 
-    print(f"\n  " + "─"*(W-2))
-    print(DIM("  Columns: 1WK%/2WK% = 5/10 trading days.  NOW% = unrealised.  "
-              "EUR P&L accounts for FX at exit date."))
-    print(DIM("  MaxDD = worst intra-week close vs entry price.  "
-              "Regime = SPY vs 50 SMA at entry."))
-    print(DIM("  To add: python3 show_tracker.py add"))
-    print(DIM("  To close a trade: python3 show_tracker.py close"))
-    print(DIM("  Risk dashboard:   python3 show_tracker.py risk"))
+    print("  " + "─" * (W - 4))
+    print(DIM("  NOW% = unrealised.  1WK/2WK shown when available.  add · close · risk subcommands available."))
     print("╚" + "═"*(W-2) + "╝\n")
-
 
 # ── HTML DASHBOARD ────────────────────────────────────────────────────────────
 
