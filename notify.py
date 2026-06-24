@@ -738,7 +738,7 @@ def build_email(trades: list[dict]) -> str:
         <div style="font-size:22px;font-weight:700;color:{_C_THEAD};">
           📊 Trade Digest</div>
         <div style="font-size:13px;color:{_C_DIM};margin-top:2px;">
-          {TODAY.strftime("%A, %d %b %Y")} &nbsp;·&nbsp; dahakehemant@gmail.com
+          {TODAY.strftime("%A, %d %b %Y")} &nbsp;·&nbsp; {NOTIFY_TO}
           &nbsp;·&nbsp; SL {int(STOP_LOSS_PCT*100)}% · Target {int(PROFIT_TARGET*100)}%
           · Earnings warn {EARNINGS_WARN}d
         </div>
