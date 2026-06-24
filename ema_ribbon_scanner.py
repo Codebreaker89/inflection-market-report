@@ -318,6 +318,9 @@ def score_row(df: pd.DataFrame, idx: int,
     rsi_val   = float(row["rsi"])
     adx_val   = float(row["adx"])
     if pd.isna(rsi_val) or pd.isna(adx_val): return None
+
+    # Hard ADX floor: ribbon must have real trend behind it (ADX=15 let GEV through)
+    if adx_val < 20: return None
     vol_ratio = float(row["Volume"]) / vol_ma_val if vol_ma_val > 0 else 0
     macd_hist = float(row["macd_hist"]) if not pd.isna(row["macd_hist"]) else 0.0
 

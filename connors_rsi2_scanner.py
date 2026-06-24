@@ -277,6 +277,12 @@ def score_row(df: pd.DataFrame, idx: int,
     if rsi2_val >= RSI2_THRESHOLD: return None
     if rsi2_prev < RSI2_THRESHOLD: return None   # must be fresh
 
+    # Anti-already-moved guard: if stock surged >12% in last 5 days, the
+    # mean-reversion bounce is over — skip to avoid chasing (e.g. WDC +30%)
+    if idx >= 5:
+        ret5d = (float(row["Close"]) / float(df.iloc[idx - 5]["Close"]) - 1) * 100
+        if ret5d > 12.0: return None
+
     # Trend filter: price above both SMAs
     if float(row["Close"]) <= float(row["sma200"]): return None
     if float(row["Close"]) <= float(row["sma50"]):  return None

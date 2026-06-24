@@ -70,7 +70,7 @@ ATR_CONTRACT    = 0.72   # recent ATR must be < 72% of prior ATR
 VOL_DRYUP       = 0.65   # recent vol must be < 65% of 20d avg
 PIVOT_PROXIMITY = 0.04   # price within 4% of 10-day high
 ADX_COIL_MAX    = 25     # ADX must be below this (not already trending)
-ADX_COIL_MIN    = 10     # ADX must be above this (not dead flat)
+ADX_COIL_MIN    = 15     # ADX must be above this (not dead flat; raised from 10 to cut weak-trend FPs)
 MIN_COIL_SCORE  = 4      # min to qualify as a coil setup
 MIN_BREAK_SCORE = 7      # min to qualify as active breakout
 

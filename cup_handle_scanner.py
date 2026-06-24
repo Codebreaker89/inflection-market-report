@@ -202,6 +202,10 @@ def _score(df: pd.DataFrame, idx: int) -> Optional[dict]:
     adx = float(row["adx"]) if not pd.isna(row["adx"]) else 0
     if adx < 15: return None
 
+    rsi_pre = float(row["rsi"]) if not pd.isna(row["rsi"]) else 50
+    # Handle must form on declining RSI, not at overbought (MET had RSI 71)
+    if rsi_pre > 65: return None
+
     # Minervini
     m = sum([
         c > row["sma150"] if not pd.isna(row["sma150"]) else False,
