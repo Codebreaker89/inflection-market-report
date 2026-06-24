@@ -8,7 +8,7 @@ trades.csv
 digest_preview.html
 tracker.html
 notify.log
-last_scan.json
+# last_scan.json tracked intentionally — CI commits it for GitHub Pages + email matrix
 
 # Python
 __pycache__/
