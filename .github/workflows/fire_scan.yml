@@ -27,20 +27,27 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run scan (all 10 strategies)
+      - name: Write config.py from secrets
+        run: |
+          cat > config.py << EOF
+          GMAIL_USER         = "${{ secrets.GMAIL_USER }}"
+          GMAIL_APP_PASSWORD = "${{ secrets.GMAIL_APP_PASSWORD }}"
+          NOTIFY_TO          = "${{ secrets.GMAIL_USER }}"
+          STOP_LOSS_PCT      = 0.03
+          PROFIT_TARGET      = 0.08
+          EARNINGS_WARN      = 7
+          HOLD_DAYS          = 7
+          DEFAULT_HOLD_DAYS  = 7
+          EOF
+
+      - name: Run scan (all strategies)
         run: python3 scan.py --no-backtest
-        env:
-          GMAIL_USER: ${{ secrets.GMAIL_USER }}
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
 
       - name: Update scan history
         run: python3 update_scan_history.py
 
       - name: Send email digest
         run: python3 notify.py --send
-        env:
-          GMAIL_USER: ${{ secrets.GMAIL_USER }}
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
 
       - name: Commit updated data back to repo
         run: |
