@@ -313,6 +313,7 @@ def score_row(df: pd.DataFrame, idx: int,
     # ADX filter
     adx_val = float(row["adx"])
     if pd.isna(adx_val) or adx_val < MIN_ADX: return None
+    if adx_val > 35: return None   # ADX cap: overextended trend = chasing
 
     # ── Anti-extension filter ──────────────────────────────────────────────
     # Reject blow-off runs: price must not be >15% above its 20-day SMA.

@@ -320,8 +320,8 @@ W = 110
 
 # ── DISPLAY ───────────────────────────────────────────────────────────────────
 
-def _print_group(strategy: str, results: list, with_backtest: bool):
-    """Print a single strategy group."""
+def _print_group(strategy: str, results: list, with_backtest: bool, multi_tickers: set = None):
+    """Print a single strategy group. multi_tickers = tickers passing ≥2 strategies (promoted to top)."""
     label = STRATEGY_LABELS.get(strategy, strategy.upper())
     hold  = HOLD_DAYS_MAP.get(strategy, 5)
     count = len(results)
@@ -350,12 +350,16 @@ def _print_group(strategy: str, results: list, with_backtest: bool):
     print(BOLD(hdr))
     print("  " + "─"*(W-2))
 
-    # Breakout: BREAK phase first (act now), then COIL (watch only)
-    if strategy == "breakout":
-        sorted_r = sorted(results, key=lambda r: (0 if r.get("phase") == "BREAK" else 1,
-                                                   -(r.get("wr") or 0), -r.get("score", 0)))
-    else:
-        sorted_r = sorted(results, key=lambda r: (-(r.get("wr") or 0), -r.get("score", 0)))
+    # Multi-strategy tickers always surface first (highest conviction).
+    # Within tier: breakout sorts BREAK→COIL; others sort by WR then score.
+    def _sort_key(r):
+        multi_rank = 0 if (multi_tickers and r.get("ticker") in multi_tickers) else 1
+        if strategy == "breakout":
+            phase_rank = 0 if r.get("phase") == "BREAK" else 1
+            return (multi_rank, phase_rank, -(r.get("wr") or 0), -r.get("score", 0))
+        return (multi_rank, -(r.get("wr") or 0), -r.get("score", 0))
+
+    sorted_r = sorted(results, key=_sort_key)
 
     _prev_phase = None
     for rank, r in enumerate(sorted_r[:50], 1):
@@ -599,12 +603,17 @@ def main():
     # Analyst upgrade tickers (for cross-reference star in matrix)
     upgrade_tickers = {r["ticker"] for r in results_by_strategy.get("analyst_upgrade", [])}
 
+    # Multi-strategy tickers: appear in ≥2 strategies (highest conviction — float to top)
+    from collections import Counter
+    ticker_strat_count = Counter(r["ticker"] for r in all_results)
+    multi_tickers = {t for t, n in ticker_strat_count.items() if n >= 2}
+
     # Display
     _print_header(strategies, len(all_results), with_backtest)
     _print_sector_pulse(sector_excess, spy_ret)
     _thematic_check()
     for strategy in strategies:
-        _print_group(strategy, results_by_strategy[strategy], with_backtest)
+        _print_group(strategy, results_by_strategy[strategy], with_backtest, multi_tickers)
 
     # Cross-strategy matrix (⭐ = also in analyst_upgrade)
     _print_matrix(results_by_strategy, strategies, upgrade_tickers)

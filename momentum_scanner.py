@@ -369,6 +369,7 @@ def score_row(df: pd.DataFrame, idx: int,
         return None
     if row["adx"] < MIN_ADX:
         return None
+    if row["adx"] > 35: return None   # ADX cap: overextended trend = chasing
 
     # Minervini Trend Template — need ≥6/8
     m = sum([
