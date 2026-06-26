@@ -53,13 +53,30 @@ def _fetch_history(ticker: str, start: date, end: date) -> pd.DataFrame:
     key = (ticker, start, end)
     if key in _px_cache:
         return _px_cache[key]
+    end_str   = (end + timedelta(days=5)).strftime("%Y-%m-%d")
+    start_str = start.strftime("%Y-%m-%d")
+    # Try batch download first (single HTTP request — avoids per-ticker rate limits in CI).
+    # Fall back to Ticker().history() on failure.
+    for attempt in range(3):
+        try:
+            with _quiet():
+                df = yf.download(ticker, start=start_str, end=end_str,
+                                 interval="1d", auto_adjust=True,
+                                 progress=False, threads=False)
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.droplevel(1)
+            if not df.empty:
+                df.index = pd.to_datetime(df.index).date
+                _px_cache[key] = df
+                return df
+        except Exception:
+            pass
+        import time; time.sleep(2 ** attempt)   # 1s, 2s, 4s back-off
+    # last-resort: Ticker API
     try:
         with _quiet():
-            df = yf.Ticker(ticker).history(
-                start=start.strftime("%Y-%m-%d"),
-                end=(end + timedelta(days=5)).strftime("%Y-%m-%d"),
-                interval="1d", auto_adjust=True
-            )
+            df = yf.Ticker(ticker).history(start=start_str, end=end_str,
+                                           interval="1d", auto_adjust=True)
         df.index = pd.to_datetime(df.index).date
         _px_cache[key] = df
         return df
@@ -162,6 +179,36 @@ def backfill_returns(rows: list[dict]) -> list[dict]:
         print("  Nothing to backfill yet"); return rows
 
     print(f"  Backfilling: {len(to_fill_d5)} d5 rows, {len(to_fill_d10)} d10 rows")
+
+    # Batch-prefetch all unique tickers + SPY in one yf.download() call per scan date.
+    # This avoids per-ticker rate-limiting in CI (one bulk request vs. 100+ individual ones).
+    all_rows = list({r["ticker"] for r in to_fill_d5 + to_fill_d10})
+    if all_rows:
+        scan_dates = {date.fromisoformat(r["scan_date"]) for r in to_fill_d5 + to_fill_d10}
+        fetch_start = min(scan_dates)
+        fetch_end   = today + timedelta(days=2)
+        batch_tickers = all_rows + ["SPY"]
+        print(f"  Batch-fetching {len(batch_tickers)} tickers ({fetch_start} → {fetch_end})...")
+        try:
+            import time
+            with _quiet():
+                bulk = yf.download(batch_tickers,
+                                   start=fetch_start.strftime("%Y-%m-%d"),
+                                   end=fetch_end.strftime("%Y-%m-%d"),
+                                   interval="1d", auto_adjust=True,
+                                   progress=False, threads=True)
+            if not bulk.empty:
+                # Populate _px_cache from bulk result
+                close = bulk["Close"] if "Close" in bulk.columns else bulk.xs("Close", axis=1, level=0)
+                for tkr in close.columns:
+                    s = close[tkr].dropna()
+                    if s.empty: continue
+                    mini_df = pd.DataFrame({"Close": s, "Low": bulk["Low"][tkr] if "Low" in bulk.columns else s})
+                    mini_df.index = pd.to_datetime(mini_df.index).date
+                    _px_cache[(tkr, fetch_start, fetch_end)] = mini_df
+                print(f"  Batch fetch OK — {len(close.columns)} tickers loaded")
+        except Exception as e:
+            print(f"  Batch fetch failed ({e}), falling back to per-ticker")
 
     # d5
     for r in to_fill_d5:
