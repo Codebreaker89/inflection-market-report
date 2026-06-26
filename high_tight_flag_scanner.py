@@ -54,6 +54,10 @@ def _adx(high, low, close, n=14):
     dx  = 100*(dip-dim).abs()/(dip+dim).replace(0, np.nan)
     return dx.ewm(alpha=1/n, adjust=False).mean()
 
+def _atr(high, low, close, n=14):
+    tr = pd.concat([(high-low),(high-close.shift()).abs(),(low-close.shift()).abs()],axis=1).max(axis=1)
+    return tr.ewm(alpha=1/n, adjust=False).mean()
+
 def _build(df: pd.DataFrame) -> pd.DataFrame:
     c, h, l, v = df["Close"], df["High"], df["Low"], df["Volume"]
     df["sma50"]    = _sma(c, 50)
@@ -61,6 +65,7 @@ def _build(df: pd.DataFrame) -> pd.DataFrame:
     df["sma200"]   = _sma(c, 200)
     df["rsi"]      = _rsi(c, 14)
     df["adx"]      = _adx(h, l, c, 14)
+    df["atr"]      = _atr(h, l, c, 14)
     df["vol_ma20"] = v.rolling(20).mean()
     df["52w_high"] = c.rolling(252).max()
     df["52w_low"]  = c.rolling(252).min()
@@ -101,6 +106,17 @@ def _score(df: pd.DataFrame, idx: int) -> Optional[dict]:
     rsi = float(row["rsi"]); adx = float(row["adx"])
     if pd.isna(rsi) or pd.isna(adx): return None
 
+    # ATR ratio cap: flag must have CONTRACTING volatility (not still parabolic).
+    # MRVL had atr_ratio=2.457 (vol expanding — entered mid-parabola) → blocked.
+    # SNDK had atr_ratio=1.423 → passes (flag genuinely compressing).
+    atr_ratio_val = None
+    if idx >= 25 and "atr" in df.columns:
+        atr_recent = float(df["atr"].iloc[idx - 5 : idx].mean())
+        atr_prior  = float(df["atr"].iloc[idx - 20 : idx - 5].mean())
+        if atr_prior > 0:
+            atr_ratio_val = round(atr_recent / atr_prior, 3)
+            if atr_ratio_val > 1.8: return None   # vol still expanding — not a real flag
+
     m = sum([
         c > row["sma150"], c > row["sma200"],
         row["sma150"] > row["sma200"],
@@ -129,6 +145,7 @@ def _score(df: pd.DataFrame, idx: int) -> Optional[dict]:
         "minervini": m, "rsi": round(rsi, 1), "adx": round(adx, 1),
         "price": round(c, 2), "vol_ratio": round(vol_ratio, 2),
         "pole_return": pole_ret, "flag_drawdown": flag_dd,
+        "atr_ratio": atr_ratio_val,
     }
 
 def run_backtest(df: pd.DataFrame) -> dict:

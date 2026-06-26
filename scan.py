@@ -14,12 +14,98 @@ Usage:
 Available strategies: momentum, breakout, pocket_pivot, connors_rsi2, ema_ribbon
 """
 
-import sys, os, time, json
+import sys, os, time, json, warnings as _warnings, contextlib
 from datetime import datetime
 from pathlib import Path
+import numpy as np
+import pandas as pd
+try:
+    import yfinance as yf
+    _HAS_YF = True
+except ImportError:
+    _HAS_YF = False
 
 HERE = Path(__file__).parent
 LAST_SCAN_JSON = HERE / "last_scan.json"
+
+# ── SECTOR → ETF MAP ──────────────────────────────────────────────────────────
+SECTOR_ETF = {
+    "Technology":             "XLK",
+    "Industrials":            "XLI",
+    "Healthcare":             "XLV",
+    "Financial Services":     "XLF",
+    "Consumer Cyclical":      "XLY",
+    "Consumer Defensive":     "XLP",
+    "Basic Materials":        "XLB",
+    "Energy":                 "XLE",
+    "Communication Services": "XLC",
+    "Utilities":              "XLU",
+    "Real Estate":            "XLRE",
+}
+_ETF_SHORT = {v: k[:5] for k, v in SECTOR_ETF.items()}  # XLK → "Techn"
+
+
+def _fetch_sector_pulse() -> tuple:
+    """Return (excess_dict, spy_10d_ret). excess = ETF 10d return minus SPY 10d return."""
+    if not _HAS_YF:
+        return {}, 0.0
+    _warnings.filterwarnings("ignore")
+    syms = ["SPY"] + list(SECTOR_ETF.values())
+    rets = {}
+    for sym in syms:
+        try:
+            with contextlib.suppress(Exception):
+                df = yf.download(sym, period="20d", interval="1d",
+                                 progress=False, auto_adjust=True, threads=False)
+                if isinstance(df.columns, pd.MultiIndex):
+                    df.columns = df.columns.droplevel(1)
+                c = df["Close"].dropna()
+                if len(c) >= 11:
+                    rets[sym] = float((c.iloc[-1] - c.iloc[-11]) / c.iloc[-11] * 100)
+        except Exception:
+            pass
+    spy = rets.get("SPY", 0.0)
+    excess = {sym: round(v - spy, 2) for sym, v in rets.items() if sym != "SPY"}
+    return excess, round(spy, 2)
+
+
+def _print_sector_pulse(excess: dict, spy_ret: float):
+    """Print compact sector heat strip above scan output."""
+    if not excess:
+        return
+    ranked = sorted(excess.items(), key=lambda x: -x[1])
+    parts = []
+    for etf, ex in ranked:
+        label = _ETF_SHORT.get(etf, etf)
+        s = f"{label}({etf}) {'+' if ex >= 0 else ''}{ex:.1f}%"
+        parts.append(GRN(s) if ex >= 1.0 else (RED(s) if ex <= -1.0 else DIM(s)))
+    spy_s = f"SPY 10d: {'+' if spy_ret >= 0 else ''}{spy_ret:.1f}%"
+    print()
+    print(BOLD(f"  📊  SECTOR PULSE  ·  {spy_s}  ·  vs SPY:"))
+    print("    " + "   ".join(parts))
+    # Build underperforming set for caller use
+    return {etf for etf, ex in excess.items() if ex <= -1.5}
+
+
+def _thematic_check():
+    """Read trades.csv → show open & recent closed position concentration by sector."""
+    trades_path = HERE / "trades.csv"
+    if not trades_path.exists():
+        return
+    try:
+        df = pd.read_csv(trades_path)
+        open_t   = df[df["status"] == "OPEN"] if "status" in df.columns else pd.DataFrame()
+        if not open_t.empty:
+            sectors = open_t["sector"].dropna().value_counts() if "sector" in open_t.columns else pd.Series()
+            total   = len(open_t)
+            print()
+            print(BOLD(f"  💼  OPEN POSITIONS ({total}) by sector:"))
+            print("    " + "   ".join(f"{s}:{c}" for s, c in sectors.items()))
+            for sec, cnt in sectors.items():
+                if cnt / total > 0.40 and total >= 3:
+                    print(YLW(f"    ⚠  {sec} at {cnt/total:.0%} of book — new {sec} signals are HIGH-RISK"))
+    except Exception:
+        pass
 
 # ── IMPORTS ───────────────────────────────────────────────────────────────────
 from momentum_scanner       import (scan as scan_momentum,
@@ -264,10 +350,25 @@ def _print_group(strategy: str, results: list, with_backtest: bool):
     print(BOLD(hdr))
     print("  " + "─"*(W-2))
 
-    # Sort by win rate desc, then score desc
-    sorted_r = sorted(results, key=lambda r: (-(r.get("wr") or 0), -r.get("score", 0)))
+    # Breakout: BREAK phase first (act now), then COIL (watch only)
+    if strategy == "breakout":
+        sorted_r = sorted(results, key=lambda r: (0 if r.get("phase") == "BREAK" else 1,
+                                                   -(r.get("wr") or 0), -r.get("score", 0)))
+    else:
+        sorted_r = sorted(results, key=lambda r: (-(r.get("wr") or 0), -r.get("score", 0)))
 
+    _prev_phase = None
     for rank, r in enumerate(sorted_r[:50], 1):
+        # Inject BREAK / COIL section header for breakout strategy
+        cur_phase = r.get("phase")
+        if strategy == "breakout" and cur_phase != _prev_phase:
+            if cur_phase == "BREAK":
+                print(f"\n  {GRN(BOLD('▶  BREAKING OUT NOW  —  volume + price confirming, act today'))}")
+            elif cur_phase == "COIL" and _prev_phase is not None:
+                print(f"\n  {YLW(BOLD('◎  COILING / WATCHLIST  —  setup building, do NOT trade yet'))}")
+            elif cur_phase == "COIL":
+                print(f"\n  {YLW(BOLD('◎  COILING / WATCHLIST  —  setup building, do NOT trade yet'))}")
+            _prev_phase = cur_phase
         fresh_str = " ".join(r.get("fresh", []))
         conf_str  = ("  · " + " ".join(r.get("conf", []))) if r.get("conf") else ""
         sig_str   = CYN(fresh_str) + DIM(conf_str)
@@ -320,7 +421,7 @@ def _nan_safe(d: dict) -> dict:
 
 # ── CROSS-STRATEGY MATRIX ─────────────────────────────────────────────────────
 
-def _print_matrix(results_by_strategy: dict, strategies: list):
+def _print_matrix(results_by_strategy: dict, strategies: list, upgrade_tickers: set = None):
     """Print ticker × strategy pass/fail matrix."""
     # Collect all tickers that passed at least one strategy
     all_tickers = {}   # ticker → {strategy: result_dict}
@@ -380,8 +481,10 @@ def _print_matrix(results_by_strategy: dict, strategies: list):
             for r in strat_map.values():
                 company = r.get("ticker", "")
 
-        passes = len(strat_map)
-        ticker_s = RED(BOLD(f"{ticker:<10}")) if passes > 1 else f"{ticker:<10}"
+        passes   = len(strat_map)
+        up_star  = "⭐" if (upgrade_tickers and ticker in upgrade_tickers) else " "
+        t_label  = f"{ticker:<9}{up_star}"   # 10 chars
+        ticker_s  = RED(BOLD(t_label)) if passes > 1 else t_label
         company_s = RED(f"{str(company)[:24]:<24}") if passes > 1 else f"{str(company)[:24]:<24}"
         row = f"  {ticker_s}  {company_s}"
         for strat, w in zip(strategies, col_w):
@@ -489,13 +592,22 @@ def main():
 
     total_time = time.time() - t0
 
+    # Sector pulse (fetch 10d sector ETF returns vs SPY)
+    print(DIM("  Fetching sector pulse..."), flush=True)
+    sector_excess, spy_ret = _fetch_sector_pulse()
+
+    # Analyst upgrade tickers (for cross-reference star in matrix)
+    upgrade_tickers = {r["ticker"] for r in results_by_strategy.get("analyst_upgrade", [])}
+
     # Display
     _print_header(strategies, len(all_results), with_backtest)
+    _print_sector_pulse(sector_excess, spy_ret)
+    _thematic_check()
     for strategy in strategies:
         _print_group(strategy, results_by_strategy[strategy], with_backtest)
 
-    # Cross-strategy matrix
-    _print_matrix(results_by_strategy, strategies)
+    # Cross-strategy matrix (⭐ = also in analyst_upgrade)
+    _print_matrix(results_by_strategy, strategies, upgrade_tickers)
 
     print()
     print("─" * W)
