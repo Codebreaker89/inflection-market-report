@@ -103,6 +103,22 @@ def _price_on_or_after(ticker: str, target: date, scan_date: date) -> Optional[f
     df = _fetch_history(ticker, scan_date, target + timedelta(days=14))
     if df.empty: return None
     future = df[df.index >= target]
+    if future.empty:
+        # bulk data may not cover target date — try direct per-ticker fetch
+        end_str   = (target + timedelta(days=10)).strftime("%Y-%m-%d")
+        start_str = target.strftime("%Y-%m-%d")
+        import time
+        try:
+            with _quiet():
+                df2 = yf.download(ticker, start=start_str, end=end_str,
+                                  interval="1d", auto_adjust=True, progress=False, threads=False)
+            if isinstance(df2.columns, pd.MultiIndex): df2.columns = df2.columns.droplevel(1)
+            df2 = _clean_df(df2)
+            if not df2.empty:
+                df2.index = pd.to_datetime(df2.index).date
+                future = df2[df2.index >= target]
+        except Exception:
+            pass
     if future.empty: return None
     val = float(future["Close"].iloc[0])
     return None if (math.isnan(val) or val <= 0) else val
