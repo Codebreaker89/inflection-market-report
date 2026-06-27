@@ -48,15 +48,28 @@ _EMPTY = {f: "" for f in FIELDNAMES}
 
 # ── Price helpers ─────────────────────────────────────────────────────────────
 _px_cache: dict = {}
+_bulk_df:  dict = {}   # ticker → full DataFrame from batch prefetch (key-agnostic)
+
+def _clean_df(df: pd.DataFrame) -> pd.DataFrame:
+    """Drop rows where Close is NaN — yfinance sometimes returns NaN for non-trading days."""
+    if df.empty: return df
+    return df[df["Close"].notna() & (df["Close"] > 0)]
 
 def _fetch_history(ticker: str, start: date, end: date) -> pd.DataFrame:
+    # 1. Check bulk prefetch cache first (populated by batch download, key-agnostic)
+    if ticker in _bulk_df:
+        df = _bulk_df[ticker]
+        subset = df[(df.index >= start) & (df.index <= end + timedelta(days=5))]
+        if not subset.empty:
+            return subset
+
     key = (ticker, start, end)
     if key in _px_cache:
         return _px_cache[key]
+
     end_str   = (end + timedelta(days=5)).strftime("%Y-%m-%d")
     start_str = start.strftime("%Y-%m-%d")
-    # Try batch download first (single HTTP request — avoids per-ticker rate limits in CI).
-    # Fall back to Ticker().history() on failure.
+    import time
     for attempt in range(3):
         try:
             with _quiet():
@@ -65,18 +78,20 @@ def _fetch_history(ticker: str, start: date, end: date) -> pd.DataFrame:
                                  progress=False, threads=False)
             if isinstance(df.columns, pd.MultiIndex):
                 df.columns = df.columns.droplevel(1)
+            df = _clean_df(df)
             if not df.empty:
                 df.index = pd.to_datetime(df.index).date
                 _px_cache[key] = df
                 return df
         except Exception:
             pass
-        import time; time.sleep(2 ** attempt)   # 1s, 2s, 4s back-off
+        time.sleep(2 ** attempt)   # 1s, 2s, 4s back-off
     # last-resort: Ticker API
     try:
         with _quiet():
             df = yf.Ticker(ticker).history(start=start_str, end=end_str,
                                            interval="1d", auto_adjust=True)
+        df = _clean_df(df)
         df.index = pd.to_datetime(df.index).date
         _px_cache[key] = df
         return df
@@ -89,7 +104,8 @@ def _price_on_or_after(ticker: str, target: date, scan_date: date) -> Optional[f
     if df.empty: return None
     future = df[df.index >= target]
     if future.empty: return None
-    return float(future["Close"].iloc[0])
+    val = float(future["Close"].iloc[0])
+    return None if (math.isnan(val) or val <= 0) else val
 
 def _min_price_between(ticker: str, start: date, end: date) -> Optional[float]:
     """Lowest closing price in [start, end] for drawdown calc."""
@@ -97,7 +113,8 @@ def _min_price_between(ticker: str, start: date, end: date) -> Optional[float]:
     if df.empty: return None
     window = df[(df.index >= start) & (df.index <= end)]
     if window.empty: return None
-    return float(window["Low"].min())
+    val = float(window["Low"].min())
+    return None if (math.isnan(val) or val <= 0) else val
 
 def _spy_return(scan_date: date, target: date) -> Optional[float]:
     df = _fetch_history("SPY", scan_date, target + timedelta(days=14))
@@ -107,7 +124,8 @@ def _spy_return(scan_date: date, target: date) -> Optional[float]:
     if base.empty or tgt.empty: return None
     p0 = float(base["Close"].iloc[0])
     p1 = float(tgt["Close"].iloc[0])
-    return round((p1/p0 - 1)*100, 2) if p0 else None
+    if math.isnan(p0) or math.isnan(p1) or p0 <= 0: return None
+    return round((p1/p0 - 1)*100, 2)
 
 def _safe(v):
     if v is None or (isinstance(v, float) and (math.isnan(v) or math.isinf(v))):
@@ -198,15 +216,22 @@ def backfill_returns(rows: list[dict]) -> list[dict]:
                                    interval="1d", auto_adjust=True,
                                    progress=False, threads=True)
             if not bulk.empty:
-                # Populate _px_cache from bulk result
-                close = bulk["Close"] if "Close" in bulk.columns else bulk.xs("Close", axis=1, level=0)
+                # Populate _bulk_df (ticker-only key) so _fetch_history() finds it
+                if isinstance(bulk.columns, pd.MultiIndex):
+                    close = bulk["Close"]
+                    low   = bulk["Low"]
+                else:
+                    close = bulk[["Close"]]
+                    low   = bulk[["Low"]]
                 for tkr in close.columns:
                     s = close[tkr].dropna()
                     if s.empty: continue
-                    mini_df = pd.DataFrame({"Close": s, "Low": bulk["Low"][tkr] if "Low" in bulk.columns else s})
+                    l = low[tkr] if tkr in low.columns else s
+                    mini_df = pd.DataFrame({"Close": s, "Low": l})
+                    mini_df = _clean_df(mini_df)
                     mini_df.index = pd.to_datetime(mini_df.index).date
-                    _px_cache[(tkr, fetch_start, fetch_end)] = mini_df
-                print(f"  Batch fetch OK — {len(close.columns)} tickers loaded")
+                    _bulk_df[tkr] = mini_df
+                print(f"  Batch fetch OK — {len(_bulk_df)} tickers loaded")
         except Exception as e:
             print(f"  Batch fetch failed ({e}), falling back to per-ticker")
 
