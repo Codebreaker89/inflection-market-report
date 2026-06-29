@@ -298,7 +298,8 @@ def score_row(df: pd.DataFrame, idx: int,
 
     adx_val = float(row["adx"])
 
-    # Hard ADX cap — already strongly trending = not coiling
+    # ADX floor: no trend = no setup; cap: overextended = chasing
+    if adx_val < 16: return None
     if adx_val > 35: return None
 
     # ── COIL SIGNALS ─────────────────────────────────────────────────────────
@@ -323,8 +324,8 @@ def score_row(df: pd.DataFrame, idx: int,
     adx_low_5  = float(df["adx"].iloc[idx-5:idx].min())
     adx_coil   = (ADX_COIL_MIN < adx_val < ADX_COIL_MAX) and (adx_val > adx_low_5)
 
-    # 5. RSI base: RSI between 45–62 (not overbought, not broken; floor raised from 38 → 45)
-    rsi_base   = 45 < float(row["rsi"]) < 62
+    # 5. RSI base: RSI between 50–62 (floor raised 45→50: RSI 45-50 = avg -0.25% in backtest)
+    rsi_base   = 50 < float(row["rsi"]) < 62
 
     # 6. Relative strength improving: stock RS trend vs benchmark curling up
     rs_improving = False
@@ -384,10 +385,9 @@ def score_row(df: pd.DataFrame, idx: int,
     total_score = coil_score + break_score * 2  # break signals weighted double
     phase       = "BREAK" if (break_score >= 2 and total_score >= MIN_BREAK_SCORE) else "COIL"
 
-    # Score paradox: COIL signals with score≥9 are overextended setups, not better ones.
-    # (scan_history analysis: score 9/13 = worst losers; score 7/8 = best winners)
-    # BREAK phase is exempt — confirmation signals override score concern.
-    if phase == "COIL" and total_score >= 9: return None
+    # Score cap: COIL signals score≥6 = WR drops to 49%, avg -0.27% (scan_history backtest)
+    # Score 2-5 = sweet spot (WR 60-66%). BREAK phase exempt — confirmation overrides.
+    if phase == "COIL" and total_score >= 6: return None
 
     coil_list  = [k for k, v in coil_signals.items() if v]
     break_list = [k for k, v in break_signals.items() if v]

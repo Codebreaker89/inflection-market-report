@@ -159,7 +159,8 @@ SCANNER_MAP = {
     "ema_ribbon":      scan_ema_ribbon,
     "nr7":             scan_nr7,
     "bb_squeeze":      scan_bb_squeeze,
-    "high_tight_flag": scan_htf,
+    # "high_tight_flag": scan_htf,   # DISABLED: 0% WR, avg -5.05% across 5 signals (backtest)
+
     "analyst_upgrade":      scan_analyst_upgrade,
     "signal_velocity":      scan_signal_velocity,
     "chokepoint_inflection": scan_chokepoint,

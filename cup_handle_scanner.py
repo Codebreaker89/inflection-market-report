@@ -200,13 +200,12 @@ def _score(df: pd.DataFrame, idx: int) -> Optional[dict]:
     if c <= sma50 or c <= sma200: return None
 
     adx = float(row["adx"]) if not pd.isna(row["adx"]) else 0
-    if adx < 15: return None
+    if adx < 16: return None   # ADX floor raised 15→16 (≤15 = no trend, WR 41%)
     if adx > 35: return None   # ADX cap: overextended trend = chasing
 
     rsi_pre = float(row["rsi"]) if not pd.isna(row["rsi"]) else 50
-    # Handle must form on declining RSI, not at overbought (MET had RSI 71)
-    # RSI floor 45: below 45 = broken/no momentum; ceiling 65 = not yet overbought
-    if rsi_pre < 45 or rsi_pre > 65: return None
+    # RSI floor raised 45→50 (RSI 45-50 = avg -0.25% in backtest); ceiling 65
+    if rsi_pre < 50 or rsi_pre > 65: return None
 
     # Minervini
     m = sum([

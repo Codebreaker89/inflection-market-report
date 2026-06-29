@@ -43,7 +43,7 @@ MIN_PRICE      = 1.0
 MIN_AVG_VOL    = 100_000
 FRESH_WINDOW   = 1   # pivot must fire TODAY — 3-day window caused stale signals (e.g. MAR)
 MIN_MINERVINI  = 5
-MIN_ADX        = 15
+MIN_ADX        = 16   # raised 15→16: ADX≤15 = no trend (WR 41% in backtest)
 EXCLUDE_SECTORS = {"Utilities", "Real Estate"}
 TOP_N   = 50
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; pocket-pivot-scanner/1.0)"}

@@ -86,6 +86,7 @@ def _score(df: pd.DataFrame, idx: int) -> Optional[dict]:
 
     rsi = float(row["rsi"]); adx = float(row["adx"])
     if pd.isna(rsi) or pd.isna(adx): return None
+    if adx < 16: return None    # ADX floor: ≤15 = no trend (WR 41% in backtest)
     if adx > 35: return None    # ADX cap: overextended trend = not a healthy base
     if rsi > 80: return None    # NR7 + RSI>80 = narrow range at overbought top, not a flag
 

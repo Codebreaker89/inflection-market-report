@@ -303,6 +303,7 @@ def score_row(df: pd.DataFrame, idx: int,
     rsi14_val = float(row["rsi"])
     adx_val   = float(row["adx"])
     if pd.isna(rsi14_val) or pd.isna(adx_val): return None
+    if adx_val < 16: return None   # ADX floor: ≤15 = no trend (WR 41% in backtest)
     vol_ratio = float(row["Volume"]) / vol_ma_val if vol_ma_val > 0 else 0
     w52_high  = float(row["52w_high"])
 
