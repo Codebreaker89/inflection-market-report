@@ -225,6 +225,10 @@ _STRAT_COLORS = {
     "defensive_rotation":    ("#1a5a00", "#ecfccb"),
     "cup_handle":            ("#003e8a", "#dbeafe"),
     "power_earnings_gap":    ("#7a2200", "#ffedd5"),
+    "darvas_box":            ("#3d2b00", "#fef9c3"),
+    "rs_line":               ("#004d2e", "#d1fae5"),
+    "vcp":                   ("#2d006e", "#ede9fe"),
+    "elder_impulse":         ("#006e1a", "#dcfce7"),
 }
 
 def _c(val, good_if_pos=True):
@@ -444,6 +448,26 @@ def _build_scanner_results_html() -> str:
     except Exception:
         return ""
 
+    # Strategy descriptions pulled from scan.py definitions
+    _STRAT_DESC = {
+        "momentum":       "Finds stocks that just entered momentum — MACD, RSI(14), EMA9/21 crossovers within last 3 bars. ADX≥22, Minervini≥6. Hold 5d. (O'Neil / IBD)",
+        "breakout":       "Catches stocks BEFORE they move — coiling for breakout (COIL) or confirmed today (BREAK). ADX 16-35, RSI 50-62, score≤5. Hold 5d.",
+        "pocket_pivot":   "Pocket Pivot — volume surge on up-day exceeding any down-day volume in prior 10 days. ADX 16-35, Minervini≥5. Hold 7d. (Morales & Kacher)",
+        "connors_rsi2":   "RSI(2) drops below 10 in an uptrending stock — mean reversion snap-back. ADX 16-35, Minervini≥5. Hold 5d. (Larry Connors)",
+        "ema_ribbon":     "EMA 8/13/21/34/55 all expanding upward, price pulls back to ribbon and bounces. ADX 20-35, Minervini≥5. Hold 7d.",
+        "nr7":            "Narrowest range of last 7 days — maximum volatility compression before expansion. ADX 16-35, RSI<80, Minervini≥5. Hold 3d. (Toby Crabel)",
+        "bb_squeeze":     "Bollinger Bands inside Keltner Channels = squeeze. Entry on expansion breakout. Hold 7d. (John Carter / TTM Squeeze)",
+        "cup_handle":     "Rounded cup base (6-65 weeks), handle ≤12% depth in upper half, volume dry-up. ADX 16-35, RSI 50-65, Minervini≥5. Hold 10d. (O'Neil / IBD)",
+        "power_earnings_gap": "Gap ≥8% on earnings with 2× volume, gap not filled, stock not extended >20%. Hold 10d. (Gil Morales — Power Earnings Gaps)",
+        "analyst_upgrade":    "≥3 analyst upgrades in 5 days including ≥1 tier-1 firm. Hold 7d.",
+        "stage4_short":       "Weinstein Stage 4 — confirmed distribution, price below falling SMA30, failed rally. SHORT. Hold 7d.",
+        "defensive_rotation": "Sector ETF outperforms SPY >3% with acceleration → stock leaders in that sector. Hold 10d. (Meb Faber)",
+        "darvas_box":         "New 52w high → tight box consolidation (≤15% width) → volume breakout above box top. ADX 16-35, Minervini≥5. Hold 5d. (Nicolas Darvas, 1960)",
+        "rs_line":            "RS line (stock/SPY) makes new 52w high — leading indicator of institutional accumulation. ADX 16-35, Minervini≥5. Hold 7d. (O'Neil / IBD)",
+        "vcp":                "≥3 volatility contractions, each tighter than last, on drying volume. Final contraction ≤10%. ADX 16-35, Minervini≥6. Hold 10d. (Minervini — SEPA)",
+        "elder_impulse":      "EMA(13) slope AND MACD histogram both rising = green bar. Signal: 2 consecutive green bars. ADX 16-35, RSI 45-75, Minervini≥5. Hold 5d. (Alexander Elder)",
+    }
+
     active = [(s, rbs[s]) for s in strategies if rbs.get(s)]
     if not active:
         return (f'<br>{_section_head("📡","Scanner Results","no signals today","#888888")}'
@@ -470,6 +494,7 @@ def _build_scanner_results_html() -> str:
             bt_note = (f'backtest avg: {sum(wrs)/len(wrs):.0f}% win · '
                        f'{sum(avgs)/len(avgs):+.1f}% return')
 
+        desc_text = _STRAT_DESC.get(strat, "")
         html += (f'<table width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;margin-bottom:0;">'
                  f'<tr><td style="background:{bg_badge};border-left:4px solid {fg};'
                  f'padding:6px 10px;border-radius:3px 3px 0 0;">'
@@ -477,6 +502,7 @@ def _build_scanner_results_html() -> str:
                  f'letter-spacing:.05em;text-transform:uppercase;">'
                  f'{strat_label} &nbsp;·&nbsp; {len(results)} signal(s)</span>'
                  + (f'<span style="font-size:10px;color:{fg};margin-left:12px;">{bt_note}</span>' if bt_note else "")
+                 + (f'<br><span style="font-size:10px;color:{fg};opacity:0.8;font-style:italic;">{desc_text}</span>' if desc_text else "")
                  + f'</td></tr></table>')
 
         thead = (f'<table width="100%" cellpadding="0" cellspacing="0" '
