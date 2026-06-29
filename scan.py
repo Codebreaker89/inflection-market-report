@@ -129,6 +129,10 @@ from darvas_box_scanner            import scan as scan_darvas
 from rs_line_scanner               import scan as scan_rs_line
 from vcp_scanner                   import scan as scan_vcp
 from elder_impulse_scanner         import scan as scan_elder
+from raschke_holy_grail_scanner    import scan as scan_holy_grail
+from connors_3down_scanner         import scan as scan_3down
+from williams_pct_r_scanner        import scan as scan_williams_r
+from bollinger_pctb_scanner        import scan as scan_bb_pctb
 from show_tracker                  import add_trade_interactive
 
 # ANSI helpers (inline — no shared module dependency)
@@ -154,7 +158,8 @@ ALL_STRATEGIES = ["momentum", "breakout", "pocket_pivot", "connors_rsi2",
                   "analyst_upgrade", "signal_velocity", "chokepoint_inflection",
                   "stage4_short", "defensive_rotation",
                   "cup_handle", "power_earnings_gap",
-                  "darvas_box", "rs_line", "vcp", "elder_impulse"]
+                  "darvas_box", "rs_line", "vcp", "elder_impulse",
+                  "holy_grail", "connors_3down", "williams_pct_r", "bollinger_pctb"]
 
 SCANNER_MAP = {
     "momentum":        scan_momentum,
@@ -177,6 +182,10 @@ SCANNER_MAP = {
     "rs_line":               scan_rs_line,
     "vcp":                   scan_vcp,
     "elder_impulse":         scan_elder,
+    "holy_grail":            scan_holy_grail,
+    "connors_3down":         scan_3down,
+    "williams_pct_r":        scan_williams_r,
+    "bollinger_pctb":        scan_bb_pctb,
 }
 
 STRATEGY_LABELS = {
@@ -199,6 +208,10 @@ STRATEGY_LABELS = {
     "rs_line":               "📈  RS LINE NEW HIGH  (O'Neil/IBD — RS line vs SPY makes new 52w high before price)",
     "vcp":                   "🌀  VCP  (Minervini — ≥3 volatility contractions, each tighter, volume drying)",
     "elder_impulse":         "💚  ELDER IMPULSE  (Alexander Elder — EMA13 + MACD-hist both rising = green bar)",
+    "holy_grail":            "🏆  HOLY GRAIL  (Raschke — ADX peaked >30, pullback to EMA20, bounce)",
+    "connors_3down":         "📉  CONNORS 3-DOWN  (Connors — 3 consecutive lower closes in uptrend, RSI2<20)",
+    "williams_pct_r":        "📊  WILLIAMS %R  (Larry Williams — %R crosses above -80 from oversold)",
+    "bollinger_pctb":        "🎯  BOLLINGER %B  (John Bollinger — %B<0.20 + MFI<35 + bouncing, sideways specialist)",
 }
 
 STRATEGY_DESCRIPTIONS = {
@@ -327,7 +340,27 @@ STRATEGY_DESCRIPTIONS = {
     "elder_impulse": (
         "Alexander Elder — EMA(13) slope AND MACD histogram both rising = green bar.\n"
         "  Signal: 2 consecutive green bars (confirmed). ADX 16-35, RSI 45-75, Minervini ≥5.\n"
-        "  Hold 5 days. Source: 'Come Into My Trading Room'."
+        "  SPY regime gate: suppressed in CHOPPY/BEAR market. Hold 5 days. Source: 'Come Into My Trading Room'."
+    ),
+    "holy_grail": (
+        "Linda Bradford Raschke ('Street Smarts') — ADX(14) peaked above 30 in last 10 bars,\n"
+        "  stock pulls back to EMA(20) for ≥2 bars (volume drying), then bounces. ADX floor 16,\n"
+        "  RSI 40-65. Works in trending AND slowing markets. Hold 5 days."
+    ),
+    "connors_3down": (
+        "Larry Connors ('Short-Term Trading Strategies That Work') — 3 consecutive lower closes\n"
+        "  in a stock above 200d + 50d SMA. RSI(2) < 20 (short-term oversold). ADX 16-40.\n"
+        "  Mean-reversion snap-back in any market. Hold 3 days."
+    ),
+    "williams_pct_r": (
+        "Larry Williams ('Long-Term Secrets to Short-Term Trading') — %R drops below -80 then\n"
+        "  crosses back above (oversold reversal). Stock above 50d + 200d SMA. ADX 16-40.\n"
+        "  Works in sideways + mild uptrend. Hold 3 days."
+    ),
+    "bollinger_pctb": (
+        "John Bollinger ('Bollinger on Bollinger Bands') — %B < 0.20 (price near lower band)\n"
+        "  AND MFI < 35 (money flowing out) AND %B rising (bounce starting). Above 200d SMA.\n"
+        "  ADX floor 12 — sideways market specialist. Hold 5 days."
     ),
 }
 
@@ -350,6 +383,10 @@ HOLD_DAYS_MAP = {
     "rs_line":               7,
     "vcp":                   10,
     "elder_impulse":         5,
+    "holy_grail":            5,
+    "connors_3down":         3,
+    "williams_pct_r":        3,
+    "bollinger_pctb":        5,
     "power_earnings_gap":    10,
 }
 
@@ -578,6 +615,10 @@ def _print_matrix(results_by_strategy: dict, strategies: list, upgrade_tickers: 
         "rs_line":               "RS-HIGH",
         "vcp":                   "VCP",
         "elder_impulse":         "ELDER",
+        "holy_grail":            "HG",
+        "connors_3down":         "3DOWN",
+        "williams_pct_r":        "WR",
+        "bollinger_pctb":        "BB%B",
     }
     cols = [col_labels.get(s, s[:6].upper()) for s in strategies]
     col_w = [max(len(c), 6) for c in cols]

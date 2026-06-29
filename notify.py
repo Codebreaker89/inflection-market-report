@@ -229,6 +229,10 @@ _STRAT_COLORS = {
     "rs_line":               ("#004d2e", "#d1fae5"),
     "vcp":                   ("#2d006e", "#ede9fe"),
     "elder_impulse":         ("#006e1a", "#dcfce7"),
+    "holy_grail":            ("#4a2800", "#fff7ed"),
+    "connors_3down":         ("#00406e", "#e0f2fe"),
+    "williams_pct_r":        ("#006e5a", "#ccfbf1"),
+    "bollinger_pctb":        ("#3d004a", "#fae8ff"),
 }
 
 def _c(val, good_if_pos=True):
@@ -466,6 +470,10 @@ def _build_scanner_results_html() -> str:
         "rs_line":            "RS line (stock/SPY) makes new 52w high — leading indicator of institutional accumulation. ADX 16-35, Minervini≥5. Hold 7d. (O'Neil / IBD)",
         "vcp":                "≥3 volatility contractions, each tighter than last, on drying volume. Final contraction ≤10%. ADX 16-35, Minervini≥6. Hold 10d. (Minervini — SEPA)",
         "elder_impulse":      "EMA(13) slope AND MACD histogram both rising = green bar. Signal: 2 consecutive green bars. ADX 16-35, RSI 45-75, Minervini≥5. Hold 5d. (Alexander Elder)",
+        "holy_grail":         "ADX peaked >30 then stock pulls back to EMA(20) for ≥2 bars on drying volume, then bounces. ADX floor 16, RSI 40-65, Minervini≥4. Trend-pullback, works in slowing markets. Hold 5d. (Linda Raschke — Street Smarts)",
+        "connors_3down":      "3 consecutive lower closes in stock above 200d+50d SMA. RSI(2)<20 (short-term oversold). ADX 16-40, Minervini≥4. Mean-reversion snap-back in any market. Hold 3d. (Larry Connors — Short-Term Trading Strategies)",
+        "williams_pct_r":     "Williams %R crosses above -80 from oversold. Stock above 50d+200d SMA. ADX 16-40, RSI 35-65, Minervini≥4. Sideways + mild uptrend specialist. Hold 3d. (Larry Williams — Long-Term Secrets to Short-Term Trading)",
+        "bollinger_pctb":     "Bollinger %B<0.20 (near lower band) AND MFI<35 (money outflow) AND %B rising (bounce starting). Above 200d SMA. ADX floor 12 — sideways market specialist. Hold 5d. (John Bollinger — Bollinger on Bollinger Bands)",
     }
 
     active = [(s, rbs[s]) for s in strategies if rbs.get(s)]

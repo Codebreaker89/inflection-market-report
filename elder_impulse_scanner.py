@@ -26,6 +26,33 @@ def _quiet():
     try: yield
     finally: sys.stderr = old; devnull.close()
 
+# ── SPY REGIME GATE ───────────────────────────────────────────────────────────
+_SPY_REGIME_CACHE: dict = {}
+
+def _spy_is_bullish() -> bool:
+    """SPY regime gate: returns True if SPY EMA(13) is rising AND MACD histogram is positive.
+    In choppy/bear markets this returns False → scanner suppresses signals."""
+    import datetime
+    today = str(datetime.date.today())
+    if today in _SPY_REGIME_CACHE:
+        return _SPY_REGIME_CACHE[today]
+    try:
+        with _quiet():
+            raw = yf.download("SPY", period="120d", interval="1d",
+                              progress=False, auto_adjust=True, threads=False)
+        if isinstance(raw.columns, pd.MultiIndex): raw.columns = raw.columns.droplevel(1)
+        c = raw["Close"]
+        ema13 = c.ewm(span=13, adjust=False).mean()
+        ema26 = c.ewm(span=26, adjust=False).mean()
+        macd  = ema13 - ema26
+        sig   = macd.ewm(span=9, adjust=False).mean()
+        hist  = macd - sig
+        bullish = bool(ema13.iloc[-1] > ema13.iloc[-2] and hist.iloc[-1] > 0)
+        _SPY_REGIME_CACHE[today] = bullish
+        return bullish
+    except Exception:
+        return True  # fail open — don't block signals if SPY fetch fails
+
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 HOLD_DAYS    = 5
 MAX_WORKERS  = 25
@@ -216,6 +243,9 @@ def analyze_ticker(ticker: str, bench_ret: Optional[float], with_backtest: bool)
         return None
 
 def scan(universe: dict, bench_returns: dict, with_backtest: bool = True) -> list:
+    spy_bull = _spy_is_bullish()
+    if not spy_bull:
+        print("  [elder_impulse] SPY regime: CHOPPY/BEAR — signals tagged LOW conviction")
     results = []
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
         futs = {pool.submit(analyze_ticker, t, bench_returns.get(b), with_backtest): t
@@ -225,6 +255,7 @@ def scan(universe: dict, bench_returns: dict, with_backtest: bool = True) -> lis
                 r = f.result(timeout=30)
                 if r:
                     r["strategy"] = "elder_impulse"
+                    r["spy_regime"] = "BULL" if spy_bull else "CHOPPY"
                     results.append(r)
             except Exception:
                 pass
