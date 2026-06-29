@@ -319,6 +319,84 @@ HOLD_DAYS_MAP = {
 W = 110
 
 
+# ── CONVICTION TIER ───────────────────────────────────────────────────────────
+# Criteria derived from scan_history backtest (285 rows, 4 scan dates):
+#   HIGH  = strat_count≥2  AND score≤5  AND RSI 50-70  AND ADX 16-35
+#   MED   = strat_count≥2  OR  (score≤5 AND RSI 50-70 AND ADX 16-35)
+#   LOW   = everything else
+
+def _conviction_tier(r: dict, multi_tickers: set) -> tuple:
+    """Returns (tier_str, color_fn) for a result row."""
+    is_multi  = bool(multi_tickers and r.get("ticker") in multi_tickers)
+    score     = r.get("score", 99)
+    rsi       = r.get("rsi",   0)
+    adx       = r.get("adx",   0)
+    good_score = score <= 5
+    good_rsi   = 50 <= rsi <= 70
+    good_adx   = 16 <= adx <= 35
+
+    if is_multi and good_score and good_rsi and good_adx:
+        return ("★★★ HIGH", GRN)
+    if is_multi or (good_score and good_rsi and good_adx):
+        return ("★★  MED ", YLW)
+    return ("★   LOW ", DIM)
+
+
+def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_backtest: bool):
+    """Print a compact summary of HIGH + MED conviction picks from all strategies."""
+    seen = {}   # ticker → best (tier_rank, result_dict, strategy)
+    tier_rank = {"★★★ HIGH": 0, "★★  MED ": 1, "★   LOW ": 2}
+
+    for strategy, results in results_by_strategy.items():
+        for r in results:
+            t = r["ticker"]
+            tier, _ = _conviction_tier(r, multi_tickers)
+            rank = tier_rank[tier]
+            if tier == "★   LOW ":
+                continue
+            if t not in seen or rank < seen[t][0]:
+                seen[t] = (rank, r, strategy)
+
+    if not seen:
+        return
+
+    # Sort: HIGH first, then MED; within tier by score asc
+    picks = sorted(seen.values(), key=lambda x: (x[0], x[1].get("score", 99)))
+
+    print()
+    print("╔" + "═"*(W-2) + "╗")
+    print("║" + BOLD("  ★  HIGH-CONVICTION PICKS  —  multi-strategy · score≤5 · RSI 50-70 · ADX 16-35").ljust(W+8) + "║")
+    print("╚" + "═"*(W-2) + "╝")
+
+    if with_backtest:
+        hdr = (f"  {'TIER':<10}  {'TICKER':<10}  {'STRATS':>5}  {'PRICE':>9}  "
+               f"{'RSI':>5}  {'ADX':>5}  {'SCR':>4}  {'WIN%':>5}  {'AVG':>7}  STRATEGY")
+    else:
+        hdr = (f"  {'TIER':<10}  {'TICKER':<10}  {'STRATS':>5}  {'PRICE':>9}  "
+               f"{'RSI':>5}  {'ADX':>5}  {'SCR':>4}  STRATEGY")
+    print(BOLD(hdr))
+    print("  " + "─"*(W-2))
+
+    for _, r, strategy in picks:
+        tier, color = _conviction_tier(r, multi_tickers)
+        strat_count = sum(1 for res in results_by_strategy.values()
+                          if any(x["ticker"] == r["ticker"] for x in res))
+        tier_s    = color(tier)
+        ticker_s  = BOLD(f"{r['ticker']:<10}")
+        base = (f"  {tier_s}  {ticker_s}  {strat_count:>5}  {r.get('price', 0):>9.2f}"
+                f"  {r.get('rsi', 0):>5.1f}  {r.get('adx', 0):>5.1f}  {r.get('score', 0):>4}  ")
+        if with_backtest and r.get("n", 0) > 0:
+            row = base + f"{wr_fmt(r.get('wr')):>5}  {ret_fmt(r.get('avg')):>7}  {DIM(strategy)}"
+        else:
+            row = base + DIM(strategy)
+        print(row)
+
+    high_n = sum(1 for x in picks if x[0] == 0)
+    med_n  = sum(1 for x in picks if x[0] == 1)
+    print()
+    print(DIM(f"  {high_n} HIGH  ·  {med_n} MED  ·  act on HIGH first, monitor MED for confirmation"))
+
+
 # ── DISPLAY ───────────────────────────────────────────────────────────────────
 
 def _print_group(strategy: str, results: list, with_backtest: bool, multi_tickers: set = None):
@@ -342,11 +420,11 @@ def _print_group(strategy: str, results: list, with_backtest: bool, multi_ticker
 
     print()
     if with_backtest:
-        hdr = (f"  {'#':>3}  {'MKT':<3}  {'TICKER':<8}  {'PRICE':>9}  "
+        hdr = (f"  {'#':>3}  {'CV':<2}  {'MKT':<3}  {'TICKER':<8}  {'PRICE':>9}  "
                f"{'RSI':>5}  {'ADX':>5}  {'VOL×':>5}  {'M':>3}  {'SCR':>3}  "
                f"{'#BT':>3}  {'WIN%':>5}  {'AVG':>7}  {'MED':>7}  SIGNALS")
     else:
-        hdr = (f"  {'#':>3}  {'MKT':<3}  {'TICKER':<8}  {'PRICE':>9}  "
+        hdr = (f"  {'#':>3}  {'CV':<2}  {'MKT':<3}  {'TICKER':<8}  {'PRICE':>9}  "
                f"{'RSI':>5}  {'ADX':>5}  {'VOL×':>5}  {'M':>3}  {'SCR':>3}  SIGNALS")
     print(BOLD(hdr))
     print("  " + "─"*(W-2))
@@ -379,7 +457,9 @@ def _print_group(strategy: str, results: list, with_backtest: bool, multi_ticker
         sig_str   = CYN(fresh_str) + DIM(conf_str)
         mkt_s     = YLW(f"{r['mkt']:<3}") if r["mkt"] != "US" else DIM(f"{r['mkt']:<3}")
         ticker_s  = BOLD(f"{r['ticker']:<8}")
-        base = (f"  {rank:>3}  {mkt_s}  {ticker_s}  {r.get('price', 0):>9.2f}"
+        tier, tier_color = _conviction_tier(r, multi_tickers)
+        tier_badge = tier_color(tier[:2])   # ★★★ / ★★  / ★
+        base = (f"  {rank:>3}  {tier_badge}  {mkt_s}  {ticker_s}  {r.get('price', 0):>9.2f}"
                 f"  {r.get('rsi', 0):>5.1f}  {r.get('adx', 0):>5.1f}"
                 f"  {r.get('vol_ratio', 0):>5.1f}"
                 f"  {r.get('minervini', 0):>3}  {r.get('score', 0):>3}  ")
@@ -618,6 +698,9 @@ def main():
 
     # Cross-strategy matrix (⭐ = also in analyst_upgrade)
     _print_matrix(results_by_strategy, strategies, upgrade_tickers)
+
+    # High-conviction summary — act on these first
+    _print_high_conviction(results_by_strategy, multi_tickers, with_backtest)
 
     print()
     print("─" * W)
