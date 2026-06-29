@@ -125,6 +125,10 @@ from stage4_short_scanner          import scan as scan_stage4_short
 from defensive_rotation_scanner    import scan as scan_defensive_rotation
 from cup_handle_scanner            import scan as scan_cup_handle
 from power_earnings_gap_scanner    import scan as scan_peg
+from darvas_box_scanner            import scan as scan_darvas
+from rs_line_scanner               import scan as scan_rs_line
+from vcp_scanner                   import scan as scan_vcp
+from elder_impulse_scanner         import scan as scan_elder
 from show_tracker                  import add_trade_interactive
 
 # ANSI helpers (inline — no shared module dependency)
@@ -149,7 +153,8 @@ ALL_STRATEGIES = ["momentum", "breakout", "pocket_pivot", "connors_rsi2",
                   "ema_ribbon", "nr7", "bb_squeeze", "high_tight_flag",
                   "analyst_upgrade", "signal_velocity", "chokepoint_inflection",
                   "stage4_short", "defensive_rotation",
-                  "cup_handle", "power_earnings_gap"]
+                  "cup_handle", "power_earnings_gap",
+                  "darvas_box", "rs_line", "vcp", "elder_impulse"]
 
 SCANNER_MAP = {
     "momentum":        scan_momentum,
@@ -168,6 +173,10 @@ SCANNER_MAP = {
     "defensive_rotation":    scan_defensive_rotation,
     "cup_handle":            scan_cup_handle,
     "power_earnings_gap":    scan_peg,
+    "darvas_box":            scan_darvas,
+    "rs_line":               scan_rs_line,
+    "vcp":                   scan_vcp,
+    "elder_impulse":         scan_elder,
 }
 
 STRATEGY_LABELS = {
@@ -186,6 +195,10 @@ STRATEGY_LABELS = {
     "defensive_rotation":    "🛡️   DEFENSIVE ROTATION  (Faber — sector ETF outperforms SPY >3% + accelerating → stock leaders)",
     "cup_handle":            "☕  CUP & HANDLE  (O'Neil / IBD — rounded base + tight handle at pivot)",
     "power_earnings_gap":    "⚡  POWER EARNINGS GAP  (Gil Morales — 8%+ gap on earnings, 2× volume, gap held)",
+    "darvas_box":            "📦  DARVAS BOX  (Nicolas Darvas — 52w high → tight box → volume breakout)",
+    "rs_line":               "📈  RS LINE NEW HIGH  (O'Neil/IBD — RS line vs SPY makes new 52w high before price)",
+    "vcp":                   "🌀  VCP  (Minervini — ≥3 volatility contractions, each tighter, volume drying)",
+    "elder_impulse":         "💚  ELDER IMPULSE  (Alexander Elder — EMA13 + MACD-hist both rising = green bar)",
 }
 
 STRATEGY_DESCRIPTIONS = {
@@ -296,6 +309,26 @@ STRATEGY_DESCRIPTIONS = {
         "  require 3× volume. Tagged EG✓ (confirmed) or EG~ (pattern-only).\n"
         "  Hold 10 days. Source: Gil Morales 'Power Earnings Gaps', IBD gap-up research."
     ),
+    "darvas_box": (
+        "Nicolas Darvas (1960) — stock makes new 52w high, consolidates in a tight box\n"
+        "  (≤15% width) for ≥3 bars, then breaks above box top on volume ≥1.5× avg.\n"
+        "  ADX 16-35, Minervini ≥5. Hold 5 days."
+    ),
+    "rs_line": (
+        "O'Neil / IBD — Relative Strength line (stock / SPY) makes new 52w high.\n"
+        "  Leading indicator: RS line new high before price = institutional accumulation.\n"
+        "  ADX 16-35, price within 15% of 52w high, Minervini ≥5. Hold 7 days."
+    ),
+    "vcp": (
+        "Minervini Volatility Contraction Pattern — ≥3 price contractions, each smaller\n"
+        "  than the last, on drying volume. Final contraction ≤10%. Price near pivot.\n"
+        "  ADX 16-35, Minervini ≥6. Hold 10 days. Source: 'Trade Like a Stock Market Wizard'."
+    ),
+    "elder_impulse": (
+        "Alexander Elder — EMA(13) slope AND MACD histogram both rising = green bar.\n"
+        "  Signal: 2 consecutive green bars (confirmed). ADX 16-35, RSI 45-75, Minervini ≥5.\n"
+        "  Hold 5 days. Source: 'Come Into My Trading Room'."
+    ),
 }
 
 HOLD_DAYS_MAP = {
@@ -313,6 +346,10 @@ HOLD_DAYS_MAP = {
     "stage4_short":          7,
     "defensive_rotation":    10,
     "cup_handle":            10,
+    "darvas_box":            5,
+    "rs_line":               7,
+    "vcp":                   10,
+    "elder_impulse":         5,
     "power_earnings_gap":    10,
 }
 
@@ -537,6 +574,10 @@ def _print_matrix(results_by_strategy: dict, strategies: list, upgrade_tickers: 
         "defensive_rotation":    "DEFROT",
         "cup_handle":            "C&H",
         "power_earnings_gap":    "PEG",
+        "darvas_box":            "DARVAS",
+        "rs_line":               "RS-HIGH",
+        "vcp":                   "VCP",
+        "elder_impulse":         "ELDER",
     }
     cols = [col_labels.get(s, s[:6].upper()) for s in strategies]
     col_w = [max(len(c), 6) for c in cols]
