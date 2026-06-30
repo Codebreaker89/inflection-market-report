@@ -513,35 +513,6 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
 
 
 
-def _load_hist_stats() -> dict:
-    """Load per-strategy WR/avg from scan_history.csv."""
-    import csv as _csv, math as _math
-    from collections import defaultdict
-    p = Path(__file__).parent / "scan_history.csv"
-    if not p.exists():
-        return {}
-    stats = defaultdict(lambda: {"wins": 0, "total": 0, "sum": 0.0})
-    try:
-        with open(p, newline="") as f:
-            for row in _csv.DictReader(f):
-                s = row.get("strategy", "").strip()
-                if not s: continue
-                try:
-                    ret = float(row["ret_d5"])
-                    if _math.isnan(ret): continue
-                    stats[s]["total"] += 1
-                    stats[s]["sum"] += ret
-                    if ret > 0: stats[s]["wins"] += 1
-                except (ValueError, TypeError, KeyError): pass
-    except Exception:
-        return {}
-    return {s: {"n": d["total"],
-                "wr": round(100*d["wins"]/d["total"], 1),
-                "avg": round(d["sum"]/d["total"], 2)}
-            for s, d in stats.items() if d["total"] >= 1}
-
-_HIST_STATS: dict = {}  # loaded once at scan time
-
 
 def _load_hist_stats() -> dict:
     import csv as _csv, math as _math
@@ -900,6 +871,8 @@ def main():
     _print_sector_pulse(sector_excess, spy_ret)
     _thematic_check()
     for strategy in strategies:
+        if strategy not in results_by_strategy:
+            continue  # disabled/skipped scanner
         _print_group(strategy, results_by_strategy[strategy], with_backtest, multi_tickers)
 
     # Cross-strategy matrix (⭐ = also in analyst_upgrade)
