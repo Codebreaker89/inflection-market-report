@@ -1,0 +1,127 @@
+{
+  "last_updated": "2026-06-30",
+  "sample_size": "620 trades (Jun 21-25, 5 scan dates)",
+  "learnings": [
+    {
+      "id": "L001",
+      "date": "2026-06-30",
+      "category": "strategy_performance",
+      "finding": "momentum scanner has 0% WR across 5 trades, avg -4.40%. Disabled permanently.",
+      "action": "momentum removed from SCANNER_MAP",
+      "data": {"n": 5, "wr_pct": 0.0, "avg_ret_pct": -4.40}
+    },
+    {
+      "id": "L002",
+      "date": "2026-06-30",
+      "category": "strategy_performance",
+      "finding": "ema_ribbon is best large-sample strategy: WR 73.8%, avg +3.06% (65 trades). pocket_pivot best WR at 87% (23 trades). stage4_short WR 78.3% avg +3.32% (23 trades).",
+      "action": "none — already running. Prioritise these in conviction tier.",
+      "data": {
+        "ema_ribbon":    {"n": 65, "wr_pct": 73.8, "avg_ret_pct": 3.06},
+        "pocket_pivot":  {"n": 23, "wr_pct": 87.0, "avg_ret_pct": 3.03},
+        "stage4_short":  {"n": 23, "wr_pct": 78.3, "avg_ret_pct": 3.32},
+        "cup_handle":    {"n": 58, "wr_pct": 65.5, "avg_ret_pct": 2.34},
+        "nr7":           {"n": 141,"wr_pct": 61.0, "avg_ret_pct": 1.57},
+        "connors_rsi2":  {"n": 79, "wr_pct": 65.8, "avg_ret_pct": 1.46},
+        "breakout":      {"n": 182,"wr_pct": 54.9, "avg_ret_pct": 0.55},
+        "signal_velocity":{"n": 14,"wr_pct": 50.0, "avg_ret_pct": -0.14},
+        "high_tight_flag":{"n": 14,"wr_pct": 14.3, "avg_ret_pct": -4.14},
+        "momentum":       {"n": 5, "wr_pct": 0.0,  "avg_ret_pct": -4.40}
+      }
+    },
+    {
+      "id": "L003",
+      "date": "2026-06-30",
+      "category": "score_cap",
+      "finding": "Score 6+ WR collapses: score 6=WR 56% avg -0.33%, score 7=WR 38%, score 8=WR 25% avg -2.12%, score 9=WR 0%. Score sweet spot is 2-5 (WR 61-67%, avg +1.85-2.33%). Enforcing hard cap score≤5 across all scanners (except signal_velocity which uses 0-13 scale).",
+      "action": "Post-filter in scan.py: drop results with score>=6 unless strategy=signal_velocity",
+      "data": {
+        "score_0": {"n": 5,   "wr_pct": 80.0, "avg_ret_pct": 2.99},
+        "score_1": {"n": 26,  "wr_pct": 54.0, "avg_ret_pct": 0.82},
+        "score_2": {"n": 90,  "wr_pct": 67.0, "avg_ret_pct": 1.85},
+        "score_3": {"n": 139, "wr_pct": 65.0, "avg_ret_pct": 2.33},
+        "score_4": {"n": 186, "wr_pct": 61.0, "avg_ret_pct": 1.94},
+        "score_5": {"n": 64,  "wr_pct": 64.0, "avg_ret_pct": 0.81},
+        "score_6": {"n": 73,  "wr_pct": 56.0, "avg_ret_pct": -0.33},
+        "score_7": {"n": 8,   "wr_pct": 38.0, "avg_ret_pct": -0.38},
+        "score_8": {"n": 16,  "wr_pct": 25.0, "avg_ret_pct": -2.12},
+        "score_9": {"n": 4,   "wr_pct": 0.0,  "avg_ret_pct": -2.77}
+      }
+    },
+    {
+      "id": "L004",
+      "date": "2026-06-30",
+      "category": "rsi_filter",
+      "finding": "RSI 40-50 dead zone confirmed with larger sample: WR 48%, avg -0.30% (79 trades). RSI 50-60 is the best entry zone: WR 63%, avg +2.23%. RSI floor of 50 validated.",
+      "action": "RSI floor 50 already enforced in breakout/cup_handle. Validate other scanners.",
+      "data": {
+        "rsi_lt40":  {"n": 42,  "wr_pct": 50.0, "avg_ret_pct": 0.38},
+        "rsi_40_50": {"n": 79,  "wr_pct": 48.0, "avg_ret_pct": -0.30},
+        "rsi_50_60": {"n": 181, "wr_pct": 63.0, "avg_ret_pct": 2.23},
+        "rsi_60_70": {"n": 201, "wr_pct": 65.0, "avg_ret_pct": 1.54},
+        "rsi_70_80": {"n": 85,  "wr_pct": 64.0, "avg_ret_pct": 1.56},
+        "rsi_80plus":{"n": 32,  "wr_pct": 69.0, "avg_ret_pct": 1.00}
+      }
+    },
+    {
+      "id": "L005",
+      "date": "2026-06-30",
+      "category": "adx_filter",
+      "finding": "ADX 16-30 is the sweet spot: WR 63-66%, avg +1.78-1.98%. ADX 35+ degrades: WR 52%, avg +0.34%. ADX 10-16 marginal: WR 57%, avg +0.74%. Floor of 16 remains correct.",
+      "action": "ADX floor 16 already enforced. Cap at 35 validated.",
+      "data": {
+        "adx_10_16": {"n": 104, "wr_pct": 57.0, "avg_ret_pct": 0.74},
+        "adx_16_20": {"n": 137, "wr_pct": 66.0, "avg_ret_pct": 1.78},
+        "adx_20_25": {"n": 183, "wr_pct": 63.0, "avg_ret_pct": 1.49},
+        "adx_25_30": {"n": 78,  "wr_pct": 63.0, "avg_ret_pct": 1.98},
+        "adx_30_35": {"n": 58,  "wr_pct": 59.0, "avg_ret_pct": 1.75},
+        "adx_35plus":{"n": 60,  "wr_pct": 52.0, "avg_ret_pct": 0.34}
+      }
+    },
+    {
+      "id": "L006",
+      "date": "2026-06-30",
+      "category": "multi_strategy",
+      "finding": "Multi-strategy conviction edge confirmed and strengthens with count: 1 strat=WR 59% avg +1.11%, 2 strats=WR 66% avg +1.97%, 3 strats=WR 70% avg +2.69%. Always prioritise 2+ strategy overlaps.",
+      "action": "Conviction tier HIGH already requires multi-strategy. Validated.",
+      "data": {
+        "count_1": {"n": 435, "wr_pct": 59.0, "avg_ret_pct": 1.11},
+        "count_2": {"n": 155, "wr_pct": 66.0, "avg_ret_pct": 1.97},
+        "count_3": {"n": 30,  "wr_pct": 70.0, "avg_ret_pct": 2.69}
+      }
+    },
+    {
+      "id": "L007",
+      "date": "2026-06-30",
+      "category": "risk_management",
+      "finding": "17% of trades hit stop loss. Avg loss when SL triggered: -6.43%. Winners avg ~+1.5-2%. Asymmetry means position sizing is critical — never risk more than 1-2% of portfolio per trade.",
+      "action": "No code change — user awareness.",
+      "data": {
+        "sl_hit_rate_pct": 17.0,
+        "avg_loss_on_sl_pct": -6.43
+      }
+    },
+    {
+      "id": "L008",
+      "date": "2026-06-21",
+      "category": "data_bug",
+      "finding": "US tickers returning NaN for ret_d5 due to yfinance bulk download missing most recent trading day. Fixed with per-ticker fallback in _price_on_or_after().",
+      "action": "Fixed in update_scan_history.py"
+    },
+    {
+      "id": "L009",
+      "date": "2026-06-21",
+      "category": "scanner_improvement",
+      "finding": "ADX<=15 = WR 41%, avg -0.10% — as bad as overextended ADX>35. RSI 45-50 = WR 48%, avg -0.25%. COIL score>=6 = WR 49%, avg -0.27%.",
+      "action": "ADX floor raised to 16, RSI floor raised to 50, COIL score cap set to 5 in breakout_scanner"
+    }
+  ],
+  "disabled_strategies": ["high_tight_flag", "momentum"],
+  "active_filters": {
+    "adx_floor": 16,
+    "adx_cap": 35,
+    "rsi_floor": 50,
+    "score_cap": 5,
+    "score_cap_exceptions": ["signal_velocity"]
+  }
+}

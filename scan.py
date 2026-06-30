@@ -157,7 +157,7 @@ def wr_fmt(v):
 
 
 # ── STRATEGY REGISTRY ─────────────────────────────────────────────────────────
-ALL_STRATEGIES = ["momentum", "breakout", "pocket_pivot", "connors_rsi2",
+ALL_STRATEGIES = ["breakout", "pocket_pivot", "connors_rsi2",
                   "ema_ribbon", "nr7", "bb_squeeze", "high_tight_flag",
                   "analyst_upgrade", "signal_velocity", "chokepoint_inflection",
                   "stage4_short", "defensive_rotation",
@@ -167,7 +167,7 @@ ALL_STRATEGIES = ["momentum", "breakout", "pocket_pivot", "connors_rsi2",
                   "connors_r3", "connors_tps", "turtle_soup", "raschke_8020"]
 
 SCANNER_MAP = {
-    "momentum":        scan_momentum,
+    # "momentum":        scan_momentum,  # DISABLED: 0% WR, avg -4.40% across 5 signals (Jun 30 backtest)
     "breakout":        scan_breakout,
     "pocket_pivot":    scan_pocket_pivot,
     "connors_rsi2":    scan_connors,
@@ -851,6 +851,18 @@ def main():
         print(DIM(f"  [{strategy}] done in {elapsed:.0f}s — {len(res)} signal(s)"))
         results_by_strategy[strategy] = res
         all_results.extend(res)
+
+    # Score cap: score>=6 WR drops to 25-56%, avg turns negative (Jun 30 backtest, 620 trades)
+    # Exception: signal_velocity uses 0-13 scale so cap doesn't apply
+    SCORE_CAP_EXEMPT = {"signal_velocity", "stage4_short"}
+    for strat in results_by_strategy:
+        if strat in SCORE_CAP_EXEMPT:
+            continue
+        results_by_strategy[strat] = [r for r in results_by_strategy[strat]
+                                       if (r.get("score") or 0) <= 5]
+    all_results = [r for r in all_results
+                   if r.get("strategy") in SCORE_CAP_EXEMPT
+                   or (r.get("score") or 0) <= 5]
 
     total_time = time.time() - t0
 
