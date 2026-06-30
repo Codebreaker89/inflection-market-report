@@ -133,6 +133,10 @@ from raschke_holy_grail_scanner    import scan as scan_holy_grail
 from connors_3down_scanner         import scan as scan_3down
 from williams_pct_r_scanner        import scan as scan_williams_r
 from bollinger_pctb_scanner        import scan as scan_bb_pctb
+from connors_r3_scanner            import scan as scan_r3
+from connors_tps_scanner           import scan as scan_tps
+from turtle_soup_scanner           import scan as scan_turtle_soup
+from raschke_8020_scanner          import scan as scan_8020
 from show_tracker                  import add_trade_interactive
 
 # ANSI helpers (inline — no shared module dependency)
@@ -159,7 +163,8 @@ ALL_STRATEGIES = ["momentum", "breakout", "pocket_pivot", "connors_rsi2",
                   "stage4_short", "defensive_rotation",
                   "cup_handle", "power_earnings_gap",
                   "darvas_box", "rs_line", "vcp", "elder_impulse",
-                  "holy_grail", "connors_3down", "williams_pct_r", "bollinger_pctb"]
+                  "holy_grail", "connors_3down", "williams_pct_r", "bollinger_pctb",
+                  "connors_r3", "connors_tps", "turtle_soup", "raschke_8020"]
 
 SCANNER_MAP = {
     "momentum":        scan_momentum,
@@ -186,6 +191,10 @@ SCANNER_MAP = {
     "connors_3down":         scan_3down,
     "williams_pct_r":        scan_williams_r,
     "bollinger_pctb":        scan_bb_pctb,
+    "connors_r3":            scan_r3,
+    "connors_tps":           scan_tps,
+    "turtle_soup":           scan_turtle_soup,
+    "raschke_8020":          scan_8020,
 }
 
 STRATEGY_LABELS = {
@@ -212,6 +221,10 @@ STRATEGY_LABELS = {
     "connors_3down":         "📉  CONNORS 3-DOWN  (Connors — 3 consecutive lower closes in uptrend, RSI2<20)",
     "williams_pct_r":        "📊  WILLIAMS %R  (Larry Williams — %R crosses above -80 from oversold)",
     "bollinger_pctb":        "🎯  BOLLINGER %B  (John Bollinger — %B<0.20 + MFI<35 + bouncing, sideways specialist)",
+    "connors_r3":            "🔁  CONNORS R3  (Connors — RSI2 drops 3 days from <60, RSI2<10, mean reversion)",
+    "connors_tps":           "📐  CONNORS TPS  (Connors — Time/Price Scale-In, 3-7 lower closes, RSI2<25)",
+    "turtle_soup":           "🐢  TURTLE SOUP  (Raschke — false 20d low breakdown → reversal close above)",
+    "raschke_8020":          "🔄  RASCHKE 80-20  (Raschke — open bottom-20% yesterday's range, close top-50%)",
 }
 
 STRATEGY_DESCRIPTIONS = {
@@ -362,6 +375,30 @@ STRATEGY_DESCRIPTIONS = {
         "  AND MFI < 35 (money flowing out) AND %B rising (bounce starting). Above 200d SMA.\n"
         "  ADX floor 12 — sideways market specialist. Hold 5 days."
     ),
+    "connors_r3": (
+        "Larry Connors ('High Probability ETF Trading' 2009) — RSI(2) drops 3 consecutive days,\n"
+        "  first day from below 60 (not from overbought peak), final RSI(2) < 10. Price above\n"
+        "  200d SMA. Pure mean reversion — strongest in sideways/choppy markets. Hold 3 days.\n"
+        "  Backtested 90% win rate on SPY since 1993 per Connors Research."
+    ),
+    "connors_tps": (
+        "Larry Connors ('High Probability ETF Trading' 2009) — Time/Price Scale-In strategy.\n"
+        "  3-7 consecutive lower closes, RSI(2) declining each day, RSI(2) < 25 on entry.\n"
+        "  Volume declining (orderly pullback, not panic). Price above 200d + 50d SMA.\n"
+        "  Explicitly designed for choppy/sideways markets. Hold 4 days."
+    ),
+    "turtle_soup": (
+        "Linda Raschke & Larry Connors ('Street Smarts' 1996) — Stock makes new 20-day low\n"
+        "  (suckers short sellers in) but CLOSES back above the prior 20d low the same day.\n"
+        "  False breakdown reversal. Volume confirms. Works in sideways markets where false\n"
+        "  breakouts dominate. Price above 200d SMA. Hold 3 days."
+    ),
+    "raschke_8020": (
+        "Linda Raschke ('Street Smarts' 1996) — Bullish 80-20 Rule. Stock opens in BOTTOM 20%\n"
+        "  of yesterday's range (bearish gap/open) but closes ABOVE yesterday's midpoint.\n"
+        "  Failed breakdown = next 1-2 days trend up. Works in choppy/sideways markets.\n"
+        "  Pure price-action pattern, any ADX regime. Hold 2 days."
+    ),
 }
 
 HOLD_DAYS_MAP = {
@@ -388,6 +425,10 @@ HOLD_DAYS_MAP = {
     "williams_pct_r":        3,
     "bollinger_pctb":        5,
     "power_earnings_gap":    10,
+    "connors_r3":            3,
+    "connors_tps":           4,
+    "turtle_soup":           3,
+    "raschke_8020":          2,
 }
 
 W = 110
@@ -471,6 +512,68 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
     print(DIM(f"  {high_n} HIGH  ·  {med_n} MED  ·  act on HIGH first, monitor MED for confirmation"))
 
 
+
+def _load_hist_stats() -> dict:
+    """Load per-strategy WR/avg from scan_history.csv."""
+    import csv as _csv, math as _math
+    from collections import defaultdict
+    p = Path(__file__).parent / "scan_history.csv"
+    if not p.exists():
+        return {}
+    stats = defaultdict(lambda: {"wins": 0, "total": 0, "sum": 0.0})
+    try:
+        with open(p, newline="") as f:
+            for row in _csv.DictReader(f):
+                s = row.get("strategy", "").strip()
+                if not s: continue
+                try:
+                    ret = float(row["ret_d5"])
+                    if _math.isnan(ret): continue
+                    stats[s]["total"] += 1
+                    stats[s]["sum"] += ret
+                    if ret > 0: stats[s]["wins"] += 1
+                except (ValueError, TypeError, KeyError): pass
+    except Exception:
+        return {}
+    return {s: {"n": d["total"],
+                "wr": round(100*d["wins"]/d["total"], 1),
+                "avg": round(d["sum"]/d["total"], 2)}
+            for s, d in stats.items() if d["total"] >= 1}
+
+_HIST_STATS: dict = {}  # loaded once at scan time
+
+
+def _load_hist_stats() -> dict:
+    import csv as _csv, math as _math
+    from collections import defaultdict
+    from pathlib import Path as _Path
+    p = _Path(__file__).parent / "scan_history.csv"
+    if not p.exists():
+        return {}
+    stats = defaultdict(lambda: {"wins": 0, "total": 0, "s": 0.0})
+    try:
+        with open(p, newline="") as f:
+            for row in _csv.DictReader(f):
+                strat = row.get("strategy", "").strip()
+                if not strat: continue
+                try:
+                    ret = float(row["ret_d5"])
+                    if _math.isnan(ret): continue
+                    stats[strat]["total"] += 1
+                    stats[strat]["s"] += ret
+                    if ret > 0: stats[strat]["wins"] += 1
+                except (ValueError, TypeError, KeyError): pass
+    except Exception:
+        return {}
+    out = {}
+    for s, d in stats.items():
+        n = d["total"]
+        if n < 1: continue
+        out[s] = {"n": n, "wr": round(100*d["wins"]/n, 1), "avg": round(d["s"]/n, 2)}
+    return out
+
+_HIST_STATS: dict = {}
+
 # ── DISPLAY ───────────────────────────────────────────────────────────────────
 
 def _print_group(strategy: str, results: list, with_backtest: bool, multi_tickers: set = None):
@@ -480,12 +583,27 @@ def _print_group(strategy: str, results: list, with_backtest: bool, multi_ticker
     count = len(results)
     desc  = STRATEGY_DESCRIPTIONS.get(strategy, "")
 
+    h      = _HIST_STATS.get(strategy, {})
+    h_n    = h.get("n", 0)
+    h_wr   = h.get("wr", 0.0)
+    h_avg  = h.get("avg", 0.0)
+    if h_n >= 3:
+        wr_col   = GRN if h_wr >= 60 else (YLW if h_wr >= 45 else RED)
+        proven   = "  ★ PROVEN EDGE" if h_n >= 10 and h_wr >= 60 else ""
+        wr_part  = wr_col(str(round(h_wr)) + "%WR")
+        avg_sign = "+" if h_avg >= 0 else ""
+        avg_part = avg_sign + str(round(h_avg, 2)) + "%avg"
+        hist_tag = "  [" + wr_part + " · " + avg_part + " · n=" + str(h_n) + proven + "]"
+    else:
+        hist_tag = ""
+
     print()
     print("┌" + "─"*(W-2) + "┐")
-    print("│" + f"  {BOLD(label)}  ·  {count} signal(s)  ·  hold={hold}d".ljust(W+8) + "│")
+    hdr_line = "  " + BOLD(label) + "  ·  " + str(count) + " signal(s)  ·  hold=" + str(hold) + "d" + hist_tag
+    print("│" + hdr_line.ljust(W+20) + "│")
     if desc:
         for line in desc.split("\n"):
-            print("│" + DIM(f"  {line}").ljust(W+8) + "│")
+            print("│" + DIM("  " + line).ljust(W+8) + "│")
     print("└" + "─"*(W-2) + "┘")
 
     if not results:
@@ -619,6 +737,10 @@ def _print_matrix(results_by_strategy: dict, strategies: list, upgrade_tickers: 
         "connors_3down":         "3DOWN",
         "williams_pct_r":        "WR",
         "bollinger_pctb":        "BB%B",
+        "connors_r3":            "R3",
+        "connors_tps":           "TPS",
+        "turtle_soup":           "TSOUP",
+        "raschke_8020":          "8020",
     }
     cols = [col_labels.get(s, s[:6].upper()) for s in strategies]
     col_w = [max(len(c), 6) for c in cols]
@@ -744,7 +866,9 @@ def main():
     results_by_strategy = {}
 
     for strategy in strategies:
-        scanner = SCANNER_MAP[strategy]
+        scanner = SCANNER_MAP.get(strategy)
+        if scanner is None:
+            continue  # disabled strategy (e.g. high_tight_flag)
         print(DIM(f"  [{strategy}] scanning..."), flush=True)
         t1 = time.time()
         try:

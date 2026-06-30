@@ -123,7 +123,7 @@ def _score(df: pd.DataFrame, idx: int) -> Optional[dict]:
     if pd.isna(rsi2) or pd.isna(rsi) or pd.isna(adx): return None
 
     # RSI(2) < 20 — short-term oversold (Connors' core condition)
-    if rsi2 >= 20: return None
+    if rsi2 >= 25: return None  # Connors book: threshold is 25 not 20
 
     # RSI(14) > 40 — not a broken stock
     if rsi <= 40: return None
@@ -179,7 +179,7 @@ def run_backtest(df: pd.DataFrame) -> dict:
         c   = float(row["Close"])
         rsi2 = float(row["rsi2"]); rsi = float(row["rsi"]); adx = float(row["adx"])
         if pd.isna(rsi2) or pd.isna(rsi) or pd.isna(adx): continue
-        if rsi2 >= 20 or rsi <= 40 or adx < 16 or adx > 40: continue
+        if rsi2 >= 25 or rsi <= 40 or adx < 16 or adx > 40: continue
         sma200 = float(row["sma200"]); sma50 = float(row["sma50"])
         if pd.isna(sma200) or pd.isna(sma50): continue
         if c <= sma200 or c <= sma50: continue

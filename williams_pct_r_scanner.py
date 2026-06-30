@@ -30,7 +30,7 @@ def _quiet():
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 HOLD_DAYS    = 3
 MAX_WORKERS  = 25
-WR_PERIOD    = 14       # Williams %R lookback
+WR_PERIOD    = 10       # Williams used 10 bars       # Williams %R lookback
 FRESH_WINDOW = 2        # signal must have fired within last N bars
 
 # ── INDICATOR HELPERS ─────────────────────────────────────────────────────────
@@ -78,11 +78,11 @@ def _is_wr_cross(df: pd.DataFrame, idx: int) -> bool:
     wr_prev  = float(df["wr"].iloc[idx - 1])
     if pd.isna(wr_today) or pd.isna(wr_prev): return False
     # today must be above -80 (exited oversold), yesterday below -80
-    if not (wr_today > -80 and wr_prev <= -80): return False
+    if not (wr_today > -80 and wr_prev <= -90): return False  # Williams power setup: enter from -90
     # must have dipped below -80 within last 5 bars (already satisfied by prev<=80,
     # but confirm it actually entered oversold zone)
     recent = df["wr"].iloc[max(0, idx - 5): idx]
-    return bool((recent < -80).any())
+    return bool((recent < -90).any())
 
 def _score(df: pd.DataFrame, idx: int) -> Optional[dict]:
     if idx < 215: return None

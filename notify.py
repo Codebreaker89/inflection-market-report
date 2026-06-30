@@ -438,6 +438,45 @@ def _build_matrix_html() -> str:
             f'<thead><tr>{th_row}</tr></thead><tbody>{rows}</tbody></table>{note}')
 
 
+
+def _load_strategy_stats() -> dict:
+    """Read scan_history.csv → per-strategy {n, wr, avg} from filled ret_d5 rows."""
+    csv_path = HERE / "scan_history.csv"
+    if not csv_path.exists():
+        return {}
+    from collections import defaultdict
+    import csv as _csv, math as _math
+    stats = defaultdict(lambda: {"wins": 0, "total": 0, "sum": 0.0})
+    try:
+        with open(csv_path, newline="", encoding="utf-8") as f:
+            for row in _csv.DictReader(f):
+                strat = row.get("strategy", "").strip()
+                if not strat:
+                    continue
+                try:
+                    ret = float(row["ret_d5"])
+                    if _math.isnan(ret):
+                        continue
+                    stats[strat]["total"] += 1
+                    stats[strat]["sum"]   += ret
+                    if ret > 0:
+                        stats[strat]["wins"] += 1
+                except (ValueError, TypeError, KeyError):
+                    pass
+    except Exception:
+        return {}
+    out = {}
+    for s, d in stats.items():
+        n = d["total"]
+        if n < 1:
+            continue
+        out[s] = {
+            "n":   n,
+            "wr":  round(100 * d["wins"] / n, 1),
+            "avg": round(d["sum"] / n, 2),
+        }
+    return out
+
 def _build_scanner_results_html() -> str:
     """Per-strategy detailed scanner results table from last_scan.json."""
     scan_json = HERE / "last_scan.json"
@@ -474,13 +513,26 @@ def _build_scanner_results_html() -> str:
         "connors_3down":      "3 consecutive lower closes in stock above 200d+50d SMA. RSI(2)<20 (short-term oversold). ADX 16-40, Minervini≥4. Mean-reversion snap-back in any market. Hold 3d. (Larry Connors — Short-Term Trading Strategies)",
         "williams_pct_r":     "Williams %R crosses above -80 from oversold. Stock above 50d+200d SMA. ADX 16-40, RSI 35-65, Minervini≥4. Sideways + mild uptrend specialist. Hold 3d. (Larry Williams — Long-Term Secrets to Short-Term Trading)",
         "bollinger_pctb":     "Bollinger %B<0.20 (near lower band) AND MFI<35 (money outflow) AND %B rising (bounce starting). Above 200d SMA. ADX floor 12 — sideways market specialist. Hold 5d. (John Bollinger — Bollinger on Bollinger Bands)",
+        "connors_r3":         "RSI(2) drops 3 consecutive days (first from below 60), final RSI(2)<10. Price above 200d SMA. 90% WR on SPY per Connors Research backtests. Best in sideways/choppy markets. Hold 3d. (Connors — High Probability ETF Trading 2009)",
+        "connors_tps":        "Time/Price Scale-In: 3-7 consecutive lower closes, RSI(2) declining each day, RSI(2)<25 on entry, volume orderly (declining). Designed for choppy/sideways markets. Hold 4d. (Connors — High Probability ETF Trading 2009)",
+        "turtle_soup":        "New 20-day low (traps shorts) then reverses and closes above prior 20d low the same day. False breakdown reversal. Volume confirms. Works in sideways markets. Hold 3d. (Raschke & Connors — Street Smarts 1996)",
+        "raschke_8020":       "Bullish 80-20: Opens in bottom 20% of yesterday's range (weak open), closes above yesterday's midpoint (failed breakdown). Next 1-2 days trend up. Pure price-action, any market condition. Hold 2d. (Linda Raschke — Street Smarts 1996)",
     }
+
+    hist_stats = _load_strategy_stats()
 
     active = [(s, rbs[s]) for s in strategies if rbs.get(s)]
     if not active:
         return (f'<br>{_section_head("📡","Scanner Results","no signals today","#888888")}'
                 f'<p style="color:{_C_DIM};font-size:12px;font-style:italic;padding:8px 0;">'
                 f'No strategies fired on {scan_date}.</p>')
+
+    # Sort active strategies by historical WR (best first), then by signal count
+    def _sort_key(item):
+        s, res = item
+        st = hist_stats.get(s, {})
+        return (-(st.get("wr", 0) if st.get("n", 0) >= 5 else 0), -len(res))
+    active = sorted(active, key=_sort_key)
 
     total_hits = sum(len(r) for _, r in active)
     html = f'<br>{_section_head("📡","Scanner Results",f"scan {scan_date} · {len(active)} strategies fired · {total_hits} total signals","#1a5a8a")}'
@@ -489,6 +541,46 @@ def _build_scanner_results_html() -> str:
         ("Total Signals",    str(total_hits),   _C_BODY),
         ("Scan Date",        scan_date,          _C_DIM),
     ])
+
+    # ── Strategy Scorecard ────────────────────────────────────────────────────
+    if hist_stats:
+        scored = sorted(
+            [(s, d) for s, d in hist_stats.items() if d["n"] >= 3],
+            key=lambda x: (-x[1]["wr"], -x[1]["avg"])
+        )
+        sc_rows = ""
+        for rank, (s, d) in enumerate(scored[:10], 1):
+            proven = d["n"] >= 10 and d["wr"] >= 60
+            wr_color = "#16a34a" if d["wr"] >= 60 else ("#d97706" if d["wr"] >= 45 else "#dc2626")
+            avg_color = "#16a34a" if d["avg"] >= 0 else "#dc2626"
+            badge = ('<span style="background:#16a34a;color:#fff;font-size:9px;font-weight:700;'
+                     'border-radius:3px;padding:1px 4px;margin-left:6px;">PROVEN EDGE ✓</span>') if proven else ""
+            s_label = s.replace("_", " ").upper()
+            sc_rows += (
+                f'<tr style="background:{_C_ROW1 if rank%2 else _C_ROW0};">'
+                f'<td style="padding:5px 8px;font-size:11px;color:{_C_BODY};">{rank}</td>'
+                f'<td style="padding:5px 8px;font-size:11px;font-weight:600;color:{_C_BODY};">{s_label}{badge}</td>'
+                f'<td style="padding:5px 8px;font-size:11px;text-align:right;color:{wr_color};font-weight:700;">{d["wr"]:.0f}%</td>'
+                f'<td style="padding:5px 8px;font-size:11px;text-align:right;color:{avg_color};">{d["avg"]:+.2f}%</td>'
+                f'<td style="padding:5px 8px;font-size:11px;text-align:right;color:{_C_DIM};">{d["n"]}</td>'
+                '</tr>'
+            )
+        html += (
+            f'<br><table width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px;margin-bottom:0;">'
+            f'<tr><td style="background:#1a2a1a;border-left:4px solid #16a34a;padding:6px 10px;border-radius:3px 3px 0 0;">'
+            f'<span style="font-size:11px;font-weight:700;color:#16a34a;letter-spacing:.05em;">'
+            f'📊 STRATEGY SCORECARD &nbsp;·&nbsp; LIVE from scan_history.csv</span></td></tr></table>'
+            f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:11px;">'
+            f'<thead><tr>'
+            f'<th style="padding:5px 8px;text-align:left;color:#888;background:#1a1a2e;">#</th>'
+            f'<th style="padding:5px 8px;text-align:left;color:#888;background:#1a1a2e;">Strategy</th>'
+            f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;">WR% d5</th>'
+            f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;">Avg% d5</th>'
+            f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;">n</th>'
+            f'</tr></thead><tbody>'
+            + sc_rows +
+            f'</tbody></table>'
+        )
 
     for strat, results in active:
         is_short = "short" in strat
@@ -503,12 +595,28 @@ def _build_scanner_results_html() -> str:
                        f'{sum(avgs)/len(avgs):+.1f}% return')
 
         desc_text = _STRAT_DESC.get(strat, "")
+        h_stat    = hist_stats.get(strat, {})
+        proven    = h_stat.get("n", 0) >= 10 and h_stat.get("wr", 0) >= 60
+        live_wr   = h_stat.get("wr")
+        live_avg  = h_stat.get("avg")
+        live_n    = h_stat.get("n", 0)
+        live_note = ""
+        if live_wr is not None:
+            wr_col  = "#16a34a" if live_wr >= 60 else ("#d97706" if live_wr >= 45 else "#dc2626")
+            live_note = (f'<span style="font-size:10px;color:{wr_col};font-weight:700;margin-left:10px;">'
+                         f'📈 {live_wr:.0f}% WR · {live_avg:+.2f}% avg (n={live_n})</span>')
+        proven_badge = ""
+        if proven:
+            proven_badge = ('<span style="background:#16a34a;color:#fff;font-size:9px;font-weight:700;'
+                            'border-radius:3px;padding:1px 5px;margin-left:8px;">PROVEN EDGE ✓</span>')
         html += (f'<table width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;margin-bottom:0;">'
                  f'<tr><td style="background:{bg_badge};border-left:4px solid {fg};'
                  f'padding:6px 10px;border-radius:3px 3px 0 0;">'
                  f'<span style="font-size:11px;font-weight:700;color:{fg};'
                  f'letter-spacing:.05em;text-transform:uppercase;">'
                  f'{strat_label} &nbsp;·&nbsp; {len(results)} signal(s)</span>'
+                 + proven_badge
+                 + live_note
                  + (f'<span style="font-size:10px;color:{fg};margin-left:12px;">{bt_note}</span>' if bt_note else "")
                  + (f'<br><span style="font-size:10px;color:{fg};opacity:0.8;font-style:italic;">{desc_text}</span>' if desc_text else "")
                  + f'</td></tr></table>')

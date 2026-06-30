@@ -90,7 +90,7 @@ def _detect_darvas_box(df: pd.DataFrame, idx: int) -> Optional[dict]:
     if bars_after["High"].max() >= peak_price: return None
 
     box_top    = peak_price
-    box_bottom = float(bars_after["Close"].min())
+    box_bottom = float(bars_after["Low"].min())   # Darvas used intraday lows
     box_width  = (box_top - box_bottom) / box_top
     if box_width > 0.15: return None
 
