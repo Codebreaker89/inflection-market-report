@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-06-30",
-  "sample_size": "620 trades (Jun 21-25, 5 scan dates)",
+  "last_updated": "2026-07-01",
+  "sample_size": "751 trades (Jun 21-26, 6 scan dates)",
   "learnings": [
     {
       "id": "L001",
@@ -12,21 +12,22 @@
     },
     {
       "id": "L002",
-      "date": "2026-06-30",
+      "date": "2026-07-01",
       "category": "strategy_performance",
-      "finding": "ema_ribbon is best large-sample strategy: WR 73.8%, avg +3.06% (65 trades). pocket_pivot best WR at 87% (23 trades). stage4_short WR 78.3% avg +3.32% (23 trades).",
-      "action": "none — already running. Prioritise these in conviction tier.",
+      "finding": "Updated with 751-trade data (Jun 21-26). Rankings unchanged at top: pocket_pivot WR 88.9% (27 trades), stage4_short WR 78.1% (32), ema_ribbon WR 74.6% (67). bb_squeeze weak at WR 37.5% despite avg +1.70% — high variance, avoid. high_tight_flag confirmed dead: WR 16.7%, avg -3.15% (18 trades). signal_velocity improved to WR 57.1% avg +1.35% (21 trades) — watchable. momentum confirmed worst: WR 25%, avg -2.81% (8 trades).",
+      "action": "none — already running top strategies. bb_squeeze and high_tight_flag flagged as weak. momentum disabled.",
       "data": {
-        "ema_ribbon":    {"n": 65, "wr_pct": 73.8, "avg_ret_pct": 3.06},
-        "pocket_pivot":  {"n": 23, "wr_pct": 87.0, "avg_ret_pct": 3.03},
-        "stage4_short":  {"n": 23, "wr_pct": 78.3, "avg_ret_pct": 3.32},
-        "cup_handle":    {"n": 58, "wr_pct": 65.5, "avg_ret_pct": 2.34},
-        "nr7":           {"n": 141,"wr_pct": 61.0, "avg_ret_pct": 1.57},
-        "connors_rsi2":  {"n": 79, "wr_pct": 65.8, "avg_ret_pct": 1.46},
-        "breakout":      {"n": 182,"wr_pct": 54.9, "avg_ret_pct": 0.55},
-        "signal_velocity":{"n": 14,"wr_pct": 50.0, "avg_ret_pct": -0.14},
-        "high_tight_flag":{"n": 14,"wr_pct": 14.3, "avg_ret_pct": -4.14},
-        "momentum":       {"n": 5, "wr_pct": 0.0,  "avg_ret_pct": -4.40}
+        "ema_ribbon":    {"n": 67, "wr_pct": 74.6, "avg_ret_pct": 3.32},
+        "pocket_pivot":  {"n": 27, "wr_pct": 88.9, "avg_ret_pct": 3.03},
+        "stage4_short":  {"n": 32, "wr_pct": 78.1, "avg_ret_pct": 2.91},
+        "cup_handle":    {"n": 69, "wr_pct": 65.2, "avg_ret_pct": 2.14},
+        "connors_rsi2":  {"n": 107,"wr_pct": 62.6, "avg_ret_pct": 1.34},
+        "nr7":           {"n": 171,"wr_pct": 56.7, "avg_ret_pct": 1.31},
+        "signal_velocity":{"n": 21,"wr_pct": 57.1, "avg_ret_pct": 1.35},
+        "breakout":      {"n": 212,"wr_pct": 55.2, "avg_ret_pct": 0.57},
+        "bb_squeeze":    {"n": 16, "wr_pct": 37.5, "avg_ret_pct": 1.70},
+        "high_tight_flag":{"n": 18,"wr_pct": 16.7, "avg_ret_pct": -3.15},
+        "momentum":      {"n": 8,  "wr_pct": 25.0, "avg_ret_pct": -2.81}
       }
     },
     {
@@ -114,6 +115,32 @@
       "category": "scanner_improvement",
       "finding": "ADX<=15 = WR 41%, avg -0.10% — as bad as overextended ADX>35. RSI 45-50 = WR 48%, avg -0.25%. COIL score>=6 = WR 49%, avg -0.27%.",
       "action": "ADX floor raised to 16, RSI floor raised to 50, COIL score cap set to 5 in breakout_scanner"
+    },
+    {
+      "id": "L010",
+      "date": "2026-07-01",
+      "category": "market_regime",
+      "finding": "Jun 26 was a significantly weaker scan day: WR 48.4%, avg 0.00% (64 signals) vs 56-70% on other days. Suggests broad market choppy/indecisive — scan days with weak internals produce weak signals. Jun 24 was the best day: WR 69.9%, avg +2.47% (136 signals). The market regime on scan day matters as much as individual strategy signals.",
+      "action": "Consider adding SPY regime gate on scan days — avoid trading when SPY trending sideways/down. Consider daily market health check before acting on signals.",
+      "data": {
+        "2026-06-21": {"wr_pct": 56.1, "avg_ret_pct": 1.00, "n": 114},
+        "2026-06-22": {"wr_pct": 60.8, "avg_ret_pct": 1.32, "n": 199},
+        "2026-06-23": {"wr_pct": 58.6, "avg_ret_pct": 1.02, "n": 128},
+        "2026-06-24": {"wr_pct": 69.9, "avg_ret_pct": 2.47, "n": 136},
+        "2026-06-25": {"wr_pct": 58.2, "avg_ret_pct": 1.55, "n": 110},
+        "2026-06-26": {"wr_pct": 48.4, "avg_ret_pct": 0.00, "n": 64}
+      }
+    },
+    {
+      "id": "L011",
+      "date": "2026-07-01",
+      "category": "strategy_weakness",
+      "finding": "bb_squeeze is a high-variance, low-WR strategy: WR 37.5%, avg +1.70% (16 trades). The avg is positive only due to 1 outlier (GLW +21.86%). Without that, avg is negative. Strategy not reliable enough for trading. Score 6 less catastrophic than 620-trade analysis suggested: WR 57.8%, avg +0.06% (83 trades) — still worse than score 0-5 but not a cliff.",
+      "action": "bb_squeeze kept active but flagged as weak in email digest. Score cap remains at 5 — score 6 still underperforms score 2-5 meaningfully.",
+      "data": {
+        "bb_squeeze_without_outlier": "if GLW excluded, avg < 0",
+        "score_6_updated": {"n": 83, "wr_pct": 57.8, "avg_ret_pct": 0.06}
+      }
     }
   ],
   "disabled_strategies": ["high_tight_flag", "momentum"],
