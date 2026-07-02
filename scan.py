@@ -137,6 +137,8 @@ from connors_r3_scanner            import scan as scan_r3
 from connors_tps_scanner           import scan as scan_tps
 from turtle_soup_scanner           import scan as scan_turtle_soup
 from raschke_8020_scanner          import scan as scan_8020
+from wyckoff_spring_scanner        import scan as scan_wyckoff_spring
+from weinstein_stage2_scanner      import scan as scan_weinstein_stage2
 from show_tracker                  import add_trade_interactive
 
 # ANSI helpers (inline — no shared module dependency)
@@ -164,7 +166,8 @@ ALL_STRATEGIES = ["breakout", "pocket_pivot", "connors_rsi2",
                   "cup_handle", "power_earnings_gap",
                   "darvas_box", "rs_line", "vcp", "elder_impulse",
                   "holy_grail", "connors_3down", "williams_pct_r", "bollinger_pctb",
-                  "connors_r3", "connors_tps", "turtle_soup", "raschke_8020"]
+                  "connors_r3", "connors_tps", "turtle_soup", "raschke_8020",
+                  "wyckoff_spring", "weinstein_stage2"]
 
 SCANNER_MAP = {
     # "momentum":        scan_momentum,  # DISABLED: 0% WR, avg -4.40% across 5 signals (Jun 30 backtest)
@@ -195,6 +198,8 @@ SCANNER_MAP = {
     "connors_tps":           scan_tps,
     "turtle_soup":           scan_turtle_soup,
     "raschke_8020":          scan_8020,
+    "wyckoff_spring":        scan_wyckoff_spring,
+    "weinstein_stage2":      scan_weinstein_stage2,
 }
 
 STRATEGY_LABELS = {
@@ -225,6 +230,8 @@ STRATEGY_LABELS = {
     "connors_tps":           "📐  CONNORS TPS  (Connors — Time/Price Scale-In, 3-7 lower closes, RSI2<25)",
     "turtle_soup":           "🐢  TURTLE SOUP  (Raschke — false 20d low breakdown → reversal close above)",
     "raschke_8020":          "🔄  RASCHKE 80-20  (Raschke — open bottom-20% yesterday's range, close top-50%)",
+    "wyckoff_spring":        "🌱  WYCKOFF SPRING  (Wyckoff — false break below support on low vol → shakeout, markup begins)",
+    "weinstein_stage2":      "📈  WEINSTEIN STAGE 2  (Weinstein — 30-week MA turns up, price crosses above it on volume surge)",
 }
 
 STRATEGY_DESCRIPTIONS = {
@@ -429,6 +436,8 @@ HOLD_DAYS_MAP = {
     "connors_tps":           4,
     "turtle_soup":           3,
     "raschke_8020":          2,
+    "wyckoff_spring":        5,
+    "weinstein_stage2":      10,
 }
 
 W = 110
@@ -497,16 +506,27 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
         print(BOLD(f"  {'TICKER':<10}  {'COMPANY':<22}  {'STRATEGIES':<28}  {'HIST WR':>7}  {'SCORE':>5}  {'RSI':>5}  {'ADX':>5}  {'PRICE':>8}"))
         print("  " + "─"*(W-2))
         for _, r, strategy in high_picks:
-            # All strategies this ticker fired on
-            strats_fired = [s for s, res in results_by_strategy.items()
-                            if any(x["ticker"] == r["ticker"] for x in res)]
-            proven_badge = " ✦PROVEN" if strategy in PROVEN_EDGE else ""
+            # All strategies this ticker fired on, sorted by known WR (best first)
+            strats_fired = sorted(
+                [s for s, res in results_by_strategy.items()
+                 if any(x["ticker"] == r["ticker"] for x in res)],
+                key=lambda s: -_HIST_STATS.get(s, {}).get("wr", 0)
+            )
+            # Use best-WR strategy for hist display
+            best_strat = next((s for s in strats_fired if _HIST_STATS.get(s,{}).get("n",0)>=5), strategy)
+            proven_badge = " ✦PROVEN" if any(s in PROVEN_EDGE for s in strats_fired) else ""
             strat_str = "+".join(s.replace("_"," ").upper()[:6] for s in strats_fired[:3])
-            hist = _HIST_STATS.get(strategy, {})
+            hist = _HIST_STATS.get(best_strat, {})
             wr_s = f"{hist['wr']:.0f}%WR" if hist.get("n",0)>=5 else "─"
             wr_col = GRN(f"{wr_s:>7}") if hist.get("wr",0)>=60 else YLW(f"{wr_s:>7}")
             proven_s = GRN(proven_badge) if proven_badge else ""
-            company  = str(r.get("company","") or "")[:22]
+            # Collect company name across all results for this ticker
+            company = ""
+            for s in strats_fired:
+                for rx in results_by_strategy.get(s, []):
+                    if rx["ticker"] == r["ticker"] and rx.get("company"):
+                        company = str(rx["company"])[:22]; break
+                if company: break
             ticker_fmt = f"{r['ticker']:<10}"
             print(f"  {GRN(BOLD(ticker_fmt))}  {company:<22}  {strat_str:<28}{proven_s}  {wr_col}  {r.get('score',0):>5}  {r.get('rsi',0):>5.1f}  {r.get('adx',0):>5.1f}  {r.get('price',0):>8.2f}")
         print()
@@ -516,11 +536,15 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
         print(BOLD(f"  👀  WATCHLIST  ·  {len(med_picks)} stock(s)  ·  ★★ MED — confirm before entering"))
         print("  " + "─"*(W-2))
         for _, r, strategy in med_picks[:15]:
-            strats_fired = [s for s, res in results_by_strategy.items()
-                            if any(x["ticker"] == r["ticker"] for x in res)]
+            strats_fired = sorted(
+                [s for s, res in results_by_strategy.items()
+                 if any(x["ticker"] == r["ticker"] for x in res)],
+                key=lambda s: -_HIST_STATS.get(s, {}).get("wr", 0)
+            )
+            best_strat = next((s for s in strats_fired if _HIST_STATS.get(s,{}).get("n",0)>=5), strategy)
             strat_str = "+".join(s.replace("_"," ").upper()[:5] for s in strats_fired[:2])
-            proven_badge = " ✦" if strategy in PROVEN_EDGE else ""
-            hist = _HIST_STATS.get(strategy, {})
+            proven_badge = " ✦" if any(s in PROVEN_EDGE for s in strats_fired) else ""
+            hist = _HIST_STATS.get(best_strat, {})
             wr_s = f"{hist['wr']:.0f}%WR" if hist.get("n",0)>=5 else "─"
             ticker_fmt2 = f"{r['ticker']:<10}"
             print(f"  {YLW(BOLD(ticker_fmt2))}  {str(r.get('company','') or '')[:22]:<22}  {strat_str+proven_badge:<30}  {wr_s:>6}  score={r.get('score',0)}  RSI={r.get('rsi',0):.0f}  ADX={r.get('adx',0):.0f}")
@@ -842,7 +866,7 @@ def main():
     # RSI floor: drop RSI<50 for non-mean-reversion strategies (dead zone confirmed WR 48%)
     RSI_FLOOR_EXEMPT = {"connors_rsi2", "connors_3down", "connors_r3", "connors_tps",
                         "williams_pct_r", "bollinger_pctb", "raschke_8020", "turtle_soup",
-                        "stage4_short", "signal_velocity"}
+                        "stage4_short", "signal_velocity", "wyckoff_spring", "weinstein_stage2"}
     for strat in list(results_by_strategy.keys()):
         if strat in RSI_FLOOR_EXEMPT:
             continue
@@ -865,6 +889,10 @@ def main():
     from collections import Counter
     ticker_strat_count = Counter(r["ticker"] for r in all_results)
     multi_tickers = {t for t, n in ticker_strat_count.items() if n >= 2}
+
+    # Load historical WR stats (must happen before any display function)
+    global _HIST_STATS
+    _HIST_STATS = _load_hist_stats()
 
     # Display
     _print_header(strategies, len(all_results), with_backtest)

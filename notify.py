@@ -235,6 +235,12 @@ _STRAT_COLORS = {
     "connors_3down":         ("#00406e", "#e0f2fe"),
     "williams_pct_r":        ("#006e5a", "#ccfbf1"),
     "bollinger_pctb":        ("#3d004a", "#fae8ff"),
+    "connors_r3":            ("#004a1a", "#dcfce7"),
+    "connors_tps":           ("#1a3a00", "#f0fce8"),
+    "turtle_soup":           ("#004040", "#ccfbf1"),
+    "raschke_8020":          ("#3a1a00", "#fff7ed"),
+    "wyckoff_spring":        ("#1a3a4a", "#e0f4ff"),
+    "weinstein_stage2":      ("#2a004a", "#f3e8ff"),
 }
 
 def _c(val, good_if_pos=True):
