@@ -162,11 +162,12 @@ def compute_pnl(trade: dict) -> dict:
     else:
         curr_price = raw_price
 
-    fx_now    = fetch_fx_now(ccy)
-    curr_eur  = round(curr_price / fx_now, 2)
-    buy_eur   = round(buy_price / fx_entry, 2)
-    ret_pct   = round((curr_price / buy_price - 1) * 100, 2)
-    pnl_eur   = round((curr_eur - buy_eur) * qty, 2)
+    fx_now     = fetch_fx_now(ccy)
+    curr_eur   = round(curr_price / fx_now, 2)
+    buy_eur    = round(buy_price / fx_entry, 2)
+    ret_pct    = round((curr_price / buy_price - 1) * 100, 2)
+    pnl_eur    = round((curr_eur - buy_eur) * qty, 2)
+    curr_native = round(curr_price, 2)  # price in stock's native currency
 
     # ── Alert checks ──────────────────────────────────────────────────────────
     if curr_price <= sl_price:
@@ -187,7 +188,8 @@ def compute_pnl(trade: dict) -> dict:
         days_to = (earn_d - TODAY).days
         alerts.append(("EARNINGS", f"Earnings in {days_to} day(s) on {earn_d} — consider exiting before"))
 
-    return {"curr_eur": curr_eur, "buy_eur": buy_eur, "ret_pct": ret_pct, "pnl_eur": pnl_eur, "alerts": alerts}
+    return {"curr_eur": curr_eur, "buy_eur": buy_eur, "ret_pct": ret_pct, "pnl_eur": pnl_eur,
+            "curr_native": curr_native, "alerts": alerts}
 
 # ── Gmail-safe inline style helpers ──────────────────────────────────────────
 # Rules: white background, all layout via <table>, all colour via inline style.
@@ -295,14 +297,19 @@ def _kpi_table(items: list[tuple]) -> str:
     return (f'<table cellpadding="0" cellspacing="0" style="margin:10px 0 14px;">'
             f'<tr>{cells}</tr></table>')
 
+_CCY_SYM = {"USD": "$", "GBP": "£", "EUR": "€", "CAD": "CA$"}
+
+def _ccy_sym(ccy: str) -> str:
+    return _CCY_SYM.get(ccy, ccy + " ")
+
 def _sl_eur_str(t: dict) -> str:
     if not t.get("stop_loss_price"):
         return "─"
     try:
         sl_native = float(t["stop_loss_price"])
         ccy = t.get("currency", "EUR")
-        fx_now = fetch_fx_now(ccy)
-        return f"€{sl_native/fx_now:.2f}"
+        sym = _ccy_sym(ccy)
+        return f"{sym}{sl_native:.2f}"
     except Exception:
         return str(t.get("stop_loss_price", "─"))
 
@@ -313,8 +320,8 @@ def _portfolio_table(results_slice: list, alert_tickers: set) -> str:
              + _th("Ticker", "left") + _th("Company", "left") + _th("Type", "left")
              + _th("Strategy", "left") + _th("Entry") + _th("Exit→", title="Target exit date")
              + _th("Held", title="Calendar days held") + _th("Rem", title="Days to target exit")
-             + _th("Buy€") + _th("Now€") + _th("Qty") + _th("Inv€")
-             + _th("Ret%") + _th("P&L€") + _th("SL€", title="Stop-loss price in EUR")
+             + _th("Buy") + _th("Now") + _th("Qty") + _th("Inv€")
+             + _th("Ret%") + _th("P&L€") + _th("SL", title="Stop-loss price (native currency)")
              + '</tr></thead><tbody>')
     rows = ""
     for i, (t, r) in enumerate(results_slice):
@@ -347,8 +354,12 @@ def _portfolio_table(results_slice: list, alert_tickers: set) -> str:
         rows += _td(target or "─", "right", _C_DIM, bg=bg)
         rows += _td(days_held, "right", _C_DIM, bg=bg)
         rows += _td(days_rem_s, "right", rem_c, bg=bg)
-        rows += _td(f'€{r["buy_eur"]:.2f}' if r.get("buy_eur") else "─", "right", _C_DIM, bg=bg)
-        rows += _td(f'€{r["curr_eur"]:.2f}' if r.get("curr_eur") else "─", "right", _C_BODY, bg=bg)
+        _buy_sym = _ccy_sym(t.get("currency", "EUR"))
+        _buy_px  = float(t["buy_price"]) if t.get("buy_price") else None
+        rows += _td(f'{_buy_sym}{_buy_px:.2f}' if _buy_px else "─", "right", _C_DIM, bg=bg)
+        _now_sym = _ccy_sym(t.get("currency", "EUR"))
+        _now_px  = r.get("curr_native")
+        rows += _td(f'{_now_sym}{_now_px:.2f}' if _now_px else "─", "right", _C_BODY, bg=bg)
         rows += _td(f'{float(t["qty"]):.0f}', "right", _C_DIM, bg=bg)
         rows += _td(f'€{float(t["investment_eur"]):.0f}', "right", _C_DIM, bg=bg)
         rows += _td(_pct(r["ret_pct"]), "right", ret_c, bold=True, bg=bg)
@@ -477,8 +488,25 @@ def _load_strategy_stats() -> dict:
         }
     return out
 
+_PROVEN_EDGE_SET = {"pocket_pivot", "stage4_short", "ema_ribbon", "cup_handle",
+                    "signal_velocity", "connors_rsi2"}
+
+def _conviction_tier_email(r: dict, multi_tickers: set) -> str:
+    """Returns HIGH / MED / LOW conviction string."""
+    is_multi   = r.get("ticker") in multi_tickers
+    good_score = (r.get("score") or 99) <= 5
+    rsi        = r.get("rsi") or 0
+    adx        = r.get("adx") or 0
+    good_rsi   = 50 <= rsi <= 70
+    good_adx   = 16 <= adx <= 35
+    if is_multi and good_score and good_rsi and good_adx:
+        return "HIGH"
+    if is_multi or (good_score and good_rsi and good_adx):
+        return "MED"
+    return "LOW"
+
 def _build_scanner_results_html() -> str:
-    """Per-strategy detailed scanner results table from last_scan.json."""
+    """Scanner results: leads with conviction cards, then full detail by strategy."""
     scan_json = HERE / "last_scan.json"
     if not scan_json.exists():
         return ""
@@ -535,11 +563,154 @@ def _build_scanner_results_html() -> str:
     active = sorted(active, key=_sort_key)
 
     total_hits = sum(len(r) for _, r in active)
-    html = f'<br>{_section_head("📡","Scanner Results",f"scan {scan_date} · {len(active)} strategies fired · {total_hits} total signals","#1a5a8a")}'
+
+    # ── Conviction classification ─────────────────────────────────────────────
+    all_results_flat = [(s, r) for s, res in rbs.items() for r in res]
+    from collections import Counter
+    ticker_counts = Counter(r["ticker"] for _, r in all_results_flat)
+    multi_tickers = {t for t, n in ticker_counts.items() if n >= 2}
+
+    # Deduplicate: best conviction tier per ticker
+    tier_rank = {"HIGH": 0, "MED": 1, "LOW": 2}
+    best_by_ticker: dict = {}
+    for s, r in all_results_flat:
+        t = r["ticker"]
+        tier = _conviction_tier_email(r, multi_tickers)
+        rank = tier_rank[tier]
+        if t not in best_by_ticker or rank < best_by_ticker[t][0]:
+            best_by_ticker[t] = (rank, tier, s, r)
+
+    high_picks = sorted(
+        [(tier, s, r) for t, (rank, tier, s, r) in best_by_ticker.items() if tier == "HIGH"],
+        key=lambda x: (x[2].get("score", 99), -(x[2].get("rsi") or 0))
+    )
+    med_picks = sorted(
+        [(tier, s, r) for t, (rank, tier, s, r) in best_by_ticker.items() if tier == "MED"],
+        key=lambda x: (x[2].get("score", 99))
+    )
+
+    html = f'<br>{_section_head("📡","Scanner Results",f"scan {scan_date} · {len(active)} strategies fired · {total_hits} signals","#1a5a8a")}'
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # SECTION A: ACT ON THESE — HIGH conviction cards
+    # ══════════════════════════════════════════════════════════════════════════
+    if high_picks:
+        html += (
+            f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:12px 0 4px;">'
+            f'<tr><td style="background:#052e16;border-left:5px solid #16a34a;padding:8px 12px;border-radius:4px 4px 0 0;">'
+            f'<span style="font-size:13px;font-weight:800;color:#4ade80;letter-spacing:.06em;">'
+            f'🎯 ACT ON THESE &nbsp;·&nbsp; {len(high_picks)} stock(s) &nbsp;·&nbsp; ★★★ HIGH CONVICTION</span>'
+            f'<br><span style="font-size:10px;color:#86efac;">Multi-strategy ✓ &nbsp;·&nbsp; Score ≤5 ✓ &nbsp;·&nbsp; RSI 50-70 ✓ &nbsp;·&nbsp; ADX 16-35 ✓</span>'
+            f'</td></tr></table>'
+        )
+        for tier, strat, r in high_picks:
+            strats_fired = sorted(
+                [s for s, res in rbs.items() if any(x["ticker"] == r["ticker"] for x in res)],
+                key=lambda s: -(hist_stats.get(s, {}).get("wr", 0))
+            )
+            proven = strat in _PROVEN_EDGE_SET
+            h = hist_stats.get(strat, {})
+            wr_val = h.get("wr")
+            avg_val = h.get("avg")
+            wr_col = "#16a34a" if (wr_val or 0) >= 60 else "#d97706"
+            proven_badge = (
+                '<span style="background:#16a34a;color:#fff;font-size:9px;font-weight:700;'
+                'border-radius:3px;padding:1px 5px;margin-left:6px;">✦ PROVEN EDGE</span>'
+            ) if proven else ""
+            strat_chips = " ".join(
+                f'<span style="background:{"#052e16" if s in _PROVEN_EDGE_SET else "#1c1c2e"};'
+                f'color:{"#4ade80" if s in _PROVEN_EDGE_SET else "#a5b4fc"};'
+                f'border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">'
+                f'{s.replace("_"," ").upper()}'
+                f'{" " + str(int(hist_stats[s]["wr"])) + "%" if hist_stats.get(s, {}).get("n", 0) >= 5 else ""}'
+                f'</span>'
+                for s in strats_fired[:4]
+            )
+            price_s  = f'${r["price"]:.2f}' if r.get("price") else "─"
+            sl_approx = r["price"] * 0.97 if r.get("price") else None
+            sl_s     = f'${sl_approx:.2f}' if sl_approx else "─"
+            hold_d   = {"pocket_pivot":7,"ema_ribbon":7,"cup_handle":10,"vcp":10,"connors_rsi2":5,"nr7":3,"breakout":5}.get(strat, 5)
+
+            html += (
+                f'<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:6px;border-radius:0 0 4px 4px;">'
+                f'<tr style="background:#0f2a1a;">'
+                f'<td style="padding:10px 14px;border-left:5px solid #16a34a;border-bottom:1px solid #1a4a2a;">'
+                f'<table width="100%" cellpadding="0" cellspacing="0"><tr>'
+                f'<td style="width:120px;vertical-align:top;">'
+                f'<div style="font-size:20px;font-weight:800;color:#f0fdf4;font-family:monospace;">{r["ticker"]}</div>'
+                f'<div style="font-size:11px;color:#86efac;">{str(r.get("company","") or "")[:20]}</div>'
+                f'</td>'
+                f'<td style="vertical-align:top;padding-left:12px;">'
+                f'<div style="margin-bottom:5px;">{strat_chips}{proven_badge}</div>'
+                f'<div style="font-size:11px;color:#d1fae5;">'
+                f'Price <b>{price_s}</b> &nbsp;·&nbsp; '
+                f'SL ~<b style="color:#fca5a5;">{sl_s}</b> &nbsp;·&nbsp; '
+                f'Hold <b>{hold_d}d</b> &nbsp;·&nbsp; '
+                f'RSI <b>{r.get("rsi", 0):.0f}</b> &nbsp;·&nbsp; '
+                f'ADX <b>{r.get("adx", 0):.0f}</b> &nbsp;·&nbsp; '
+                f'Score <b>{r.get("score", 0)}</b>'
+                f'</div>'
+                f'</td>'
+                f'<td style="width:90px;text-align:right;vertical-align:top;">'
+                + (f'<div style="font-size:18px;font-weight:800;color:{wr_col};">{wr_val:.0f}% WR</div>'
+                   f'<div style="font-size:10px;color:#86efac;">{avg_val:+.2f}% avg</div>'
+                   if wr_val else '')
+                + f'</td></tr></table></td></tr></table>'
+            )
+    else:
+        html += (
+            f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:12px 0 4px;">'
+            f'<tr><td style="background:#1a1a00;border-left:5px solid #facc15;padding:8px 12px;border-radius:4px;">'
+            f'<span style="font-size:12px;font-weight:700;color:#fde68a;">'
+            f'⚠ No HIGH conviction signals today — see WATCHLIST below or wait for better setup</span>'
+            f'</td></tr></table>'
+        )
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # SECTION B: WATCHLIST — MED conviction (compact)
+    # ══════════════════════════════════════════════════════════════════════════
+    if med_picks:
+        html += (
+            f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:14px 0 4px;">'
+            f'<tr><td style="background:#1a1a0a;border-left:5px solid #d97706;padding:6px 12px;border-radius:4px 4px 0 0;">'
+            f'<span style="font-size:12px;font-weight:700;color:#fcd34d;">'
+            f'👀 WATCHLIST &nbsp;·&nbsp; {len(med_picks)} stock(s) &nbsp;·&nbsp; ★★ MED — confirm before entering</span>'
+            f'</td></tr></table>'
+            f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:11px;margin-bottom:8px;">'
+            f'<thead><tr style="background:#1a1a2e;">'
+            + _th("Ticker","left") + _th("Strategy","left") + _th("WR%","right")
+            + _th("Score","center") + _th("RSI","right") + _th("ADX","right") + _th("Price","right")
+            + f'</tr></thead><tbody>'
+        )
+        for i, (tier, strat, r) in enumerate(med_picks[:12]):
+            bg = _C_ROW1 if i % 2 else _C_ROW0
+            h = hist_stats.get(strat, {})
+            proven = strat in _PROVEN_EDGE_SET
+            pb = (' <span style="background:#16a34a;color:#fff;font-size:8px;border-radius:2px;padding:0 3px;">✦</span>'
+                  if proven else "")
+            strats_fired = [s for s, res in rbs.items() if any(x["ticker"] == r["ticker"] for x in res)]
+            strat_str = " + ".join(s.replace("_"," ").upper()[:8] for s in strats_fired[:2])
+            wr_v = h.get("wr")
+            wr_c = "#16a34a" if (wr_v or 0) >= 60 else "#d97706"
+            price_s = f'${r["price"]:.2f}' if r.get("price") else "─"
+            html += (
+                f'<tr style="background:{bg};">'
+                + _td(f'<b>{r["ticker"]}</b>{pb}', "left", bg=bg)
+                + _td(strat_str, "left", _C_DIM, bg=bg)
+                + _td(f'<span style="color:{wr_c};font-weight:700;">{wr_v:.0f}%</span>' if wr_v else "─", "right", bg=bg)
+                + _td(str(r.get("score",0)), "center", bg=bg)
+                + _td(f'{r.get("rsi",0):.0f}' if r.get("rsi") else "─", "right", bg=bg)
+                + _td(f'{r.get("adx",0):.0f}' if r.get("adx") else "─", "right", bg=bg)
+                + _td(price_s, "right", _C_DIM, bg=bg)
+                + '</tr>'
+            )
+        html += '</tbody></table>'
+
     html += _kpi_table([
-        ("Strategies Fired", str(len(active)), "#1a5a8a"),
-        ("Total Signals",    str(total_hits),   _C_BODY),
-        ("Scan Date",        scan_date,          _C_DIM),
+        ("HIGH Conviction", str(len(high_picks)), "#16a34a"),
+        ("MED Watchlist",   str(len(med_picks)),  "#d97706"),
+        ("Total Signals",   str(total_hits),       _C_DIM),
+        ("Scan Date",       scan_date,             _C_DIM),
     ])
 
     # ── Strategy Scorecard ────────────────────────────────────────────────────
@@ -581,6 +752,17 @@ def _build_scanner_results_html() -> str:
             + sc_rows +
             f'</tbody></table>'
         )
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # SECTION C: FULL STRATEGY DETAIL (reference — scroll past if acted on above)
+    # ══════════════════════════════════════════════════════════════════════════
+    html += (
+        f'<br><table width="100%" cellpadding="0" cellspacing="0" style="margin:18px 0 4px;">'
+        f'<tr><td style="background:#1a1a2e;border-left:4px solid #4f46e5;padding:6px 12px;border-radius:4px;">'
+        f'<span style="font-size:11px;font-weight:600;color:#a5b4fc;letter-spacing:.04em;">'
+        f'📋 FULL SCAN DETAIL — {total_hits} signals across {len(active)} strategies</span>'
+        f'</td></tr></table>'
+    )
 
     for strat, results in active:
         is_short = "short" in strat

@@ -158,7 +158,7 @@ def wr_fmt(v):
 
 # ── STRATEGY REGISTRY ─────────────────────────────────────────────────────────
 ALL_STRATEGIES = ["breakout", "pocket_pivot", "connors_rsi2",
-                  "ema_ribbon", "nr7", "bb_squeeze", "high_tight_flag",
+                  "ema_ribbon", "nr7", "high_tight_flag",
                   "analyst_upgrade", "signal_velocity", "chokepoint_inflection",
                   "stage4_short", "defensive_rotation",
                   "cup_handle", "power_earnings_gap",
@@ -173,7 +173,7 @@ SCANNER_MAP = {
     "connors_rsi2":    scan_connors,
     "ema_ribbon":      scan_ema_ribbon,
     "nr7":             scan_nr7,
-    "bb_squeeze":      scan_bb_squeeze,
+    # "bb_squeeze": scan_bb_squeeze,   # DISABLED: WR 33.3% avg +0.91% n=21 — high variance, avoid
     # "high_tight_flag": scan_htf,   # DISABLED: 0% WR, avg -5.05% across 5 signals (backtest)
 
     "analyst_upgrade":      scan_analyst_upgrade,
@@ -457,9 +457,13 @@ def _conviction_tier(r: dict, multi_tickers: set) -> tuple:
     return ("★   LOW ", DIM)
 
 
+# PROVEN EDGE strategies (WR≥60%, n≥10 from scan_history backtest)
+PROVEN_EDGE = {"pocket_pivot", "stage4_short", "ema_ribbon", "cup_handle",
+               "signal_velocity", "connors_rsi2"}
+
 def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_backtest: bool):
-    """Print a compact summary of HIGH + MED conviction picks from all strategies."""
-    seen = {}   # ticker → best (tier_rank, result_dict, strategy)
+    """Lead with ACT ON THESE — make the actionable signal unmissable."""
+    seen = {}
     tier_rank = {"★★★ HIGH": 0, "★★  MED ": 1, "★   LOW ": 2}
 
     for strategy, results in results_by_strategy.items():
@@ -475,41 +479,57 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
     if not seen:
         return
 
-    # Sort: HIGH first, then MED; within tier by score asc
     picks = sorted(seen.values(), key=lambda x: (x[0], x[1].get("score", 99)))
+    high_picks = [p for p in picks if p[0] == 0]
+    med_picks  = [p for p in picks if p[0] == 1]
 
+    # ── ACT ON THESE (HIGH conviction) ────────────────────────────────────────
     print()
     print("╔" + "═"*(W-2) + "╗")
-    print("║" + BOLD("  ★  HIGH-CONVICTION PICKS  —  multi-strategy · score≤5 · RSI 50-70 · ADX 16-35").ljust(W+8) + "║")
+    if high_picks:
+        print("║" + GRN(BOLD(f"  🎯  ACT ON THESE  ·  {len(high_picks)} stock(s)  ·  ★★★ HIGH CONVICTION")).ljust(W+16) + "║")
+    else:
+        print("║" + YLW(BOLD(f"  👀  NO HIGH CONVICTION TODAY  —  see WATCHLIST below")).ljust(W+12) + "║")
     print("╚" + "═"*(W-2) + "╝")
 
-    if with_backtest:
-        hdr = (f"  {'TIER':<10}  {'TICKER':<10}  {'STRATS':>5}  {'PRICE':>9}  "
-               f"{'RSI':>5}  {'ADX':>5}  {'SCR':>4}  {'WIN%':>5}  {'AVG':>7}  STRATEGY")
-    else:
-        hdr = (f"  {'TIER':<10}  {'TICKER':<10}  {'STRATS':>5}  {'PRICE':>9}  "
-               f"{'RSI':>5}  {'ADX':>5}  {'SCR':>4}  STRATEGY")
-    print(BOLD(hdr))
-    print("  " + "─"*(W-2))
+    if high_picks:
+        # Header
+        print(BOLD(f"  {'TICKER':<10}  {'COMPANY':<22}  {'STRATEGIES':<28}  {'HIST WR':>7}  {'SCORE':>5}  {'RSI':>5}  {'ADX':>5}  {'PRICE':>8}"))
+        print("  " + "─"*(W-2))
+        for _, r, strategy in high_picks:
+            # All strategies this ticker fired on
+            strats_fired = [s for s, res in results_by_strategy.items()
+                            if any(x["ticker"] == r["ticker"] for x in res)]
+            proven_badge = " ✦PROVEN" if strategy in PROVEN_EDGE else ""
+            strat_str = "+".join(s.replace("_"," ").upper()[:6] for s in strats_fired[:3])
+            hist = _HIST_STATS.get(strategy, {})
+            wr_s = f"{hist['wr']:.0f}%WR" if hist.get("n",0)>=5 else "─"
+            wr_col = GRN(f"{wr_s:>7}") if hist.get("wr",0)>=60 else YLW(f"{wr_s:>7}")
+            proven_s = GRN(proven_badge) if proven_badge else ""
+            company  = str(r.get("company","") or "")[:22]
+            ticker_fmt = f"{r['ticker']:<10}"
+            print(f"  {GRN(BOLD(ticker_fmt))}  {company:<22}  {strat_str:<28}{proven_s}  {wr_col}  {r.get('score',0):>5}  {r.get('rsi',0):>5.1f}  {r.get('adx',0):>5.1f}  {r.get('price',0):>8.2f}")
+        print()
 
-    for _, r, strategy in picks:
-        tier, color = _conviction_tier(r, multi_tickers)
-        strat_count = sum(1 for res in results_by_strategy.values()
-                          if any(x["ticker"] == r["ticker"] for x in res))
-        tier_s    = color(tier)
-        ticker_s  = BOLD(f"{r['ticker']:<10}")
-        base = (f"  {tier_s}  {ticker_s}  {strat_count:>5}  {r.get('price', 0):>9.2f}"
-                f"  {r.get('rsi', 0):>5.1f}  {r.get('adx', 0):>5.1f}  {r.get('score', 0):>4}  ")
-        if with_backtest and r.get("n", 0) > 0:
-            row = base + f"{wr_fmt(r.get('wr')):>5}  {ret_fmt(r.get('avg')):>7}  {DIM(strategy)}"
-        else:
-            row = base + DIM(strategy)
-        print(row)
+    # ── WATCHLIST (MED conviction) ─────────────────────────────────────────────
+    if med_picks:
+        print(BOLD(f"  👀  WATCHLIST  ·  {len(med_picks)} stock(s)  ·  ★★ MED — confirm before entering"))
+        print("  " + "─"*(W-2))
+        for _, r, strategy in med_picks[:15]:
+            strats_fired = [s for s, res in results_by_strategy.items()
+                            if any(x["ticker"] == r["ticker"] for x in res)]
+            strat_str = "+".join(s.replace("_"," ").upper()[:5] for s in strats_fired[:2])
+            proven_badge = " ✦" if strategy in PROVEN_EDGE else ""
+            hist = _HIST_STATS.get(strategy, {})
+            wr_s = f"{hist['wr']:.0f}%WR" if hist.get("n",0)>=5 else "─"
+            ticker_fmt2 = f"{r['ticker']:<10}"
+            print(f"  {YLW(BOLD(ticker_fmt2))}  {str(r.get('company','') or '')[:22]:<22}  {strat_str+proven_badge:<30}  {wr_s:>6}  score={r.get('score',0)}  RSI={r.get('rsi',0):.0f}  ADX={r.get('adx',0):.0f}")
+        if len(med_picks) > 15:
+            print(DIM(f"  ... and {len(med_picks)-15} more"))
+        print()
 
-    high_n = sum(1 for x in picks if x[0] == 0)
-    med_n  = sum(1 for x in picks if x[0] == 1)
+    print(DIM(f"  {len(high_picks)} HIGH  ·  {len(med_picks)} MED  ·  Focus: HIGH only unless 2+ strategies confirmed"))
     print()
-    print(DIM(f"  {high_n} HIGH  ·  {med_n} MED  ·  act on HIGH first, monitor MED for confirmation"))
 
 
 
@@ -670,9 +690,8 @@ def _nan_safe(d: dict) -> dict:
 # ── CROSS-STRATEGY MATRIX ─────────────────────────────────────────────────────
 
 def _print_matrix(results_by_strategy: dict, strategies: list, upgrade_tickers: set = None):
-    """Print ticker × strategy pass/fail matrix."""
-    # Collect all tickers that passed at least one strategy
-    all_tickers = {}   # ticker → {strategy: result_dict}
+    """Compact multi-strategy view — only show tickers firing 2+ scanners."""
+    all_tickers = {}
     for strat, results in results_by_strategy.items():
         for r in results:
             t = r["ticker"]
@@ -680,90 +699,46 @@ def _print_matrix(results_by_strategy: dict, strategies: list, upgrade_tickers: 
                 all_tickers[t] = {}
             all_tickers[t][strat] = r
 
-    if not all_tickers:
+    # Only show multi-strategy tickers here — single-strategy are in group view
+    multi = {t: m for t, m in all_tickers.items() if len(m) >= 2}
+    if not multi:
+        print()
+        print(DIM("  No multi-strategy overlaps today."))
         return
 
-    # Short column labels
-    col_labels = {
-        "momentum":       "MNTM",
-        "breakout":       "BRKOUT",
-        "pocket_pivot":   "PP",
-        "connors_rsi2":   "RSI2",
-        "ema_ribbon":     "EMARIBN",
-        "nr7":             "NR7",
-        "bb_squeeze":      "BBSQZ",
-        "high_tight_flag": "HTF",
-        "analyst_upgrade": "ANUPGRD",
-        "signal_velocity":       "SIGVEL",
-        "chokepoint_inflection": "CHKPNT",
-        "stage4_short":          "S4SHORT",
-        "defensive_rotation":    "DEFROT",
-        "cup_handle":            "C&H",
-        "power_earnings_gap":    "PEG",
-        "darvas_box":            "DARVAS",
-        "rs_line":               "RS-HIGH",
-        "vcp":                   "VCP",
-        "elder_impulse":         "ELDER",
-        "holy_grail":            "HG",
-        "connors_3down":         "3DOWN",
-        "williams_pct_r":        "WR",
-        "bollinger_pctb":        "BB%B",
-        "connors_r3":            "R3",
-        "connors_tps":           "TPS",
-        "turtle_soup":           "TSOUP",
-        "raschke_8020":          "8020",
-    }
-    cols = [col_labels.get(s, s[:6].upper()) for s in strategies]
-    col_w = [max(len(c), 6) for c in cols]
+    sorted_t = sorted(multi.items(), key=lambda kv: -len(kv[1]))
 
     print()
-    print(BOLD("  CROSS-STRATEGY MATRIX  —  tickers that passed ≥1 scanner"))
-    print()
+    print(BOLD(f"  ⚡  MULTI-STRATEGY OVERLAPS  ·  {len(multi)} ticker(s)  —  highest conviction pool"))
+    print(BOLD(f"  {'STRATS':>6}  {'TICKER':<10}  {'COMPANY':<24}  {'FIRED ON':<45}  {'SCORE':>5}  {'RSI':>5}  {'ADX':>5}"))
+    print("  " + "─"*(W-2))
 
-    # Header
-    hdr = f"  {'TICKER':<10}  {'COMPANY':<24}"
-    for c, w in zip(cols, col_w):
-        hdr += f"  {c:^{w}}"
-    print(BOLD(hdr))
-    print("  " + "─" * (W - 2))
-
-    # Sort: tickers passing most strategies first
-    sorted_tickers = sorted(all_tickers.items(),
-                            key=lambda kv: -len(kv[1]))
-
-    for ticker, strat_map in sorted_tickers[:60]:
+    for ticker, strat_map in sorted_t[:30]:
         company = ""
-        for r in strat_map.values():
-            company = r.get("company", "") or ""
-            if company: break
-        # Try to get company from any result
-        if not company:
-            for r in strat_map.values():
-                company = r.get("ticker", "")
+        best_r = None
+        best_score = 99
+        for s, r in strat_map.items():
+            if not company: company = r.get("company","") or ""
+            sc = r.get("score", 99)
+            if sc < best_score:
+                best_score = sc
+                best_r = r
 
-        passes   = len(strat_map)
-        up_star  = "⭐" if (upgrade_tickers and ticker in upgrade_tickers) else " "
-        t_label  = f"{ticker:<9}{up_star}"   # 10 chars
-        ticker_s  = RED(BOLD(t_label)) if passes > 1 else t_label
-        company_s = RED(f"{str(company)[:24]:<24}") if passes > 1 else f"{str(company)[:24]:<24}"
-        row = f"  {ticker_s}  {company_s}"
-        for strat, w in zip(strategies, col_w):
-            if strat in strat_map:
-                r = strat_map[strat]
-                wr = r.get("wr")
-                if wr is not None:
-                    cell = GRN(f"{'✓ '+str(int(wr))+'%':^{w}}")
-                else:
-                    cell = GRN(f"{'✓':^{w}}")
-            else:
-                cell = DIM(f"{'─':^{w}}")
-            row += f"  {cell}"
-        print(row)
+        n_strats = len(strat_map)
+        up_star  = "⭐" if (upgrade_tickers and ticker in upgrade_tickers) else ""
+        strat_names = sorted(strat_map.keys(), key=lambda s: -_HIST_STATS.get(s,{}).get("wr",0))
+        chips = "  ".join(
+            (GRN if _HIST_STATS.get(s,{}).get("wr",0)>=60 else YLW)(
+                f"[{s.replace('_',' ').upper()[:8]} {_HIST_STATS.get(s,{}).get('wr',0):.0f}%]"
+                if _HIST_STATS.get(s,{}).get("n",0)>=5
+                else f"[{s.replace('_',' ').upper()[:8]}]"
+            )
+            for s in strat_names[:4]
+        )
+        ticker_s = GRN(BOLD(f"{ticker+up_star:<10}")) if n_strats >= 3 else YLW(BOLD(f"{ticker+up_star:<10}"))
+        r = best_r or {}
+        print(f"  {n_strats:>6}  {ticker_s}  {str(company)[:24]:<24}  {chips:<45}  {r.get('score',0):>5}  {r.get('rsi',0):>5.1f}  {r.get('adx',0):>5.1f}")
 
-    multi = sum(1 for _, m in sorted_tickers if len(m) > 1)
-    if multi:
-        print()
-        print(GRN(f"  ★  {multi} ticker(s) passed multiple strategies — highest conviction"))
     print()
 
 
@@ -864,6 +839,19 @@ def main():
                    if r.get("strategy") in SCORE_CAP_EXEMPT
                    or (r.get("score") or 0) <= 5]
 
+    # RSI floor: drop RSI<50 for non-mean-reversion strategies (dead zone confirmed WR 48%)
+    RSI_FLOOR_EXEMPT = {"connors_rsi2", "connors_3down", "connors_r3", "connors_tps",
+                        "williams_pct_r", "bollinger_pctb", "raschke_8020", "turtle_soup",
+                        "stage4_short", "signal_velocity"}
+    for strat in list(results_by_strategy.keys()):
+        if strat in RSI_FLOOR_EXEMPT:
+            continue
+        results_by_strategy[strat] = [r for r in results_by_strategy[strat]
+                                       if (r.get("rsi") or 0) >= 50]
+    all_results = [r for r in all_results
+                   if r.get("strategy") in RSI_FLOOR_EXEMPT
+                   or (r.get("rsi") or 0) >= 50]
+
     total_time = time.time() - t0
 
     # Sector pulse (fetch 10d sector ETF returns vs SPY)
@@ -882,16 +870,20 @@ def main():
     _print_header(strategies, len(all_results), with_backtest)
     _print_sector_pulse(sector_excess, spy_ret)
     _thematic_check()
-    for strategy in strategies:
-        if strategy not in results_by_strategy:
-            continue  # disabled/skipped scanner
-        _print_group(strategy, results_by_strategy[strategy], with_backtest, multi_tickers)
 
-    # Cross-strategy matrix (⭐ = also in analyst_upgrade)
+    # ── LEAD WITH CONVICTION — what to act on ─────────────────────────────────
+    _print_high_conviction(results_by_strategy, multi_tickers, with_backtest)
+
+    # ── MULTI-STRATEGY OVERLAP MATRIX ─────────────────────────────────────────
     _print_matrix(results_by_strategy, strategies, upgrade_tickers)
 
-    # High-conviction summary — act on these first
-    _print_high_conviction(results_by_strategy, multi_tickers, with_backtest)
+    # ── FULL STRATEGY DETAIL (reference) ──────────────────────────────────────
+    print()
+    print(DIM("  ── FULL SCAN DETAIL ──────────────────────────────────────────────────────"))
+    for strategy in strategies:
+        if strategy not in results_by_strategy:
+            continue
+        _print_group(strategy, results_by_strategy[strategy], with_backtest, multi_tickers)
 
     print()
     print("─" * W)
