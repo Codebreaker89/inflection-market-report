@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-07-01",
-  "sample_size": "751 trades (Jun 21-26, 6 scan dates)",
+  "last_updated": "2026-07-02",
+  "sample_size": "859 trades (Jun 21-26, 6 scan dates fully filled)",
   "learnings": [
     {
       "id": "L001",
@@ -12,41 +12,43 @@
     },
     {
       "id": "L002",
-      "date": "2026-07-01",
+      "date": "2026-07-02",
       "category": "strategy_performance",
-      "finding": "Updated with 751-trade data (Jun 21-26). Rankings unchanged at top: pocket_pivot WR 88.9% (27 trades), stage4_short WR 78.1% (32), ema_ribbon WR 74.6% (67). bb_squeeze weak at WR 37.5% despite avg +1.70% — high variance, avoid. high_tight_flag confirmed dead: WR 16.7%, avg -3.15% (18 trades). signal_velocity improved to WR 57.1% avg +1.35% (21 trades) — watchable. momentum confirmed worst: WR 25%, avg -2.81% (8 trades).",
-      "action": "none — already running top strategies. bb_squeeze and high_tight_flag flagged as weak. momentum disabled.",
+      "finding": "Updated with 859-trade data (Jun 21-26, all 6 dates fully filled). Top 3 stable: pocket_pivot WR 87.1% (31), stage4_short WR 79.1% (43), ema_ribbon WR 73.5% (68). signal_velocity now crosses PROVEN EDGE: WR 64.3% avg +1.54% (28 trades). bb_squeeze further weakened: WR 33.3% (21 trades). high_tight_flag confirmed dead: WR 21.7% avg -3.34% (23 trades). momentum: WR 22.2% avg -4.16% (9 trades).",
+      "action": "signal_velocity now qualifies for PROVEN EDGE badge (WR≥60%, n≥10). Rankings update in notify.py scorecard.",
       "data": {
-        "ema_ribbon":    {"n": 67, "wr_pct": 74.6, "avg_ret_pct": 3.32},
-        "pocket_pivot":  {"n": 27, "wr_pct": 88.9, "avg_ret_pct": 3.03},
-        "stage4_short":  {"n": 32, "wr_pct": 78.1, "avg_ret_pct": 2.91},
-        "cup_handle":    {"n": 69, "wr_pct": 65.2, "avg_ret_pct": 2.14},
-        "connors_rsi2":  {"n": 107,"wr_pct": 62.6, "avg_ret_pct": 1.34},
-        "nr7":           {"n": 171,"wr_pct": 56.7, "avg_ret_pct": 1.31},
-        "signal_velocity":{"n": 21,"wr_pct": 57.1, "avg_ret_pct": 1.35},
-        "breakout":      {"n": 212,"wr_pct": 55.2, "avg_ret_pct": 0.57},
-        "bb_squeeze":    {"n": 16, "wr_pct": 37.5, "avg_ret_pct": 1.70},
-        "high_tight_flag":{"n": 18,"wr_pct": 16.7, "avg_ret_pct": -3.15},
-        "momentum":      {"n": 8,  "wr_pct": 25.0, "avg_ret_pct": -2.81}
+        "pocket_pivot":   {"n": 31, "wr_pct": 87.1, "avg_ret_pct": 2.73},
+        "stage4_short":   {"n": 43, "wr_pct": 79.1, "avg_ret_pct": 3.47},
+        "ema_ribbon":     {"n": 68, "wr_pct": 73.5, "avg_ret_pct": 3.20},
+        "cup_handle":     {"n": 77, "wr_pct": 64.9, "avg_ret_pct": 2.12},
+        "signal_velocity":{"n": 28, "wr_pct": 64.3, "avg_ret_pct": 1.54},
+        "connors_rsi2":   {"n": 118,"wr_pct": 61.0, "avg_ret_pct": 1.34},
+        "nr7":            {"n": 205,"wr_pct": 56.6, "avg_ret_pct": 1.11},
+        "breakout":       {"n": 232,"wr_pct": 54.7, "avg_ret_pct": 0.44},
+        "bb_squeeze":     {"n": 21, "wr_pct": 33.3, "avg_ret_pct": 0.91},
+        "high_tight_flag":{"n": 23, "wr_pct": 21.7, "avg_ret_pct": -3.34},
+        "momentum":       {"n": 9,  "wr_pct": 22.2, "avg_ret_pct": -4.16}
       }
     },
     {
       "id": "L003",
-      "date": "2026-06-30",
+      "date": "2026-07-02",
       "category": "score_cap",
-      "finding": "Score 6+ WR collapses: score 6=WR 56% avg -0.33%, score 7=WR 38%, score 8=WR 25% avg -2.12%, score 9=WR 0%. Score sweet spot is 2-5 (WR 61-67%, avg +1.85-2.33%). Enforcing hard cap score≤5 across all scanners (except signal_velocity which uses 0-13 scale).",
-      "action": "Post-filter in scan.py: drop results with score>=6 unless strategy=signal_velocity",
+      "finding": "859-trade update: score 6 avg now -0.17% (was -0.33% at 620 trades, briefly improved to +0.06% at 751). Confirmed negative avg at scale — cap at ≤5 is correct. signal_velocity scores 10-12 are strong (score 12: WR 100%, avg +3.77% — 6 trades). Exemption for signal_velocity validated. Score 3-5 is the sweet spot: WR 60-68%, avg +1.39-2.01%.",
+      "action": "Score cap ≤5 remains. signal_velocity exempted (uses 0-13 scale, high scores still edge).",
       "data": {
-        "score_0": {"n": 5,   "wr_pct": 80.0, "avg_ret_pct": 2.99},
-        "score_1": {"n": 26,  "wr_pct": 54.0, "avg_ret_pct": 0.82},
-        "score_2": {"n": 90,  "wr_pct": 67.0, "avg_ret_pct": 1.85},
-        "score_3": {"n": 139, "wr_pct": 65.0, "avg_ret_pct": 2.33},
-        "score_4": {"n": 186, "wr_pct": 61.0, "avg_ret_pct": 1.94},
-        "score_5": {"n": 64,  "wr_pct": 64.0, "avg_ret_pct": 0.81},
-        "score_6": {"n": 73,  "wr_pct": 56.0, "avg_ret_pct": -0.33},
-        "score_7": {"n": 8,   "wr_pct": 38.0, "avg_ret_pct": -0.38},
-        "score_8": {"n": 16,  "wr_pct": 25.0, "avg_ret_pct": -2.12},
-        "score_9": {"n": 4,   "wr_pct": 0.0,  "avg_ret_pct": -2.77}
+        "score_0":  {"n": 6,   "wr_pct": 67, "avg_ret_pct": 1.65},
+        "score_1":  {"n": 41,  "wr_pct": 49, "avg_ret_pct": 0.37},
+        "score_2":  {"n": 134, "wr_pct": 59, "avg_ret_pct": 1.23},
+        "score_3":  {"n": 183, "wr_pct": 63, "avg_ret_pct": 2.01},
+        "score_4":  {"n": 252, "wr_pct": 60, "avg_ret_pct": 1.60},
+        "score_5":  {"n": 94,  "wr_pct": 68, "avg_ret_pct": 1.39},
+        "score_6":  {"n": 93,  "wr_pct": 55, "avg_ret_pct": -0.17},
+        "score_7":  {"n": 8,   "wr_pct": 38, "avg_ret_pct": -0.38},
+        "score_8":  {"n": 23,  "wr_pct": 30, "avg_ret_pct": -1.14},
+        "score_9":  {"n": 5,   "wr_pct": 20, "avg_ret_pct": -1.94},
+        "score_10": {"n": 10,  "wr_pct": 80, "avg_ret_pct": 2.03, "note": "signal_velocity only"},
+        "score_12": {"n": 6,   "wr_pct": 100,"avg_ret_pct": 3.77, "note": "signal_velocity only"}
       }
     },
     {
@@ -118,17 +120,17 @@
     },
     {
       "id": "L010",
-      "date": "2026-07-01",
+      "date": "2026-07-02",
       "category": "market_regime",
-      "finding": "Jun 26 was a significantly weaker scan day: WR 48.4%, avg 0.00% (64 signals) vs 56-70% on other days. Suggests broad market choppy/indecisive — scan days with weak internals produce weak signals. Jun 24 was the best day: WR 69.9%, avg +2.47% (136 signals). The market regime on scan day matters as much as individual strategy signals.",
-      "action": "Consider adding SPY regime gate on scan days — avoid trading when SPY trending sideways/down. Consider daily market health check before acting on signals.",
+      "finding": "Jun 26 fully filled (172 trades): WR 52.9%, avg +0.24% — still worst day but less dire than partial read (was 48.4% on 64 trades). Within Jun 26: stage4_short WR 87%, signal_velocity WR 88% — top strategies still worked. bb_squeeze WR 14% on that day — confirms regime-sensitive. Jun 24 remains best day: WR 69.9%, avg +2.47%. Market regime matters — avoid bb_squeeze on weak days.",
+      "action": "Track per-day quality. In weak markets, focus on stage4_short and signal_velocity which held up. bb_squeeze is especially regime-sensitive.",
       "data": {
         "2026-06-21": {"wr_pct": 56.1, "avg_ret_pct": 1.00, "n": 114},
         "2026-06-22": {"wr_pct": 60.8, "avg_ret_pct": 1.32, "n": 199},
         "2026-06-23": {"wr_pct": 58.6, "avg_ret_pct": 1.02, "n": 128},
         "2026-06-24": {"wr_pct": 69.9, "avg_ret_pct": 2.47, "n": 136},
         "2026-06-25": {"wr_pct": 58.2, "avg_ret_pct": 1.55, "n": 110},
-        "2026-06-26": {"wr_pct": 48.4, "avg_ret_pct": 0.00, "n": 64}
+        "2026-06-26": {"wr_pct": 52.9, "avg_ret_pct": 0.24, "n": 172, "note": "fully filled — revised from 48.4%"}
       }
     },
     {
