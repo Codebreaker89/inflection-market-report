@@ -143,14 +143,70 @@
         "bb_squeeze_without_outlier": "if GLW excluded, avg < 0",
         "score_6_updated": {"n": 83, "wr_pct": 57.8, "avg_ret_pct": 0.06}
       }
+    },
+    {
+      "id": "L012",
+      "date": "2026-07-03",
+      "category": "market_regime",
+      "finding": "Elder Impulse emerged as dominant signal from Jul 1 onwards: 0 signals in entire Jun 21-29 period → 25 signals Jul 1 → 28 signals Jul 3. Market entered confirmed uptrend on Jul 1. Elder Impulse requires BOTH EMA13 rising AND MACD histogram positive — a simultaneous surge across 25+ stocks signals broad institutional participation. Breakout simultaneously collapsed from 43 (Jun 26) to 9 (Jul 3) — market moved past coiling phase into trending phase. When elder_impulse > 20 signals/day, conditions are most favorable for trend-following strategies.",
+      "action": "Use elder_impulse signal count as a daily market regime indicator. High elder count = buy momentum/trend strategies. Low elder count = favour mean-reversion (connors, williams, bollinger).",
+      "data": {
+        "elder_impulse_by_date": {
+          "2026-06-21_to_06-29": 0,
+          "2026-07-01": 25,
+          "2026-07-02": 15,
+          "2026-07-03": 28
+        },
+        "breakout_by_date": {
+          "2026-06-26": 43,
+          "2026-06-29": 19,
+          "2026-07-01": 20,
+          "2026-07-03": 9
+        }
+      }
+    },
+    {
+      "id": "L013",
+      "date": "2026-07-03",
+      "category": "signal_persistence",
+      "finding": "Stocks appearing across 3+ scan dates with 3+ strategies are the highest conviction picks. DPLM.L: 6 appearances, 4 dates, 4 strategies (breakout+cup_handle+elder+nr7). DGX: 4 appearances, 3 dates, 4 strategies — already +4% in tracker. FAST: 4 appearances, 3 dates, 3 strategies — entered day 1. CSX: 5 appearances in 2 days, 5 strategies (bb_squeeze pre-disable, elder, nr7, pocket_pivot, rs_line). Persistence across dates = institutional accumulation continuing. Single-day multi-strategy is good; multi-day multi-strategy is exceptional.",
+      "action": "Flag tickers that appear on 3+ consecutive scan dates as PERSISTENT picks — these should be prioritised over single-day multi-strategy signals.",
+      "data": {
+        "DPLM.L": {"appearances": 6, "dates": 4, "strategies": ["breakout","cup_handle","elder_impulse","nr7"]},
+        "DGX":    {"appearances": 4, "dates": 3, "strategies": ["cup_handle","elder_impulse","nr7","pocket_pivot"], "tracker_ret": "+4%"},
+        "FAST":   {"appearances": 4, "dates": 3, "strategies": ["cup_handle","elder_impulse","pocket_pivot"], "in_tracker": true},
+        "CSX":    {"appearances": 5, "dates": 2, "strategies": ["elder_impulse","nr7","pocket_pivot","rs_line"]}
+      }
+    },
+    {
+      "id": "L014",
+      "date": "2026-07-03",
+      "category": "new_scanners",
+      "finding": "Wyckoff Spring fired first day (Jul 3): CIEN ($422, RSI=44.6), RIO.L ($7118, RSI=17.9), FANG ($172, RSI=18.3), SLB ($45, RSI=8.7). All are in energy/materials sector with very low RSI — true shakeouts with institutional spring pattern. Weinstein Stage2 first signal: WM ($230, RSI=67.7, ADX=15) — but ADX=15 is below our preferred 16 floor, treat with caution. New scanners are live and generating signals on day 1.",
+      "action": "Track wyckoff_spring and weinstein_stage2 signals carefully for first 20 trades to validate. Wyckoff spring signals in energy/commodities with RSI<25 deserve attention — these are classic institutional shakeout zones.",
+      "data": {
+        "wyckoff_spring_day1": [
+          {"ticker": "CIEN",  "rsi": 44.6, "adx": 20.9, "score": 2, "price": 422.46},
+          {"ticker": "RIO.L", "rsi": 17.9, "adx": 38.3, "score": 2, "price": 7118.0},
+          {"ticker": "FANG",  "rsi": 18.3, "adx": 21.0, "score": 1, "price": 172.04},
+          {"ticker": "SLB",   "rsi": 8.7,  "adx": 39.2, "score": 1, "price": 45.13}
+        ],
+        "weinstein_stage2_day1": [
+          {"ticker": "WM", "rsi": 67.7, "adx": 15.0, "score": 4, "price": 230.4, "note": "ADX=15 below preferred floor"}
+        ]
+      }
     }
   ],
-  "disabled_strategies": ["high_tight_flag", "momentum"],
+  "disabled_strategies": ["high_tight_flag", "momentum", "bb_squeeze"],
   "active_filters": {
     "adx_floor": 16,
     "adx_cap": 35,
     "rsi_floor": 50,
     "score_cap": 5,
     "score_cap_exceptions": ["signal_velocity"]
+  },
+  "new_scanners": {
+    "wyckoff_spring": {"status": "live", "first_signals": "2026-07-03", "n_signals_day1": 4},
+    "weinstein_stage2": {"status": "live", "first_signals": "2026-07-03", "n_signals_day1": 1}
   }
 }
