@@ -39,8 +39,8 @@ FIELDNAMES = [
     "scan_date","ticker","company","strategy","strategies_count",
     "price_at_scan","score","wr","avg","adx","rsi","vol_ratio",
     # filled later
-    "price_d5","ret_d5","spy_ret_d5","excess_ret_d5","hit_stop_loss_d5",
-    "price_d10","ret_d10","spy_ret_d10","excess_ret_d10","hit_stop_loss_d10",
+    "price_d5","ret_d5","r_multiple_d5","spy_ret_d5","excess_ret_d5","hit_stop_loss_d5",
+    "price_d10","ret_d10","r_multiple_d10","spy_ret_d10","excess_ret_d10","hit_stop_loss_d10",
     "max_drawdown_d10",
 ]
 
@@ -266,6 +266,7 @@ def backfill_returns(rows: list[dict]) -> list[dict]:
                 sl5   = 1 if p5 <= p0*(1-STOP_LOSS_PCT) else 0
                 r["price_d5"]          = round(p5, 4)
                 r["ret_d5"]            = ret5
+                r["r_multiple_d5"]     = round(ret5 / (STOP_LOSS_PCT * 100), 2)  # ret / risk
                 r["spy_ret_d5"]        = _safe(spy5)
                 r["excess_ret_d5"]     = ex5
                 r["hit_stop_loss_d5"]  = sl5
@@ -289,6 +290,7 @@ def backfill_returns(rows: list[dict]) -> list[dict]:
                 mdd    = round((pmin/p0 - 1)*100, 2) if pmin and p0 else ""
                 r["price_d10"]         = round(p10, 4)
                 r["ret_d10"]           = ret10
+                r["r_multiple_d10"]    = round(ret10 / (STOP_LOSS_PCT * 100), 2)
                 r["spy_ret_d10"]       = _safe(spy10)
                 r["excess_ret_d10"]    = ex10
                 r["hit_stop_loss_d10"] = sl10

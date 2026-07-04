@@ -470,7 +470,69 @@ def _conviction_tier(r: dict, multi_tickers: set) -> tuple:
 PROVEN_EDGE = {"pocket_pivot", "stage4_short", "ema_ribbon", "cup_handle",
                "signal_velocity", "connors_rsi2"}
 
-def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_backtest: bool):
+def _rank_score(r: dict, strats_fired: list) -> float:
+    """
+    Score each HIGH-conviction pick so we can label top 1/2/3.
+    Higher = better. Criteria (max ~13 pts):
+      +3  any PROVEN_EDGE strategy fired
+      +2  ADX 20-35  (sweet trend zone)
+      +1  ADX 16-20 or 35-45
+      +2  RSI 50-65  (momentum without overextension)
+      +1  RSI 65-70
+      +2  3+ strategies (multi-confirmation)
+      +1  2 strategies
+      +1  score ≤ 3  (clean, not cluttered signal)
+      +1  wr ≥ 60%   (best strategy WR)
+    """
+    pts = 0.0
+    if any(s in PROVEN_EDGE for s in strats_fired):
+        pts += 3
+    adx = r.get("adx", 0) or 0
+    if 20 <= adx <= 35:
+        pts += 2
+    elif 16 <= adx < 20 or 35 < adx <= 45:
+        pts += 1
+    rsi = r.get("rsi", 0) or 0
+    if 50 <= rsi <= 65:
+        pts += 2
+    elif 65 < rsi <= 70:
+        pts += 1
+    n_strats = len(strats_fired)
+    if n_strats >= 3:
+        pts += 2
+    elif n_strats == 2:
+        pts += 1
+    if (r.get("score") or 99) <= 3:
+        pts += 1
+    best_wr = max((_HIST_STATS.get(s, {}).get("wr", 0) for s in strats_fired), default=0)
+    if best_wr >= 60:
+        pts += 1
+    return pts
+
+
+def _get_ticker_sector_tag(ticker: str, sector_excess: dict) -> str:
+    """Return '🔥' if ticker's sector is top 3 vs SPY, '❄' if bottom 3, else ''."""
+    if not sector_excess or not _HAS_YF:
+        return ""
+    try:
+        info = yf.Ticker(_yf_sym(ticker)).fast_info
+        sector = getattr(info, "sector", None) or ""
+    except Exception:
+        return ""
+    etf = SECTOR_ETF.get(sector, "")
+    ex = sector_excess.get(etf)
+    if ex is None:
+        return ""
+    ranked = sorted(sector_excess.values(), reverse=True)
+    if ex >= ranked[2]:   # top 3
+        return GRN(" 🔥")
+    if ex <= ranked[-3]:  # bottom 3
+        return RED(" ❄")
+    return ""
+
+
+def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_backtest: bool,
+                           sector_excess: dict = None):
     """Lead with ACT ON THESE — make the actionable signal unmissable."""
     seen = {}
     tier_rank = {"★★★ HIGH": 0, "★★  MED ": 1, "★   LOW ": 2}
@@ -502,17 +564,27 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
     print("╚" + "═"*(W-2) + "╝")
 
     if high_picks:
-        # Header
-        print(BOLD(f"  {'TICKER':<10}  {'COMPANY':<22}  {'STRATEGIES':<28}  {'HIST WR':>7}  {'SCORE':>5}  {'RSI':>5}  {'ADX':>5}  {'PRICE':>8}"))
-        print("  " + "─"*(W-2))
+        # Pre-compute strats_fired and rank scores for all HIGH picks
+        enriched = []
         for _, r, strategy in high_picks:
-            # All strategies this ticker fired on, sorted by known WR (best first)
             strats_fired = sorted(
                 [s for s, res in results_by_strategy.items()
                  if any(x["ticker"] == r["ticker"] for x in res)],
                 key=lambda s: -_HIST_STATS.get(s, {}).get("wr", 0)
             )
-            # Use best-WR strategy for hist display
+            rs = _rank_score(r, strats_fired)
+            enriched.append((rs, r, strategy, strats_fired))
+
+        # Sort by rank score descending
+        enriched.sort(key=lambda x: -x[0])
+
+        # Assign medal labels to top 3
+        medals = {0: GRN(BOLD(" #1 ")), 1: GRN(BOLD(" #2 ")), 2: YLW(BOLD(" #3 "))}
+
+        # Header
+        print(BOLD(f"  {'RANK':<4}  {'TICKER':<10}  {'COMPANY':<22}  {'STRATEGIES':<28}  {'HIST WR':>7}  {'SCORE':>5}  {'RSI':>5}  {'ADX':>5}  {'PRICE':>8}"))
+        print("  " + "─"*(W-2))
+        for idx, (rs, r, strategy, strats_fired) in enumerate(enriched):
             best_strat = next((s for s in strats_fired if _HIST_STATS.get(s,{}).get("n",0)>=5), strategy)
             proven_badge = " ✦PROVEN" if any(s in PROVEN_EDGE for s in strats_fired) else ""
             strat_str = "+".join(s.replace("_"," ").upper()[:6] for s in strats_fired[:3])
@@ -520,15 +592,16 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
             wr_s = f"{hist['wr']:.0f}%WR" if hist.get("n",0)>=5 else "─"
             wr_col = GRN(f"{wr_s:>7}") if hist.get("wr",0)>=60 else YLW(f"{wr_s:>7}")
             proven_s = GRN(proven_badge) if proven_badge else ""
-            # Collect company name across all results for this ticker
             company = ""
             for s in strats_fired:
                 for rx in results_by_strategy.get(s, []):
                     if rx["ticker"] == r["ticker"] and rx.get("company"):
                         company = str(rx["company"])[:22]; break
                 if company: break
+            rank_label = medals.get(idx, "     ")
             ticker_fmt = f"{r['ticker']:<10}"
-            print(f"  {GRN(BOLD(ticker_fmt))}  {company:<22}  {strat_str:<28}{proven_s}  {wr_col}  {r.get('score',0):>5}  {r.get('rsi',0):>5.1f}  {r.get('adx',0):>5.1f}  {r.get('price',0):>8.2f}")
+            sec_tag = _get_ticker_sector_tag(r["ticker"], sector_excess or {})
+            print(f"  {rank_label}  {GRN(BOLD(ticker_fmt))}{sec_tag}  {company:<22}  {strat_str:<28}{proven_s}  {wr_col}  {r.get('score',0):>5}  {r.get('rsi',0):>5.1f}  {r.get('adx',0):>5.1f}  {r.get('price',0):>8.2f}")
         print()
 
     # ── WATCHLIST (MED conviction) ─────────────────────────────────────────────
@@ -876,6 +949,50 @@ def main():
                    if r.get("strategy") in RSI_FLOOR_EXEMPT
                    or (r.get("rsi") or 0) >= 50]
 
+    # Earnings block: drop tickers with earnings within 14 days (gap risk destroys stop)
+    EARNINGS_EXEMPT = {"stage4_short"}  # shorts not affected by earnings the same way
+    def _near_earnings(ticker: str, days: int = 14) -> bool:
+        try:
+            t_obj = yf.Ticker(_yf_sym(ticker))
+            cal = t_obj.calendar
+            if cal is None or cal.empty:
+                return False
+            # calendar may be dict or DataFrame depending on yfinance version
+            if hasattr(cal, "T"):
+                dates = cal.T.get("Earnings Date", pd.Series()).dropna()
+            else:
+                dates = pd.Series(cal.get("Earnings Date", []))
+            today = pd.Timestamp.today().normalize()
+            for d in dates:
+                diff = (pd.Timestamp(d).normalize() - today).days
+                if -2 <= diff <= days:
+                    return True
+        except Exception:
+            pass
+        return False
+
+    print(DIM("  Checking earnings windows..."), flush=True)
+    earnings_blocked = set()
+    for strat, res in results_by_strategy.items():
+        if strat in EARNINGS_EXEMPT:
+            continue
+        for r in res:
+            t = r["ticker"]
+            if t not in earnings_blocked and _near_earnings(t):
+                earnings_blocked.add(t)
+
+    if earnings_blocked:
+        print(YLW(f"  ⚠  Earnings block ({len(earnings_blocked)} tickers removed): "
+                  + ", ".join(sorted(earnings_blocked))))
+        for strat in list(results_by_strategy.keys()):
+            if strat in EARNINGS_EXEMPT:
+                continue
+            results_by_strategy[strat] = [r for r in results_by_strategy[strat]
+                                           if r["ticker"] not in earnings_blocked]
+        all_results = [r for r in all_results
+                       if r.get("strategy") in EARNINGS_EXEMPT
+                       or r["ticker"] not in earnings_blocked]
+
     total_time = time.time() - t0
 
     # Sector pulse (fetch 10d sector ETF returns vs SPY)
@@ -900,7 +1017,7 @@ def main():
     _thematic_check()
 
     # ── LEAD WITH CONVICTION — what to act on ─────────────────────────────────
-    _print_high_conviction(results_by_strategy, multi_tickers, with_backtest)
+    _print_high_conviction(results_by_strategy, multi_tickers, with_backtest, sector_excess)
 
     # ── MULTI-STRATEGY OVERLAP MATRIX ─────────────────────────────────────────
     _print_matrix(results_by_strategy, strategies, upgrade_tickers)
