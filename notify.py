@@ -457,13 +457,13 @@ def _build_matrix_html() -> str:
 
 
 def _load_strategy_stats() -> dict:
-    """Read scan_history.csv → per-strategy {n, wr, avg} from filled ret_d5 rows."""
+    """Read scan_history.csv → per-strategy {n, wr, avg, avg_r} from filled ret_d5 rows."""
     csv_path = HERE / "scan_history.csv"
     if not csv_path.exists():
         return {}
     from collections import defaultdict
     import csv as _csv, math as _math
-    stats = defaultdict(lambda: {"wins": 0, "total": 0, "sum": 0.0})
+    stats = defaultdict(lambda: {"wins": 0, "total": 0, "sum": 0.0, "r_sum": 0.0, "r_n": 0})
     try:
         with open(csv_path, newline="", encoding="utf-8") as f:
             for row in _csv.DictReader(f):
@@ -478,6 +478,12 @@ def _load_strategy_stats() -> dict:
                     stats[strat]["sum"]   += ret
                     if ret > 0:
                         stats[strat]["wins"] += 1
+                    rm_raw = row.get("r_multiple_d5", "")
+                    if rm_raw:
+                        rm = float(rm_raw)
+                        if not _math.isnan(rm):
+                            stats[strat]["r_sum"] += rm
+                            stats[strat]["r_n"]   += 1
                 except (ValueError, TypeError, KeyError):
                     pass
     except Exception:
@@ -488,9 +494,10 @@ def _load_strategy_stats() -> dict:
         if n < 1:
             continue
         out[s] = {
-            "n":   n,
-            "wr":  round(100 * d["wins"] / n, 1),
-            "avg": round(d["sum"] / n, 2),
+            "n":     n,
+            "wr":    round(100 * d["wins"] / n, 1),
+            "avg":   round(d["sum"] / n, 2),
+            "avg_r": round(d["r_sum"] / d["r_n"], 2) if d["r_n"] > 0 else None,
         }
     return out
 
@@ -518,10 +525,14 @@ def _build_scanner_results_html() -> str:
         return ""
     try:
         import json
-        data      = json.loads(scan_json.read_text())
-        scan_date = data.get("scan_date", "unknown")
-        strategies = data.get("strategies", [])
-        rbs        = data.get("results_by_strategy", {})
+        data           = json.loads(scan_json.read_text())
+        scan_date      = data.get("scan_date", "unknown")
+        strategies     = data.get("strategies", [])
+        rbs            = data.get("results_by_strategy", {})
+        sector_excess  = data.get("sector_excess", {})
+        spy_ret        = data.get("spy_ret", 0.0)
+        elder_count    = data.get("elder_impulse_count", 0)
+        market_regime  = data.get("market_regime", "NEUTRAL")
     except Exception:
         return ""
 
@@ -619,7 +630,79 @@ def _build_scanner_results_html() -> str:
         key=lambda x: (x[2].get("score", 99))
     )
 
+    # Regime colour
+    regime_col  = {"BULL": "#16a34a", "NEUTRAL": "#d97706", "BEAR": "#dc2626"}.get(market_regime, "#888")
+    regime_icon = {"BULL": "🟢", "NEUTRAL": "🟡", "BEAR": "🔴"}.get(market_regime, "⚪")
+    spy_s = f"SPY 10d {'+' if spy_ret >= 0 else ''}{spy_ret:.1f}%"
+
     html = f'<br>{_section_head("📡","Scanner Results",f"scan {scan_date} · {len(active)} strategies fired · {total_hits} signals","#1a5a8a")}'
+
+    # ── Market Regime Bar ─────────────────────────────────────────────────────
+    html += (
+        f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px;">'
+        f'<tr><td style="background:#0f172a;padding:7px 14px;border-radius:4px;border-left:4px solid {regime_col};">'
+        f'<span style="font-size:12px;font-weight:700;color:{regime_col};">'
+        f'{regime_icon} MARKET REGIME: {market_regime}</span>'
+        f'<span style="font-size:11px;color:#94a3b8;margin-left:12px;">'
+        f'Elder Impulse: <b style="color:#e2e8f0;">{elder_count} signals</b>'
+        f'{"  · 🔥 Uptrend confirmed — favour trend strategies" if elder_count >= 15 else ("  · ⚠ Mixed — use high-conviction only" if elder_count >= 5 else "  · ❄️ Avoid longs — favour mean-reversion")}'
+        f'</span>'
+        f'</td></tr></table>'
+    )
+
+    # ── Sector Strength Panel ─────────────────────────────────────────────────
+    _ETF_TO_SECTOR = {
+        "XLK":"Technology","XLI":"Industrials","XLV":"Healthcare","XLF":"Financial Services",
+        "XLY":"Consumer Cyclical","XLP":"Consumer Defensive","XLB":"Basic Materials",
+        "XLE":"Energy","XLC":"Communication Services","XLU":"Utilities","XLRE":"Real Estate",
+    }
+    if sector_excess:
+        ranked_sectors = sorted(sector_excess.items(), key=lambda x: -x[1])
+        top3  = ranked_sectors[:3]
+        bot3  = ranked_sectors[-3:]
+        bot3_etfs = {e for e, _ in bot3}
+
+        def _sec_chip(etf, ex):
+            sector_name = _ETF_TO_SECTOR.get(etf, etf)
+            bg   = "#052e16" if ex >= 1.0 else ("#3b0000" if ex <= -1.0 else "#1e293b")
+            col  = "#4ade80" if ex >= 1.0 else ("#f87171" if ex <= -1.0 else "#94a3b8")
+            sign = "+" if ex >= 0 else ""
+            return (f'<span style="background:{bg};color:{col};border-radius:3px;'
+                    f'padding:2px 7px;font-size:10px;font-weight:700;margin-right:4px;">'
+                    f'{sector_name[:6]} {sign}{ex:.1f}%</span>')
+
+        top_chips = "".join(_sec_chip(e, x) for e, x in top3)
+        bot_chips = "".join(_sec_chip(e, x) for e, x in bot3)
+
+        # Which HIGH picks align with top sectors?
+        proven_in_top = []
+        all_high = [(s, r) for s, res in rbs.items() for r in res
+                    if _conviction_tier_email(r, {t for t, n in __import__('collections').Counter(
+                        rx["ticker"] for _, rx in [(s2, r2) for s2, res2 in rbs.items() for r2 in res2]
+                    ).items() if n >= 2}) == "HIGH"]
+        # simplified: just get ticker→sector from results
+        ticker_sector = {}
+        for s, res in rbs.items():
+            for r in res:
+                if r.get("sector"):
+                    ticker_sector[r["ticker"]] = r.get("sector", "")
+
+        top_sector_names = {_ETF_TO_SECTOR.get(e, "") for e, _ in top3}
+        aligned = [r["ticker"] for _, r in all_high
+                   if ticker_sector.get(r["ticker"],"") in top_sector_names]
+        aligned = list(dict.fromkeys(aligned))  # dedupe
+
+        html += (
+            f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 10px;">'
+            f'<tr><td style="background:#0f1923;padding:8px 14px;border-radius:4px;border-left:4px solid #0ea5e9;">'
+            f'<div style="font-size:11px;font-weight:700;color:#7dd3fc;margin-bottom:4px;">📊 SECTOR STRENGTH vs SPY (10d) &nbsp;·&nbsp; {spy_s}</div>'
+            f'<div style="margin-bottom:3px;"><span style="font-size:10px;color:#94a3b8;margin-right:6px;">HOT 🔥</span>{top_chips}</div>'
+            f'<div style="margin-bottom:4px;"><span style="font-size:10px;color:#94a3b8;margin-right:6px;">COLD ❄️</span>{bot_chips}</div>'
+            + (f'<div style="font-size:10px;color:#4ade80;">✓ HIGH conviction picks in HOT sectors: <b>{", ".join(aligned)}</b></div>'
+               if aligned else
+               f'<div style="font-size:10px;color:#f59e0b;">⚠ No HIGH conviction picks in top sectors today — consider reducing size</div>')
+            + f'</td></tr></table>'
+        )
 
     # ══════════════════════════════════════════════════════════════════════════
     # SECTION A: ACT ON THESE — HIGH conviction cards
@@ -671,6 +754,21 @@ def _build_scanner_results_html() -> str:
             sl_s     = f'${sl_approx:.2f}' if sl_approx else "─"
             hold_d   = {"pocket_pivot":7,"ema_ribbon":7,"cup_handle":10,"vcp":10,"connors_rsi2":5,"nr7":3,"breakout":5}.get(strat, 5)
 
+            # Sector tag for this card
+            ticker_sec = r.get("sector", "")
+            sec_etf = next((etf for etf, sname in _ETF_TO_SECTOR.items() if sname == ticker_sec), "")
+            sec_ex  = sector_excess.get(sec_etf) if sector_excess else None
+            if sec_ex is not None:
+                ranked_vals = sorted(sector_excess.values(), reverse=True)
+                if sec_ex >= ranked_vals[2]:
+                    sec_tag = f'<span style="background:#052e16;color:#4ade80;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-left:4px;">🔥 {ticker_sec[:8]} +{sec_ex:.1f}%</span>'
+                elif sec_ex <= ranked_vals[-3]:
+                    sec_tag = f'<span style="background:#3b0000;color:#f87171;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-left:4px;">❄️ {ticker_sec[:8]} {sec_ex:.1f}%</span>'
+                else:
+                    sec_tag = ""
+            else:
+                sec_tag = ""
+
             border_col = "#16a34a" if card_idx == 0 else ("#2563eb" if card_idx == 1 else "#d97706" if card_idx == 2 else "#16a34a")
             html += (
                 f'<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:6px;border-radius:0 0 4px 4px;">'
@@ -680,7 +778,7 @@ def _build_scanner_results_html() -> str:
                 f'<td style="width:140px;vertical-align:top;">'
                 + (f'<div style="margin-bottom:4px;">{rank_badge}</div>' if rank_badge else '')
                 + f'<div style="font-size:20px;font-weight:800;color:#f0fdf4;font-family:monospace;">{r["ticker"]}</div>'
-                f'<div style="font-size:11px;color:#86efac;">{str(r.get("company","") or "")[:20]}</div>'
+                f'<div style="font-size:11px;color:#86efac;">{str(r.get("company","") or "")[:20]}{sec_tag}</div>'
                 f'</td>'
                 f'<td style="vertical-align:top;padding-left:12px;">'
                 f'<div style="margin-bottom:5px;">{strat_chips}{proven_badge}</div>'
@@ -769,12 +867,16 @@ def _build_scanner_results_html() -> str:
             badge = ('<span style="background:#16a34a;color:#fff;font-size:9px;font-weight:700;'
                      'border-radius:3px;padding:1px 4px;margin-left:6px;">PROVEN EDGE ✓</span>') if proven else ""
             s_label = s.replace("_", " ").upper()
+            avg_r = d.get("avg_r")
+            avg_r_col = "#16a34a" if (avg_r or 0) >= 1.0 else ("#d97706" if (avg_r or 0) >= 0.5 else _C_DIM)
+            avg_r_s = f'{avg_r:.2f}R' if avg_r is not None else '─'
             sc_rows += (
                 f'<tr style="background:{_C_ROW1 if rank%2 else _C_ROW0};">'
                 f'<td style="padding:5px 8px;font-size:11px;color:{_C_BODY};">{rank}</td>'
                 f'<td style="padding:5px 8px;font-size:11px;font-weight:600;color:{_C_BODY};">{s_label}{badge}</td>'
                 f'<td style="padding:5px 8px;font-size:11px;text-align:right;color:{wr_color};font-weight:700;">{d["wr"]:.0f}%</td>'
                 f'<td style="padding:5px 8px;font-size:11px;text-align:right;color:{avg_color};">{d["avg"]:+.2f}%</td>'
+                f'<td style="padding:5px 8px;font-size:11px;text-align:right;color:{avg_r_col};font-weight:600;">{avg_r_s}</td>'
                 f'<td style="padding:5px 8px;font-size:11px;text-align:right;color:{_C_DIM};">{d["n"]}</td>'
                 '</tr>'
             )
@@ -789,6 +891,7 @@ def _build_scanner_results_html() -> str:
             f'<th style="padding:5px 8px;text-align:left;color:#888;background:#1a1a2e;">Strategy</th>'
             f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;">WR% d5</th>'
             f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;">Avg% d5</th>'
+            f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;font-style:italic;" title="Avg reward:risk multiple — higher = better exits">avgR</th>'
             f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;">n</th>'
             f'</tr></thead><tbody>'
             + sc_rows +

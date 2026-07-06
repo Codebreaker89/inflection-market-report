@@ -1040,13 +1040,18 @@ def main():
 
     # Persist latest scan results for notify.py / update_scan_history.py
     try:
+        elder_count = len(results_by_strategy.get("elder_impulse", []))
         payload = {
             "scan_date": datetime.now().strftime("%Y-%m-%d"),
             "strategies": strategies,
             "results_by_strategy": {
                 s: [_nan_safe(r) for r in res]
                 for s, res in results_by_strategy.items()
-            }
+            },
+            "sector_excess": sector_excess,
+            "spy_ret": spy_ret,
+            "elder_impulse_count": elder_count,
+            "market_regime": "BULL" if elder_count >= 15 else ("NEUTRAL" if elder_count >= 5 else "BEAR"),
         }
         LAST_SCAN_JSON.write_text(json.dumps(payload, indent=2))
         print(DIM(f"  Saved last_scan.json ({sum(len(v) for v in payload['results_by_strategy'].values())} results)"))
