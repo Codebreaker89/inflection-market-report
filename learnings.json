@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-07-02",
-  "sample_size": "859 trades (Jun 21-26, 6 scan dates fully filled)",
+  "last_updated": "2026-07-06",
+  "sample_size": "954 trades filled (1394 total signals, 11 scan dates)",
   "learnings": [
     {
       "id": "L001",
@@ -194,6 +194,59 @@
         "weinstein_stage2_day1": [
           {"ticker": "WM", "rsi": 67.7, "adx": 15.0, "score": 4, "price": 230.4, "note": "ADX=15 below preferred floor"}
         ]
+      }
+    }
+  ],
+    {
+      "id": "L015",
+      "date": "2026-07-06",
+      "category": "multi_strategy",
+      "finding": "954-trade update: multi-strategy edge strengthens further. 3 strategies = WR 76.9% avg +2.33% (n=39) vs 2 strategies = WR 65.4% avg +1.67% (n=228) vs 1 strategy = WR 59.8% avg +1.21% (n=687). Each additional strategy confirmation adds ~6-7pp WR. 3-strategy overlap is now strongest confirmed edge signal in the system.",
+      "action": "Conviction tier HIGH already requires multi-strategy. Validated and strengthened — prioritise 3+ strategy picks above all others.",
+      "data": {
+        "count_1": {"n": 687, "wr_pct": 59.8, "avg_ret_pct": 1.21},
+        "count_2": {"n": 228, "wr_pct": 65.4, "avg_ret_pct": 1.67},
+        "count_3": {"n": 39,  "wr_pct": 76.9, "avg_ret_pct": 2.33}
+      }
+    },
+    {
+      "id": "L016",
+      "date": "2026-07-06",
+      "category": "score_cap",
+      "finding": "Score 5 is NOT a weak signal — WR 72.1% avg +1.81% (n=111). It outperforms score 3 (63.4%) and score 4 (62.0%) in WR. Score cap at ≤5 is confirmed correct. Score 6 drops to 56.1% avg -0.14% (n=98) — confirmed degradation cliff. Score 7-9 collapses to 37.5% / 30.4% / 20.0%. Score 10+ is signal_velocity only (different scale, high scores valid).",
+      "action": "Score cap ≤5 stays. Score 5 should NOT be downranked in conviction scoring — it is the best single-strategy score band.",
+      "data": {
+        "score_5":  {"n": 111, "wr_pct": 72.1, "avg_ret_pct": 1.81},
+        "score_6":  {"n": 98,  "wr_pct": 56.1, "avg_ret_pct": -0.14},
+        "score_7":  {"n": 8,   "wr_pct": 37.5, "avg_ret_pct": -0.38},
+        "score_8":  {"n": 23,  "wr_pct": 30.4, "avg_ret_pct": -1.14}
+      }
+    },
+    {
+      "id": "L017",
+      "date": "2026-07-06",
+      "category": "rr_tracking",
+      "finding": "First R:R analysis (954 trades). avgR across strategies is low: breakout 0.59R, nr7 0.62R, connors_rsi2 1.24R (best). Strategies with highest avg% but low R: ema_ribbon +3.20% avg but avgR=0 (r_multiple not yet backfilled). connors_rsi2 is the best risk-adjusted strategy: WR 64.2%, avg +1.62%, avgR 1.24 — capturing >1R per trade. Most strategies capture only 0.5-0.6R, meaning hold_days exits are leaving returns on the table. Trailing stops instead of fixed hold_days would likely improve R:R across all strategies.",
+      "action": "Exit rule improvement needed: take partial at +1.5R, trail remainder on 10d EMA. Will improve avgR from ~0.6 toward 1.0+.",
+      "data": {
+        "breakout":      {"avg_r": 0.59},
+        "nr7":           {"avg_r": 0.62},
+        "connors_rsi2":  {"avg_r": 1.24},
+        "signal_velocity":{"avg_r": 0.50},
+        "stage4_short":  {"avg_r": 2.40}
+      }
+    },
+    {
+      "id": "L018",
+      "date": "2026-07-06",
+      "category": "strategy_performance",
+      "finding": "ema_ribbon crosses PROVEN EDGE threshold: WR 73.5% avg +3.20% n=68 — third strongest strategy after pocket_pivot (87.1%) and stage4_short (83.0%). RSI 50-60 remains best entry zone: WR 64.4% avg +1.84% (n=306). RSI 70-80 is surprisingly strong: WR 66.4% avg +1.49% — stronger than RSI 60-70 (61.3%). RSI cap of 70 may be leaving profitable setups on the table.",
+      "action": "Add ema_ribbon to PROVEN_EDGE set in scan.py and notify.py. Consider loosening RSI cap to 75 in next scan.py update.",
+      "data": {
+        "ema_ribbon": {"n": 68, "wr_pct": 73.5, "avg_ret_pct": 3.20},
+        "rsi_50_60":  {"n": 306, "wr_pct": 64.4, "avg_ret_pct": 1.84},
+        "rsi_60_70":  {"n": 274, "wr_pct": 61.3, "avg_ret_pct": 1.24},
+        "rsi_70_80":  {"n": 140, "wr_pct": 66.4, "avg_ret_pct": 1.49}
       }
     }
   ],
