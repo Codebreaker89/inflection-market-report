@@ -139,7 +139,10 @@ from turtle_soup_scanner           import scan as scan_turtle_soup
 from raschke_8020_scanner          import scan as scan_8020
 from wyckoff_spring_scanner        import scan as scan_wyckoff_spring
 from weinstein_stage2_scanner      import scan as scan_weinstein_stage2
-from show_tracker                  import add_trade_interactive
+from show_tracker                  import (add_trade_interactive, load_trades, save_trades,
+                                           next_id, ticker_ccy, fetch_fx_on_date,
+                                           fetch_company_name, fetch_sector, fetch_market_regime,
+                                           trade_stop_loss, trade_hold_days, biz_days_add)
 
 # ANSI helpers (inline — no shared module dependency)
 import os as _os
@@ -1050,9 +1053,129 @@ def main():
     except Exception as e:
         print(f"  WARNING: could not save last_scan.json — {e}")
 
+    # Auto-add HIGH conviction picks as practice trades
+    _auto_add_practice_trades(results_by_strategy, multi_tickers)
+
     # Tracker prompt
     if all_results:
         _tracker_prompt(all_results)
+
+
+def _auto_add_practice_trades(results_by_strategy: dict, multi_tickers: set):
+    """
+    Auto-add every HIGH conviction pick as a practice trade.
+    Skips tickers already OPEN in trades.csv (any trade type).
+    Runs silently at end of scan — no user input needed.
+    """
+    try:
+        existing_trades = load_trades()
+    except Exception:
+        existing_trades = []
+
+    open_tickers = {t["ticker"] for t in existing_trades if t.get("status") == "OPEN"}
+    today = date.today()
+    scan_date_str = today.strftime("%Y-%m-%d")
+    added = []
+    skipped = []
+
+    # Collect HIGH conviction picks (same logic as _print_high_conviction)
+    seen: dict = {}
+    tier_rank = {"★★★ HIGH": 0, "★★  MED ": 1, "★   LOW ": 2}
+    for strategy, results in results_by_strategy.items():
+        for r in results:
+            t = r["ticker"]
+            tier, _ = _conviction_tier(r, multi_tickers)
+            rank = tier_rank[tier]
+            if tier != "★★★ HIGH":
+                continue
+            if t not in seen or rank < seen[t][0]:
+                seen[t] = (rank, r, strategy)
+
+    if not seen:
+        return
+
+    # Sort by rank score (best first)
+    picks = sorted(seen.values(), key=lambda x: (x[0], x[1].get("score", 99)))
+
+    for _, r, strategy in picks:
+        ticker = r["ticker"]
+
+        if ticker in open_tickers:
+            skipped.append(ticker)
+            continue
+
+        try:
+            ccy      = ticker_ccy(ticker)
+            fx       = fetch_fx_on_date(ccy, today)
+            price    = float(r.get("price") or 0)
+            if not price:
+                continue
+            sl       = trade_stop_loss(price)
+            hold_d   = trade_hold_days(strategy)
+            exit_dt  = biz_days_add(today, hold_d)
+            qty      = round(1000.0 * fx / price, 4)
+            inv_eur  = round(qty * price / fx, 2)
+            company  = r.get("company") or fetch_company_name(ticker)
+            sector   = fetch_sector(ticker)
+            regime   = fetch_market_regime(today)
+
+            # Build signals string from scan result
+            strats_fired = [s for s, res in results_by_strategy.items()
+                            if any(x["ticker"] == ticker for x in res)]
+            proven = any(s in PROVEN_EDGE for s in strats_fired)
+            sig = ("+".join(strats_fired) +
+                   (f" · ✦PROVEN ({strategy} {int(_HIST_STATS.get(strategy,{}).get('wr',0))}%WR)" if proven else "") +
+                   f" · score={r.get('score',0)} · RSI={r.get('rsi',0):.1f} · ADX={r.get('adx',0):.1f} · ★★★ HIGH conviction")
+
+            trade = {
+                "id":                  next_id(existing_trades),
+                "entry_date":          scan_date_str,
+                "ticker":              ticker,
+                "company":             company,
+                "currency":            ccy,
+                "buy_price":           price,
+                "stop_loss_price":     sl,
+                "fx_at_entry":         round(fx, 6),
+                "qty":                 qty,
+                "investment_eur":      inv_eur,
+                "trade_type":          "practice",
+                "strategy":            strategy,
+                "hold_days":           hold_d,
+                "target_exit_date":    exit_dt.strftime("%Y-%m-%d"),
+                "signals":             sig,
+                "status":              "OPEN",
+                "actual_sell_date":    "",
+                "exit_price":          "",
+                "rsi_at_entry":        r.get("rsi", ""),
+                "adx_at_entry":        r.get("adx", ""),
+                "minervini_at_entry":  r.get("minervini", ""),
+                "vol_ratio_entry":     r.get("vol_ratio", ""),
+                "atr_ratio_entry":     r.get("atr_ratio", ""),
+                "market_regime_entry": regime,
+                "sector":              sector,
+                "rsi_at_exit":         "",
+                "adx_at_exit":         "",
+                "minervini_at_exit":   "",
+                "vol_ratio_exit":      "",
+                "max_dd_1wk":          "",
+                "exit_reason":         "",
+            }
+            existing_trades.append(trade)
+            open_tickers.add(ticker)
+            added.append(ticker)
+        except Exception as e:
+            print(DIM(f"  [practice-auto] skipped {ticker}: {e}"))
+
+    if added or skipped:
+        try:
+            save_trades(existing_trades)
+        except Exception as e:
+            print(f"  WARNING: could not save practice trades — {e}")
+            return
+        if added:
+            print(GRN(f"\n  ✅  Auto-practice: added {len(added)} trade(s) → {', '.join(added)}"))
+        if skipped:
+            print(DIM(f"  ↩  Already open, skipped: {', '.join(skipped)}"))
 
 
 if __name__ == "__main__":
