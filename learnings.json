@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-07-06",
-  "sample_size": "954 trades filled (1394 total signals, 11 scan dates)",
+  "last_updated": "2026-07-08",
+  "sample_size": "1212 trades filled (1498 total signals, 12 scan dates)",
   "learnings": [
     {
       "id": "L001",
@@ -14,40 +14,31 @@
       "id": "L002",
       "date": "2026-07-02",
       "category": "strategy_performance",
-      "finding": "Updated with 859-trade data (Jun 21-26, all 6 dates fully filled). Top 3 stable: pocket_pivot WR 87.1% (31), stage4_short WR 79.1% (43), ema_ribbon WR 73.5% (68). signal_velocity now crosses PROVEN EDGE: WR 64.3% avg +1.54% (28 trades). bb_squeeze further weakened: WR 33.3% (21 trades). high_tight_flag confirmed dead: WR 21.7% avg -3.34% (23 trades). momentum: WR 22.2% avg -4.16% (9 trades).",
-      "action": "signal_velocity now qualifies for PROVEN EDGE badge (WR≥60%, n≥10). Rankings update in notify.py scorecard.",
+      "finding": "Updated with 859-trade data. Top strategies: pocket_pivot WR 87.1% (31), stage4_short WR 79.1% (43 — NOTE: later found to be a short-tracking bug, see L020), ema_ribbon WR 73.5% (68). signal_velocity crosses PROVEN EDGE: WR 64.3% avg +1.54% (28 trades). bb_squeeze weak: WR 33.3% (21 trades). high_tight_flag dead: WR 21.7% avg -3.34% (23 trades).",
+      "action": "signal_velocity qualifies for PROVEN EDGE badge. Rankings updated in notify.py.",
       "data": {
-        "pocket_pivot":   {"n": 31, "wr_pct": 87.1, "avg_ret_pct": 2.73},
-        "stage4_short":   {"n": 43, "wr_pct": 79.1, "avg_ret_pct": 3.47},
-        "ema_ribbon":     {"n": 68, "wr_pct": 73.5, "avg_ret_pct": 3.20},
-        "cup_handle":     {"n": 77, "wr_pct": 64.9, "avg_ret_pct": 2.12},
-        "signal_velocity":{"n": 28, "wr_pct": 64.3, "avg_ret_pct": 1.54},
-        "connors_rsi2":   {"n": 118,"wr_pct": 61.0, "avg_ret_pct": 1.34},
-        "nr7":            {"n": 205,"wr_pct": 56.6, "avg_ret_pct": 1.11},
-        "breakout":       {"n": 232,"wr_pct": 54.7, "avg_ret_pct": 0.44},
-        "bb_squeeze":     {"n": 21, "wr_pct": 33.3, "avg_ret_pct": 0.91},
-        "high_tight_flag":{"n": 23, "wr_pct": 21.7, "avg_ret_pct": -3.34},
-        "momentum":       {"n": 9,  "wr_pct": 22.2, "avg_ret_pct": -4.16}
+        "pocket_pivot":    {"n": 31,  "wr_pct": 87.1, "avg_ret_pct": 2.73},
+        "stage4_short":    {"n": 43,  "wr_pct": 79.1, "avg_ret_pct": 3.47, "note": "INVALID — see L020"},
+        "ema_ribbon":      {"n": 68,  "wr_pct": 73.5, "avg_ret_pct": 3.20},
+        "cup_handle":      {"n": 77,  "wr_pct": 64.9, "avg_ret_pct": 2.12},
+        "signal_velocity": {"n": 28,  "wr_pct": 64.3, "avg_ret_pct": 1.54},
+        "connors_rsi2":    {"n": 118, "wr_pct": 61.0, "avg_ret_pct": 1.34},
+        "nr7":             {"n": 205, "wr_pct": 56.6, "avg_ret_pct": 1.11},
+        "breakout":        {"n": 232, "wr_pct": 54.7, "avg_ret_pct": 0.44},
+        "high_tight_flag": {"n": 23,  "wr_pct": 21.7, "avg_ret_pct": -3.34}
       }
     },
     {
       "id": "L003",
       "date": "2026-07-02",
       "category": "score_cap",
-      "finding": "859-trade update: score 6 avg now -0.17% (was -0.33% at 620 trades, briefly improved to +0.06% at 751). Confirmed negative avg at scale — cap at ≤5 is correct. signal_velocity scores 10-12 are strong (score 12: WR 100%, avg +3.77% — 6 trades). Exemption for signal_velocity validated. Score 3-5 is the sweet spot: WR 60-68%, avg +1.39-2.01%.",
-      "action": "Score cap ≤5 remains. signal_velocity exempted (uses 0-13 scale, high scores still edge).",
+      "finding": "859-trade update: score 6 avg now -0.17%. Confirmed negative at scale — cap at ≤5 is correct. signal_velocity scores 10-12 are strong (score 12: WR 100%, avg +3.77% — 6 trades). Score 3-5 is sweet spot: WR 60-68%, avg +1.39-2.01%.",
+      "action": "Score cap ≤5 remains. signal_velocity exempted (0-13 scale).",
       "data": {
-        "score_0":  {"n": 6,   "wr_pct": 67, "avg_ret_pct": 1.65},
-        "score_1":  {"n": 41,  "wr_pct": 49, "avg_ret_pct": 0.37},
-        "score_2":  {"n": 134, "wr_pct": 59, "avg_ret_pct": 1.23},
         "score_3":  {"n": 183, "wr_pct": 63, "avg_ret_pct": 2.01},
         "score_4":  {"n": 252, "wr_pct": 60, "avg_ret_pct": 1.60},
         "score_5":  {"n": 94,  "wr_pct": 68, "avg_ret_pct": 1.39},
         "score_6":  {"n": 93,  "wr_pct": 55, "avg_ret_pct": -0.17},
-        "score_7":  {"n": 8,   "wr_pct": 38, "avg_ret_pct": -0.38},
-        "score_8":  {"n": 23,  "wr_pct": 30, "avg_ret_pct": -1.14},
-        "score_9":  {"n": 5,   "wr_pct": 20, "avg_ret_pct": -1.94},
-        "score_10": {"n": 10,  "wr_pct": 80, "avg_ret_pct": 2.03, "note": "signal_velocity only"},
         "score_12": {"n": 6,   "wr_pct": 100,"avg_ret_pct": 3.77, "note": "signal_velocity only"}
       }
     },
@@ -55,38 +46,36 @@
       "id": "L004",
       "date": "2026-06-30",
       "category": "rsi_filter",
-      "finding": "RSI 40-50 dead zone confirmed with larger sample: WR 48%, avg -0.30% (79 trades). RSI 50-60 is the best entry zone: WR 63%, avg +2.23%. RSI floor of 50 validated.",
-      "action": "RSI floor 50 already enforced in breakout/cup_handle. Validate other scanners.",
+      "finding": "RSI 40-50 dead zone confirmed: WR 48%, avg -0.30% (79 trades). RSI 50-60 is the best entry zone: WR 63%, avg +2.23%. RSI floor of 50 validated for trend strategies.",
+      "action": "RSI floor 50 enforced in breakout/cup_handle. connors_rsi2/wyckoff_spring exempted (low RSI is the signal).",
       "data": {
-        "rsi_lt40":  {"n": 42,  "wr_pct": 50.0, "avg_ret_pct": 0.38},
         "rsi_40_50": {"n": 79,  "wr_pct": 48.0, "avg_ret_pct": -0.30},
         "rsi_50_60": {"n": 181, "wr_pct": 63.0, "avg_ret_pct": 2.23},
         "rsi_60_70": {"n": 201, "wr_pct": 65.0, "avg_ret_pct": 1.54},
-        "rsi_70_80": {"n": 85,  "wr_pct": 64.0, "avg_ret_pct": 1.56},
-        "rsi_80plus":{"n": 32,  "wr_pct": 69.0, "avg_ret_pct": 1.00}
+        "rsi_70_80": {"n": 85,  "wr_pct": 64.0, "avg_ret_pct": 1.56}
       }
     },
     {
       "id": "L005",
       "date": "2026-06-30",
       "category": "adx_filter",
-      "finding": "ADX 16-30 is the sweet spot: WR 63-66%, avg +1.78-1.98%. ADX 35+ degrades: WR 52%, avg +0.34%. ADX 10-16 marginal: WR 57%, avg +0.74%. Floor of 16 remains correct.",
-      "action": "ADX floor 16 already enforced. Cap at 35 validated.",
+      "finding": "ADX 16-30 is sweet spot: WR 63-66%, avg +1.78-1.98%. ADX 35+ degrades: WR 52%, avg +0.34%. Floor of 16 correct.",
+      "action": "ADX floor 16, cap 35 enforced.",
       "data": {
-        "adx_10_16": {"n": 104, "wr_pct": 57.0, "avg_ret_pct": 0.74},
-        "adx_16_20": {"n": 137, "wr_pct": 66.0, "avg_ret_pct": 1.78},
-        "adx_20_25": {"n": 183, "wr_pct": 63.0, "avg_ret_pct": 1.49},
-        "adx_25_30": {"n": 78,  "wr_pct": 63.0, "avg_ret_pct": 1.98},
-        "adx_30_35": {"n": 58,  "wr_pct": 59.0, "avg_ret_pct": 1.75},
-        "adx_35plus":{"n": 60,  "wr_pct": 52.0, "avg_ret_pct": 0.34}
+        "adx_lt15":  {"n": 110, "wr_pct": 54.5, "avg_ret_pct": 0.63},
+        "adx_15_20": {"n": 355, "wr_pct": 62.3, "avg_ret_pct": 1.00},
+        "adx_20_25": {"n": 364, "wr_pct": 61.8, "avg_ret_pct": 1.12},
+        "adx_25_35": {"n": 275, "wr_pct": 59.6, "avg_ret_pct": 1.05},
+        "adx_35_45": {"n": 80,  "wr_pct": 58.8, "avg_ret_pct": 1.56},
+        "adx_45plus":{"n": 28,  "wr_pct": 53.6, "avg_ret_pct": 0.05}
       }
     },
     {
       "id": "L006",
       "date": "2026-06-30",
       "category": "multi_strategy",
-      "finding": "Multi-strategy conviction edge confirmed and strengthens with count: 1 strat=WR 59% avg +1.11%, 2 strats=WR 66% avg +1.97%, 3 strats=WR 70% avg +2.69%. Always prioritise 2+ strategy overlaps.",
-      "action": "Conviction tier HIGH already requires multi-strategy. Validated.",
+      "finding": "Multi-strategy conviction edge confirmed: 1 strat=WR 59%, 2 strats=WR 66%, 3 strats=WR 70%. Always prioritise 2+ strategy overlaps.",
+      "action": "Conviction tier HIGH requires multi-strategy. Validated.",
       "data": {
         "count_1": {"n": 435, "wr_pct": 59.0, "avg_ret_pct": 1.11},
         "count_2": {"n": 155, "wr_pct": 66.0, "avg_ret_pct": 1.97},
@@ -99,82 +88,63 @@
       "category": "risk_management",
       "finding": "17% of trades hit stop loss. Avg loss when SL triggered: -6.43%. Winners avg ~+1.5-2%. Asymmetry means position sizing is critical — never risk more than 1-2% of portfolio per trade.",
       "action": "No code change — user awareness.",
-      "data": {
-        "sl_hit_rate_pct": 17.0,
-        "avg_loss_on_sl_pct": -6.43
-      }
+      "data": {"sl_hit_rate_pct": 17.0, "avg_loss_on_sl_pct": -6.43}
     },
     {
       "id": "L008",
       "date": "2026-06-21",
       "category": "data_bug",
-      "finding": "US tickers returning NaN for ret_d5 due to yfinance bulk download missing most recent trading day. Fixed with per-ticker fallback in _price_on_or_after().",
+      "finding": "US tickers returning NaN for ret_d5 due to yfinance bulk download missing most recent trading day. Fixed with per-ticker fallback.",
       "action": "Fixed in update_scan_history.py"
     },
     {
       "id": "L009",
       "date": "2026-06-21",
       "category": "scanner_improvement",
-      "finding": "ADX<=15 = WR 41%, avg -0.10% — as bad as overextended ADX>35. RSI 45-50 = WR 48%, avg -0.25%. COIL score>=6 = WR 49%, avg -0.27%.",
-      "action": "ADX floor raised to 16, RSI floor raised to 50, COIL score cap set to 5 in breakout_scanner"
+      "finding": "ADX<=15 = WR 41%, RSI 45-50 = WR 48%, COIL score>=6 = WR 49%.",
+      "action": "ADX floor 16, RSI floor 50, score cap 5 enforced."
     },
     {
       "id": "L010",
       "date": "2026-07-02",
       "category": "market_regime",
-      "finding": "Jun 26 fully filled (172 trades): WR 52.9%, avg +0.24% — still worst day but less dire than partial read (was 48.4% on 64 trades). Within Jun 26: stage4_short WR 87%, signal_velocity WR 88% — top strategies still worked. bb_squeeze WR 14% on that day — confirms regime-sensitive. Jun 24 remains best day: WR 69.9%, avg +2.47%. Market regime matters — avoid bb_squeeze on weak days.",
-      "action": "Track per-day quality. In weak markets, focus on stage4_short and signal_velocity which held up. bb_squeeze is especially regime-sensitive.",
+      "finding": "Jun 24 best day: WR 69.9%, avg +2.47%. Jun 26 worst: WR 52.9%, avg +0.24%. stage4_short and signal_velocity held up on weak days. bb_squeeze is regime-sensitive (WR 14% on Jun 26).",
+      "action": "In weak markets, focus on PROVEN_EDGE strategies only. Avoid bb_squeeze.",
       "data": {
-        "2026-06-21": {"wr_pct": 56.1, "avg_ret_pct": 1.00, "n": 114},
-        "2026-06-22": {"wr_pct": 60.8, "avg_ret_pct": 1.32, "n": 199},
-        "2026-06-23": {"wr_pct": 58.6, "avg_ret_pct": 1.02, "n": 128},
-        "2026-06-24": {"wr_pct": 69.9, "avg_ret_pct": 2.47, "n": 136},
-        "2026-06-25": {"wr_pct": 58.2, "avg_ret_pct": 1.55, "n": 110},
-        "2026-06-26": {"wr_pct": 52.9, "avg_ret_pct": 0.24, "n": 172, "note": "fully filled — revised from 48.4%"}
+        "2026-06-21": {"wr_pct": 56.1, "n": 114},
+        "2026-06-22": {"wr_pct": 60.8, "n": 199},
+        "2026-06-23": {"wr_pct": 58.6, "n": 128},
+        "2026-06-24": {"wr_pct": 69.9, "n": 136},
+        "2026-06-25": {"wr_pct": 58.2, "n": 110},
+        "2026-06-26": {"wr_pct": 52.9, "n": 172}
       }
     },
     {
       "id": "L011",
       "date": "2026-07-01",
       "category": "strategy_weakness",
-      "finding": "bb_squeeze is a high-variance, low-WR strategy: WR 37.5%, avg +1.70% (16 trades). The avg is positive only due to 1 outlier (GLW +21.86%). Without that, avg is negative. Strategy not reliable enough for trading. Score 6 less catastrophic than 620-trade analysis suggested: WR 57.8%, avg +0.06% (83 trades) — still worse than score 0-5 but not a cliff.",
-      "action": "bb_squeeze kept active but flagged as weak in email digest. Score cap remains at 5 — score 6 still underperforms score 2-5 meaningfully.",
-      "data": {
-        "bb_squeeze_without_outlier": "if GLW excluded, avg < 0",
-        "score_6_updated": {"n": 83, "wr_pct": 57.8, "avg_ret_pct": 0.06}
-      }
+      "finding": "bb_squeeze high-variance: WR 37.5%, avg +1.70% (16 trades). Avg positive only due to 1 outlier (GLW +21.86%). Not reliable for trading. Score 6 less catastrophic at scale: WR 57.8%, avg +0.06% (83 trades) — still underperforms score 0-5.",
+      "action": "bb_squeeze flagged as weak in email digest. Score cap remains 5."
     },
     {
       "id": "L012",
       "date": "2026-07-03",
       "category": "market_regime",
-      "finding": "Elder Impulse emerged as dominant signal from Jul 1 onwards: 0 signals in entire Jun 21-29 period → 25 signals Jul 1 → 28 signals Jul 3. Market entered confirmed uptrend on Jul 1. Elder Impulse requires BOTH EMA13 rising AND MACD histogram positive — a simultaneous surge across 25+ stocks signals broad institutional participation. Breakout simultaneously collapsed from 43 (Jun 26) to 9 (Jul 3) — market moved past coiling phase into trending phase. When elder_impulse > 20 signals/day, conditions are most favorable for trend-following strategies.",
-      "action": "Use elder_impulse signal count as a daily market regime indicator. High elder count = buy momentum/trend strategies. Low elder count = favour mean-reversion (connors, williams, bollinger).",
+      "finding": "Elder Impulse emerged as dominant signal Jul 1+: 0 signals Jun 21-29 → 25 signals Jul 1 → 28 Jul 3 → 26 Jul 7. Market entered confirmed uptrend Jul 1. elder_impulse count > 20 = broad institutional participation = favour trend strategies.",
+      "action": "Use elder_impulse signal count as daily market regime indicator.",
       "data": {
-        "elder_impulse_by_date": {
-          "2026-06-21_to_06-29": 0,
-          "2026-07-01": 25,
-          "2026-07-02": 15,
-          "2026-07-03": 28
-        },
-        "breakout_by_date": {
-          "2026-06-26": 43,
-          "2026-06-29": 19,
-          "2026-07-01": 20,
-          "2026-07-03": 9
-        }
+        "elder_impulse_by_date": {"2026-07-01": 25, "2026-07-02": 15, "2026-07-03": 28, "2026-07-07": 26}
       }
     },
     {
       "id": "L013",
       "date": "2026-07-03",
       "category": "signal_persistence",
-      "finding": "Stocks appearing across 3+ scan dates with 3+ strategies are the highest conviction picks. DPLM.L: 6 appearances, 4 dates, 4 strategies (breakout+cup_handle+elder+nr7). DGX: 4 appearances, 3 dates, 4 strategies — already +4% in tracker. FAST: 4 appearances, 3 dates, 3 strategies — entered day 1. CSX: 5 appearances in 2 days, 5 strategies (bb_squeeze pre-disable, elder, nr7, pocket_pivot, rs_line). Persistence across dates = institutional accumulation continuing. Single-day multi-strategy is good; multi-day multi-strategy is exceptional.",
-      "action": "Flag tickers that appear on 3+ consecutive scan dates as PERSISTENT picks — these should be prioritised over single-day multi-strategy signals.",
+      "finding": "Stocks on 3+ scan dates with 3+ strategies = highest conviction. DPLM.L: 6 appearances, 4 dates, 4 strategies. DGX: 4 appearances, 3 dates, 4 strategies. Persistence = institutional accumulation continuing.",
+      "action": "Flag tickers appearing 3+ consecutive scan dates as PERSISTENT — prioritise over single-day multi-strategy.",
       "data": {
         "DPLM.L": {"appearances": 6, "dates": 4, "strategies": ["breakout","cup_handle","elder_impulse","nr7"]},
-        "DGX":    {"appearances": 4, "dates": 3, "strategies": ["cup_handle","elder_impulse","nr7","pocket_pivot"], "tracker_ret": "+4%"},
-        "FAST":   {"appearances": 4, "dates": 3, "strategies": ["cup_handle","elder_impulse","pocket_pivot"], "in_tracker": true},
+        "DGX":    {"appearances": 4, "dates": 3, "strategies": ["cup_handle","elder_impulse","nr7","pocket_pivot"]},
         "CSX":    {"appearances": 5, "dates": 2, "strategies": ["elder_impulse","nr7","pocket_pivot","rs_line"]}
       }
     },
@@ -182,84 +152,154 @@
       "id": "L014",
       "date": "2026-07-03",
       "category": "new_scanners",
-      "finding": "Wyckoff Spring fired first day (Jul 3): CIEN ($422, RSI=44.6), RIO.L ($7118, RSI=17.9), FANG ($172, RSI=18.3), SLB ($45, RSI=8.7). All are in energy/materials sector with very low RSI — true shakeouts with institutional spring pattern. Weinstein Stage2 first signal: WM ($230, RSI=67.7, ADX=15) — but ADX=15 is below our preferred 16 floor, treat with caution. New scanners are live and generating signals on day 1.",
-      "action": "Track wyckoff_spring and weinstein_stage2 signals carefully for first 20 trades to validate. Wyckoff spring signals in energy/commodities with RSI<25 deserve attention — these are classic institutional shakeout zones.",
-      "data": {
-        "wyckoff_spring_day1": [
-          {"ticker": "CIEN",  "rsi": 44.6, "adx": 20.9, "score": 2, "price": 422.46},
-          {"ticker": "RIO.L", "rsi": 17.9, "adx": 38.3, "score": 2, "price": 7118.0},
-          {"ticker": "FANG",  "rsi": 18.3, "adx": 21.0, "score": 1, "price": 172.04},
-          {"ticker": "SLB",   "rsi": 8.7,  "adx": 39.2, "score": 1, "price": 45.13}
-        ],
-        "weinstein_stage2_day1": [
-          {"ticker": "WM", "rsi": 67.7, "adx": 15.0, "score": 4, "price": 230.4, "note": "ADX=15 below preferred floor"}
-        ]
-      }
-    }
-  ],
+      "finding": "Wyckoff Spring fired first day: CIEN ($422, RSI=44.6), RIO.L ($7118, RSI=17.9), FANG ($172, RSI=18.3), SLB ($45, RSI=8.7). Weinstein Stage2 first signal: WM ($230, RSI=67.7, ADX=15 — below floor, caution).",
+      "action": "Track wyckoff_spring and weinstein_stage2 for first 20 trades. Low RSI wyckoff signals in energy/materials deserve attention."
+    },
     {
       "id": "L015",
       "date": "2026-07-06",
       "category": "multi_strategy",
-      "finding": "954-trade update: multi-strategy edge strengthens further. 3 strategies = WR 76.9% avg +2.33% (n=39) vs 2 strategies = WR 65.4% avg +1.67% (n=228) vs 1 strategy = WR 59.8% avg +1.21% (n=687). Each additional strategy confirmation adds ~6-7pp WR. 3-strategy overlap is now strongest confirmed edge signal in the system.",
-      "action": "Conviction tier HIGH already requires multi-strategy. Validated and strengthened — prioritise 3+ strategy picks above all others.",
+      "finding": "1212-trade update: 3-strategy = WR 71.4% avg +1.29% (n=42), 2-strategy = WR 62.8% avg +1.23% (n=290), 1-strategy = WR 58.9% avg +0.94% (n=876). Each additional strategy adds ~6-8pp WR. 4-strategy tickers: WR 100%, avg +2.23% (n=4, small sample). 3+ strategy overlap is strongest confirmed edge.",
+      "action": "Conviction tier HIGH already requires multi-strategy. Validated.",
       "data": {
-        "count_1": {"n": 687, "wr_pct": 59.8, "avg_ret_pct": 1.21},
-        "count_2": {"n": 228, "wr_pct": 65.4, "avg_ret_pct": 1.67},
-        "count_3": {"n": 39,  "wr_pct": 76.9, "avg_ret_pct": 2.33}
+        "count_1": {"n": 876, "wr_pct": 58.9, "avg_ret_pct": 0.94},
+        "count_2": {"n": 290, "wr_pct": 62.8, "avg_ret_pct": 1.23},
+        "count_3": {"n": 42,  "wr_pct": 71.4, "avg_ret_pct": 1.29},
+        "count_4": {"n": 4,   "wr_pct": 100.0,"avg_ret_pct": 2.23, "note": "small sample"}
       }
     },
     {
       "id": "L016",
       "date": "2026-07-06",
       "category": "score_cap",
-      "finding": "Score 5 is NOT a weak signal — WR 72.1% avg +1.81% (n=111). It outperforms score 3 (63.4%) and score 4 (62.0%) in WR. Score cap at ≤5 is confirmed correct. Score 6 drops to 56.1% avg -0.14% (n=98) — confirmed degradation cliff. Score 7-9 collapses to 37.5% / 30.4% / 20.0%. Score 10+ is signal_velocity only (different scale, high scores valid).",
-      "action": "Score cap ≤5 stays. Score 5 should NOT be downranked in conviction scoring — it is the best single-strategy score band.",
+      "finding": "1212-trade update: score 5 = WR 70.2% (n=161, best band). Score 3-5 range confirmed. Score 6 = WR 57.1% avg +0.10% (n=112) — confirmed degradation. Score 7 = 41.7% (n=12), score 8 = 33.3% (n=24). Score 9 anomaly: 65.8% WR (n=38) — possibly signal_velocity overflow.",
+      "action": "Score cap ≤5 stays. Score 5 should NOT be downranked.",
       "data": {
-        "score_5":  {"n": 111, "wr_pct": 72.1, "avg_ret_pct": 1.81},
-        "score_6":  {"n": 98,  "wr_pct": 56.1, "avg_ret_pct": -0.14},
-        "score_7":  {"n": 8,   "wr_pct": 37.5, "avg_ret_pct": -0.38},
-        "score_8":  {"n": 23,  "wr_pct": 30.4, "avg_ret_pct": -1.14}
+        "score_3": {"n": 262, "wr_pct": 59.9, "avg_ret_pct": 1.35},
+        "score_4": {"n": 350, "wr_pct": 58.9, "avg_ret_pct": 1.24},
+        "score_5": {"n": 161, "wr_pct": 70.2, "avg_ret_pct": 1.13},
+        "score_6": {"n": 112, "wr_pct": 57.1, "avg_ret_pct": 0.10},
+        "score_7": {"n": 12,  "wr_pct": 41.7, "avg_ret_pct": 0.18},
+        "score_8": {"n": 24,  "wr_pct": 33.3, "avg_ret_pct": -1.04}
       }
     },
     {
       "id": "L017",
       "date": "2026-07-06",
       "category": "rr_tracking",
-      "finding": "First R:R analysis (954 trades). avgR across strategies is low: breakout 0.59R, nr7 0.62R, connors_rsi2 1.24R (best). Strategies with highest avg% but low R: ema_ribbon +3.20% avg but avgR=0 (r_multiple not yet backfilled). connors_rsi2 is the best risk-adjusted strategy: WR 64.2%, avg +1.62%, avgR 1.24 — capturing >1R per trade. Most strategies capture only 0.5-0.6R, meaning hold_days exits are leaving returns on the table. Trailing stops instead of fixed hold_days would likely improve R:R across all strategies.",
-      "action": "Exit rule improvement needed: take partial at +1.5R, trail remainder on 10d EMA. Will improve avgR from ~0.6 toward 1.0+.",
+      "finding": "R:R analysis: connors_rsi2 best risk-adjusted: WR 59.9%, avg +1.15%, avgR 0.20R. cup_handle: WR 64.9%, avg +2.01%, avgR 0.50R. Most strategies capture only 0.1-0.5R — hold_days exits are leaving money. Only partial at +1.5R + trailing would improve avg R.",
+      "action": "Exit rule improvement needed: take 1/3 at +1.5R, trail remainder on 10d EMA.",
       "data": {
-        "breakout":      {"avg_r": 0.59},
-        "nr7":           {"avg_r": 0.62},
-        "connors_rsi2":  {"avg_r": 1.24},
-        "signal_velocity":{"avg_r": 0.50},
-        "stage4_short":  {"avg_r": 2.40}
+        "breakout":       {"wr_pct": 56.4, "avg_pct": 0.46, "avg_r": 0.18},
+        "nr7":            {"wr_pct": 58.5, "avg_pct": 0.89, "avg_r": 0.11},
+        "connors_rsi2":   {"wr_pct": 59.9, "avg_pct": 1.15, "avg_r": 0.20},
+        "cup_handle":     {"wr_pct": 64.9, "avg_pct": 2.01, "avg_r": 0.50},
+        "ema_ribbon":     {"wr_pct": 69.6, "avg_pct": 2.61, "avg_r": -0.35, "note": "negative avg_r due to elder_impulse data corruption in r_multiple calc"},
+        "pocket_pivot":   {"wr_pct": 86.0, "avg_pct": 2.76, "avg_r": 0.95},
+        "signal_velocity":{"wr_pct": 64.3, "avg_pct": 1.55, "avg_r": 0.51}
       }
     },
     {
       "id": "L018",
       "date": "2026-07-06",
       "category": "strategy_performance",
-      "finding": "ema_ribbon crosses PROVEN EDGE threshold: WR 73.5% avg +3.20% n=68 — third strongest strategy after pocket_pivot (87.1%) and stage4_short (83.0%). RSI 50-60 remains best entry zone: WR 64.4% avg +1.84% (n=306). RSI 70-80 is surprisingly strong: WR 66.4% avg +1.49% — stronger than RSI 60-70 (61.3%). RSI cap of 70 may be leaving profitable setups on the table.",
-      "action": "Add ema_ribbon to PROVEN_EDGE set in scan.py and notify.py. Consider loosening RSI cap to 75 in next scan.py update.",
+      "finding": "1212-trade update. ema_ribbon PROVEN: WR 69.6% avg +2.61% (n=79). pocket_pivot confirmed: WR 86.0% avg +2.76% (n=43). RSI 50-60 strongest (n=368, WR 62.0%). RSI 60-65: WR 59.7%. RSI 65-70: WR 55.4%. RSI 70-80 still strong: 63.1% WR (n=179) — see L021 for nuance.",
+      "action": "ema_ribbon in PROVEN_EDGE. RSI cap at 70 may be loosened to 75 pending more data.",
       "data": {
-        "ema_ribbon": {"n": 68, "wr_pct": 73.5, "avg_ret_pct": 3.20},
-        "rsi_50_60":  {"n": 306, "wr_pct": 64.4, "avg_ret_pct": 1.84},
-        "rsi_60_70":  {"n": 274, "wr_pct": 61.3, "avg_ret_pct": 1.24},
-        "rsi_70_80":  {"n": 140, "wr_pct": 66.4, "avg_ret_pct": 1.49}
+        "ema_ribbon":   {"n": 79,  "wr_pct": 69.6, "avg_ret_pct": 2.61},
+        "pocket_pivot": {"n": 43,  "wr_pct": 86.0, "avg_ret_pct": 2.76},
+        "rsi_50_60":    {"n": 368, "wr_pct": 62.0, "avg_ret_pct": 1.41},
+        "rsi_60_65":    {"n": 216, "wr_pct": 59.7, "avg_ret_pct": 0.62},
+        "rsi_65_70":    {"n": 157, "wr_pct": 55.4, "avg_ret_pct": 0.51},
+        "rsi_70_80":    {"n": 179, "wr_pct": 63.1, "avg_ret_pct": 0.74}
+      }
+    },
+    {
+      "id": "L019",
+      "date": "2026-07-08",
+      "category": "volume_filter",
+      "finding": "VOLUME RATIO is the strongest untapped ranking signal. 1212-trade analysis: vol <1x = WR 58.9% avg +0.72% (n=688), vol 1-1.5x = 59.9% avg +1.00% (n=192), vol 1.5-2x = 64.4% avg +1.34% (n=118), vol 2-3x = 73.2% avg +3.22% (n=82), vol 3x+ = 72.9% avg +2.54% (n=48). Volume 2x+ is nearly as predictive as 3-strategy overlap. Currently NOT factored into rank_score.",
+      "action": "Add vol_ratio to _rank_score(): vol≥2x = +2pts, vol 1.5-2x = +1pt. This is the highest-ROI improvement available.",
+      "data": {
+        "vol_lt1x":   {"n": 688, "wr_pct": 58.9, "avg_ret_pct": 0.72},
+        "vol_1_1p5x": {"n": 192, "wr_pct": 59.9, "avg_ret_pct": 1.00},
+        "vol_1p5_2x": {"n": 118, "wr_pct": 64.4, "avg_ret_pct": 1.34},
+        "vol_2_3x":   {"n": 82,  "wr_pct": 73.2, "avg_ret_pct": 3.22},
+        "vol_3xplus": {"n": 48,  "wr_pct": 72.9, "avg_ret_pct": 2.54}
+      }
+    },
+    {
+      "id": "L020",
+      "date": "2026-07-08",
+      "category": "data_bug",
+      "finding": "CRITICAL: stage4_short WR tracking is inverted. ret_d5 = (price_d5 - price_scan)/price_scan * 100. For shorts, WIN = price fell = ret_d5 < 0. But scan_history WR was computed as ret_d5 > 0 (price rose = LOSS for short). True short WR = 11.4% (9/79). Stored WR 88.6% was actually 88.6% LOSS rate. stage4_short is performing terribly, not as PROVEN_EDGE. All prior stage4_short stats (L002, L010) are invalid.",
+      "action": "REMOVE stage4_short from PROVEN_EDGE set immediately. DISABLE stage4_short scanner (it fires on stocks about to go UP, not down). Fix update_scan_history.py to invert sign for short strategies before computing WR.",
+      "data": {
+        "true_wr_pct": 11.4,
+        "true_n": 79,
+        "stored_wr_pct_invalid": 88.6,
+        "explanation": "ret_d5 > 0 means price rose = SHORT POSITION LOST MONEY"
+      }
+    },
+    {
+      "id": "L021",
+      "date": "2026-07-08",
+      "category": "data_bug",
+      "finding": "elder_impulse has data corruption in Jul 1 records: CRWD shows price 701→199 (-71.6%), GLW 255→194 (-23.7%), KLAC 301→233 (-22.7%), TER 483→379 (-21.6%). These are stock-split artifacts or yfinance adjusted-price errors. These 8 corrupted records are dragging elder_impulse true WR to 47.8% avg -3.73% (vs likely 55-60% if cleaned). Similarly taints r_multiple calculations for ema_ribbon which overlaps these Jul 1 records.",
+      "action": "Filter out ret_d5 < -15% as data errors in update_scan_history.py. Re-run backfill after fix. Until then, elder_impulse stats are unreliable.",
+      "data": {
+        "corrupted_records": [
+          {"ticker": "CRWD", "scan_date": "2026-07-01", "ret_d5": -71.56},
+          {"ticker": "GLW",  "scan_date": "2026-07-01", "ret_d5": -23.74},
+          {"ticker": "KLAC", "scan_date": "2026-07-01", "ret_d5": -22.67},
+          {"ticker": "TER",  "scan_date": "2026-07-01", "ret_d5": -21.56},
+          {"ticker": "FLEX", "scan_date": "2026-07-01", "ret_d5": -14.45}
+        ]
+      }
+    },
+    {
+      "id": "L022",
+      "date": "2026-07-08",
+      "category": "rsi_filter",
+      "finding": "RSI <40 revisited with 1212 trades: WR 67.3% avg +2.51% (n=98). Previous analysis (L004) showed RSI <40 at 50% WR with only 42 trades — was small sample noise. With 98 trades, RSI <40 is actually the second-best RSI band. This applies mainly to connors_rsi2 and wyckoff_spring which target oversold conditions. RSI 50-60 still best for trend strategies (WR 62.0%, n=368).",
+      "action": "Keep RSI floor at 50 for breakout/cup_handle/nr7. Explicitly exempt connors_rsi2 and wyckoff_spring from RSI floor — their edge is in the <40 zone.",
+      "data": {
+        "rsi_lt40":  {"n": 98,  "wr_pct": 67.3, "avg_ret_pct": 2.51, "note": "mostly connors_rsi2 + wyckoff"},
+        "rsi_40_50": {"n": 144, "wr_pct": 56.2, "avg_ret_pct": 0.79},
+        "rsi_50_60": {"n": 368, "wr_pct": 62.0, "avg_ret_pct": 1.41},
+        "rsi_60_65": {"n": 216, "wr_pct": 59.7, "avg_ret_pct": 0.62}
       }
     }
   ],
-  "disabled_strategies": ["high_tight_flag", "momentum", "bb_squeeze"],
+  "disabled_strategies": ["high_tight_flag", "momentum", "bb_squeeze", "stage4_short"],
   "active_filters": {
     "adx_floor": 16,
     "adx_cap": 35,
     "rsi_floor": 50,
+    "rsi_floor_exceptions": ["connors_rsi2", "wyckoff_spring", "connors_3down"],
     "score_cap": 5,
     "score_cap_exceptions": ["signal_velocity"]
   },
   "new_scanners": {
     "wyckoff_spring": {"status": "live", "first_signals": "2026-07-03", "n_signals_day1": 4},
     "weinstein_stage2": {"status": "live", "first_signals": "2026-07-03", "n_signals_day1": 1}
-  }
+  },
+  "proven_edge_set": {
+    "pocket_pivot":    {"wr_pct": 86.0, "n": 43,  "status": "PROVEN"},
+    "ema_ribbon":      {"wr_pct": 69.6, "n": 79,  "status": "PROVEN"},
+    "cup_handle":      {"wr_pct": 64.9, "n": 94,  "status": "PROVEN"},
+    "signal_velocity": {"wr_pct": 64.3, "n": 42,  "status": "PROVEN"},
+    "connors_rsi2":    {"wr_pct": 59.9, "n": 157, "status": "PROVEN"},
+    "stage4_short":    {"wr_pct": 11.4, "n": 79,  "status": "REMOVED — tracking was inverted, see L020"}
+  },
+  "open_trades": {
+    "CSX": {"entry": 49.00, "date": "2026-07-06", "strategy": "pocket_pivot", "target_exit": "2026-07-13", "type": "real"}
+  },
+  "pending_improvements": [
+    "Add vol_ratio to _rank_score(): vol≥2x=+2pts, vol 1.5-2x=+1pt (L019 — highest ROI fix)",
+    "Remove stage4_short from scan.py PROVEN_EDGE + SCANNER_MAP (L020 — critical bug)",
+    "Fix update_scan_history.py: filter ret_d5 < -15% as data errors before WR calc (L021)",
+    "Consider loosening RSI cap to 75 — RSI 70-80 shows 63.1% WR (L018)",
+    "Persistence flag: 3+ scan dates = highlight ticker (L013 — not yet implemented)"
+  ]
 }

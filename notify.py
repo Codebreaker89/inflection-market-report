@@ -501,8 +501,9 @@ def _load_strategy_stats() -> dict:
         }
     return out
 
-_PROVEN_EDGE_SET = {"pocket_pivot", "stage4_short", "ema_ribbon", "cup_handle",
+_PROVEN_EDGE_SET = {"pocket_pivot", "ema_ribbon", "cup_handle",
                     "signal_velocity", "connors_rsi2"}
+# stage4_short REMOVED: tracking inverted, true WR=11.4% (L020)
 
 def _conviction_tier_email(r: dict, multi_tickers: set) -> str:
     """Returns HIGH / MED / LOW conviction string."""

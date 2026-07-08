@@ -185,7 +185,7 @@ SCANNER_MAP = {
     "analyst_upgrade":      scan_analyst_upgrade,
     "signal_velocity":      scan_signal_velocity,
     "chokepoint_inflection": scan_chokepoint,
-    "stage4_short":          scan_stage4_short,
+    # "stage4_short": scan_stage4_short,  # DISABLED: tracking inverted — true WR=11.4% (L020)
     "defensive_rotation":    scan_defensive_rotation,
     "cup_handle":            scan_cup_handle,
     "power_earnings_gap":    scan_peg,
@@ -470,8 +470,10 @@ def _conviction_tier(r: dict, multi_tickers: set) -> tuple:
 
 
 # PROVEN EDGE strategies (WR≥60%, n≥10 from scan_history backtest)
-PROVEN_EDGE = {"pocket_pivot", "stage4_short", "ema_ribbon", "cup_handle",
+PROVEN_EDGE = {"pocket_pivot", "ema_ribbon", "cup_handle",
                "signal_velocity", "connors_rsi2"}
+# stage4_short REMOVED from PROVEN_EDGE: tracking was inverted (ret_d5>0 = price UP = SHORT LOSS).
+# True WR for stage4_short as a short strategy = 11.4% (9/79). Disabled scanner.
 
 def _rank_score(r: dict, strats_fired: list) -> float:
     """
@@ -509,6 +511,12 @@ def _rank_score(r: dict, strats_fired: list) -> float:
         pts += 1
     best_wr = max((_HIST_STATS.get(s, {}).get("wr", 0) for s in strats_fired), default=0)
     if best_wr >= 60:
+        pts += 1
+    # Volume ratio: strongest untapped signal (L019 — vol 2-3x = 73% WR)
+    vr = r.get("vol_ratio", 0) or 0
+    if vr >= 2.0:
+        pts += 2
+    elif vr >= 1.5:
         pts += 1
     return pts
 
@@ -929,7 +937,7 @@ def main():
 
     # Score cap: score>=6 WR drops to 25-56%, avg turns negative (Jun 30 backtest, 620 trades)
     # Exception: signal_velocity uses 0-13 scale so cap doesn't apply
-    SCORE_CAP_EXEMPT = {"signal_velocity", "stage4_short"}
+    SCORE_CAP_EXEMPT = {"signal_velocity"}
     for strat in results_by_strategy:
         if strat in SCORE_CAP_EXEMPT:
             continue
@@ -942,7 +950,7 @@ def main():
     # RSI floor: drop RSI<50 for non-mean-reversion strategies (dead zone confirmed WR 48%)
     RSI_FLOOR_EXEMPT = {"connors_rsi2", "connors_3down", "connors_r3", "connors_tps",
                         "williams_pct_r", "bollinger_pctb", "raschke_8020", "turtle_soup",
-                        "stage4_short", "signal_velocity", "wyckoff_spring", "weinstein_stage2"}
+                        "signal_velocity", "wyckoff_spring", "weinstein_stage2"}
     for strat in list(results_by_strategy.keys()):
         if strat in RSI_FLOOR_EXEMPT:
             continue
@@ -953,7 +961,7 @@ def main():
                    or (r.get("rsi") or 0) >= 50]
 
     # Earnings block: drop tickers with earnings within 14 days (gap risk destroys stop)
-    EARNINGS_EXEMPT = {"stage4_short"}  # shorts not affected by earnings the same way
+    EARNINGS_EXEMPT: set = set()  # no exemptions — stage4_short disabled
     def _near_earnings(ticker: str, days: int = 14) -> bool:
         try:
             t_obj = yf.Ticker(_yf_sym(ticker))
