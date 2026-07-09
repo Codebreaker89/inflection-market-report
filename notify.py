@@ -463,16 +463,21 @@ def _load_strategy_stats() -> dict:
         return {}
     from collections import defaultdict
     import csv as _csv, math as _math
+    # Strategies with known tracking issues — exclude from scorecard
+    _EXCLUDED_FROM_STATS = {"stage4_short"}  # L020: ret tracking inverted for shorts
     stats = defaultdict(lambda: {"wins": 0, "total": 0, "sum": 0.0, "r_sum": 0.0, "r_n": 0})
     try:
         with open(csv_path, newline="", encoding="utf-8") as f:
             for row in _csv.DictReader(f):
                 strat = row.get("strategy", "").strip()
-                if not strat:
+                if not strat or strat in _EXCLUDED_FROM_STATS:
                     continue
                 try:
                     ret = float(row["ret_d5"])
                     if _math.isnan(ret):
+                        continue
+                    # L021: skip corrupted data (stock splits/yfinance errors)
+                    if abs(ret) > 15:
                         continue
                     stats[strat]["total"] += 1
                     stats[strat]["sum"]   += ret
