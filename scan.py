@@ -475,24 +475,33 @@ PROVEN_EDGE = {"pocket_pivot", "ema_ribbon", "cup_handle",
 # stage4_short REMOVED from PROVEN_EDGE: tracking was inverted (ret_d5>0 = price UP = SHORT LOSS).
 # True WR for stage4_short as a short strategy = 11.4% (9/79). Disabled scanner.
 
-def _rank_score(r: dict, strats_fired: list) -> float:
+# Regime-strategy fit: which strategies thrive in which market regime
+# Trend-following: need confirmed uptrend (BULL)
+_TREND_STRATS     = {"ema_ribbon", "pocket_pivot", "cup_handle", "breakout",
+                     "signal_velocity", "weinstein_stage2", "vcp", "power_earnings_gap"}
+# Mean reversion: work in sideways/oversold conditions (NEUTRAL/BEAR)
+_REVERSION_STRATS = {"connors_rsi2", "nr7", "wyckoff_spring", "raschke_8020",
+                     "connors_3down", "bollinger_pctb"}
+
+
+def _rank_score(r: dict, strats_fired: list, elder_count: int = 0) -> float:
     """
     Score each HIGH-conviction pick so we can label top 1/2/3.
-    Higher = better. Criteria (max ~18 pts):
+    Higher = better. Criteria (max ~19 pts):
       +3  any PROVEN_EDGE strategy fired
       +1  ADX 20-35  (data: -3.1% WR delta, reduced from +2)
       +1  ADX 16-20 or 35-45
       +2  RSI 50-65  (momentum without overextension)
-          RSI 65-70  REMOVED (data: -2.3% WR — was costing points)
-      +3  3+ strategies (data: 74% WR, +16pts vs baseline — boosted from +2)
-      +2  2 strategies (data: 63% WR, +6pts vs baseline — boosted from +1)
-      +1  score ≤ 3  (clean signal)
-          hist WR ≥60%  REMOVED (data: -9% WR — scan-time WR is noisy)
-      +2  vol 1.5-2x  (data: 68.4% WR — better than ≥2x, swapped)
-      +1  vol ≥ 2x    (data: 66.2% WR)
+          RSI 65-70  REMOVED (data: -2.3% WR)
+      +3  3+ strategies (data: 74% WR)
+      +2  2 strategies  (data: 63% WR)
+      +1  score ≤ 3
+      +2  vol 1.5-2x   (data: 68.4% WR)
+      +1  vol ≥ 2x     (data: 66.2% WR)
       +2  persistent 3+ scan dates (L013 — 61% vs 47% WR)
       +1  persistent 2 scan dates
-      +1  RS positive vs SPY 10d (beating market)
+      +1  RS positive vs SPY 10d
+      +1  regime-strategy fit (trend strats in BULL, reversion strats in NEUTRAL)
     Calibrated via optimize_weights.py on 1119 signals (10 scan dates).
     """
     pts = 0.0
@@ -500,35 +509,37 @@ def _rank_score(r: dict, strats_fired: list) -> float:
         pts += 3
     adx = r.get("adx", 0) or 0
     if 20 <= adx <= 35:
-        pts += 1                              # was +2; data shows -3.1% WR delta
+        pts += 1
     elif 16 <= adx < 20 or 35 < adx <= 45:
         pts += 1
     rsi = r.get("rsi", 0) or 0
     if 50 <= rsi <= 65:
         pts += 2
-    # RSI 65-70: REMOVED — data shows -2.3% WR, was +1
     n_strats = len(strats_fired)
     if n_strats >= 3:
-        pts += 3                              # was +2; data: 74% WR (+16pts vs baseline)
+        pts += 3
     elif n_strats == 2:
-        pts += 2                              # was +1; data: 63% WR (+6pts vs baseline)
+        pts += 2
     if (r.get("score") or 99) <= 3:
         pts += 1
-    # hist WR ≥60%: REMOVED — data shows -9% WR (scan-time WR too noisy at low n)
-    # Volume ratio — swapped: 1.5-2x outperforms ≥2x (68.4% vs 66.2% WR)
     vr = r.get("vol_ratio", 0) or 0
     if 1.5 <= vr < 2.0:
-        pts += 2                              # was +1; data: 68.4% WR
+        pts += 2
     elif vr >= 2.0:
-        pts += 1                              # was +2; data: 66.2% WR
-    # Persistence: ticker appeared on previous scan dates (L013 — 61% vs 47% WR)
+        pts += 1
     days_seen = _PERSISTENCE.get(r.get("ticker", ""), 0)
     if days_seen >= 3:
         pts += 2
     elif days_seen >= 2:
         pts += 1
-    # Relative strength vs SPY (stock beating market before signal)
     if r.get("rs_vs_spy", 0) and float(r.get("rs_vs_spy", 0)) > 0:
+        pts += 1
+    # Regime fit: +1 if strategy type matches current market regime
+    is_bull    = elder_count >= 15
+    is_neutral = 5 <= elder_count < 15
+    has_trend  = any(s in _TREND_STRATS     for s in strats_fired)
+    has_revert = any(s in _REVERSION_STRATS for s in strats_fired)
+    if (is_bull and has_trend) or (is_neutral and has_revert):
         pts += 1
     return pts
 
@@ -555,7 +566,7 @@ def _get_ticker_sector_tag(ticker: str, sector_excess: dict) -> str:
 
 
 def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_backtest: bool,
-                           sector_excess: dict = None):
+                           sector_excess: dict = None, elder_count: int = 0):
     """Lead with ACT ON THESE — make the actionable signal unmissable."""
     seen = {}
     tier_rank = {"★★★ HIGH": 0, "★★  MED ": 1, "★   LOW ": 2}
@@ -595,7 +606,7 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
                  if any(x["ticker"] == r["ticker"] for x in res)],
                 key=lambda s: -_HIST_STATS.get(s, {}).get("wr", 0)
             )
-            rs = _rank_score(r, strats_fired)
+            rs = _rank_score(r, strats_fired, elder_count)
             enriched.append((rs, r, strategy, strats_fired))
 
         # Sort by rank score descending
@@ -1130,7 +1141,8 @@ def main():
     _thematic_check()
 
     # ── LEAD WITH CONVICTION — what to act on ─────────────────────────────────
-    _print_high_conviction(results_by_strategy, multi_tickers, with_backtest, sector_excess)
+    elder_count = len(results_by_strategy.get("elder_impulse", []))
+    _print_high_conviction(results_by_strategy, multi_tickers, with_backtest, sector_excess, elder_count)
 
     # ── MULTI-STRATEGY OVERLAP MATRIX ─────────────────────────────────────────
     _print_matrix(results_by_strategy, strategies, upgrade_tickers)
@@ -1150,7 +1162,6 @@ def main():
 
     # Persist latest scan results for notify.py / update_scan_history.py
     try:
-        elder_count = len(results_by_strategy.get("elder_impulse", []))
         payload = {
             "scan_date": datetime.now().strftime("%Y-%m-%d"),
             "strategies": strategies,

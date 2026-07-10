@@ -581,29 +581,39 @@ def _build_scanner_results_html() -> str:
         if t not in best_by_ticker or rank < best_by_ticker[t][0]:
             best_by_ticker[t] = (rank, tier, s, r)
 
+    _TREND_STRATS     = {"ema_ribbon", "pocket_pivot", "cup_handle", "breakout",
+                         "signal_velocity", "weinstein_stage2", "vcp", "power_earnings_gap"}
+    _REVERSION_STRATS = {"connors_rsi2", "nr7", "wyckoff_spring", "raschke_8020",
+                         "connors_3down", "bollinger_pctb"}
+
     def _email_rank_score(r: dict, strats_fired: list, persistence: dict) -> float:
         """Mirror of scan.py _rank_score — keep in sync."""
         pts = 0.0
         if any(s in _PROVEN_EDGE_SET for s in strats_fired):
             pts += 3
         adx = r.get("adx") or 0
-        if 20 <= adx <= 35:   pts += 1      # reduced: data shows -3.1% WR delta
+        if 20 <= adx <= 35:   pts += 1
         elif 16 <= adx < 20 or 35 < adx <= 45: pts += 1
         rsi = r.get("rsi") or 0
         if 50 <= rsi <= 65:   pts += 2
-        # RSI 65-70 removed: -2.3% WR
         n = len(strats_fired)
-        if n >= 3:   pts += 3               # boosted: 74% WR (+16pts vs baseline)
-        elif n == 2: pts += 2               # boosted: 63% WR (+6pts vs baseline)
+        if n >= 3:   pts += 3
+        elif n == 2: pts += 2
         if (r.get("score") or 99) <= 3: pts += 1
-        # hist WR ≥60% removed: -9% WR (scan-time WR too noisy)
         vol = r.get("vol_ratio") or 0
-        if 1.5 <= vol < 2.0: pts += 2      # swapped: 68.4% WR beats ≥2x
-        elif vol >= 2.0:     pts += 1       # 66.2% WR
+        if 1.5 <= vol < 2.0: pts += 2
+        elif vol >= 2.0:     pts += 1
         days_seen = persistence.get(r.get("ticker", ""), 0)
         if days_seen >= 3:   pts += 2
         elif days_seen >= 2: pts += 1
         if (r.get("rs_vs_spy") or 0) > 0: pts += 1
+        # Regime fit
+        is_bull    = elder_count >= 15
+        is_neutral = 5 <= elder_count < 15
+        has_trend  = any(s in _TREND_STRATS     for s in strats_fired)
+        has_revert = any(s in _REVERSION_STRATS for s in strats_fired)
+        if (is_bull and has_trend) or (is_neutral and has_revert):
+            pts += 1
         return pts
 
     _persistence = _load_persistence_counts()
