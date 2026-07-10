@@ -582,25 +582,24 @@ def _build_scanner_results_html() -> str:
             best_by_ticker[t] = (rank, tier, s, r)
 
     def _email_rank_score(r: dict, strats_fired: list, persistence: dict) -> float:
-        """Same criteria as scan.py _rank_score — higher is better."""
+        """Mirror of scan.py _rank_score — keep in sync."""
         pts = 0.0
         if any(s in _PROVEN_EDGE_SET for s in strats_fired):
             pts += 3
         adx = r.get("adx") or 0
-        if 20 <= adx <= 35:   pts += 2
+        if 20 <= adx <= 35:   pts += 1      # reduced: data shows -3.1% WR delta
         elif 16 <= adx < 20 or 35 < adx <= 45: pts += 1
         rsi = r.get("rsi") or 0
         if 50 <= rsi <= 65:   pts += 2
-        elif 65 < rsi <= 70:  pts += 1
+        # RSI 65-70 removed: -2.3% WR
         n = len(strats_fired)
-        if n >= 3:   pts += 2
-        elif n == 2: pts += 1
+        if n >= 3:   pts += 3               # boosted: 74% WR (+16pts vs baseline)
+        elif n == 2: pts += 2               # boosted: 63% WR (+6pts vs baseline)
         if (r.get("score") or 99) <= 3: pts += 1
-        best_wr = max((hist_stats.get(s, {}).get("wr", 0) for s in strats_fired), default=0)
-        if best_wr >= 60: pts += 1
+        # hist WR ≥60% removed: -9% WR (scan-time WR too noisy)
         vol = r.get("vol_ratio") or 0
-        if vol >= 2.0:   pts += 2
-        elif vol >= 1.5: pts += 1
+        if 1.5 <= vol < 2.0: pts += 2      # swapped: 68.4% WR beats ≥2x
+        elif vol >= 2.0:     pts += 1       # 66.2% WR
         days_seen = persistence.get(r.get("ticker", ""), 0)
         if days_seen >= 3:   pts += 2
         elif days_seen >= 2: pts += 1
@@ -729,7 +728,7 @@ def _build_scanner_results_html() -> str:
             f'<tr><td style="background:#052e16;border-left:5px solid #16a34a;padding:8px 12px;border-radius:4px 4px 0 0;">'
             f'<span style="font-size:13px;font-weight:800;color:#4ade80;letter-spacing:.06em;">'
             f'🎯 ACT ON THESE &nbsp;·&nbsp; {len(high_picks)} stock(s) &nbsp;·&nbsp; ★★★ HIGH CONVICTION</span>'
-            f'<br><span style="font-size:10px;color:#86efac;">Ranked by: PROVEN edge · RSI 50-65 · ADX 20-35 · multi-strategy · WR≥60%</span>'
+            f'<br><span style="font-size:10px;color:#86efac;">Ranked by: PROVEN edge · multi-strategy (74% WR) · vol 1.5-2x · RSI 50-65 · persistence</span>'
             f'</td></tr></table>'
         )
         for card_idx, (tier, strat, r) in enumerate(high_picks):

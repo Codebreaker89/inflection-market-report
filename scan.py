@@ -478,52 +478,50 @@ PROVEN_EDGE = {"pocket_pivot", "ema_ribbon", "cup_handle",
 def _rank_score(r: dict, strats_fired: list) -> float:
     """
     Score each HIGH-conviction pick so we can label top 1/2/3.
-    Higher = better. Criteria (max ~17 pts):
+    Higher = better. Criteria (max ~18 pts):
       +3  any PROVEN_EDGE strategy fired
-      +2  ADX 20-35  (sweet trend zone)
+      +1  ADX 20-35  (data: -3.1% WR delta, reduced from +2)
       +1  ADX 16-20 or 35-45
       +2  RSI 50-65  (momentum without overextension)
-      +1  RSI 65-70
-      +2  3+ strategies (multi-confirmation)
-      +1  2 strategies
-      +1  score ≤ 3  (clean, not cluttered signal)
-      +1  wr ≥ 60%   (best strategy WR)
-      +2  vol ≥ 2x   (L019 — 73% WR)
-      +1  vol ≥ 1.5x
+          RSI 65-70  REMOVED (data: -2.3% WR — was costing points)
+      +3  3+ strategies (data: 74% WR, +16pts vs baseline — boosted from +2)
+      +2  2 strategies (data: 63% WR, +6pts vs baseline — boosted from +1)
+      +1  score ≤ 3  (clean signal)
+          hist WR ≥60%  REMOVED (data: -9% WR — scan-time WR is noisy)
+      +2  vol 1.5-2x  (data: 68.4% WR — better than ≥2x, swapped)
+      +1  vol ≥ 2x    (data: 66.2% WR)
       +2  persistent 3+ scan dates (L013 — 61% vs 47% WR)
       +1  persistent 2 scan dates
       +1  RS positive vs SPY 10d (beating market)
+    Calibrated via optimize_weights.py on 1119 signals (10 scan dates).
     """
     pts = 0.0
     if any(s in PROVEN_EDGE for s in strats_fired):
         pts += 3
     adx = r.get("adx", 0) or 0
     if 20 <= adx <= 35:
-        pts += 2
+        pts += 1                              # was +2; data shows -3.1% WR delta
     elif 16 <= adx < 20 or 35 < adx <= 45:
         pts += 1
     rsi = r.get("rsi", 0) or 0
     if 50 <= rsi <= 65:
         pts += 2
-    elif 65 < rsi <= 70:
-        pts += 1
+    # RSI 65-70: REMOVED — data shows -2.3% WR, was +1
     n_strats = len(strats_fired)
     if n_strats >= 3:
-        pts += 2
+        pts += 3                              # was +2; data: 74% WR (+16pts vs baseline)
     elif n_strats == 2:
-        pts += 1
+        pts += 2                              # was +1; data: 63% WR (+6pts vs baseline)
     if (r.get("score") or 99) <= 3:
         pts += 1
-    best_wr = max((_HIST_STATS.get(s, {}).get("wr", 0) for s in strats_fired), default=0)
-    if best_wr >= 60:
-        pts += 1
-    # Volume ratio (L019 — vol 2-3x = 73% WR)
+    # hist WR ≥60%: REMOVED — data shows -9% WR (scan-time WR too noisy at low n)
+    # Volume ratio — swapped: 1.5-2x outperforms ≥2x (68.4% vs 66.2% WR)
     vr = r.get("vol_ratio", 0) or 0
-    if vr >= 2.0:
-        pts += 2
-    elif vr >= 1.5:
-        pts += 1
-    # Persistence: ticker appeared on previous scan dates (L013 — 61% vs 47% WR for 1-2 day)
+    if 1.5 <= vr < 2.0:
+        pts += 2                              # was +1; data: 68.4% WR
+    elif vr >= 2.0:
+        pts += 1                              # was +2; data: 66.2% WR
+    # Persistence: ticker appeared on previous scan dates (L013 — 61% vs 47% WR)
     days_seen = _PERSISTENCE.get(r.get("ticker", ""), 0)
     if days_seen >= 3:
         pts += 2
