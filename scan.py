@@ -140,7 +140,9 @@ from weinstein_stage2_scanner      import scan as scan_weinstein_stage2
 from show_tracker                  import (add_trade_interactive, load_trades, save_trades,
                                            next_id, ticker_ccy, fetch_fx_on_date,
                                            fetch_company_name, fetch_sector, fetch_market_regime,
-                                           trade_stop_loss, trade_hold_days, biz_days_add)
+                                           trade_stop_loss, trade_hold_days, biz_days_add,
+                                           _yf_ticker as _yf_sym)
+from scanner_utils                 import _quiet as _quiet_ctx
 
 # ANSI helpers (inline — no shared module dependency)
 import os as _os
@@ -476,7 +478,7 @@ PROVEN_EDGE = {"pocket_pivot", "ema_ribbon", "cup_handle",
 def _rank_score(r: dict, strats_fired: list) -> float:
     """
     Score each HIGH-conviction pick so we can label top 1/2/3.
-    Higher = better. Criteria (max ~13 pts):
+    Higher = better. Criteria (max ~17 pts):
       +3  any PROVEN_EDGE strategy fired
       +2  ADX 20-35  (sweet trend zone)
       +1  ADX 16-20 or 35-45
@@ -486,6 +488,11 @@ def _rank_score(r: dict, strats_fired: list) -> float:
       +1  2 strategies
       +1  score ≤ 3  (clean, not cluttered signal)
       +1  wr ≥ 60%   (best strategy WR)
+      +2  vol ≥ 2x   (L019 — 73% WR)
+      +1  vol ≥ 1.5x
+      +2  persistent 3+ scan dates (L013 — 61% vs 47% WR)
+      +1  persistent 2 scan dates
+      +1  RS positive vs SPY 10d (beating market)
     """
     pts = 0.0
     if any(s in PROVEN_EDGE for s in strats_fired):
@@ -510,11 +517,20 @@ def _rank_score(r: dict, strats_fired: list) -> float:
     best_wr = max((_HIST_STATS.get(s, {}).get("wr", 0) for s in strats_fired), default=0)
     if best_wr >= 60:
         pts += 1
-    # Volume ratio: strongest untapped signal (L019 — vol 2-3x = 73% WR)
+    # Volume ratio (L019 — vol 2-3x = 73% WR)
     vr = r.get("vol_ratio", 0) or 0
     if vr >= 2.0:
         pts += 2
     elif vr >= 1.5:
+        pts += 1
+    # Persistence: ticker appeared on previous scan dates (L013 — 61% vs 47% WR for 1-2 day)
+    days_seen = _PERSISTENCE.get(r.get("ticker", ""), 0)
+    if days_seen >= 3:
+        pts += 2
+    elif days_seen >= 2:
+        pts += 1
+    # Relative strength vs SPY (stock beating market before signal)
+    if r.get("rs_vs_spy", 0) and float(r.get("rs_vs_spy", 0)) > 0:
         pts += 1
     return pts
 
@@ -610,7 +626,16 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
             rank_label = medals.get(idx, "     ")
             ticker_fmt = f"{r['ticker']:<10}"
             sec_tag = _get_ticker_sector_tag(r["ticker"], sector_excess or {})
-            print(f"  {rank_label}  {GRN(BOLD(ticker_fmt))}{sec_tag}  {company:<22}  {strat_str:<28}{proven_s}  {wr_col}  {r.get('score',0):>5}  {r.get('rsi',0):>5.1f}  {r.get('adx',0):>5.1f}  {r.get('price',0):>8.2f}")
+            # Persistence badge
+            days_seen = _PERSISTENCE.get(r["ticker"], 0)
+            pers_badge = (GRN(" 🔁PERSIST") if days_seen >= 3
+                          else (DIM(" 🔁x2") if days_seen >= 2 else ""))
+            # Volume surge badge
+            vr = r.get("vol_ratio", 0) or 0
+            vol_badge = GRN(" ⚡VOL") if vr >= 2.0 else (YLW(" ⚡") if vr >= 1.5 else "")
+            # RS badge
+            rs_badge = GRN(" ↑RS") if r.get("rs_vs_spy", 0) and float(r.get("rs_vs_spy",0)) > 0 else ""
+            print(f"  {rank_label}  {GRN(BOLD(ticker_fmt))}{sec_tag}  {company:<22}  {strat_str:<28}{proven_s}  {wr_col}  {r.get('score',0):>5}  {r.get('rsi',0):>5.1f}  {r.get('adx',0):>5.1f}  {r.get('price',0):>8.2f}{pers_badge}{vol_badge}{rs_badge}")
         print()
 
     # ── WATCHLIST (MED conviction) ─────────────────────────────────────────────
@@ -639,6 +664,27 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
 
 
 
+
+def _load_persistence_counts() -> dict:
+    """Return {ticker: n_unique_scan_dates} from scan_history.csv — used for persistence badge."""
+    import csv as _csv
+    from collections import defaultdict
+    from pathlib import Path as _Path
+    p = _Path(__file__).parent / "scan_history.csv"
+    if not p.exists(): return {}
+    ticker_dates = defaultdict(set)
+    try:
+        with open(p, newline="") as f:
+            for row in _csv.DictReader(f):
+                t = row.get("ticker","").strip()
+                sd = row.get("scan_date","").strip()
+                if t and sd:
+                    ticker_dates[t].add(sd)
+    except Exception:
+        return {}
+    return {t: len(d) for t, d in ticker_dates.items()}
+
+_PERSISTENCE: dict = {}  # {ticker: n_scan_dates} — loaded in main()
 
 def _load_hist_stats() -> dict:
     import csv as _csv, math as _math
@@ -901,6 +947,16 @@ def main():
         print(f"Available: {ALL_STRATEGIES}")
         sys.exit(1)
 
+    # Friday warning — signals have 45% WR historically (vs Mon 65%, Wed 71%)
+    is_friday = datetime.now().weekday() == 4
+    if is_friday:
+        print()
+        print("╔" + "═"*(W-2) + "╗")
+        print("║" + RED(BOLD("  ⚠  FRIDAY SCAN — historical WR=45% avg -0.31%  ·  nr7/connors/elder all <42% WR on Fri")).ljust(W+12) + "║")
+        print("║" + YLW("  💡  Hold entry signals until Monday. Practice trades will NOT be auto-added today.").ljust(W+8) + "║")
+        print("╚" + "═"*(W-2) + "╝")
+        print()
+
     print(DIM(f"  Running: {', '.join(strategies)}  ·  backtest={'ON' if with_backtest else 'OFF'}"))
     print()
 
@@ -957,6 +1013,56 @@ def main():
     all_results = [r for r in all_results
                    if r.get("strategy") in RSI_FLOOR_EXEMPT
                    or (r.get("rsi") or 0) >= 50]
+
+    # connors_rsi2 RSI cap: strategy designed for oversold bounces; Jul data shows it
+    # misfiring at RSI 70-94 → WR collapses. Cap at 75 (data: RSI 60-75 = 64% WR, RSI>75 = weak)
+    results_by_strategy["connors_rsi2"] = [
+        r for r in results_by_strategy.get("connors_rsi2", [])
+        if (r.get("rsi") or 0) <= 75
+    ]
+
+    # Relative strength vs SPY: compute 10d return for HIGH-conviction tickers only.
+    # Stock beating SPY before signal = actual alpha, not just beta. +1pt in rank_score.
+    def _fetch_rs_vs_spy(ticker: str, spy_10d: float) -> float:
+        """Return stock 10d return minus SPY 10d return. Positive = outperforming."""
+        try:
+            import yfinance as _yf
+            sym = _yf_sym(ticker)
+            with _quiet_ctx():
+                df = _yf.Ticker(sym).history(period="15d", interval="1d", auto_adjust=True)
+            if df is None or len(df) < 5: return 0.0
+            ret = (df["Close"].iloc[-1] / df["Close"].iloc[-10] - 1) * 100 if len(df) >= 10 else 0.0
+            return round(ret - spy_10d, 2)
+        except Exception:
+            return 0.0
+
+    # Compute RS only for multi-strategy tickers (HIGH/MED) to avoid slowing full scan
+    from collections import Counter as _Counter
+    _tc = _Counter(r["ticker"] for r in all_results)
+    _multi_for_rs = {t for t, n in _tc.items() if n >= 2}
+    _spy_10d = 0.0
+    try:
+        import yfinance as _yf2
+        with _quiet_ctx():
+            _sp = _yf2.Ticker("SPY").history(period="15d", interval="1d", auto_adjust=True)
+        if _sp is not None and len(_sp) >= 10:
+            _spy_10d = (_sp["Close"].iloc[-1] / _sp["Close"].iloc[-10] - 1) * 100
+    except Exception:
+        pass
+    _rs_cache: dict = {}
+    if _multi_for_rs and _HAS_YF:
+        print(DIM(f"  Computing RS vs SPY for {len(_multi_for_rs)} conviction tickers..."), flush=True)
+        for _t in _multi_for_rs:
+            _rs_cache[_t] = _fetch_rs_vs_spy(_t, _spy_10d)
+    # Stamp rs_vs_spy onto each result dict
+    for strat in results_by_strategy:
+        for r in results_by_strategy[strat]:
+            if r["ticker"] in _rs_cache:
+                r["rs_vs_spy"] = _rs_cache[r["ticker"]]
+
+    # Load persistence counts (must be before rank scoring)
+    global _PERSISTENCE
+    _PERSISTENCE = _load_persistence_counts()
 
     # Earnings block: drop tickers with earnings within 14 days (gap risk destroys stop)
     EARNINGS_EXEMPT: set = set()  # no exemptions — stage4_short disabled
@@ -1065,19 +1171,23 @@ def main():
         print(f"  WARNING: could not save last_scan.json — {e}")
 
     # Auto-add HIGH conviction picks as practice trades
-    _auto_add_practice_trades(results_by_strategy, multi_tickers)
+    _auto_add_practice_trades(results_by_strategy, multi_tickers, is_friday=is_friday)
 
     # Tracker prompt
     if all_results:
         _tracker_prompt(all_results)
 
 
-def _auto_add_practice_trades(results_by_strategy: dict, multi_tickers: set):
+def _auto_add_practice_trades(results_by_strategy: dict, multi_tickers: set, is_friday: bool = False):
     """
     Auto-add every HIGH conviction pick as a practice trade.
     Skips tickers already OPEN in trades.csv (any trade type).
+    Skips entirely on Friday (WR=45%, not worth entering).
     Runs silently at end of scan — no user input needed.
     """
+    if is_friday:
+        print(DIM("  [practice-auto] Skipping Friday — low WR signals, hold until Monday."))
+        return
     try:
         existing_trades = load_trades()
     except Exception:

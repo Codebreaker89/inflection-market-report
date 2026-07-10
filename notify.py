@@ -470,6 +470,24 @@ _PROVEN_EDGE_SET = {"pocket_pivot", "ema_ribbon", "cup_handle",
                     "signal_velocity", "connors_rsi2"}
 # stage4_short REMOVED: tracking inverted, true WR=11.4% (L020)
 
+def _load_persistence_counts() -> dict:
+    """Return {ticker: n_unique_scan_dates} from scan_history.csv."""
+    import csv as _csv
+    from collections import defaultdict
+    p = HERE / "scan_history.csv"
+    if not p.exists(): return {}
+    ticker_dates = defaultdict(set)
+    try:
+        with open(p, newline="") as f:
+            for row in _csv.DictReader(f):
+                t = row.get("ticker","").strip()
+                sd = row.get("scan_date","").strip()
+                if t and sd:
+                    ticker_dates[t].add(sd)
+    except Exception:
+        return {}
+    return {t: len(d) for t, d in ticker_dates.items()}
+
 def _conviction_tier_email(r: dict, multi_tickers: set) -> str:
     """Returns HIGH / MED / LOW conviction string."""
     is_multi   = r.get("ticker") in multi_tickers
@@ -563,7 +581,7 @@ def _build_scanner_results_html() -> str:
         if t not in best_by_ticker or rank < best_by_ticker[t][0]:
             best_by_ticker[t] = (rank, tier, s, r)
 
-    def _email_rank_score(r: dict, strats_fired: list) -> float:
+    def _email_rank_score(r: dict, strats_fired: list, persistence: dict) -> float:
         """Same criteria as scan.py _rank_score — higher is better."""
         pts = 0.0
         if any(s in _PROVEN_EDGE_SET for s in strats_fired):
@@ -580,15 +598,24 @@ def _build_scanner_results_html() -> str:
         if (r.get("score") or 99) <= 3: pts += 1
         best_wr = max((hist_stats.get(s, {}).get("wr", 0) for s in strats_fired), default=0)
         if best_wr >= 60: pts += 1
+        vol = r.get("vol_ratio") or 0
+        if vol >= 2.0:   pts += 2
+        elif vol >= 1.5: pts += 1
+        days_seen = persistence.get(r.get("ticker", ""), 0)
+        if days_seen >= 3:   pts += 2
+        elif days_seen >= 2: pts += 1
+        if (r.get("rs_vs_spy") or 0) > 0: pts += 1
         return pts
 
+    _persistence = _load_persistence_counts()
     high_picks_raw = [(tier, s, r) for t, (rank, tier, s, r) in best_by_ticker.items() if tier == "HIGH"]
     # Compute rank score for each HIGH pick
     high_picks = sorted(
         high_picks_raw,
         key=lambda x: -_email_rank_score(
             x[2],
-            [s for s, res in rbs.items() if any(z["ticker"] == x[2]["ticker"] for z in res)]
+            [s for s, res in rbs.items() if any(z["ticker"] == x[2]["ticker"] for z in res)],
+            _persistence,
         )
     )
     med_picks = sorted(
@@ -600,6 +627,10 @@ def _build_scanner_results_html() -> str:
     regime_col  = {"BULL": "#16a34a", "NEUTRAL": "#d97706", "BEAR": "#dc2626"}.get(market_regime, "#888")
     regime_icon = {"BULL": "🟢", "NEUTRAL": "🟡", "BEAR": "🔴"}.get(market_regime, "⚪")
     spy_s = f"SPY 10d {'+' if spy_ret >= 0 else ''}{spy_ret:.1f}%"
+
+    from datetime import date as _date
+    _scan_weekday = _date.fromisoformat(scan_date).weekday() if scan_date else -1
+    _is_friday = (_scan_weekday == 4)
 
     html = f'<br>{_section_head("📡","Scanner Results",f"scan {scan_date} · {len(active)} strategies fired · {total_hits} signals","#1a5a8a")}'
 
@@ -615,6 +646,16 @@ def _build_scanner_results_html() -> str:
         f'</span>'
         f'</td></tr></table>'
     )
+
+    # ── Friday Warning ────────────────────────────────────────────────────────
+    if _is_friday:
+        html += (
+            '<table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px;">'
+            '<tr><td style="background:#3b1a00;border-left:5px solid #f97316;padding:8px 14px;border-radius:4px;">'
+            '<span style="font-size:12px;font-weight:800;color:#fb923c;">⚠ FRIDAY SCAN — Historical WR=45%, avg -0.31%</span>'
+            '<span style="font-size:11px;color:#fed7aa;margin-left:10px;">Hold entry until Monday. Consider existing positions only.</span>'
+            '</td></tr></table>'
+        )
 
     # ── Sector Strength Panel ─────────────────────────────────────────────────
     _ETF_TO_SECTOR = {
@@ -735,6 +776,22 @@ def _build_scanner_results_html() -> str:
             else:
                 sec_tag = ""
 
+            # Signal badges: persistence, vol, RS
+            _days_seen = _persistence.get(r.get("ticker",""), 0)
+            _vol = r.get("vol_ratio") or 0
+            _rs  = r.get("rs_vs_spy") or 0
+            _sig_badges = ""
+            if _days_seen >= 3:
+                _sig_badges += '<span style="background:#1e3a5f;color:#93c5fd;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-right:3px;">🔁 PERSIST {_days_seen}d</span>'.replace("{_days_seen}", str(_days_seen))
+            elif _days_seen >= 2:
+                _sig_badges += '<span style="background:#1e3a5f;color:#93c5fd;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-right:3px;">🔁 2d</span>'
+            if _vol >= 2.0:
+                _sig_badges += f'<span style="background:#3b2200;color:#fb923c;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-right:3px;">⚡ VOL {_vol:.1f}x</span>'
+            elif _vol >= 1.5:
+                _sig_badges += f'<span style="background:#3b2200;color:#fbbf24;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-right:3px;">⚡ {_vol:.1f}x</span>'
+            if _rs > 0:
+                _sig_badges += f'<span style="background:#052e16;color:#4ade80;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-right:3px;">↑RS +{_rs:.1f}%</span>'
+
             border_col = "#16a34a" if card_idx == 0 else ("#2563eb" if card_idx == 1 else "#d97706" if card_idx == 2 else "#16a34a")
             html += (
                 f'<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:6px;border-radius:0 0 4px 4px;">'
@@ -745,7 +802,8 @@ def _build_scanner_results_html() -> str:
                 + (f'<div style="margin-bottom:4px;">{rank_badge}</div>' if rank_badge else '')
                 + f'<div style="font-size:20px;font-weight:800;color:#f0fdf4;font-family:monospace;">{r["ticker"]}</div>'
                 f'<div style="font-size:11px;color:#86efac;">{str(r.get("company","") or "")[:20]}{sec_tag}</div>'
-                f'</td>'
+                + (f'<div style="margin-top:4px;">{_sig_badges}</div>' if _sig_badges else '')
+                + f'</td>'
                 f'<td style="vertical-align:top;padding-left:12px;">'
                 f'<div style="margin-bottom:5px;">{strat_chips}{proven_badge}</div>'
                 f'<div style="font-size:11px;color:#d1fae5;">'
