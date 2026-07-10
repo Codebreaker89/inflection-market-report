@@ -1,0 +1,164 @@
+════════════════════════════════════════════════════════════════════════════════
+  SWING SCANNER WEIGHT OPTIMIZER
+════════════════════════════════════════════════════════════════════════════════
+  Source: /sessions/upbeat-great-goodall/mnt/fire/scan_history.csv
+  Clean rows with ret_d5: 1119  |  Scan dates: 10
+  Overall WR: 58.6%  |  avg ret_d5: +0.73%
+
+  ── Per-Feature WR + Avg Return ───────────────────────────────────────────────
+  Feature                      N(yes)    WR(yes)   WR(no)     Δ WR  Avg(yes)   Avg(no)    Δ Avg
+────────────────────────────────────────────────────────────────────────────────
+  PROVEN edge strategy         436         63.5%    55.5%    +8.0%    +1.50%    +0.24%   +1.26%  ★
+  ADX 20-35 (sweet zone)       588         57.1%    60.3%    -3.1%    +0.77%    +0.68%   +0.08%
+  ADX 16-20 or 35-45           332         59.3%    58.3%    +1.0%    +0.68%    +0.75%   -0.07%
+  RSI 50-65                    573         60.6%    56.6%    +4.0%    +0.81%    +0.64%   +0.18%
+  RSI 65-70                    157         56.7%    58.9%    -2.3%    +0.74%    +0.73%   +0.01%
+  Vol ≥2x avg                  80          66.2%    58.0%    +8.2%    +1.87%    +0.64%   +1.24%  ★
+  Vol 1.5-2x avg               98          68.4%    57.7%   +10.7%    +1.78%    +0.63%   +1.15%  ★
+  3+ strategies fired          50          74.0%    57.9%   +16.1%    +1.28%    +0.70%   +0.58%  ★
+  2 strategies fired           276         63.0%    57.2%    +5.9%    +1.10%    +0.60%   +0.50%  ★
+  Score ≤3                     498         59.0%    58.3%    +0.7%    +0.86%    +0.62%   +0.25%
+  Strategy hist WR ≥60%        42          50.0%    59.0%    -9.0%    +0.50%    +0.74%   -0.24%  ↓
+
+  ── Strategy-Level WR (from actual outcomes) ──────────────────────────────────
+  Strategy                      N      WR      Avg   Proven
+────────────────────────────────────────────────────────────────────────────────
+  pocket_pivot                 43   83.7%   +2.24%  ✦  ████████████████
+  ema_ribbon                   78   66.7%   +1.82%  ✦  █████████████
+  cup_handle                   98   64.3%   +1.91%  ✦  ████████████
+  signal_velocity              52   61.5%   +1.05%  ✦  ████████████
+  connors_rsi2                165   57.0%   +1.05%  ✦  ███████████
+  nr7                         290   56.9%   +0.63%     ███████████
+  breakout                    280   56.1%   +0.04%     ███████████
+  elder_impulse                64   50.0%   -0.57%     ██████████
+  connors_3down                13   46.2%   -1.15%     █████████
+  defensive_rotation            9   44.4%   +0.69%     ████████
+  holy_grail                    7   42.9%   +0.17%     ████████
+  power_earnings_gap            5   40.0%   -0.13%     ████████
+  rs_line                       5   20.0%   -1.75%     ████
+
+  ── Logistic Regression → Optimal Feature Weights ─────────────────────────────
+  In-sample AUC: 0.587  (0.5=random, 1.0=perfect)
+
+  Feature                          Coef   Current   Proposed  Change
+────────────────────────────────────────────────────────────────────────────────
+  PROVEN edge strategy           +0.129         3        2.0  -1.0 ◄ decrease
+  ADX 20-35 (sweet zone)         -0.084         2        0.0  -2.0 ◄ decrease
+  ADX 16-20 or 35-45             -0.044         1        0.0  -1.0 ◄ decrease
+  RSI 50-65                      +0.067         2        1.0  -1.0 ◄ decrease
+  RSI 65-70                      -0.006         1        0.0  -1.0 ◄ decrease
+  Vol ≥2x avg                    +0.085         2        1.5  -0.5 ◄ decrease
+  Vol 1.5-2x avg                 +0.119         1        2.0  +1.0 ◄ INCREASE
+  3+ strategies fired            +0.174         2        3.0  +1.0 ◄ INCREASE
+  2 strategies fired             +0.131         1        2.5  +1.5 ◄ INCREASE
+  Score ≤3                       +0.016         1        0.5  -0.5 ◄ decrease
+  Strategy hist WR ≥60%          -0.057         1        0.0  -1.0 ◄ decrease
+
+  ── Strategy Weight Optimization ──────────────────────────────────────────────
+  Method: WR-weighted vote (use actual WR as weight, not flat +1 per strategy)
+
+  Flat count correlation with win:    +0.0496
+  WR-weighted score correlation:      +0.0918
+  → WR-weighted is more predictive of outcome
+
+  ── Best Multi-Strategy Combos (n≥5 occurrences) ──────────────────────────────
+  Combo                                            N      WR      Avg
+────────────────────────────────────────────────────────────────────────────────
+  breakout+cup_handle+nr7                          6  100.0%   +4.24%
+  nr7+signal_velocity                              3  100.0%   +4.36%
+  cup_handle+pocket_pivot                          3  100.0%   +2.58%
+  ema_ribbon+nr7                                   5   80.0%   +2.74%
+  connors_rsi2+nr7                                15   73.3%   +1.90%
+  cup_handle+elder_impulse                         3   66.7%   +0.11%
+  connors_rsi2+ema_ribbon                         11   63.6%   +1.95%
+  breakout+ema_ribbon                              8   62.5%   +1.89%
+  breakout+connors_rsi2+nr7                        5   60.0%   +0.94%
+  elder_impulse+nr7                                5   60.0%   +0.62%
+  breakout+cup_handle                              7   57.1%   +0.30%
+  breakout+nr7                                    51   56.9%   +0.69%
+  breakout+connors_rsi2                           12   50.0%   +0.36%
+  cup_handle+nr7                                   9   33.3%   +1.18%
+
+  ── Threshold Grid Search (entry filters) ─────────────────────────────────────
+  Testing all combos of: min_strategies × min_vol_ratio × rsi_max × score_cap
+
+  min_strats  min_vol  rsi_max  score_cap     N      WR      Avg  Composite
+────────────────────────────────────────────────────────────────────────────────
+           2      2.0      100          3    18   83.3%   +3.67%    64.7  ◄ BEST
+           2      2.0      100          5    21   81.0%   +3.19%    61.3
+           2      2.0      100          4    19   78.9%   +3.39%    60.9
+           2      2.0      100         99    29   79.3%   +2.85%    59.0
+           2      2.0       70         99    15   73.3%   +2.74%    55.0
+           2      1.5       70          3    13   69.2%   +3.29%    54.7
+           2      1.0      100          3    48   75.0%   +2.41%    54.6
+           2      2.0       65         99    14   71.4%   +2.90%    54.5
+           2      1.5      100          3    29   72.4%   +2.68%    54.2
+           2      1.0       70          3    29   72.4%   +2.39%    53.0
+           2      1.5       65          5    20   70.0%   +2.75%    53.0
+           2      1.0       75          3    36   72.2%   +2.20%    52.1
+           1      2.0      100          4    56   69.6%   +2.47%    51.7
+           1      2.0      100          3    50   70.0%   +2.41%    51.6
+           2      2.0       75          3    10   70.0%   +2.39%    51.6
+           2      1.5       65          3    12   66.7%   +2.86%    51.4
+           1      1.5       70          5   108   70.4%   +2.17%    50.9
+           2      1.5      100         99    50   70.0%   +2.21%    50.9
+           1      2.0      100          5    62   69.4%   +2.26%    50.7
+           1      2.0       70          5    39   69.2%   +2.26%    50.6
+
+  Baseline (no filters): N=1119, WR=58.6%, avg=+0.73%
+
+  ── Walk-Forward Validation (train on first 7 dates, test on last 3) ──────────
+  Train: ['2026-06-21', '2026-06-22', '2026-06-23', '2026-06-24', '2026-06-25', '2026-06-26', '2026-06-29']
+  Test:  ['2026-07-01', '2026-07-02', '2026-07-03']
+
+  [NO FILTER — baseline]
+    Train baseline                      N= 841  WR= 61.2%  avg=+1.07%
+    Test  baseline                      N= 278  WR= 50.7%  avg=-0.31%
+
+  [BEST THRESHOLDS from grid search]
+    Train filtered                      N=  18  WR= 83.3%  avg=+3.67%
+    Test  filtered                      N=   0  WR=  nan%  avg= +nan%
+════════════════════════════════════════════════════════════════════════════════
+  RECOMMENDATIONS
+════════════════════════════════════════════════════════════════════════════════
+
+  ① OPTIMAL THRESHOLD FILTERS (apply before rank_score)
+    min_strategies : 2
+    min_vol_ratio  : 2.0x
+    rsi_max        : 100
+    score_cap      : 3
+
+  ② DATA-DRIVEN RANK_SCORE WEIGHTS (from logistic regression)
+    Feature                       Current  Proposed
+    PROVEN edge strategy                3       2.0 ←
+    ADX 20-35 (sweet zone)              2       0.0 ←
+    ADX 16-20 or 35-45                  1       0.0 ←
+    RSI 50-65                           2       1.0 ←
+    RSI 65-70                           1       0.0 ←
+    Vol ≥2x avg                         2       1.5 ←
+    Vol 1.5-2x avg                      1       2.0 ←
+    3+ strategies fired                 2       3.0 ←
+    2 strategies fired                  1       2.5 ←
+    Score ≤3                            1       0.5 ←
+    Strategy hist WR ≥60%               1       0.0 ←
+
+  ③ STRATEGY WEIGHTS (use WR as multiplier instead of flat +1)
+    pocket_pivot              actual WR= 83.7%  n= 43  ✦
+    ema_ribbon                actual WR= 66.7%  n= 78  ✦
+    cup_handle                actual WR= 64.3%  n= 98  ✦
+    signal_velocity           actual WR= 61.5%  n= 52  ✦
+    connors_rsi2              actual WR= 57.0%  n=165  ✦
+    nr7                       actual WR= 56.9%  n=290   
+    breakout                  actual WR= 56.1%  n=280   
+    elder_impulse             actual WR= 50.0%  n= 64   
+    connors_3down             actual WR= 46.2%  n= 13   
+    defensive_rotation        actual WR= 44.4%  n=  9   
+
+  ④ NEXT STEPS
+    a. Add hard threshold filters at start of main() in scan.py
+       before rank scoring — drop signals that fail them entirely
+    b. Replace integer _rank_score pts with proposed weights above
+       (only if walk-forward test WR ≥ 55%)
+    c. In next 4 weeks, re-run optimize_weights.py to validate
+       whether proposed weights held out-of-sample
+
