@@ -1184,8 +1184,8 @@ def _auto_add_practice_trades(results_by_strategy: dict, multi_tickers: set, is_
     Runs silently at end of scan — no user input needed.
     """
     if is_friday:
-        print(DIM("  [practice-auto] Skipping Friday — low WR signals, hold until Monday."))
-        return
+        print(DIM("  [practice-auto] Friday scan — adding practice trades (WR=45%, paper only)."))
+
     try:
         existing_trades = load_trades()
     except Exception:
