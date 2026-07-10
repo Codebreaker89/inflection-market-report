@@ -122,13 +122,13 @@ from signal_velocity_scanner      import scan as scan_signal_velocity
 from chokepoint_inflection_scanner import scan as scan_chokepoint
 from defensive_rotation_scanner    import scan as scan_defensive_rotation
 from cup_handle_scanner            import scan as scan_cup_handle
-from power_earnings_gap_scanner    import scan as scan_peg
+# from power_earnings_gap_scanner  import scan as scan_peg   # DISABLED: WR 40.0% n=5 — below threshold
+# from rs_line_scanner             import scan as scan_rs_line  # DISABLED: WR 20.0% n=5 — implementation broken
+# from raschke_holy_grail_scanner  import scan as scan_holy_grail  # DISABLED: WR 42.9% n=7
+# from connors_3down_scanner       import scan as scan_3down  # DISABLED: WR 46.2% n=13, avg -1.15%
 from darvas_box_scanner            import scan as scan_darvas
-from rs_line_scanner               import scan as scan_rs_line
 from vcp_scanner                   import scan as scan_vcp
 from elder_impulse_scanner         import scan as scan_elder
-from raschke_holy_grail_scanner    import scan as scan_holy_grail
-from connors_3down_scanner         import scan as scan_3down
 from williams_pct_r_scanner        import scan as scan_williams_r
 from bollinger_pctb_scanner        import scan as scan_bb_pctb
 from connors_r3_scanner            import scan as scan_r3
@@ -137,6 +137,8 @@ from turtle_soup_scanner           import scan as scan_turtle_soup
 from raschke_8020_scanner          import scan as scan_8020
 from wyckoff_spring_scanner        import scan as scan_wyckoff_spring
 from weinstein_stage2_scanner      import scan as scan_weinstein_stage2
+from momentum_burst_scanner        import scan as scan_momentum_burst
+from ma50_reclaim_scanner          import scan as scan_ma50_reclaim
 from show_tracker                  import (add_trade_interactive, load_trades, save_trades,
                                            next_id, ticker_ccy, fetch_fx_on_date,
                                            fetch_company_name, fetch_sector, fetch_market_regime,
@@ -170,7 +172,8 @@ ALL_STRATEGIES = ["breakout", "pocket_pivot", "connors_rsi2",
                   "darvas_box", "rs_line", "vcp", "elder_impulse",
                   "holy_grail", "connors_3down", "williams_pct_r", "bollinger_pctb",
                   "connors_r3", "connors_tps", "turtle_soup", "raschke_8020",
-                  "wyckoff_spring", "weinstein_stage2"]
+                  "wyckoff_spring", "weinstein_stage2",
+                  "momentum_burst", "ma50_reclaim"]
 
 SCANNER_MAP = {
     # "momentum":        scan_momentum,  # DISABLED: 0% WR, avg -4.40% across 5 signals (Jun 30 backtest)
@@ -188,13 +191,13 @@ SCANNER_MAP = {
     # "stage4_short": scan_stage4_short,  # DISABLED: tracking inverted — true WR=11.4% (L020)
     "defensive_rotation":    scan_defensive_rotation,
     "cup_handle":            scan_cup_handle,
-    "power_earnings_gap":    scan_peg,
+    # "power_earnings_gap": scan_peg,   # DISABLED: WR 40%
+    # "rs_line":           scan_rs_line, # DISABLED: WR 20% — broken impl
+    # "holy_grail":        scan_holy_grail, # DISABLED: WR 42.9%
+    # "connors_3down":     scan_3down,   # DISABLED: WR 46.2%, avg -1.15%
     "darvas_box":            scan_darvas,
-    "rs_line":               scan_rs_line,
     "vcp":                   scan_vcp,
     "elder_impulse":         scan_elder,
-    "holy_grail":            scan_holy_grail,
-    "connors_3down":         scan_3down,
     "williams_pct_r":        scan_williams_r,
     "bollinger_pctb":        scan_bb_pctb,
     "connors_r3":            scan_r3,
@@ -203,6 +206,8 @@ SCANNER_MAP = {
     "raschke_8020":          scan_8020,
     "wyckoff_spring":        scan_wyckoff_spring,
     "weinstein_stage2":      scan_weinstein_stage2,
+    "momentum_burst":        scan_momentum_burst,
+    "ma50_reclaim":          scan_ma50_reclaim,
 }
 
 STRATEGY_LABELS = {
@@ -235,6 +240,8 @@ STRATEGY_LABELS = {
     "raschke_8020":          "🔄  RASCHKE 80-20  (Raschke — open bottom-20% yesterday's range, close top-50%)",
     "wyckoff_spring":        "🌱  WYCKOFF SPRING  (Wyckoff — false break below support on low vol → shakeout, markup begins)",
     "weinstein_stage2":      "📈  WEINSTEIN STAGE 2  (Weinstein — 30-week MA turns up, price crosses above it on volume surge)",
+    "momentum_burst":        "💥  MOMENTUM BURST  (Stockbee — first explosive day ≥4% after NR compression, vol≥1.5x, fresh move)",
+    "ma50_reclaim":          "📍  50 SMA RECLAIM  (Minervini/IBD — price reclaims 50 SMA after pullback, institutions add here)",
 }
 
 STRATEGY_DESCRIPTIONS = {
@@ -441,6 +448,8 @@ HOLD_DAYS_MAP = {
     "raschke_8020":          2,
     "wyckoff_spring":        5,
     "weinstein_stage2":      10,
+    "momentum_burst":        5,
+    "ma50_reclaim":          7,
 }
 
 W = 110
@@ -478,7 +487,8 @@ PROVEN_EDGE = {"pocket_pivot", "ema_ribbon", "cup_handle",
 # Regime-strategy fit: which strategies thrive in which market regime
 # Trend-following: need confirmed uptrend (BULL)
 _TREND_STRATS     = {"ema_ribbon", "pocket_pivot", "cup_handle", "breakout",
-                     "signal_velocity", "weinstein_stage2", "vcp", "power_earnings_gap"}
+                     "signal_velocity", "weinstein_stage2", "vcp",
+                     "momentum_burst", "ma50_reclaim"}
 # Mean reversion: work in sideways/oversold conditions (NEUTRAL/BEAR)
 _REVERSION_STRATS = {"connors_rsi2", "nr7", "wyckoff_spring", "raschke_8020",
                      "connors_3down", "bollinger_pctb"}
@@ -672,6 +682,79 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
     print()
 
 
+
+
+def _apply_trend_template(universe: dict) -> dict:
+    """
+    Minervini Trend Template — filter universe to Stage 2 stocks only.
+    Criteria (Minervini, Trade Like a Stock Market Wizard):
+      1. Price > 50MA > 150MA > 200MA  (MA stack aligned)
+      2. 200MA trending up (current > value 30 trading days ago)
+      3. Price >= 30% above 52-week low
+      4. Price <= 25% below 52-week high  (not too extended)
+    Stocks failing any criterion are Stage 1/3/4 — skip them.
+    """
+    if not _HAS_YF:
+        return universe
+    import yfinance as _yf
+    tickers = list(universe.keys())
+    passed = {}
+    failed = 0
+    print(DIM(f"  Applying Trend Template to {len(tickers)} tickers..."), flush=True)
+    try:
+        with _quiet_ctx():
+            raw = _yf.download(
+                [_yf_sym(t) for t in tickers],
+                period="1y", interval="1d",
+                auto_adjust=True, progress=False, threads=True,
+            )
+        if raw.empty:
+            return universe
+        # Multi-ticker download has MultiIndex columns: (field, ticker)
+        if isinstance(raw.columns, pd.MultiIndex):
+            close_df = raw["Close"]
+        else:
+            close_df = raw  # single ticker fallback
+
+        for t in tickers:
+            sym = _yf_sym(t)
+            try:
+                s = close_df[sym].dropna() if sym in close_df.columns else None
+                if s is None or len(s) < 60:
+                    failed += 1; continue
+                price   = float(s.iloc[-1])
+                ma50    = float(s.rolling(50).mean().iloc[-1])
+                ma150   = float(s.rolling(150).mean().iloc[-1]) if len(s) >= 150 else None
+                ma200   = float(s.rolling(200).mean().iloc[-1]) if len(s) >= 200 else None
+                ma200_30ago = float(s.rolling(200).mean().iloc[-31]) if len(s) >= 231 else None
+                hi52    = float(s[-252:].max()) if len(s) >= 252 else float(s.max())
+                lo52    = float(s[-252:].min()) if len(s) >= 252 else float(s.min())
+
+                # Criterion 1: MA stack (require at least 50MA and 150MA)
+                if ma150 is None or price < ma50 or ma50 < ma150:
+                    failed += 1; continue
+                if ma200 is not None and ma150 < ma200:
+                    failed += 1; continue
+                # Criterion 2: 200MA trending up
+                if ma200 is not None and ma200_30ago is not None and ma200 < ma200_30ago:
+                    failed += 1; continue
+                # Criterion 3: price >= 30% above 52-week low
+                if lo52 > 0 and price < lo52 * 1.30:
+                    failed += 1; continue
+                # Criterion 4: price <= 25% below 52-week high (not too extended)
+                if hi52 > 0 and price < hi52 * 0.75:
+                    failed += 1; continue
+                passed[t] = universe[t]
+            except Exception:
+                failed += 1
+                continue
+    except Exception as e:
+        print(DIM(f"  TT filter error ({e}) — using full universe"))
+        return universe
+
+    print(DIM(f"  Trend Template: {len(passed)} passed / {failed} filtered out  "
+              f"({100*len(passed)/max(len(tickers),1):.0f}% Stage 2)"))
+    return passed if passed else universe
 
 
 def _load_persistence_counts() -> dict:
@@ -974,8 +1057,14 @@ def main():
     universe     = build_universe()
     bench_returns = compute_bench_returns(set(universe.values()))
 
+    # ── Minervini Trend Template pre-filter ───────────────────────────────────
+    # Only scan Stage 2 stocks: MA stack aligned, 200MA trending up, near 52w high.
+    # Cuts universe ~60-70% while keeping only institutional-grade uptrends.
+    if _HAS_YF:
+        universe = _apply_trend_template(universe)
+
     bt_label = "backtest ON" if with_backtest else "backtest OFF"
-    print(DIM(f"  Universe: {len(universe)} tickers  ·  {bt_label}"))
+    print(DIM(f"  Universe (post-TT filter): {len(universe)} tickers  ·  {bt_label}"))
     print()
 
     # Run scanners sequentially (avoid yfinance rate limit from concurrent universe fetches)
@@ -1013,7 +1102,8 @@ def main():
     # RSI floor: drop RSI<50 for non-mean-reversion strategies (dead zone confirmed WR 48%)
     RSI_FLOOR_EXEMPT = {"connors_rsi2", "connors_3down", "connors_r3", "connors_tps",
                         "williams_pct_r", "bollinger_pctb", "raschke_8020", "turtle_soup",
-                        "signal_velocity", "wyckoff_spring", "weinstein_stage2"}
+                        "signal_velocity", "wyckoff_spring", "weinstein_stage2",
+                        "momentum_burst", "ma50_reclaim"}
     for strat in list(results_by_strategy.keys()):
         if strat in RSI_FLOOR_EXEMPT:
             continue
