@@ -21,6 +21,7 @@ from email.mime.text      import MIMEText
 from typing      import Optional
 
 import yfinance as yf
+from show_tracker import _yf_ticker, fetch_live_price  # canonical impls (pre-market aware, GBp-safe)
 
 HERE       = Path(__file__).parent
 TRADES_CSV = HERE / "trades.csv"
@@ -54,24 +55,12 @@ def load_trades() -> list[dict]:
         return list(csv.DictReader(f))
 
 # ── Price fetching ────────────────────────────────────────────────────────────
+# _yf_ticker and fetch_live_price imported from show_tracker (canonical, better impl)
 
-_PREFIX_MAP = {
-    "ETR": (".DE","EUR"), "FRA": (".DE","EUR"), "XETRA": (".DE","EUR"),
-    "EPA": (".PA","EUR"), "AMS": (".AS","EUR"), "BIT": (".MI","EUR"),
-    "BME": (".MC","EUR"), "LON": (".L","GBP"),
-    "TSX": (".TO","CAD"), "CVE": (".TO","CAD"),
-    "NYSE": ("","USD"), "NASDAQ": ("","USD"), "NYSEARCA": ("","USD"),
-}
 _FX_CACHE: dict[str, float] = {}
 
-def _yf_ticker(ticker: str) -> str:
-    if ":" in ticker:
-        prefix, base = ticker.split(":", 1)
-        sfx, _ = _PREFIX_MAP.get(prefix.upper(), ("", "EUR"))
-        return base.strip() + sfx
-    return ticker
-
 def fetch_fx_now(currency: str) -> float:
+    """Cached FX rate: 1 EUR = X currency. Uses in-memory cache to avoid repeat calls."""
     if currency in ("EUR", ""): return 1.0
     if currency in _FX_CACHE: return _FX_CACHE[currency]
     try:
@@ -84,35 +73,6 @@ def fetch_fx_now(currency: str) -> float:
     except Exception:
         pass
     return 1.0
-
-def fetch_live_price(ticker: str) -> tuple[Optional[float], Optional[str]]:
-    yf_t = _yf_ticker(ticker)
-    def _norm(p, ccy):
-        if ccy in ("GBp","GBX","GBx"): return p/100.0, "GBP"
-        return p, (ccy.upper() if ccy else None)
-    def _try(sym):
-        try:
-            with _quiet():
-                fi = yf.Ticker(sym).fast_info
-            p   = getattr(fi, "last_price", None) or getattr(fi, "previous_close", None)
-            ccy = getattr(fi, "currency", None)
-            if p and float(p) > 0:
-                return _norm(float(p), ccy)
-        except Exception: pass
-        try:
-            with _quiet():
-                df = yf.Ticker(sym).history(period="5d", interval="1d", auto_adjust=True)
-            if not df.empty:
-                p = float(df["Close"].dropna().iloc[-1])
-                ccy = None
-                try:
-                    with _quiet():
-                        ccy = getattr(yf.Ticker(sym).fast_info, "currency", None)
-                except Exception: pass
-                return _norm(p, ccy)
-        except Exception: pass
-        return None, None
-    return _try(yf_t)
 
 def fetch_earnings_date(ticker: str) -> Optional[date]:
     """Return next earnings date if within EARNINGS_WARN days, else None."""

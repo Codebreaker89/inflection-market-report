@@ -21,16 +21,11 @@ import pandas as pd
 import yfinance as yf
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
+from scanner_utils import _ema, _quiet, _rsi, _sma
 
 warnings.filterwarnings("ignore")
 logging.getLogger("yfinance").setLevel(logging.CRITICAL)
 logging.getLogger("peewee").setLevel(logging.CRITICAL)
-
-@contextlib.contextmanager
-def _quiet():
-    devnull = open(os.devnull, "w"); old = sys.stderr; sys.stderr = devnull
-    try: yield
-    finally: sys.stderr = old; devnull.close()
 
 HOLD_DAYS       = 5
 MAX_WORKERS     = 25
@@ -38,14 +33,6 @@ FRESH_WINDOW    = 2
 MIN_SCORE       = 3      # net score must be at least mildly bullish
 MIN_VELOCITY    = 6      # must gain ≥6 net points over 3 days
 MAX_SCORE       = 12     # reject if already maxed out (too late to the party)
-
-def _sma(s, n): return s.rolling(n).mean()
-def _ema(s, n): return s.ewm(span=n, adjust=False).mean()
-
-def _rsi(s, n=14):
-    d = s.diff(); g = d.clip(lower=0).rolling(n).mean()
-    l = (-d.clip(upper=0)).rolling(n).mean()
-    return 100 - 100 / (1 + g / l.replace(0, np.nan))
 
 def _stoch(high, low, close, k=14, d=3):
     lowest  = low.rolling(k).min()

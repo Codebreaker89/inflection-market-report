@@ -45,16 +45,11 @@ import yfinance as yf
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import timedelta
 from typing import Optional
+from scanner_utils import _adx, _ema, _quiet, _rsi, _sma
 
 warnings.filterwarnings("ignore")
 logging.getLogger("yfinance").setLevel(logging.CRITICAL)
 logging.getLogger("peewee").setLevel(logging.CRITICAL)
-
-@contextlib.contextmanager
-def _quiet():
-    devnull = open(os.devnull, "w"); old = sys.stderr; sys.stderr = devnull
-    try: yield
-    finally: sys.stderr = old; devnull.close()
 
 HOLD_DAYS    = 10
 MAX_WORKERS  = 20
@@ -66,26 +61,6 @@ GAP_VOL_UNVERIFIED = 3.0    # if earnings not confirmed, require 3× volume
 MAX_EXTENSION      = 0.20   # don't buy if already 20%+ above gap close
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
-
-def _sma(s, n): return s.rolling(n).mean()
-def _ema(s, n): return s.ewm(span=n, adjust=False).mean()
-
-def _rsi(s, n=14):
-    d = s.diff(); g = d.clip(lower=0).rolling(n).mean()
-    l = (-d.clip(upper=0)).rolling(n).mean()
-    return 100 - 100 / (1 + g / l.replace(0, np.nan))
-
-def _adx(high, low, close, n=14):
-    tr  = pd.concat([(high-low),(high-close.shift()).abs(),
-                     (low-close.shift()).abs()], axis=1).max(axis=1)
-    atr = tr.ewm(alpha=1/n, adjust=False).mean()
-    up  = (high - high.shift()).clip(lower=0)
-    dn  = (low.shift() - low).clip(lower=0)
-    dmp = up.where(up>dn, 0).ewm(alpha=1/n, adjust=False).mean()
-    dmm = dn.where(dn>up, 0).ewm(alpha=1/n, adjust=False).mean()
-    dip = 100 * dmp / atr; dim = 100 * dmm / atr
-    dx  = 100 * (dip - dim).abs() / (dip + dim).replace(0, np.nan)
-    return dx.ewm(alpha=1/n, adjust=False).mean()
 
 def _build(df: pd.DataFrame) -> pd.DataFrame:
     c, h, l, v = df["Close"], df["High"], df["Low"], df["Volume"]

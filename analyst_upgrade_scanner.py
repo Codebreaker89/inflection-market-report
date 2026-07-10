@@ -24,16 +24,11 @@ import pandas as pd
 import yfinance as yf
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
+from scanner_utils import _quiet, _sma
 
 warnings.filterwarnings("ignore")
 logging.getLogger("yfinance").setLevel(logging.CRITICAL)
 logging.getLogger("peewee").setLevel(logging.CRITICAL)
-
-@contextlib.contextmanager
-def _quiet():
-    devnull = open(os.devnull, "w"); old = sys.stderr; sys.stderr = devnull
-    try: yield
-    finally: sys.stderr = old; devnull.close()
 
 HOLD_DAYS       = 7
 MAX_WORKERS     = 20   # lower — recommendations API is heavier
@@ -61,8 +56,6 @@ def _is_buy_grade(grade: str) -> bool:
 def _is_tier1(firm: str) -> bool:
     f = str(firm).lower()
     return any(kw in f for kw in TIER1_KEYWORDS)
-
-def _sma(s, n): return s.rolling(n).mean()
 
 def _minervini(df: pd.DataFrame, idx: int) -> int:
     row = df.iloc[idx]; c = float(row["Close"])

@@ -108,20 +108,18 @@ def _thematic_check():
         pass
 
 # ── IMPORTS ───────────────────────────────────────────────────────────────────
-from momentum_scanner       import (scan as scan_momentum,
-                                    build_universe, compute_bench_returns,
-                                    print_results as _print_momentum)
+from momentum_scanner       import build_universe, compute_bench_returns  # scan disabled: 0% WR
 from breakout_scanner       import scan as scan_breakout
 from pocket_pivot_scanner   import scan as scan_pocket_pivot
 from connors_rsi2_scanner   import scan as scan_connors
 from ema_ribbon_scanner     import scan as scan_ema_ribbon
 from nr7_scanner             import scan as scan_nr7
-from bb_squeeze_scanner      import scan as scan_bb_squeeze
-from high_tight_flag_scanner import scan as scan_htf
+# bb_squeeze_scanner — disabled: WR 33.3%, high variance
+# high_tight_flag_scanner — disabled: 0% WR
+# stage4_short_scanner — disabled: tracking inverted, true WR=11.4% (L020)
 from analyst_upgrade_scanner import scan as scan_analyst_upgrade
 from signal_velocity_scanner      import scan as scan_signal_velocity
 from chokepoint_inflection_scanner import scan as scan_chokepoint
-from stage4_short_scanner          import scan as scan_stage4_short
 from defensive_rotation_scanner    import scan as scan_defensive_rotation
 from cup_handle_scanner            import scan as scan_cup_handle
 from power_earnings_gap_scanner    import scan as scan_peg

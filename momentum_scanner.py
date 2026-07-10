@@ -25,23 +25,12 @@ import yfinance as yf
 from datetime           import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing             import Optional
+from scanner_utils import _adx, _ema, _quiet, _rsi, _sma
 
 warnings.filterwarnings("ignore")
 # Suppress yfinance's own error/warning spam
 logging.getLogger("yfinance").setLevel(logging.CRITICAL)
 logging.getLogger("peewee").setLevel(logging.CRITICAL)
-
-@contextlib.contextmanager
-def _quiet():
-    """Redirect stderr to devnull — suppresses yfinance 'Failed download' prints."""
-    devnull = open(os.devnull, "w")
-    old_err = sys.stderr
-    sys.stderr = devnull
-    try:
-        yield
-    finally:
-        sys.stderr = old_err
-        devnull.close()
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 LOOKBACK_DAYS  = 400
@@ -300,32 +289,9 @@ def fetch_benchmark_returns(bench_symbols: set) -> dict:
 
 # ── INDICATORS ────────────────────────────────────────────────────────────────
 
-def _ema(s, n):  return s.ewm(span=n, adjust=False).mean()
-def _sma(s, n):  return s.rolling(n).mean()
-
-def _rsi(s, n=14):
-    d = s.diff()
-    g = d.clip(lower=0).rolling(n).mean()
-    l = (-d.clip(upper=0)).rolling(n).mean()
-    return 100 - 100 / (1 + g / l.replace(0, np.nan))
-
 def _macd(s):
     m = _ema(s, 12) - _ema(s, 26)
     return m, _ema(m, 9)
-
-def _adx(high, low, close, n=14):
-    tr  = pd.concat([(high - low),
-                     (high - close.shift()).abs(),
-                     (low  - close.shift()).abs()], axis=1).max(axis=1)
-    atr = tr.ewm(alpha=1/n, adjust=False).mean()
-    up  = (high - high.shift()).clip(lower=0)
-    dn  = (low.shift() - low).clip(lower=0)
-    dmp = up.where(up > dn, 0).ewm(alpha=1/n, adjust=False).mean()
-    dmm = dn.where(dn > up, 0).ewm(alpha=1/n, adjust=False).mean()
-    dip = 100 * dmp / atr
-    dim = 100 * dmm / atr
-    dx  = 100 * (dip - dim).abs() / (dip + dim).replace(0, np.nan)
-    return dx.ewm(alpha=1/n, adjust=False).mean()
 
 def _stoch_rsi(rsi, n=14):
     lo, hi = rsi.rolling(n).min(), rsi.rolling(n).max()

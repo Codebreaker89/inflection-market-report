@@ -20,20 +20,11 @@ import yfinance as yf
 from datetime           import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing             import Optional
+from scanner_utils import _adx, _ema, _fetch_html, _quiet, _rsi, _sma
 
 warnings.filterwarnings("ignore")
 logging.getLogger("yfinance").setLevel(logging.CRITICAL)
 logging.getLogger("peewee").setLevel(logging.CRITICAL)
-
-@contextlib.contextmanager
-def _quiet():
-    devnull = open(os.devnull, "w")
-    old_err = sys.stderr
-    sys.stderr = devnull
-    try:    yield
-    finally:
-        sys.stderr = old_err
-        devnull.close()
 
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
@@ -102,11 +93,6 @@ def _clean(tickers, suffix="", max_len=8):
         final = base + suffix if suffix else base
         if len(final) <= max_len + 4: out.append(final)
     return out
-
-def _fetch_html(url):
-    r = requests.get(url, headers=HEADERS, timeout=15)
-    r.raise_for_status()
-    return pd.read_html(io.StringIO(r.text))
 
 def _ticker_col(tbl):
     for n in ["Ticker","ticker","Symbol","symbol","EPIC","Epic","Code"]:
@@ -220,24 +206,6 @@ compute_bench_returns = fetch_benchmark_returns
 
 
 # ── INDICATORS ────────────────────────────────────────────────────────────────
-def _ema(s, n): return s.ewm(span=n, adjust=False).mean()
-def _sma(s, n): return s.rolling(n).mean()
-
-def _rsi(s, n=14):
-    d = s.diff()
-    g = d.clip(lower=0).rolling(n).mean()
-    l = (-d.clip(upper=0)).rolling(n).mean()
-    return 100 - 100 / (1 + g / l.replace(0, np.nan))
-
-def _adx(high, low, close, n=14):
-    tr  = pd.concat([(high-low),(high-close.shift()).abs(),(low-close.shift()).abs()],axis=1).max(axis=1)
-    atr = tr.ewm(alpha=1/n, adjust=False).mean()
-    up  = (high-high.shift()).clip(lower=0); dn=(low.shift()-low).clip(lower=0)
-    dmp = up.where(up>dn,0).ewm(alpha=1/n, adjust=False).mean()
-    dmm = dn.where(dn>up,0).ewm(alpha=1/n, adjust=False).mean()
-    dip = 100*dmp/atr; dim=100*dmm/atr
-    dx  = 100*(dip-dim).abs()/(dip+dim).replace(0,np.nan)
-    return dx.ewm(alpha=1/n, adjust=False).mean()
 
 
 # ── MINERVINI TREND TEMPLATE ──────────────────────────────────────────────────

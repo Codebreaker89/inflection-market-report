@@ -17,16 +17,11 @@ import pandas as pd
 import yfinance as yf
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
+from scanner_utils import _adx, _ema, _quiet, _rsi, _sma
 
 warnings.filterwarnings("ignore")
 logging.getLogger("yfinance").setLevel(logging.CRITICAL)
 logging.getLogger("peewee").setLevel(logging.CRITICAL)
-
-@contextlib.contextmanager
-def _quiet():
-    devnull = open(os.devnull, "w"); old = sys.stderr; sys.stderr = devnull
-    try: yield
-    finally: sys.stderr = old; devnull.close()
 
 HOLD_DAYS    = 10
 MAX_WORKERS  = 25
@@ -35,24 +30,6 @@ POLE_DAYS    = 40         # 8 trading weeks
 POLE_MIN_RET = 0.90       # ≥90% gain in pole
 FLAG_MAX_DD  = 0.25       # flag must not pull back more than 25%
 ENTRY_ZONE   = 0.15       # current price within 15% of 8-week high
-
-def _sma(s, n): return s.rolling(n).mean()
-def _ema(s, n): return s.ewm(span=n, adjust=False).mean()
-
-def _rsi(s, n=14):
-    d = s.diff(); g = d.clip(lower=0).rolling(n).mean()
-    l = (-d.clip(upper=0)).rolling(n).mean()
-    return 100 - 100 / (1 + g / l.replace(0, np.nan))
-
-def _adx(high, low, close, n=14):
-    tr  = pd.concat([(high-low),(high-close.shift()).abs(),(low-close.shift()).abs()],axis=1).max(axis=1)
-    atr = tr.ewm(alpha=1/n, adjust=False).mean()
-    up  = (high-high.shift()).clip(lower=0); dn = (low.shift()-low).clip(lower=0)
-    dmp = up.where(up>dn,0).ewm(alpha=1/n, adjust=False).mean()
-    dmm = dn.where(dn>up,0).ewm(alpha=1/n, adjust=False).mean()
-    dip = 100*dmp/atr; dim = 100*dmm/atr
-    dx  = 100*(dip-dim).abs()/(dip+dim).replace(0, np.nan)
-    return dx.ewm(alpha=1/n, adjust=False).mean()
 
 def _atr(high, low, close, n=14):
     tr = pd.concat([(high-low),(high-close.shift()).abs(),(low-close.shift()).abs()],axis=1).max(axis=1)
