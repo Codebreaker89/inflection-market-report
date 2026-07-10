@@ -123,7 +123,7 @@ from chokepoint_inflection_scanner import scan as scan_chokepoint
 from defensive_rotation_scanner    import scan as scan_defensive_rotation
 from cup_handle_scanner            import scan as scan_cup_handle
 # from power_earnings_gap_scanner  import scan as scan_peg   # DISABLED: WR 40.0% n=5 — below threshold
-# from rs_line_scanner             import scan as scan_rs_line  # DISABLED: WR 20.0% n=5 — implementation broken
+from rs_line_scanner              import scan as scan_rs_line  # v2: RS-leads-price O'Neil impl
 # from raschke_holy_grail_scanner  import scan as scan_holy_grail  # DISABLED: WR 42.9% n=7
 # from connors_3down_scanner       import scan as scan_3down  # DISABLED: WR 46.2% n=13, avg -1.15%
 from darvas_box_scanner            import scan as scan_darvas
@@ -192,7 +192,7 @@ SCANNER_MAP = {
     "defensive_rotation":    scan_defensive_rotation,
     "cup_handle":            scan_cup_handle,
     # "power_earnings_gap": scan_peg,   # DISABLED: WR 40%
-    # "rs_line":           scan_rs_line, # DISABLED: WR 20% — broken impl
+    "rs_line":           scan_rs_line,  # v2: RS-leads-price O'Neil impl
     # "holy_grail":        scan_holy_grail, # DISABLED: WR 42.9%
     # "connors_3down":     scan_3down,   # DISABLED: WR 46.2%, avg -1.15%
     "darvas_box":            scan_darvas,
@@ -757,6 +757,56 @@ def _apply_trend_template(universe: dict) -> dict:
     return passed if passed else universe
 
 
+def _apply_eps_filter(universe: dict) -> dict:
+    """
+    EPS fundamental filter — applied AFTER Trend Template (~180 tickers).
+    Keeps stocks with EPS growth ≥15% YoY OR where data is unavailable (fail-open).
+    Uses yfinance .info; skips tickers that time out or error (fail-open).
+    """
+    if not _HAS_YF:
+        return universe
+    from concurrent.futures import ThreadPoolExecutor as _TPE, as_completed as _ac
+    import yfinance as _yf
+
+    EPS_GROWTH_MIN = 0.15  # 15% YoY growth minimum
+
+    def _check_eps(ticker: str) -> tuple[str, bool]:
+        """Return (ticker, keep). keep=True if EPS growth OK or data missing."""
+        try:
+            with _quiet_ctx():
+                info = _yf.Ticker(_yf_sym(ticker)).info
+            if not info:
+                return (ticker, True)  # fail-open
+            # Prefer earningsGrowth (analyst-reported YoY EPS growth)
+            eg = info.get("earningsGrowth")
+            if eg is not None:
+                return (ticker, float(eg) >= EPS_GROWTH_MIN)
+            # Fallback: trailing EPS vs forward EPS
+            t_eps = info.get("trailingEps")
+            f_eps = info.get("forwardEps")
+            if t_eps and f_eps and float(t_eps) > 0:
+                growth = (float(f_eps) - float(t_eps)) / abs(float(t_eps))
+                return (ticker, growth >= EPS_GROWTH_MIN)
+            return (ticker, True)  # no data → fail-open
+        except Exception:
+            return (ticker, True)  # fail-open on any error
+
+    tickers = list(universe.keys())
+    print(DIM(f"  Applying EPS filter (≥15% growth) to {len(tickers)} tickers..."), flush=True)
+    passed = {}
+    failed = 0
+    with _TPE(max_workers=20) as ex:
+        futs = {ex.submit(_check_eps, t): t for t in tickers}
+        for f in _ac(futs):
+            t, keep = f.result()
+            if keep:
+                passed[t] = universe[t]
+            else:
+                failed += 1
+    print(DIM(f"  EPS filter: {len(passed)} passed / {failed} filtered out"))
+    return passed if passed else universe
+
+
 def _load_persistence_counts() -> dict:
     """Return {ticker: n_unique_scan_dates} from scan_history.csv — used for persistence badge."""
     import csv as _csv
@@ -1062,9 +1112,10 @@ def main():
     # Cuts universe ~60-70% while keeping only institutional-grade uptrends.
     if _HAS_YF:
         universe = _apply_trend_template(universe)
+        universe = _apply_eps_filter(universe)
 
     bt_label = "backtest ON" if with_backtest else "backtest OFF"
-    print(DIM(f"  Universe (post-TT filter): {len(universe)} tickers  ·  {bt_label}"))
+    print(DIM(f"  Universe (post-TT+EPS filter): {len(universe)} tickers  ·  {bt_label}"))
     print()
 
     # Run scanners sequentially (avoid yfinance rate limit from concurrent universe fetches)
@@ -1269,7 +1320,7 @@ def main():
     except Exception as e:
         print(f"  WARNING: could not save last_scan.json — {e}")
 
-    # Auto-add HIGH conviction picks as practice trades
+    # Auto-add HIGH conviction picks as practice trades (includes heat display)
     _auto_add_practice_trades(results_by_strategy, multi_tickers, is_friday=is_friday)
 
     # Tracker prompt
@@ -1292,7 +1343,19 @@ def _auto_add_practice_trades(results_by_strategy: dict, multi_tickers: set, is_
     except Exception:
         existing_trades = []
 
-    open_tickers = {t["ticker"] for t in existing_trades if t.get("status") == "OPEN"}
+    open_trades  = [t for t in existing_trades if t.get("status") == "OPEN"]
+    open_tickers = {t["ticker"] for t in open_trades}
+    MAX_OPEN     = 6
+    total_invested = sum(float(t.get("investment_eur") or 0) for t in open_trades)
+
+    # ── Portfolio heat check ───────────────────────────────────────────────────
+    print()
+    heat_color = GRN if len(open_trades) <= 4 else (YLW if len(open_trades) <= 5 else RED)
+    print(heat_color(f"  📊  Portfolio heat: {len(open_trades)} open positions  ·  €{total_invested:,.0f} deployed"))
+    if len(open_trades) >= MAX_OPEN:
+        print(RED(f"  🔥  Heat limit reached ({MAX_OPEN} open) — no new trades added. Close a position first."))
+        return
+
     today = date.today()
     scan_date_str = today.strftime("%Y-%m-%d")
     added = []

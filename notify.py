@@ -74,6 +74,18 @@ def fetch_fx_now(currency: str) -> float:
         pass
     return 1.0
 
+def fetch_10d_ema(ticker: str) -> Optional[float]:
+    """Return current 10-day EMA for trailing stop check. None on failure."""
+    try:
+        with _quiet():
+            df = yf.Ticker(_yf_ticker(ticker)).history(period="60d", interval="1d", auto_adjust=True)
+        if df.empty or len(df) < 10: return None
+        close = df["Close"].dropna()
+        ema10 = close.ewm(span=10, adjust=False).mean()
+        return float(ema10.iloc[-1])
+    except Exception:
+        return None
+
 def fetch_earnings_date(ticker: str) -> Optional[date]:
     """Return next earnings date if within EARNINGS_WARN days, else None."""
     try:
@@ -129,6 +141,12 @@ def compute_pnl(trade: dict) -> dict:
     pnl_eur    = round((curr_eur - buy_eur) * qty, 2)
     curr_native = round(curr_price, 2)  # price in stock's native currency
 
+    # ── R-multiple tracking ────────────────────────────────────────────────────
+    risk_pct  = (buy_price - sl_price) / buy_price  # e.g. 0.03 for 3% stop
+    r_mult    = ret_pct / (risk_pct * 100) if risk_pct > 0 else 0  # current R
+    target_1r = buy_price * (1 + risk_pct)       # breakeven move stop target
+    target_1p5r = buy_price * (1 + risk_pct * 1.5)  # partial profit price
+
     # ── Alert checks ──────────────────────────────────────────────────────────
     if curr_price <= sl_price:
         drop_pct = round((curr_price / buy_price - 1) * 100, 2)
@@ -137,11 +155,28 @@ def compute_pnl(trade: dict) -> dict:
     if ret_pct >= PROFIT_TARGET * 100:
         alerts.append(("PROFIT_TARGET", f"+{ret_pct:.1f}% — consider taking profits (target {int(PROFIT_TARGET*100)}%)"))
 
+    # Exit rule 1: 1.5R reached → take 1/3 off, move stop to breakeven
+    if r_mult >= 1.5 and curr_price > sl_price:
+        alerts.append(("PROFIT_TARGET",
+            f"✂ +{r_mult:.1f}R reached — take 1/3 off now (${curr_native:.2f}) · move stop to BE (${buy_price:.2f})"))
+
+    # Exit rule 2: stop should be moved to breakeven if >1R
+    elif r_mult >= 1.0 and curr_price > sl_price:
+        alerts.append(("PROFIT_TARGET",
+            f"🔒 +{r_mult:.1f}R — move stop to breakeven (${buy_price:.2f}) to lock in cost-free trade"))
+
     target_exit = trade.get("target_exit_date", "")
     if target_exit and TODAY >= datetime.strptime(target_exit, "%Y-%m-%d").date():
         days_over = (TODAY - datetime.strptime(target_exit, "%Y-%m-%d").date()).days
         hold_d = trade.get("hold_days", DEFAULT_HOLD_DAYS)
         alerts.append(("HOLD_EXPIRED", f"Hold period ({hold_d}d) expired {days_over} day(s) ago — target exit was {target_exit}"))
+
+    # Exit rule 3: trailing 10d EMA breach — price crossed below
+    ema10 = fetch_10d_ema(trade["ticker"])
+    if ema10 is not None and curr_price < ema10 and curr_price > sl_price:
+        gap_pct = (ema10 - curr_price) / ema10 * 100
+        alerts.append(("TRAIL_BREACH",
+            f"⚠ Price ${curr_native:.2f} crossed below 10d EMA ${ema10:.2f} ({gap_pct:.1f}% below) — consider tightening stop or exiting"))
 
     earn_d = fetch_earnings_date(trade["ticker"])
     if earn_d:
@@ -149,7 +184,7 @@ def compute_pnl(trade: dict) -> dict:
         alerts.append(("EARNINGS", f"Earnings in {days_to} day(s) on {earn_d} — consider exiting before"))
 
     return {"curr_eur": curr_eur, "buy_eur": buy_eur, "ret_pct": ret_pct, "pnl_eur": pnl_eur,
-            "curr_native": curr_native, "alerts": alerts}
+            "curr_native": curr_native, "r_mult": round(r_mult, 2), "alerts": alerts}
 
 # ── Gmail-safe inline style helpers ──────────────────────────────────────────
 # Rules: white background, all layout via <table>, all colour via inline style.
@@ -287,7 +322,7 @@ def _portfolio_table(results_slice: list, alert_tickers: set) -> str:
              + _th("Strategy", "left") + _th("Entry") + _th("Exit→", title="Target exit date")
              + _th("Held", title="Calendar days held") + _th("Rem", title="Days to target exit")
              + _th("Buy") + _th("Now") + _th("Qty") + _th("Inv€")
-             + _th("Ret%") + _th("P&L€") + _th("SL", title="Stop-loss price (native currency)")
+             + _th("Ret%") + _th("P&L€") + _th("R", title="Current R-multiple (1R = initial risk)") + _th("SL", title="Stop-loss price (native currency)")
              + '</tr></thead><tbody>')
     rows = ""
     for i, (t, r) in enumerate(results_slice):
@@ -330,6 +365,14 @@ def _portfolio_table(results_slice: list, alert_tickers: set) -> str:
         rows += _td(f'€{float(t["investment_eur"]):.0f}', "right", _C_DIM, bg=bg)
         rows += _td(_pct(r["ret_pct"]), "right", ret_c, bold=True, bg=bg)
         rows += _td(_eur(r["pnl_eur"]), "right", pnl_c, bold=True, bg=bg)
+        # R-multiple cell — colour coded: green ≥1R, orange ≥0, red <0
+        _rm = r.get("r_mult")
+        if _rm is not None:
+            _rm_c = "#27ae60" if _rm >= 1.0 else ("#e67e22" if _rm >= 0 else _C_NEG)
+            _rm_s = f"{_rm:+.1f}R"
+        else:
+            _rm_c = _C_DIM; _rm_s = "─"
+        rows += _td(_rm_s, "right", _rm_c, bold=(_rm is not None and abs(_rm) >= 1.0), bg=bg)
         rows += _td(_sl_eur_str(t), "right", _C_DIM, bg=bg)
         rows += "</tr>"
     return thead + rows + "</tbody></table>"
@@ -1066,14 +1109,15 @@ def build_email(trades: list[dict]) -> str:
     open_trades   = [t for t in trades if t.get("status") == "OPEN"]
     closed_trades = [t for t in trades if t.get("status") == "CLOSED"]
 
-    ALERT_ORDER = ["STOP_LOSS", "HOLD_EXPIRED", "PROFIT_TARGET", "EARNINGS"]
+    ALERT_ORDER = ["STOP_LOSS", "TRAIL_BREACH", "HOLD_EXPIRED", "PROFIT_TARGET", "EARNINGS"]
     ALERT_META  = {
-        "STOP_LOSS":     ("🛑", "Stop Loss Hit",        "#c0392b", "#fff0f0"),
-        "HOLD_EXPIRED":  ("⏰", "Hold Period Expired",  "#b7590a", "#fff8f0"),
+        "STOP_LOSS":     ("🛑", "Stop Loss Hit",          "#c0392b", "#fff0f0"),
+        "TRAIL_BREACH":  ("⚠",  "Trailing EMA Breached",  "#7b3f00", "#fff8ee"),
+        "HOLD_EXPIRED":  ("⏰", "Hold Period Expired",    "#b7590a", "#fff8f0"),
         "PROFIT_TARGET": ("🎯", "Profit Target Reached","#1a7f4b", "#f0faf4"),
         "EARNINGS":      ("📣", "Earnings Warning",     "#1a5a8a", "#f0f6ff"),
     }
-    alerts_by_type: dict = {k: [] for k in ALERT_ORDER}
+    alerts_by_type: dict = {k: [] for k in ALERT_ORDER}  # includes TRAIL_BREACH
     results: list[tuple] = []
 
     print(f"  Fetching prices for {len(open_trades)} open trade(s)...", flush=True)
