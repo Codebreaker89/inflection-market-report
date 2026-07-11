@@ -1,7 +1,7 @@
 ════════════════════════════════════════════════════════════════════════════════
   SWING SCANNER WEIGHT OPTIMIZER
 ════════════════════════════════════════════════════════════════════════════════
-  Source: /sessions/upbeat-great-goodall/mnt/fire/scan_history.csv
+  Source: /Users/hemant.dahake/Claude/Projects/fire/scan_history.csv
   Clean rows with ret_d5: 1119  |  Scan dates: 10
   Overall WR: 58.6%  |  avg ret_d5: +0.73%
 
@@ -108,57 +108,13 @@
   Baseline (no filters): N=1119, WR=58.6%, avg=+0.73%
 
   ── Walk-Forward Validation (train on first 7 dates, test on last 3) ──────────
-  Train: ['2026-06-21', '2026-06-22', '2026-06-23', '2026-06-24', '2026-06-25', '2026-06-26', '2026-06-29']
-  Test:  ['2026-07-01', '2026-07-02', '2026-07-03']
-
-  [NO FILTER — baseline]
-    Train baseline                      N= 841  WR= 61.2%  avg=+1.07%
-    Test  baseline                      N= 278  WR= 50.7%  avg=-0.31%
-
-  [BEST THRESHOLDS from grid search]
-    Train filtered                      N=  18  WR= 83.3%  avg=+3.67%
-    Test  filtered                      N=   0  WR=  nan%  avg= +nan%
-════════════════════════════════════════════════════════════════════════════════
-  RECOMMENDATIONS
-════════════════════════════════════════════════════════════════════════════════
-
-  ① OPTIMAL THRESHOLD FILTERS (apply before rank_score)
-    min_strategies : 2
-    min_vol_ratio  : 2.0x
-    rsi_max        : 100
-    score_cap      : 3
-
-  ② DATA-DRIVEN RANK_SCORE WEIGHTS (from logistic regression)
-    Feature                       Current  Proposed
-    PROVEN edge strategy                3       2.0 ←
-    ADX 20-35 (sweet zone)              2       0.0 ←
-    ADX 16-20 or 35-45                  1       0.0 ←
-    RSI 50-65                           2       1.0 ←
-    RSI 65-70                           1       0.0 ←
-    Vol ≥2x avg                         2       1.5 ←
-    Vol 1.5-2x avg                      1       2.0 ←
-    3+ strategies fired                 2       3.0 ←
-    2 strategies fired                  1       2.5 ←
-    Score ≤3                            1       0.5 ←
-    Strategy hist WR ≥60%               1       0.0 ←
-
-  ③ STRATEGY WEIGHTS (use WR as multiplier instead of flat +1)
-    pocket_pivot              actual WR= 83.7%  n= 43  ✦
-    ema_ribbon                actual WR= 66.7%  n= 78  ✦
-    cup_handle                actual WR= 64.3%  n= 98  ✦
-    signal_velocity           actual WR= 61.5%  n= 52  ✦
-    connors_rsi2              actual WR= 57.0%  n=165  ✦
-    nr7                       actual WR= 56.9%  n=290   
-    breakout                  actual WR= 56.1%  n=280   
-    elder_impulse             actual WR= 50.0%  n= 64   
-    connors_3down             actual WR= 46.2%  n= 13   
-    defensive_rotation        actual WR= 44.4%  n=  9   
-
-  ④ NEXT STEPS
-    a. Add hard threshold filters at start of main() in scan.py
-       before rank scoring — drop signals that fail them entirely
-    b. Replace integer _rank_score pts with proposed weights above
-       (only if walk-forward test WR ≥ 55%)
-    c. In next 4 weeks, re-run optimize_weights.py to validate
-       whether proposed weights held out-of-sample
-
+Traceback (most recent call last):
+  File "/Users/hemant.dahake/Claude/Projects/fire/optimize_weights.py", line 405, in <module>
+    main()
+  File "/Users/hemant.dahake/Claude/Projects/fire/optimize_weights.py", line 400, in main
+    walk_forward(df, best_thresh, proposed_weights)
+  File "/Users/hemant.dahake/Claude/Projects/fire/optimize_weights.py", line 312, in walk_forward
+    print(f"  Train: {[str(d.date()) for d in train_dates]}")
+  File "/Users/hemant.dahake/Claude/Projects/fire/optimize_weights.py", line 312, in <listcomp>
+    print(f"  Train: {[str(d.date()) for d in train_dates]}")
+AttributeError: 'numpy.datetime64' object has no attribute 'date'
