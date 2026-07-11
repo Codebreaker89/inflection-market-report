@@ -128,7 +128,7 @@ from rs_line_scanner              import scan as scan_rs_line  # v2: RS-leads-pr
 # from connors_3down_scanner       import scan as scan_3down  # DISABLED: WR 46.2% n=13, avg -1.15%
 from darvas_box_scanner            import scan as scan_darvas
 from vcp_scanner                   import scan as scan_vcp
-from elder_impulse_scanner         import scan as scan_elder
+# from elder_impulse_scanner       import scan as scan_elder  # DISABLED: WR 50.0% avg -0.57% n=64 — coin flip
 from williams_pct_r_scanner        import scan as scan_williams_r
 from bollinger_pctb_scanner        import scan as scan_bb_pctb
 from connors_r3_scanner            import scan as scan_r3
@@ -197,7 +197,7 @@ SCANNER_MAP = {
     # "connors_3down":     scan_3down,   # DISABLED: WR 46.2%, avg -1.15%
     "darvas_box":            scan_darvas,
     "vcp":                   scan_vcp,
-    "elder_impulse":         scan_elder,
+    # "elder_impulse":       scan_elder,  # DISABLED: WR 50.0% avg -0.57% n=64
     "williams_pct_r":        scan_williams_r,
     "bollinger_pctb":        scan_bb_pctb,
     "connors_r3":            scan_r3,
@@ -497,31 +497,26 @@ _REVERSION_STRATS = {"connors_rsi2", "nr7", "wyckoff_spring", "raschke_8020",
 def _rank_score(r: dict, strats_fired: list, elder_count: int = 0) -> float:
     """
     Score each HIGH-conviction pick so we can label top 1/2/3.
-    Higher = better. Criteria (max ~19 pts):
+    Higher = better. Criteria (max ~17 pts):
       +3  any PROVEN_EDGE strategy fired
-      +1  ADX 20-35  (data: -3.1% WR delta, reduced from +2)
-      +1  ADX 16-20 or 35-45
+          ADX REMOVED (data: -3.1% WR delta, n=588 — noise, not signal)
       +2  RSI 50-65  (momentum without overextension)
           RSI 65-70  REMOVED (data: -2.3% WR)
-      +3  3+ strategies (data: 74% WR)
-      +2  2 strategies  (data: 63% WR)
+      +3  3+ strategies (data: 74% WR, +16.1% delta)
+      +2  2 strategies  (data: 63% WR, +5.9% delta)
       +1  score ≤ 3
-      +2  vol 1.5-2x   (data: 68.4% WR)
+      +2  vol 1.5-2x   (data: 68.4% WR — BEST single feature)
       +1  vol ≥ 2x     (data: 66.2% WR)
       +2  persistent 3+ scan dates (L013 — 61% vs 47% WR)
       +1  persistent 2 scan dates
       +1  RS positive vs SPY 10d
       +1  regime-strategy fit (trend strats in BULL, reversion strats in NEUTRAL)
-    Calibrated via optimize_weights.py on 1119 signals (10 scan dates).
+    Calibrated via optimize_weights.py on 1119 signals (10 scan dates, Jul 2026).
     """
     pts = 0.0
     if any(s in PROVEN_EDGE for s in strats_fired):
         pts += 3
-    adx = r.get("adx", 0) or 0
-    if 20 <= adx <= 35:
-        pts += 1
-    elif 16 <= adx < 20 or 35 < adx <= 45:
-        pts += 1
+    # ADX removed: data shows -3.1% WR delta for sweet zone (n=588, coef -0.084)
     rsi = r.get("rsi", 0) or 0
     if 50 <= rsi <= 65:
         pts += 2

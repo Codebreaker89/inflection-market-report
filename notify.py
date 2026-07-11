@@ -634,9 +634,7 @@ def _build_scanner_results_html() -> str:
         pts = 0.0
         if any(s in _PROVEN_EDGE_SET for s in strats_fired):
             pts += 3
-        adx = r.get("adx") or 0
-        if 20 <= adx <= 35:   pts += 1
-        elif 16 <= adx < 20 or 35 < adx <= 45: pts += 1
+        # ADX removed: -3.1% WR delta, n=588 — noise not signal
         rsi = r.get("rsi") or 0
         if 50 <= rsi <= 65:   pts += 2
         n = len(strats_fired)
