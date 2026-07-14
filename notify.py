@@ -641,9 +641,10 @@ def _build_scanner_results_html() -> str:
         if n >= 3:   pts += 3
         elif n == 2: pts += 2
         if (r.get("score") or 99) <= 3: pts += 1
+        if 7 <= (r.get("score") or 0) <= 10: pts -= 1  # high score = overextended (33% WR)
         vol = r.get("vol_ratio") or 0
-        if 1.5 <= vol < 2.0: pts += 2
-        elif vol >= 2.0:     pts += 1
+        if vol >= 2.0:       pts += 2   # >2x = 71.1% WR (raw n=135)
+        elif 1.5 <= vol < 2: pts += 1   # 1.5-2x = 64.2% WR
         days_seen = persistence.get(r.get("ticker", ""), 0)
         if days_seen >= 3:   pts += 2
         elif days_seen >= 2: pts += 1

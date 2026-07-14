@@ -527,10 +527,14 @@ def _rank_score(r: dict, strats_fired: list, elder_count: int = 0) -> float:
         pts += 2
     if (r.get("score") or 99) <= 3:
         pts += 1
+    # High scanner score penalty: score 7-10 = 33.3% WR (n=51) — overextended/noise
+    if 7 <= (r.get("score") or 0) <= 10:
+        pts -= 1
     vr = r.get("vol_ratio", 0) or 0
-    if 1.5 <= vr < 2.0:
+    # Vol weights: >2x = 71.1% WR > 1.5-2x = 64.2% WR (raw scan_history n=1534)
+    if vr >= 2.0:
         pts += 2
-    elif vr >= 2.0:
+    elif 1.5 <= vr < 2.0:
         pts += 1
     days_seen = _PERSISTENCE.get(r.get("ticker", ""), 0)
     if days_seen >= 3:
