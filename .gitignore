@@ -6,6 +6,7 @@ trades.csv
 
 # Generated outputs (rebuilt on each run)
 digest_preview.html
+universe_cache.json
 tracker.html
 notify.log
 # last_scan.json tracked intentionally — CI commits it for GitHub Pages + email matrix

@@ -18,6 +18,7 @@ Cron (weekdays 6:30am):
 """
 
 import io, os, sys, time, random, warnings, logging, contextlib
+from pathlib import Path
 import requests
 import numpy  as np
 import pandas as pd
@@ -142,12 +143,41 @@ def _clean(tickers, suffix="", max_len=8):
     return out
 
 
+_UNIVERSE_CACHE = Path(__file__).parent / "universe_cache.json"
+
 def get_sp500_with_sectors():
-    tables, _ = _fetch_html_tables("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies")
-    tbl = tables[0]
-    tbl["Symbol"] = tbl["Symbol"].str.replace(".", "-", regex=False)
-    excluded = set(tbl.loc[tbl["GICS Sector"].isin(EXCLUDE_SECTORS), "Symbol"].tolist())
-    return tbl["Symbol"].tolist(), excluded
+    try:
+        tables, _ = _fetch_html_tables("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies")
+        tbl = tables[0]
+        tbl["Symbol"] = tbl["Symbol"].str.replace(".", "-", regex=False)
+        excluded = set(tbl.loc[tbl["GICS Sector"].isin(EXCLUDE_SECTORS), "Symbol"].tolist())
+        return tbl["Symbol"].tolist(), excluded
+    except Exception as e:
+        print(DIM(f"  ⚠ Wikipedia fetch failed ({e.__class__.__name__}) — using cached universe"))
+        return [], set()
+
+
+def _save_universe_cache(universe: dict):
+    """Save universe dict to JSON for fallback on next network failure."""
+    try:
+        import json
+        with open(_UNIVERSE_CACHE, "w") as f:
+            json.dump(universe, f)
+    except Exception:
+        pass
+
+
+def _load_universe_cache() -> dict:
+    """Load last known good universe from cache."""
+    try:
+        import json
+        if _UNIVERSE_CACHE.exists():
+            data = json.loads(_UNIVERSE_CACHE.read_text())
+            print(DIM(f"  ✓ Loaded cached universe: {len(data)} tickers (last known good)"))
+            return data
+    except Exception:
+        pass
+    return {}
 
 def get_russell1000():
     try:
@@ -238,6 +268,14 @@ def get_universe(fast_mode=False) -> dict:
     stoxx           = [] if fast_mode else get_stoxx600()
     tsx             = [] if fast_mode else get_tsx_composite()
 
+    # If all fetches failed (network down), fall back to cached universe
+    if not sp500 and not ftse and not dax and not r1000:
+        cached = _load_universe_cache()
+        if cached:
+            return cached
+        print(DIM("  ⚠ No network and no cache — universe empty. Aborting scan."))
+        return {}
+
     if fast_mode:
         sample = [t for t in random.sample(sp500, 50) if t not in excluded][:30]
         print(DIM(f"  FAST MODE — {len(sample)} US tickers"))
@@ -264,6 +302,7 @@ def get_universe(fast_mode=False) -> dict:
     }
     count_str = "  ".join(f"{k}:{v}" for k, v in counts.items() if v > 0)
     print(DIM(f"  {len(universe)} total  ·  {count_str}"))
+    _save_universe_cache(universe)  # persist for fallback on next network failure
     return universe
 
 
