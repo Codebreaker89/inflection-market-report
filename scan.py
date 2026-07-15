@@ -520,11 +520,15 @@ def _rank_score(r: dict, strats_fired: list, elder_count: int = 0) -> float:
     rsi = r.get("rsi", 0) or 0
     if 50 <= rsi <= 65:
         pts += 2
+    # Multi-strategy bonus only if ≥1 strategy has WR ≥ 50% (quality gate)
+    # Prevents two garbage strategies (e.g. Raschke 33% + Williams) boosting into HIGH
+    has_quality = any(_HIST_STATS.get(s, {}).get("wr", 0) >= 50 for s in strats_fired)
     n_strats = len(strats_fired)
-    if n_strats >= 3:
-        pts += 3
-    elif n_strats == 2:
-        pts += 2
+    if has_quality:
+        if n_strats >= 3:
+            pts += 3
+        elif n_strats == 2:
+            pts += 2
     if (r.get("score") or 99) <= 3:
         pts += 1
     # High scanner score penalty: score 7-10 = 33.3% WR (n=51) — overextended/noise
@@ -1379,8 +1383,17 @@ def _auto_add_practice_trades(results_by_strategy: dict, multi_tickers: set, is_
     # Sort by rank score (best first)
     picks = sorted(seen.values(), key=lambda x: (x[0], x[1].get("score", 99)))
 
+    # Fetch regime once for bear suppression
+    _regime_today = fetch_market_regime(date.today())
+    _is_bear = isinstance(_regime_today, dict) and _regime_today.get("elder_count", 10) == 0
+
     for _, r, strategy in picks:
         ticker = r["ticker"]
+
+        # Bear regime: skip trend strategies (mean reversion only)
+        if _is_bear and strategy in _TREND_STRATS:
+            print(YLW(f"  [practice-auto] BEAR regime — skipping trend strategy {strategy} for {ticker}"))
+            continue
 
         if ticker in open_tickers:
             skipped.append(ticker)
@@ -1399,7 +1412,7 @@ def _auto_add_practice_trades(results_by_strategy: dict, multi_tickers: set, is_
             inv_eur  = round(qty * price / fx, 2)
             company  = r.get("company") or fetch_company_name(ticker)
             sector   = fetch_sector(ticker)
-            regime   = fetch_market_regime(today)
+            regime   = _regime_today
 
             # Build signals string from scan result
             strats_fired = [s for s, res in results_by_strategy.items()

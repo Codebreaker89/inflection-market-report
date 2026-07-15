@@ -638,8 +638,10 @@ def _build_scanner_results_html() -> str:
         rsi = r.get("rsi") or 0
         if 50 <= rsi <= 65:   pts += 2
         n = len(strats_fired)
-        if n >= 3:   pts += 3
-        elif n == 2: pts += 2
+        has_quality = any(hist_stats.get(s, {}).get("wr", 0) >= 50 for s in strats_fired)
+        if has_quality:
+            if n >= 3:   pts += 3
+            elif n == 2: pts += 2
         if (r.get("score") or 99) <= 3: pts += 1
         if 7 <= (r.get("score") or 0) <= 10: pts -= 1  # high score = overextended (33% WR)
         vol = r.get("vol_ratio") or 0
