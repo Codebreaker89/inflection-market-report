@@ -139,6 +139,7 @@ from wyckoff_spring_scanner        import scan as scan_wyckoff_spring
 from weinstein_stage2_scanner      import scan as scan_weinstein_stage2
 from momentum_burst_scanner        import scan as scan_momentum_burst
 from ma50_reclaim_scanner          import scan as scan_ma50_reclaim
+from turnover_momentum_scanner     import scan as scan_turnover_momentum
 from show_tracker                  import (add_trade_interactive, load_trades, save_trades,
                                            next_id, ticker_ccy, fetch_fx_on_date,
                                            fetch_company_name, fetch_sector, fetch_market_regime,
@@ -173,7 +174,7 @@ ALL_STRATEGIES = ["breakout", "pocket_pivot", "connors_rsi2",
                   "holy_grail", "connors_3down", "williams_pct_r", "bollinger_pctb",
                   "connors_r3", "connors_tps", "turtle_soup", "raschke_8020",
                   "wyckoff_spring", "weinstein_stage2",
-                  "momentum_burst", "ma50_reclaim"]
+                  "momentum_burst", "ma50_reclaim", "turnover_momentum"]
 
 SCANNER_MAP = {
     # "momentum":        scan_momentum,  # DISABLED: 0% WR, avg -4.40% across 5 signals (Jun 30 backtest)
@@ -208,6 +209,7 @@ SCANNER_MAP = {
     "weinstein_stage2":      scan_weinstein_stage2,
     "momentum_burst":        scan_momentum_burst,
     "ma50_reclaim":          scan_ma50_reclaim,
+    "turnover_momentum":     scan_turnover_momentum,
 }
 
 STRATEGY_LABELS = {
@@ -242,6 +244,7 @@ STRATEGY_LABELS = {
     "weinstein_stage2":      "📈  WEINSTEIN STAGE 2  (Weinstein — 30-week MA turns up, price crosses above it on volume surge)",
     "momentum_burst":        "💥  MOMENTUM BURST  (Stockbee — first explosive day ≥4% after NR compression, vol≥1.5x, fresh move)",
     "ma50_reclaim":          "📍  50 SMA RECLAIM  (Minervini/IBD — price reclaims 50 SMA after pullback, institutions add here)",
+    "turnover_momentum":     "🔵  TURNOVER MOMENTUM  (Medhat & Schmeling RFS 2022 — top-33% 12-1m momentum × below-median turnover)",
 }
 
 STRATEGY_DESCRIPTIONS = {
@@ -416,6 +419,11 @@ STRATEGY_DESCRIPTIONS = {
         "  Failed breakdown = next 1-2 days trend up. Works in choppy/sideways markets.\n"
         "  Pure price-action pattern, any ADX regime. Hold 2 days."
     ),
+    "turnover_momentum": (
+        "Medhat & Schmeling (RFS 2022) — buys stocks in top-third of 12-1m momentum "
+        "that also have BELOW-median share turnover. Low turnover = uncrowded position, "
+        "dramatically reduces momentum crash risk. Hold 5 days."
+    ),
 }
 
 HOLD_DAYS_MAP = {
@@ -450,6 +458,39 @@ HOLD_DAYS_MAP = {
     "weinstein_stage2":      10,
     "momentum_burst":        5,
     "ma50_reclaim":          7,
+    "turnover_momentum":     5,
+}
+
+# Short display aliases for strategy names (replaces garbled [:6] truncation)
+STRAT_ALIAS = {
+    "pocket_pivot":          "PP",
+    "ema_ribbon":            "EMA",
+    "cup_handle":            "CUP",
+    "connors_rsi2":          "RSI2",
+    "connors_r3":            "R3",
+    "connors_tps":           "TPS",
+    "signal_velocity":       "SV",
+    "breakout":              "BKT",
+    "vcp":                   "VCP",
+    "darvas_box":            "DARV",
+    "rs_line":               "RSL",
+    "nr7":                   "NR7",
+    "williams_pct_r":        "WR%",
+    "bollinger_pctb":        "BB%B",
+    "turtle_soup":           "TSUP",
+    "raschke_8020":          "R820",
+    "wyckoff_spring":        "WYK",
+    "weinstein_stage2":      "W2",
+    "momentum_burst":        "MBST",
+    "ma50_reclaim":          "MA50",
+    "holy_grail":            "HGRL",
+    "analyst_upgrade":       "UPGR",
+    "chokepoint_inflection": "CHKPT",
+    "defensive_rotation":    "DEFR",
+    "momentum":              "MOM",
+    "elder_impulse":         "EIMP",
+    "stage4_short":          "S4SH",
+    "turnover_momentum":     "TMOM",
 }
 
 W = 110
@@ -518,7 +559,13 @@ def _rank_score(r: dict, strats_fired: list, elder_count: int = 0,
     if any(s in PROVEN_EDGE for s in strats_fired):
         pts += 3
     rsi = r.get("rsi", 0) or 0
-    if 50 <= rsi <= 65:
+    # Breakout/momentum strategies can legitimately fire at RSI 65-75 (trending stocks).
+    # Keep tighter 50-65 cap for mean-reversion (those need low RSI for a bounce).
+    _BROAD_RSI_STRATS = {"breakout", "darvas_box", "pocket_pivot", "ema_ribbon", "vcp",
+                         "cup_handle", "weinstein_stage2", "momentum", "momentum_burst",
+                         "power_earnings_gap", "rs_line", "signal_velocity"}
+    _rsi_hi = 75 if any(s in _BROAD_RSI_STRATS for s in strats_fired) else 65
+    if 50 <= rsi <= _rsi_hi:
         pts += 2
     has_quality = any(_HIST_STATS.get(s, {}).get("wr", 0) >= 50 for s in strats_fired)
     n_strats = len(strats_fired)
@@ -667,12 +714,12 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
         enriched.sort(key=lambda x: -x[0])
         medals = {0: GRN(BOLD(" #1 ")), 1: GRN(BOLD(" #2 ")), 2: YLW(BOLD(" #3 "))}
 
-        print(BOLD(f"  {'RANK':<4}  {'TICKER':<10}  {'SECTOR':^11}  {'COMPANY':<22}  {'STRATEGIES':<26}  {'HIST WR':>7}  {'SCORE':>5}  {'RSI':>5}  {'ADX':>5}  {'PRICE':>8}"))
+        print(BOLD(f"  {'RANK':<4}  {'TICKER':<10}  {'SECTOR':^11}  {'COMPANY':<22}  {'STRATEGIES':<20}  {'WR':>5}  {'SCR':>4}  {'RSI':>5}  {'ADX':>5}  {'HOLD':>5}  {'PRICE':>8}  {'SL ~':>8}"))
         print("  " + "─"*(W-2))
         for idx, (rs, r, strategy, strats_fired) in enumerate(enriched):
             best_strat   = next((s for s in strats_fired if _HIST_STATS.get(s,{}).get("n",0)>=5), strategy)
             proven_badge = " ✦PROVEN" if any(s in PROVEN_EDGE for s in strats_fired) else ""
-            strat_str    = "+".join(s.replace("_"," ").upper()[:6] for s in strats_fired[:3])
+            strat_str    = "+".join(STRAT_ALIAS.get(s, s[:4].upper()) for s in strats_fired[:3])
             hist         = _HIST_STATS.get(best_strat, {})
             wr_s         = f"{hist['wr']:.0f}%WR" if hist.get("n",0)>=5 else "─"
             wr_col       = GRN(f"{wr_s:>7}") if hist.get("wr",0)>=60 else YLW(f"{wr_s:>7}")
@@ -686,12 +733,16 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
             vr           = r.get("vol_ratio", 0) or 0
             vol_badge    = GRN(" ⚡VOL") if vr >= 2.0 else (YLW(" ⚡") if vr >= 1.5 else "")
             rs_badge     = GRN(" ↑RS") if r.get("rs_vs_spy", 0) and float(r.get("rs_vs_spy",0)) > 0 else ""
-            print(f"  {rank_label}  {GRN(BOLD(ticker_fmt))}  {sec_display}  {company:<22}  {strat_str:<26}{proven_s}  {wr_col}  {r.get('score',0):>5}  {r.get('rsi',0):>5.1f}  {r.get('adx',0):>5.1f}  {r.get('price',0):>8.2f}{pers_badge}{vol_badge}{rs_badge}")
+            _price  = r.get("price", 0) or 0
+            _sl     = _price * 0.97
+            _hold   = HOLD_DAYS_MAP.get(best_strat, 5)
+            print(f"  {rank_label}  {GRN(BOLD(ticker_fmt))}  {sec_display}  {company:<22}  {strat_str+str(proven_s):<20}  {wr_col}  {r.get('score',0):>4}  {r.get('rsi',0):>5.1f}  {r.get('adx',0):>5.1f}  {_hold:>4}d  {_price:>8.2f}  {RED(f'${_sl:>6.2f}')}{pers_badge}{vol_badge}{rs_badge}")
         print()
 
     # ── WATCHLIST (MED conviction) ─────────────────────────────────────────────
     if med_picks:
-        print(BOLD(f"  👀  WATCHLIST  ·  {len(med_picks)} stock(s)  ·  ★★ MED — confirm before entering"))
+        print(BOLD(f"  👀  WATCHLIST  ·  {len(med_picks)} stock(s)  ·  ★★ MED — wait for stronger signal before buying"))
+        print(BOLD(f"  {'TICKER':<10}  {'SECTOR':^11}  {'COMPANY':<22}  {'STRATEGIES':<18}  {'WR':>5}  {'SCR':>4}  {'RSI':>5}  {'ADX':>5}  {'HOLD':>5}  {'PRICE':>8}"))
         print("  " + "─"*(W-2))
         for _, r, strategy in med_picks[:15]:
             strats_fired = sorted(
@@ -700,14 +751,16 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
                 key=lambda s: -_HIST_STATS.get(s, {}).get("wr", 0)
             )
             best_strat   = next((s for s in strats_fired if _HIST_STATS.get(s,{}).get("n",0)>=5), strategy)
-            strat_str    = "+".join(s.replace("_"," ").upper()[:5] for s in strats_fired[:2])
-            proven_badge = " ✦" if any(s in PROVEN_EDGE for s in strats_fired) else ""
+            strat_str    = "+".join(STRAT_ALIAS.get(s, s[:4].upper()) for s in strats_fired[:2])
+            proven_badge = "✦" if any(s in PROVEN_EDGE for s in strats_fired) else ""
             hist         = _HIST_STATS.get(best_strat, {})
-            wr_s         = f"{hist['wr']:.0f}%WR" if hist.get("n",0)>=5 else "─"
+            wr_s         = f"{hist['wr']:.0f}%" if hist.get("n",0)>=5 else "─"
             ticker_fmt2  = f"{r['ticker']:<10}"
             co2          = str(_company_cache.get(r["ticker"], r.get("company","") or ""))[:22]
             sec_display  = _sec_col(r["ticker"])
-            print(f"  {YLW(BOLD(ticker_fmt2))}  {sec_display}  {co2:<22}  {strat_str+proven_badge:<28}  {wr_s:>6}  score={r.get('score',0)}  RSI={r.get('rsi',0):.0f}  ADX={r.get('adx',0):.0f}")
+            _hold2       = HOLD_DAYS_MAP.get(best_strat, 5)
+            _price2      = r.get("price", 0) or 0
+            print(f"  {YLW(BOLD(ticker_fmt2))}  {sec_display}  {co2:<22}  {(strat_str+proven_badge):<18}  {wr_s:>5}  {r.get('score',0):>4}  {r.get('rsi',0):>5.1f}  {r.get('adx',0):>5.1f}  {_hold2:>4}d  {_price2:>8.2f}")
         if len(med_picks) > 15:
             print(DIM(f"  ... and {len(med_picks)-15} more"))
         print()
@@ -931,12 +984,12 @@ def _print_streak_leaders(min_streak: int = 5) -> None:
     if not leaders:
         return
     print()
-    print(BLD(f"  🔁  PERSISTENCE LEADERS  ·  seen ≥{min_streak} consecutive trading days"))
+    print(BOLD(f"  🔁  PERSISTENCE LEADERS  ·  seen ≥{min_streak} consecutive trading days"))
     print(DIM("  " + "─" * 70))
     for l in leaders:
         strat_str = "+".join(l["strategies"])
         price_str = f"  ${l['last_price']}" if l["last_price"] else ""
-        print(f"  {BLD(l['ticker']): <12}  streak={YLW(str(l['streak'])+'d')}  score={l['last_score']}  "
+        print(f"  {BOLD(l['ticker']): <12}  streak={YLW(str(l['streak'])+'d')}  score={l['last_score']}  "
               f"{DIM(strat_str)}{price_str}")
     print()
 
@@ -1066,13 +1119,18 @@ def _print_group(strategy: str, results: list, with_backtest: bool, multi_ticker
         print(row)
 
 
-def _print_header(strategies: list, total: int, with_backtest: bool):
+def _print_header(strategies: list, total: int, with_backtest: bool,
+                  elder_count: int = 0, spy_ret: float = 0.0):
     now = datetime.now().strftime("%Y-%m-%d  %H:%M")
     strat_str = ", ".join(strategies)
+    regime_label = "BULL" if elder_count >= 15 else ("NEUTRAL" if elder_count >= 5 else "BEAR")
+    regime_col   = GRN if elder_count >= 15 else (YLW if elder_count >= 5 else RED)
+    spy_s = f"SPY 10d {'+' if spy_ret >= 0 else ''}{spy_ret:.1f}%"
     print()
     print("╔" + "═"*(W-2) + "╗")
     print("║" + f"  UNIFIED SCANNER  ·  {now}  ·  {total} total signals  ·  backtest={'ON' if with_backtest else 'OFF'}".ljust(W-2) + "║")
-    print("║" + f"  Strategies:  {strat_str}".ljust(W-2) + "║")
+    print("║" + (regime_col(f"  REGIME: {regime_label}  ({spy_s})  ·  {'🔥 Uptrend — favour trend strategies' if elder_count >= 15 else ('⚠ Mixed — high-conviction only' if elder_count >= 5 else '❄️ Weak market — avoid new longs')}")).ljust(W+9) + "║")
+    print("║" + DIM(f"  Strategies: {strat_str[:W-17]}").ljust(W+7) + "║")
     print("╚" + "═"*(W-2) + "╝")
 
 
@@ -1284,6 +1342,33 @@ def main():
         if (r.get("rsi") or 0) <= 75
     ]
 
+    # Dollar-volume floor — $5M/day minimum (illiquid = wide spreads, hard to exit)
+    # Fetch 20d avg volume for each unique ticker in signals (quick, batched).
+    _DOLLAR_VOL_MIN = 5_000_000
+    _all_tickers_dv = list({r["ticker"] for r in all_results})
+    _dv_fail: set = set()
+    if _HAS_YF and _all_tickers_dv:
+        print(DIM(f"  Checking dollar-volume floor ({len(_all_tickers_dv)} tickers)..."), flush=True)
+        for _dv_tick in _all_tickers_dv:
+            try:
+                with _quiet_ctx():
+                    _dv_df = yf.Ticker(_yf_sym(_dv_tick)).history(
+                        period="30d", interval="1d", auto_adjust=True)
+                if _dv_df is None or len(_dv_df) < 5:
+                    continue
+                _avg_vol = float(_dv_df["Volume"].tail(20).mean())
+                _price_c = float(_dv_df["Close"].iloc[-1])
+                if _avg_vol * _price_c < _DOLLAR_VOL_MIN:
+                    _dv_fail.add(_dv_tick)
+            except Exception:
+                pass
+    if _dv_fail:
+        print(DIM(f"  Dollar-volume filter removed {len(_dv_fail)} tickers below $5M/day"))
+        for _strat in list(results_by_strategy.keys()):
+            results_by_strategy[_strat] = [r for r in results_by_strategy[_strat]
+                                           if r["ticker"] not in _dv_fail]
+        all_results = [r for r in all_results if r["ticker"] not in _dv_fail]
+
     # Relative strength vs SPY: compute 10d return for HIGH-conviction tickers only.
     # Stock beating SPY before signal = actual alpha, not just beta. +1pt in rank_score.
     def _fetch_rs_vs_spy(ticker: str, spy_10d: float) -> float:
@@ -1359,9 +1444,10 @@ def main():
             if t not in earnings_blocked and _near_earnings(t):
                 earnings_blocked.add(t)
 
+    _earnings_warn_msg = ""
     if earnings_blocked:
-        print(YLW(f"  ⚠  Earnings block ({len(earnings_blocked)} tickers removed): "
-                  + ", ".join(sorted(earnings_blocked))))
+        _earnings_warn_msg = (f"  ⚠  Earnings block ({len(earnings_blocked)} tickers removed): "
+                              + ", ".join(sorted(earnings_blocked)))
         for strat in list(results_by_strategy.keys()):
             if strat in EARNINGS_EXEMPT:
                 continue
@@ -1377,25 +1463,66 @@ def main():
     print(DIM("  Fetching sector pulse..."), flush=True)
     sector_excess, spy_ret = _fetch_sector_pulse()
 
+    # Derive market regime from SPY 10d return (elder_impulse disabled — WR 50%)
+    if spy_ret >= 3.0:       elder_count = 18
+    elif spy_ret >= 1.5:     elder_count = 15
+    elif spy_ret >= 0.5:     elder_count = 10
+    elif spy_ret >= -0.5:    elder_count = 5
+    elif spy_ret >= -2.0:    elder_count = 2
+    else:                    elder_count = 0
+
     # Analyst upgrade tickers (for cross-reference star in matrix)
     upgrade_tickers = {r["ticker"] for r in results_by_strategy.get("analyst_upgrade", [])}
 
-    # Multi-strategy tickers: appear in ≥2 strategies (highest conviction — float to top)
-    from collections import Counter
-    ticker_strat_count = Counter(r["ticker"] for r in all_results)
-    multi_tickers = {t for t, n in ticker_strat_count.items() if n >= 2}
+    # Strategy families — correlated signals within a family count as ONE independent vote.
+    # Prevents connors_rsi2+r3+tps (same bet × 3) from inflating to HIGH conviction.
+    _STRAT_FAMILY = {
+        "connors_rsi2":   "connors_mr",
+        "connors_r3":     "connors_mr",
+        "connors_tps":    "connors_mr",
+        "turtle_soup":    "false_breakdown",
+        "raschke_8020":   "false_breakdown",
+        "wyckoff_spring": "false_breakdown",
+        "vcp":            "base_pattern",
+        "cup_handle":     "base_pattern",
+        "breakout":       "breakout_fam",
+        "darvas_box":     "breakout_fam",
+    }
+    # Multi-strategy: ticker must fire in ≥2 INDEPENDENT strategy families
+    from collections import Counter, defaultdict as _defaultdict
+    _ticker_families: dict = _defaultdict(set)
+    for _strat, _res_list in results_by_strategy.items():
+        _fam = _STRAT_FAMILY.get(_strat, _strat)   # singleton strats are their own family
+        for _r in _res_list:
+            _ticker_families[_r["ticker"]].add(_fam)
+    multi_tickers = {t for t, fams in _ticker_families.items() if len(fams) >= 2}
 
     # Load historical WR stats (must happen before any display function)
     global _HIST_STATS
     _HIST_STATS = _load_hist_stats()
 
     # Display
-    _print_header(strategies, len(all_results), with_backtest)
+    _print_header(strategies, len(all_results), with_backtest, elder_count, spy_ret)
     _print_sector_pulse(sector_excess, spy_ret)
+
+    # ── Portfolio heat (show BEFORE signals so trader knows available slots) ──
+    try:
+        _open_t = [t for t in load_trades() if t.get("status") == "OPEN"]
+        _total_inv = sum(float(t.get("investment_eur") or 0) for t in _open_t)
+        _slots_used = len(_open_t)
+        _heat_col = GRN if _slots_used <= 4 else (YLW if _slots_used <= 5 else RED)
+        print(_heat_col(f"  📊  Portfolio heat: {_slots_used}/6 slots open  ·  €{_total_inv:,.0f} deployed"
+                        + ("  🔥 FULL — close a position before entering new trades" if _slots_used >= 6 else "")))
+    except Exception:
+        pass
+
+    # ── Earnings block warning (deferred from scan progress for visibility) ──
+    if _earnings_warn_msg:
+        print(YLW(_earnings_warn_msg))
+
     _thematic_check()
 
     # ── LEAD WITH CONVICTION — what to act on ─────────────────────────────────
-    elder_count = len(results_by_strategy.get("elder_impulse", []))
     _print_high_conviction(results_by_strategy, multi_tickers, with_backtest, sector_excess, elder_count)
 
     # ── PERSISTENCE LEADERS (≥5 consecutive trading days) ─────────────────────

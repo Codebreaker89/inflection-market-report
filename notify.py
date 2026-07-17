@@ -92,6 +92,96 @@ def fetch_10d_ema(ticker: str) -> Optional[float]:
     except Exception:
         return None
 
+def _check_exit_rules(trades: list, prices: dict) -> list[dict]:
+    """
+    Display-only exit rule checker for OPEN trades.
+
+    Args:
+        trades: list of trade dicts (same shape as trades.csv rows)
+        prices: dict of ticker → current price in native currency (e.g. USD for US stocks)
+
+    Returns list of alert dicts:
+        {"ticker", "company", "trade_type", "type", "message", "priority"}
+
+    Types emitted:
+        "PARTIAL_EXIT"  — price reached +1.5R, take half off the table
+        "MOVE_STOP_BE"  — after +1.5R, move stop to break-even
+        "TRAIL_STOP"    — 10d EMA > stop_loss while price > entry, trail the stop up
+    """
+    alerts = []
+    for t in trades:
+        if t.get("status") != "OPEN":
+            continue
+        ticker = t.get("ticker", "")
+        curr_price = prices.get(ticker)
+        if curr_price is None:
+            continue
+
+        # ── Parse entry / stop fields ──────────────────────────────────────────
+        try:
+            entry_price = float(t.get("buy_price") or 0)
+            if entry_price <= 0:
+                continue
+        except (ValueError, TypeError):
+            continue
+
+        sl_raw = t.get("stop_loss_price") or ""
+        try:
+            stop_loss = float(sl_raw) if str(sl_raw).strip() else 0.0
+        except (ValueError, TypeError):
+            stop_loss = 0.0
+
+        if stop_loss <= 0:
+            continue  # no actionable stop → skip
+
+        initial_risk = entry_price - stop_loss
+        if initial_risk <= 0:
+            continue  # stop above entry or zero risk → skip
+
+        ccy = t.get("currency", "USD")
+        sym = _ccy_sym(ccy)
+        company = t.get("company", "")
+        tt = t.get("trade_type", "practice")
+        pnl_r = (curr_price - entry_price) / initial_risk
+
+        # ── Rule 1 & 2: >= 1.5R → partial exit + move stop to break-even ──────
+        if pnl_r >= 1.5:
+            alerts.append({
+                "ticker":     ticker,
+                "company":    company,
+                "trade_type": tt,
+                "type":       "PARTIAL_EXIT",
+                "message":    (f"Sell half now at ~{sym}{curr_price:.2f} "
+                               f"— you're up {pnl_r:.1f}R"),
+                "priority":   1,
+            })
+            alerts.append({
+                "ticker":     ticker,
+                "company":    company,
+                "trade_type": tt,
+                "type":       "MOVE_STOP_BE",
+                "message":    (f"Move stop loss to your entry price "
+                               f"({sym}{entry_price:.2f}) — now risk-free"),
+                "priority":   1,
+            })
+
+        # ── Rule 3: Trail stop to 10d EMA (only when price > entry) ──────────
+        if curr_price > entry_price:
+            ema10 = fetch_10d_ema(ticker)
+            if ema10 is not None and ema10 > stop_loss:
+                alerts.append({
+                    "ticker":     ticker,
+                    "company":    company,
+                    "trade_type": tt,
+                    "type":       "TRAIL_STOP",
+                    "message":    (f"Trail stop to 10d EMA: {sym}{ema10:.2f} "
+                                   f"— locks in gains"),
+                    "priority":   2,
+                })
+
+    return alerts
+
+
 def fetch_earnings_date(ticker: str) -> Optional[date]:
     """Return next earnings date if within EARNINGS_WARN days, else None."""
     try:
@@ -1399,15 +1489,25 @@ def build_email(trades: list[dict]) -> str:
     open_trades   = [t for t in trades if t.get("status") == "OPEN"]
     closed_trades = [t for t in trades if t.get("status") == "CLOSED"]
 
-    ALERT_ORDER = ["STOP_LOSS", "TRAIL_BREACH", "HOLD_EXPIRED", "PROFIT_TARGET", "EARNINGS"]
+    ALERT_ORDER = [
+        # Exit-rule alerts — shown first (highest priority)
+        "PARTIAL_EXIT", "MOVE_STOP_BE", "TRAIL_STOP",
+        # Standard alerts
+        "STOP_LOSS", "TRAIL_BREACH", "HOLD_EXPIRED", "PROFIT_TARGET", "EARNINGS",
+    ]
     ALERT_META  = {
-        "STOP_LOSS":     ("🛑", "Stop Loss Hit",          "#c0392b", "#fff0f0"),
-        "TRAIL_BREACH":  ("⚠",  "Trailing EMA Breached",  "#7b3f00", "#fff8ee"),
-        "HOLD_EXPIRED":  ("⏰", "Hold Period Expired",    "#b7590a", "#fff8f0"),
-        "PROFIT_TARGET": ("🎯", "Profit Target Reached","#1a7f4b", "#f0faf4"),
-        "EARNINGS":      ("📣", "Earnings Warning",     "#1a5a8a", "#f0f6ff"),
+        # Exit rules — amber/orange for partial exit & BE stop; green for trail stop
+        "PARTIAL_EXIT":  ("✂",  "Take Partial Profits",    "#f59e0b", "#fffbeb"),
+        "MOVE_STOP_BE":  ("🔒", "Move Stop to Break-Even", "#f59e0b", "#fffbeb"),
+        "TRAIL_STOP":    ("📈", "Trail Stop to 10d EMA",   "#10b981", "#f0fdf4"),
+        # Standard alerts
+        "STOP_LOSS":     ("🛑", "Stop Loss Hit",            "#c0392b", "#fff0f0"),
+        "TRAIL_BREACH":  ("⚠",  "Trailing EMA Breached",   "#7b3f00", "#fff8ee"),
+        "HOLD_EXPIRED":  ("⏰", "Hold Period Expired",      "#b7590a", "#fff8f0"),
+        "PROFIT_TARGET": ("🎯", "Profit Target Reached",   "#1a7f4b", "#f0faf4"),
+        "EARNINGS":      ("📣", "Earnings Warning",         "#1a5a8a", "#f0f6ff"),
     }
-    alerts_by_type: dict = {k: [] for k in ALERT_ORDER}  # includes TRAIL_BREACH
+    alerts_by_type: dict = {k: [] for k in ALERT_ORDER}
     results: list[tuple] = []
 
     print(f"  Fetching prices for {len(open_trades)} open trade(s)...", flush=True)
@@ -1419,6 +1519,16 @@ def build_email(trades: list[dict]) -> str:
             if atype in alerts_by_type:
                 alerts_by_type[atype].append((t, amsg))
         print("✓")
+
+    # ── Exit-rule alerts (display-only, prepended to action alerts) ──────────
+    _prices_native = {t["ticker"]: r.get("curr_native") for t, r in results}
+    _trade_by_ticker = {t["ticker"]: t for t in open_trades}
+    for _ea in _check_exit_rules(open_trades, _prices_native):
+        _atype = _ea["type"]
+        if _atype in alerts_by_type:
+            alerts_by_type[_atype].append(
+                (_trade_by_ticker.get(_ea["ticker"], {}), _ea["message"])
+            )
 
     alert_tickers = {t["ticker"] for items in alerts_by_type.values() for t, _ in items}
     total_alerts  = sum(len(v) for v in alerts_by_type.values())
