@@ -601,6 +601,22 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
     high_picks = [p for p in picks if p[0] == 0]
     med_picks  = [p for p in picks if p[0] == 1]
 
+    # Batch-fetch company names for display tickers that are missing them
+    display_tickers = [p[1]["ticker"] for p in high_picks + med_picks]
+    _company_cache: dict = {}
+    try:
+        from concurrent.futures import ThreadPoolExecutor
+        def _get_co(t):
+            for _, r, _ in picks:
+                if r["ticker"] == t and r.get("company"):
+                    return t, r["company"]
+            return t, fetch_company_name(t)
+        with ThreadPoolExecutor(max_workers=10) as ex:
+            for ticker, name in ex.map(_get_co, display_tickers):
+                _company_cache[ticker] = name or ""
+    except Exception:
+        pass
+
     # ── ACT ON THESE (HIGH conviction) ────────────────────────────────────────
     print()
     print("╔" + "═"*(W-2) + "╗")
@@ -639,12 +655,7 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
             wr_s = f"{hist['wr']:.0f}%WR" if hist.get("n",0)>=5 else "─"
             wr_col = GRN(f"{wr_s:>7}") if hist.get("wr",0)>=60 else YLW(f"{wr_s:>7}")
             proven_s = GRN(proven_badge) if proven_badge else ""
-            company = ""
-            for s in strats_fired:
-                for rx in results_by_strategy.get(s, []):
-                    if rx["ticker"] == r["ticker"] and rx.get("company"):
-                        company = str(rx["company"])[:22]; break
-                if company: break
+            company = str(_company_cache.get(r["ticker"], "") or "")[:22]
             rank_label = medals.get(idx, "     ")
             ticker_fmt = f"{r['ticker']:<10}"
             sec_tag = _get_ticker_sector_tag(r["ticker"], sector_excess or {})
@@ -676,7 +687,8 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
             hist = _HIST_STATS.get(best_strat, {})
             wr_s = f"{hist['wr']:.0f}%WR" if hist.get("n",0)>=5 else "─"
             ticker_fmt2 = f"{r['ticker']:<10}"
-            print(f"  {YLW(BOLD(ticker_fmt2))}  {str(r.get('company','') or '')[:22]:<22}  {strat_str+proven_badge:<30}  {wr_s:>6}  score={r.get('score',0)}  RSI={r.get('rsi',0):.0f}  ADX={r.get('adx',0):.0f}")
+            co2 = str(_company_cache.get(r["ticker"], r.get("company","") or ""))[:22]
+            print(f"  {YLW(BOLD(ticker_fmt2))}  {co2:<22}  {strat_str+proven_badge:<30}  {wr_s:>6}  score={r.get('score',0)}  RSI={r.get('rsi',0):.0f}  ADX={r.get('adx',0):.0f}")
         if len(med_picks) > 15:
             print(DIM(f"  ... and {len(med_picks)-15} more"))
         print()
