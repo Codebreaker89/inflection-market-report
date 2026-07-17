@@ -494,34 +494,32 @@ _REVERSION_STRATS = {"connors_rsi2", "nr7", "wyckoff_spring", "raschke_8020",
                      "connors_3down", "bollinger_pctb"}
 
 
-def _rank_score(r: dict, strats_fired: list, elder_count: int = 0) -> float:
+def _rank_score(r: dict, strats_fired: list, elder_count: int = 0,
+                sector_excess: dict = None, ticker_etf: str = "") -> float:
     """
     Score each HIGH-conviction pick so we can label top 1/2/3.
     Higher = better. Criteria (max ~17 pts):
       +3  any PROVEN_EDGE strategy fired
           ADX REMOVED (data: -3.1% WR delta, n=588 — noise, not signal)
       +2  RSI 50-65  (momentum without overextension)
-          RSI 65-70  REMOVED (data: -2.3% WR)
-      +3  3+ strategies (data: 74% WR, +16.1% delta)
-      +2  2 strategies  (data: 63% WR, +5.9% delta)
+      +3  3+ strategies with quality gate (WR≥50%)
+      +2  2 strategies with quality gate
       +1  score ≤ 3
-      +2  vol 1.5-2x   (data: 68.4% WR — BEST single feature)
-      +1  vol ≥ 2x     (data: 66.2% WR)
-      +2  persistent 3+ scan dates (L013 — 61% vs 47% WR)
+      -1  score 7-10 (overextended/noise: 33.3% WR)
+      +2  vol >2x    (71.1% WR)
+      +1  vol 1.5-2x (64.2% WR)
+      +2  persistent 3+ scan dates (61% vs 47% WR)
       +1  persistent 2 scan dates
       +1  RS positive vs SPY 10d
-      +1  regime-strategy fit (trend strats in BULL, reversion strats in NEUTRAL)
-    Calibrated via optimize_weights.py on 1119 signals (10 scan dates, Jul 2026).
+      +1  regime-strategy fit (trend in BULL, reversion in NEUTRAL)
+      -1  ticker sector is bottom-3 vs SPY 10d (sector headwind)
     """
     pts = 0.0
     if any(s in PROVEN_EDGE for s in strats_fired):
         pts += 3
-    # ADX removed: data shows -3.1% WR delta for sweet zone (n=588, coef -0.084)
     rsi = r.get("rsi", 0) or 0
     if 50 <= rsi <= 65:
         pts += 2
-    # Multi-strategy bonus only if ≥1 strategy has WR ≥ 50% (quality gate)
-    # Prevents two garbage strategies (e.g. Raschke 33% + Williams) boosting into HIGH
     has_quality = any(_HIST_STATS.get(s, {}).get("wr", 0) >= 50 for s in strats_fired)
     n_strats = len(strats_fired)
     if has_quality:
@@ -531,11 +529,9 @@ def _rank_score(r: dict, strats_fired: list, elder_count: int = 0) -> float:
             pts += 2
     if (r.get("score") or 99) <= 3:
         pts += 1
-    # High scanner score penalty: score 7-10 = 33.3% WR (n=51) — overextended/noise
     if 7 <= (r.get("score") or 0) <= 10:
         pts -= 1
     vr = r.get("vol_ratio", 0) or 0
-    # Vol weights: >2x = 71.1% WR > 1.5-2x = 64.2% WR (raw scan_history n=1534)
     if vr >= 2.0:
         pts += 2
     elif 1.5 <= vr < 2.0:
@@ -547,13 +543,17 @@ def _rank_score(r: dict, strats_fired: list, elder_count: int = 0) -> float:
         pts += 1
     if r.get("rs_vs_spy", 0) and float(r.get("rs_vs_spy", 0)) > 0:
         pts += 1
-    # Regime fit: +1 if strategy type matches current market regime
     is_bull    = elder_count >= 15
     is_neutral = 5 <= elder_count < 15
     has_trend  = any(s in _TREND_STRATS     for s in strats_fired)
     has_revert = any(s in _REVERSION_STRATS for s in strats_fired)
     if (is_bull and has_trend) or (is_neutral and has_revert):
         pts += 1
+    # Sector headwind penalty: bottom-3 sectors vs SPY 10d
+    if sector_excess and ticker_etf and ticker_etf in sector_excess:
+        ranked_vals = sorted(sector_excess.values())
+        if sector_excess[ticker_etf] <= ranked_vals[2]:  # bottom 3
+            pts -= 1
     return pts
 
 
@@ -601,21 +601,47 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
     high_picks = [p for p in picks if p[0] == 0]
     med_picks  = [p for p in picks if p[0] == 1]
 
-    # Batch-fetch company names for display tickers that are missing them
+    # ── Batch-fetch company name + sector ETF (one yf.info call per ticker) ──
     display_tickers = [p[1]["ticker"] for p in high_picks + med_picks]
-    _company_cache: dict = {}
+    _company_cache: dict[str, str] = {}
+    _sector_etf_cache: dict[str, str] = {}  # ticker → ETF code e.g. "XLF"
+
+    def _fetch_info(t: str):
+        # Prefer company already in result dict
+        existing_co = next((r.get("company") for _, r, _ in picks
+                            if r["ticker"] == t and r.get("company")), None)
+        etf, name = "", existing_co or ""
+        try:
+            import yfinance as _yf
+            info = _yf.Ticker(t).info
+            if not name:
+                name = info.get("shortName") or info.get("longName") or t
+            etf = SECTOR_ETF.get(info.get("sector", ""), "")
+        except Exception:
+            if not name:
+                name = t
+        return t, name or t, etf
+
     try:
         from concurrent.futures import ThreadPoolExecutor
-        def _get_co(t):
-            for _, r, _ in picks:
-                if r["ticker"] == t and r.get("company"):
-                    return t, r["company"]
-            return t, fetch_company_name(t)
         with ThreadPoolExecutor(max_workers=10) as ex:
-            for ticker, name in ex.map(_get_co, display_tickers):
-                _company_cache[ticker] = name or ""
+            for ticker, name, etf in ex.map(_fetch_info, display_tickers):
+                _company_cache[ticker]    = name
+                _sector_etf_cache[ticker] = etf
     except Exception:
         pass
+
+    # Helper: colorised sector column "XLF+2.9%" / "XLK-5.0%"
+    def _sec_col(ticker: str) -> str:
+        etf = _sector_etf_cache.get(ticker, "")
+        if not etf or not sector_excess or etf not in sector_excess:
+            return f"{'─':^11}"
+        ex  = sector_excess[etf]
+        s   = f"{etf} {'+' if ex>=0 else ''}{ex:.1f}%"
+        ranked = sorted(sector_excess.values(), reverse=True)
+        if ex >= ranked[2]:   return GRN(f"{s:^11}")   # top 3
+        if ex <= sorted(sector_excess.values())[2]: return RED(f"{s:^11}")   # bottom 3
+        return f"{s:^11}"
 
     # ── ACT ON THESE (HIGH conviction) ────────────────────────────────────────
     print()
@@ -627,7 +653,6 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
     print("╚" + "═"*(W-2) + "╝")
 
     if high_picks:
-        # Pre-compute strats_fired and rank scores for all HIGH picks
         enriched = []
         for _, r, strategy in high_picks:
             strats_fired = sorted(
@@ -635,40 +660,33 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
                  if any(x["ticker"] == r["ticker"] for x in res)],
                 key=lambda s: -_HIST_STATS.get(s, {}).get("wr", 0)
             )
-            rs = _rank_score(r, strats_fired, elder_count)
+            etf = _sector_etf_cache.get(r["ticker"], "")
+            rs  = _rank_score(r, strats_fired, elder_count, sector_excess, etf)
             enriched.append((rs, r, strategy, strats_fired))
 
-        # Sort by rank score descending
         enriched.sort(key=lambda x: -x[0])
-
-        # Assign medal labels to top 3
         medals = {0: GRN(BOLD(" #1 ")), 1: GRN(BOLD(" #2 ")), 2: YLW(BOLD(" #3 "))}
 
-        # Header
-        print(BOLD(f"  {'RANK':<4}  {'TICKER':<10}  {'COMPANY':<22}  {'STRATEGIES':<28}  {'HIST WR':>7}  {'SCORE':>5}  {'RSI':>5}  {'ADX':>5}  {'PRICE':>8}"))
+        print(BOLD(f"  {'RANK':<4}  {'TICKER':<10}  {'SECTOR':^11}  {'COMPANY':<22}  {'STRATEGIES':<26}  {'HIST WR':>7}  {'SCORE':>5}  {'RSI':>5}  {'ADX':>5}  {'PRICE':>8}"))
         print("  " + "─"*(W-2))
         for idx, (rs, r, strategy, strats_fired) in enumerate(enriched):
-            best_strat = next((s for s in strats_fired if _HIST_STATS.get(s,{}).get("n",0)>=5), strategy)
+            best_strat   = next((s for s in strats_fired if _HIST_STATS.get(s,{}).get("n",0)>=5), strategy)
             proven_badge = " ✦PROVEN" if any(s in PROVEN_EDGE for s in strats_fired) else ""
-            strat_str = "+".join(s.replace("_"," ").upper()[:6] for s in strats_fired[:3])
-            hist = _HIST_STATS.get(best_strat, {})
-            wr_s = f"{hist['wr']:.0f}%WR" if hist.get("n",0)>=5 else "─"
-            wr_col = GRN(f"{wr_s:>7}") if hist.get("wr",0)>=60 else YLW(f"{wr_s:>7}")
-            proven_s = GRN(proven_badge) if proven_badge else ""
-            company = str(_company_cache.get(r["ticker"], "") or "")[:22]
-            rank_label = medals.get(idx, "     ")
-            ticker_fmt = f"{r['ticker']:<10}"
-            sec_tag = _get_ticker_sector_tag(r["ticker"], sector_excess or {})
-            # Persistence badge
-            days_seen = _PERSISTENCE.get(r["ticker"], 0)
-            pers_badge = (GRN(" 🔁PERSIST") if days_seen >= 3
-                          else (DIM(" 🔁x2") if days_seen >= 2 else ""))
-            # Volume surge badge
-            vr = r.get("vol_ratio", 0) or 0
-            vol_badge = GRN(" ⚡VOL") if vr >= 2.0 else (YLW(" ⚡") if vr >= 1.5 else "")
-            # RS badge
-            rs_badge = GRN(" ↑RS") if r.get("rs_vs_spy", 0) and float(r.get("rs_vs_spy",0)) > 0 else ""
-            print(f"  {rank_label}  {GRN(BOLD(ticker_fmt))}{sec_tag}  {company:<22}  {strat_str:<28}{proven_s}  {wr_col}  {r.get('score',0):>5}  {r.get('rsi',0):>5.1f}  {r.get('adx',0):>5.1f}  {r.get('price',0):>8.2f}{pers_badge}{vol_badge}{rs_badge}")
+            strat_str    = "+".join(s.replace("_"," ").upper()[:6] for s in strats_fired[:3])
+            hist         = _HIST_STATS.get(best_strat, {})
+            wr_s         = f"{hist['wr']:.0f}%WR" if hist.get("n",0)>=5 else "─"
+            wr_col       = GRN(f"{wr_s:>7}") if hist.get("wr",0)>=60 else YLW(f"{wr_s:>7}")
+            proven_s     = GRN(proven_badge) if proven_badge else ""
+            company      = str(_company_cache.get(r["ticker"], "") or "")[:22]
+            rank_label   = medals.get(idx, "     ")
+            ticker_fmt   = f"{r['ticker']:<10}"
+            sec_display  = _sec_col(r["ticker"])
+            days_seen    = _PERSISTENCE.get(r["ticker"], 0)
+            pers_badge   = GRN(" 🔁PERSIST") if days_seen >= 3 else (DIM(" 🔁x2") if days_seen >= 2 else "")
+            vr           = r.get("vol_ratio", 0) or 0
+            vol_badge    = GRN(" ⚡VOL") if vr >= 2.0 else (YLW(" ⚡") if vr >= 1.5 else "")
+            rs_badge     = GRN(" ↑RS") if r.get("rs_vs_spy", 0) and float(r.get("rs_vs_spy",0)) > 0 else ""
+            print(f"  {rank_label}  {GRN(BOLD(ticker_fmt))}  {sec_display}  {company:<22}  {strat_str:<26}{proven_s}  {wr_col}  {r.get('score',0):>5}  {r.get('rsi',0):>5.1f}  {r.get('adx',0):>5.1f}  {r.get('price',0):>8.2f}{pers_badge}{vol_badge}{rs_badge}")
         print()
 
     # ── WATCHLIST (MED conviction) ─────────────────────────────────────────────
@@ -681,14 +699,15 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
                  if any(x["ticker"] == r["ticker"] for x in res)],
                 key=lambda s: -_HIST_STATS.get(s, {}).get("wr", 0)
             )
-            best_strat = next((s for s in strats_fired if _HIST_STATS.get(s,{}).get("n",0)>=5), strategy)
-            strat_str = "+".join(s.replace("_"," ").upper()[:5] for s in strats_fired[:2])
+            best_strat   = next((s for s in strats_fired if _HIST_STATS.get(s,{}).get("n",0)>=5), strategy)
+            strat_str    = "+".join(s.replace("_"," ").upper()[:5] for s in strats_fired[:2])
             proven_badge = " ✦" if any(s in PROVEN_EDGE for s in strats_fired) else ""
-            hist = _HIST_STATS.get(best_strat, {})
-            wr_s = f"{hist['wr']:.0f}%WR" if hist.get("n",0)>=5 else "─"
-            ticker_fmt2 = f"{r['ticker']:<10}"
-            co2 = str(_company_cache.get(r["ticker"], r.get("company","") or ""))[:22]
-            print(f"  {YLW(BOLD(ticker_fmt2))}  {co2:<22}  {strat_str+proven_badge:<30}  {wr_s:>6}  score={r.get('score',0)}  RSI={r.get('rsi',0):.0f}  ADX={r.get('adx',0):.0f}")
+            hist         = _HIST_STATS.get(best_strat, {})
+            wr_s         = f"{hist['wr']:.0f}%WR" if hist.get("n",0)>=5 else "─"
+            ticker_fmt2  = f"{r['ticker']:<10}"
+            co2          = str(_company_cache.get(r["ticker"], r.get("company","") or ""))[:22]
+            sec_display  = _sec_col(r["ticker"])
+            print(f"  {YLW(BOLD(ticker_fmt2))}  {sec_display}  {co2:<22}  {strat_str+proven_badge:<28}  {wr_s:>6}  score={r.get('score',0)}  RSI={r.get('rsi',0):.0f}  ADX={r.get('adx',0):.0f}")
         if len(med_picks) > 15:
             print(DIM(f"  ... and {len(med_picks)-15} more"))
         print()

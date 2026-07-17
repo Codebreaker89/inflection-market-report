@@ -30,6 +30,10 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import yfinance as yf
 
+# Shared RRG engine (compute_rrg, quadrant, run_sector_rrg, chart_rrg_scatter)
+from rrg_engine import (compute_rrg, quadrant, run_sector_rrg,
+                        chart_rrg_scatter, SECTOR_ETFS, QUAD_COLORS)
+
 
 # ══════════════════════════════════════════════════════════════════
 #  §1  CONFIGURATION
@@ -39,18 +43,9 @@ DATA_DIR   = "data"
 START_DATE = "2010-01-01"
 BENCHMARK  = "SPY"
 
-SECTOR_ETFS = {
-    "XLK":  "Technology",
-    "XLF":  "Financials",
-    "XLY":  "Consumer Disc.",
-    "XLP":  "Consumer Staples",
-    "XLE":  "Energy",
-    "XLV":  "Health Care",
-    "XLI":  "Industrials",
-    "XLB":  "Materials",
-    "XLU":  "Utilities",
-    "XLRE": "Real Estate",
-    "XLC":  "Comm. Services",
+# SECTOR_ETFS imported from rrg_engine — extended with sub-sector ETFs for drilldown
+SECTOR_ETFS_EXTENDED = {
+    **SECTOR_ETFS,
     "SOXX": "Semiconductors",
     "XRT":  "Retail",
     "IBB":  "Biotech",
@@ -65,176 +60,100 @@ SECTOR_ETFS = {
 }
 
 STOCK_UNIVERSE = {
-    # ── Core SPDR sectors ──────────────────────────────────────────
+    # ── Core SPDR sectors (trimmed to real constituents only) ──────
     "XLE":  ["XOM","CVX","COP","EOG","SLB","MPC","PSX","VLO","OXY","DVN",
              "HAL","BKR","FANG","KMI","WMB","EQT","TRGP","OKE","MRO","APA",
-             "OVV","SWN","RRC","CTRA","UNIT","AR","SM","GPRK","PEP","CLR",
-             "BOIL","CQP","CAPL","CEL","CMLP","EDV","ENBL","ENVA","EPAY","EPE",
-             "FLEX","FTAI","GTHX","HEP","LBRT","LNG","LMRK","LNTH","LTBR","MED"],
-    
+             "OVV","SWN","RRC","CTRA","LNG"],
+
     "XLU":  ["NEE","SO","DUK","SRE","AEP","D","EXC","PCG","XEL","ED",
              "WEC","EIX","ETR","AWK","ES","PPL","AES","CNP","NI","CMS",
-             "FE","PNW","NRG","CALD","VOYA","IDXX","WR","NWE","PEGI","GLRE",
-             "AGR","AQN","BEP","CEPU","CIR","CWEN","CWEN.A","DPLA","DQM","ELP",
-             "ETRN","GLOP","HMLP","HYLD","NWLI","OGE","ORA","SDRL","TMDM","WKC"],
-    
+             "FE","PNW","NRG"],
+
     "XLK":  ["AAPL","MSFT","NVDA","AMD","AVGO","INTC","QCOM","CRM","ADBE","NOW",
-             "INTU","ORCL","SPLK","SNOW","PAYC","NET","RBLX","U","OKTA","CRWD",
-             "SQ","SHOP","FTNT","CYBR","TEAM","DDOG","MNDY","UPST","PSTG","AZO",
-             "ABNB","ACHR","ANSS","APPF","ATHM","AVNR","AXTI","BLKB","BLND","BRKS",
-             "BZFD","CBRL","CCUR","CDTX","CFIV","CHAP","CHR","CLXT","CMPR","CNIT",
-             "CODI","CRTX","CSOD","CTST","CVTI","CWBR","CWCO","CYOU","DAKT","DANS",
-             "DCUS","DECK","DELL","DFIN","DFLI","DGII","DGLY","DHC","DIBS","DKNG",
-             "DNOW","DOOO","DORM","DOVA","DV","DVAX","DVRA","DWAC","DWCH","DXPE"],
-    
+             "INTU","ORCL","SNOW","NET","CRWD","DDOG","OKTA","FTNT","TEAM",
+             "DELL","AMAT","LRCX","KLAC","ANET","IBM","ACN","PANW","ZS","WDAY"],
+
     "XLV":  ["JNJ","UNH","ABBV","MRK","LLY","PFE","TMO","ABT","MDT","ISRG",
-             "ELV","VRTX","CVS","ANTM","CI","HUM","TMDX","DXCM","VEEV","EXAS",
-             "EDIT","BEAM","AXON","DVAX","BMRN","BIIB","VBIV","SYK","ZTS","BIO",
-             "AXNX","AZTA","BCRX","BECN","BFAM","BGNE","BLPH","BOTA","BPTH","BRPT",
-             "BSRX","BSTG","BTAI","BTHX","BURS","CALA","CANO","CCXI","CDNA","CDTX",
-             "CETE","CEVI","CFVI","CGEM","CHFRW","CHKP","CHRS","CHUL","CJJD","CLBS",
-             "CLK","CLSA","CLWT","CMDX","CMPR","CNSP","COHU","COLD","COLB","COLI",
-             "COMM","CONE","COOP","CPSR","CPTK","CPXX","CRBL","CRBP","CRGS","CRMD"],
-    
+             "ELV","VRTX","CVS","CI","HUM","DXCM","VEEV","SYK","ZTS","REGN",
+             "AMGN","GILD","BSX","BDX","IQV","A","IDXX","HCA","MCK"],
+
     "XLF":  ["JPM","BAC","WFC","GS","MS","BLK","C","AXP","COF","SCHW",
              "USB","PNC","TFC","RF","CFG","FITB","HBAN","KEY","MTB","ZION",
-             "WAL","COLB","PRU","MET","ALL","LPL","PYPL","BX","KKR","APO",
-             "COIN","AIG","HIG","PGR","CME","ICE","CBOE","NDAQ","DFIN","VOYA",
-             "BAM","BANR","BBK","BBVA","BBWI","BCH","BCSF","BDHC","BDJ","BDX",
-             "BGFV","BKFS","BMC","BMRC","BOFI","BOKF","BPOP","BRLC","BSL","BTE",
-             "BTUI","BUI","BUSE","BZM","BZWK","CAF","CAFD","CAGB","CAN","CAR",
-             "CARS","CASA","CASS","CATO","CBAK","CBB","CBNK","CBOE","CBRL","CBT"],
-    
+             "PRU","MET","ALL","BX","KKR","APO","AIG","HIG","PGR","CME",
+             "ICE","CBOE","NDAQ","CB","MMC","AON","TRV","AFL"],
+
     "XLY":  ["AMZN","TSLA","HD","MCD","NKE","SBUX","LOW","TJX","BKNG","RL",
-             "TPR","TGT","WMT","COST","ROST","EBAY","W","ETSY","CMG","CVNA",
-             "F","GM","LUV","AAL","ABNB","VROOM","MAR","LYV","DIS","NFLX",
-             "CCL","RCL","SEAS","DKNG","PENN","KKR","FANG","CHWY","GMED","KSS",
-             "DECK","DLTR","DNO","DOCU","DOX","DRI","DRVN","DUOL","DVA","DVAX",
-             "DXC","DXCM","DXPE","EAT","EBAY","ECPR","ECOM","ECPG","ECVG","EDDY",
-             "EDFY","EDHC","EDMS","EDR","EDSY","EEIQ","EELV","EFSH","EGOV","EGOV",
-             "EGRX","EGRYF","EHRN","EICOE","EJHA","EK","EKSO","ELAC","ELASIW","ELAVF"],
-    
+             "TPR","ROST","ETSY","CMG","CVNA","F","GM","MAR","LYV",
+             "CCL","RCL","DKNG","PENN","CHWY","DRI","YUM","HLT","WYNN"],
+
     "XLP":  ["PG","KO","PEP","MDLZ","CL","KMB","GIS","STZ","MO","PM",
              "KDP","HSY","MKC","TSN","MNST","HRL","SJM","CAG","CPB","K",
-             "AGRO","AGOR","BF.B","WDC","BGS","COTY","EL","ESTC","FCPT","FARM",
-             "ADM","AGFS","AGRI","AGTC","AHPI","ALCO","ALRM","ALYI","AMBC","AMEH",
-             "AMH","AMRX","AMRX","AMSC","AMSI","AMSWA","AMTX","AMWX","AMZN","AMZI",
-             "AN","ANDE","ANDV","ANF","ANGI","ANGL","ANIK","ANIX","ANLY","ANMD",
-             "ANMF","ANOB","ANPC","ANRX","ANSS","ANTX","ANTX","AOCI","APAP","APAX"],
-    
+             "ADM","WMT","COST","BF.B","EL"],
+
     "XLC":  ["META","GOOGL","NFLX","DIS","VZ","T","EA","CHTR","TMUS","SNAP",
-             "PINS","ATVI","TTWO","ROBLOX","ROKU","FOXA","FUTU","BILI","MSOS",
-             "MELI","ALGN","EBAY","ADBE","RIG","AMCX","VIASP","MTCH","LSXMK",
-             "ANGI","APEI","APGB","APIC","APOG","APPH","APPL","APRE","APRO","APSF",
-             "APSG","APSM","APSW","APTV","APTY","APWR","APZI","AQMS","AQND","AQWA",
-             "AR","ARAB","ARAC","ARBD","ARBE","ARBK","ARCK","ARDS","AREC","AREF",
-             "ARHE","ARIM","ARINW","ARKO","ARLA","ARLZ","ARMP","ARMQ","ARMSW","ARND"],
-    
+             "PINS","TTWO","ROKU","FOXA","MTCH","LSXMK","LYV"],
+
     "XLI":  ["CAT","HON","UPS","RTX","LMT","DE","GE","NOC","EMR","ETN",
-             "FDX","CSX","MMM","PCAR","MAN","BA","ITW","FAST","PH","GRMN",
-             "VLTO","STAG","JCI","FWRD","ALK","LDI","GHM","IDEX","SPCE","RAVN",
-             "ACAP","ACAS","ACAT","ACBA","ACBK","ACBS","ACCH","ACDC","ACDX","ACED",
-             "ACEO","ACET","ACFB","ACGL","ACHC","ACHR","ACHT","ACHV","ACID","ACII",
-             "ACIU","ACKB","ACKL","ACLS","ACME","ACMM","ACMR","ACMU","ACNB","ACNX",
-             "ACOR","ACPI","ACPP","ACPW","ACPX","ACQU","ACRB","ACRE","ACRS","ACRX",
-             "ACSA","ACSE","ACSED","ACSEM","ACSF","ACSG","ACSH","ACSI","ACSQ","ACSSD"],
-    
+             "FDX","CSX","MMM","PCAR","BA","ITW","FAST","PH","GRMN",
+             "JCI","IDEX","ROK","IR","AME","GWW","RSG","WM","VRSK"],
+
     "XLB":  ["LIN","APD","SHW","NEM","FCX","NUE","ALB","PKG","DD","IP",
-             "ECL","CTVA","IFF","PPG","WRK","VMC","MP","X","SCCO","AA",
-             "USG","AVA","SLVM","VPLM","AXON","CRS","NWL","CLVT","HWKN",
-             "ACS","ACSI","ACSS","ACSSD","ACSV","ACTA","ACTAP","ACTD","ACTF","ACTI",
-             "ACTG","ACTH","ACTM","ACTO","ACTP","ACTQ","ACTR","ACTS","ACTU","ACTV",
-             "ACTW","ACTX","ACTY","ACTZ","ACUA","ACUB","ACUC","ACUD","ACUE","ACUF",
-             "ACUG","ACUH","ACUI","ACUJ","ACUK","ACUL","ACUM","ACUN","ACUO","ACUP",
-             "ACUQ","ACUR","ACUS","ACUT","ACUU","ACUV","ACUW","ACUX","ACUY","ACUZ"],
-    
+             "ECL","CTVA","IFF","PPG","VMC","MP","X","SCCO","AA","MLM"],
+
     "XLRE": ["PLD","AMT","CCI","EQIX","PSA","EQR","AVB","O","VICI","SPG",
-             "DLR","WY","ARE","RDFN","INVH","MAA","UMH","JLS","MPW","OHI",
-             "GMRE","NLY","SLG","EXR","ONE","SAFE","STAG","APLE","ELME","DEI",
-             "ACIW","ACIT","ACIX","ACIZ","ACKL","ACLD","ACLE","ACLF","ACLG","ACLH",
-             "ACLI","ACLJ","ACLK","ACLL","ACLM","ACLN","ACLO","ACLP","ACLQ","ACLR",
-             "ACLS","ACLT","ACLU","ACLV","ACLW","ACLX","ACLY","ACLZ","ACMA","ACMB",
-             "ACMC","ACMD","ACME","ACMF","ACMG","ACMH","ACMI","ACMJ","ACMK","ACML"],
-    
+             "DLR","WY","ARE","INVH","MAA","EXR","STAG","APLE"],
+
     # ── Thematic / sub-sector ──────────────────────────────────────
     "SOXX": ["NVDA","AMD","AVGO","INTC","QCOM","AMAT","LRCX","KLAC","MU","TSM",
-             "SMCI","ASML","MRVL","NXPI","SLAB","SITM","MPWR","PZZA","ICHR","SYNA",
-             "AEHR","ACLS","ADIL","AFOP","AGII","ALIF","ALKS","ALLK","ALLT","ALMC",
-             "ALRM","ALSI","ALSP","ALTA","ALTG","ALTM","ALTR","ALTS","ALTU","ALTV"],
-    
+             "SMCI","ASML","MRVL","NXPI","MPWR","SYNA","MCHP","ON","TXN","ADI"],
+
     "IBB":  ["AMGN","GILD","BIIB","REGN","VRTX","MRNA","ILMN","BNTX","INCY","ALNY",
-             "EDIT","BEAM","AXON","CRSP","DVAX","BMRN","XBIO","CRBU","APOP","ALCO",
-             "ALKS","ALLT","ALMC","ALRM","ALSI","ALSP","ALTA","ALTG","ALTM","ALTR",
-             "AMAG","AMBC","AMBG","AMBI","AMBL","AMBO","AMBT","AMBU","AMBV","AMBW"],
-    
+             "EDIT","CRSP","BMRN","SGEN","IONS","EXEL","NBIX","PTGX","RCUS"],
+
     "XRT":  ["TGT","WMT","COST","TJX","ROST","EBAY","W","ETSY","DLTR","FIVE",
-             "CASY","RET","CPRT","CHWY","CVCO","BGFV","KSS","JWN","ODP","AZO",
-             "ACET","ACEU","ACFB","ACGC","ACGM","ACGN","ACHC","ACHT","ACHV","ACID",
-             "ACII","ACIU","ACKB","ACKL","ACLS","ACLM","ACLS","ACME","ACMM","ACMR"],
-    
+             "CHWY","KSS","JWN","AZO","ORLY","AAP","ULTA","LULU"],
+
     "KRE":  ["USB","PNC","TFC","RF","CFG","FITB","HBAN","KEY","MTB","ZION",
-             "WAL","COLB","WAFD","CRBK","FFIN","GBCI","SFBS","CRBN","TRMK","FBKC",
-             "ACNX","ACOR","ACPI","ACPP","ACPW","ACPX","ACQU","ACRB","ACRE","ACRS",
-             "ACRX","ACSA","ACSE","ACSF","ACSG","ACSH","ACSI","ACSQ","ACSR","ACSS"],
-    
+             "WAL","COLB","WAFD","FFIN","GBCI","SFBS","TRMK"],
+
     "ITA":  ["LMT","RTX","NOC","GD","BA","TDG","HII","LHX","HWM","AXON",
-             "LDOS","CACI","ESCO","GTO","ATGE","AAXN","CTS","MERL","NSSC","SPY",
-             "ACTA","ACTAP","ACTD","ACTF","ACTI","ACTG","ACTH","ACTM","ACTO","ACTP",
-             "ACTQ","ACTR","ACTS","ACTU","ACTV","ACTW","ACTX","ACTY","ACTZ","ACUA"],
-    
+             "LDOS","CACI","SAIC","KTOS","HEI"],
+
     "XOP":  ["XOM","CVX","COP","EOG","DVN","FANG","OXY","MRO","APA","OVV",
-             "SWN","RRC","CTRA","UNIT","AR","SM","GPRK","CLR","RISE","MUR",
-             "ACXP","ACXQ","ACXR","ACXS","ACXT","ACXU","ACXV","ACXW","ACXX","ACXY",
-             "ACXZ","ACYA","ACYB","ACYC","ACYD","ACYE","ACYF","ACYG","ACYH","ACYI"],
-    
-    "OIH":  ["SLB","HAL","BKR","NOV","FTI","WHD","PTEN","GTLS","OIS","DNOW",
-             "EXFO","RES","WLKP","REI","GPP","CECO","PUMP","RCON","SSD","COIL",
-             "ACYJ","ACYK","ACYL","ACYM","ACYN","ACYO","ACYP","ACYQ","ACYR","ACYS",
-             "ACYT","ACYU","ACYV","ACYW","ACYX","ACYY","ACYZ","ACZA","ACZB","ACZC"],
-    
+             "SWN","RRC","CTRA","AR","SM","MUR"],
+
+    "OIH":  ["SLB","HAL","BKR","NOV","FTI","WHD","PTEN","GTLS","DNOW",
+             "RES","PUMP","LBRT"],
+
     "GDX":  ["NEM","GOLD","AEM","WPM","FNV","KGC","AU","GFI","HL","AGI",
-             "EGO","OR","RIO","SSRM","AUY","CDE","EXK","GDMK","MAG","VGCX",
-             "ACZD","ACZE","ACZF","ACZG","ACZH","ACZI","ACZJ","ACZK","ACZL","ACZM",
-             "ACZN","ACZO","ACZP","ACZQ","ACZR","ACZS","ACZT","ACZU","ACZV","ACZW"],
-    
+             "EGO","OR","SSRM","CDE","EXK","MAG"],
+
     "ICLN": ["ENPH","FSLR","RUN","PLUG","BE","ARRY","CWEN","ORA","SEDG","NEP",
-             "HASI","FLWR","CCME","ACHR","CHPT","NEE","NOVA","RUN","YZC","ADANIGREEN",
-             "ACZX","ACZY","ACZZ","ADAA","ADAB","ADAC","ADAD","ADAE","ADAF","ADAG",
-             "ADAH","ADAI","ADAJ","ADAK","ADAL","ADAM","ADAN","ADAO","ADAP","ADAQ"],
-    
-    "JETS": ["DAL","UAL","AAL","LUV","ALK","JBLU","RYAAY","SKW","SGEN","RAVN",
-             "ADYY","ADZB","ADZC","ADZD","ADZE","ADZF","ADZG","ADZH","ADZI","ADZJ",
-             "ADZK","ADZL","ADZM","ADZN","ADZO","ADZP","ADZQ","ADZR","ADZS","ADZTO"],
-    
+             "HASI","NEE","NOVA","CHPT"],
+
+    "JETS": ["DAL","UAL","AAL","LUV","ALK","JBLU","RYAAY"],
+
     "XHB":  ["DHI","LEN","PHM","TOL","NVR","MTH","KBH","MHO","SKY","LGIH",
-             "BLD","ATGE","TREX","RAMP","WH","APTV","LAMR","PBI","PVH","AYI",
-             "ADZV","ADZW","ADZX","ADZY","ADZZ","AEAA","AEAB","AEAC","AEAD","AEAE",
-             "AEAF","AEAG","AEAH","AEAI","AEAJ","AEAK","AEAL","AEAM","AEAN","AEAO"],
-    
-    # ── Additional thematic sectors ──────────────────────────────────
-    "CLOUD": ["NOW","SNOW","CRWD","DDOG","OKTA","NET","SPLK","PSTG","VEEVA","MNDY",
-              "ESTC","DOMO","SUMO","UPLAND","PAYCOM","PAYLOCITY","CDNS","TEAM","SEMR","WDAY"],
-    
-    "FINTECH": ["PYPL","SQ","UPST","VIRT","AFRM","COIN","MARA","MSTR","MARA","PLAN",
-                "PAYO","IPOE","TON","BILL","GPMT","HC","CANO","WU","SOFI","CHPT"],
-    
-    "EV": ["TSLA","NIO","LI","XPEV","KNDI","FSR","LCID","RIVN","PSNY","VANG",
-           "XEGF","KNDI","WKSP","CHGG","CHPT","XL","VLDY","ZEV","PAYO","CCOI"],
-    
-    "AI": ["NVIDIA","AMD","MSFT","GOOGL","META","TSLA","CRM","IBM","HPQ","ADBE",
-           "NOW","PLTR","NET","UPST","VEEV","SPLK","DDOG","AMP","COIN","LMND"],
-    
-    "CANNABIS": ["SNDL","HEXO","TRSSF","CURLF","TCNNF","CRMCF","CRLBF","GTBPF","APHQF","PRMCF"],
-    
-    "AR_VR": ["SNAP","META","RBLX","ZNGA","APPH","VERI","ACGB","BFST","CBAK","CEMD"],
-    
+             "BLD","TREX"],
+
+    # ── Additional thematic ────────────────────────────────────────
+    "CLOUD":  ["NOW","SNOW","CRWD","DDOG","OKTA","NET","PSTG","VEEV","MNDY",
+               "ESTC","CDNS","TEAM","WDAY","ZS","HUBS","DOCN"],
+
+    "FINTECH": ["PYPL","SQ","UPST","AFRM","COIN","BILL","WU","SOFI","NU","SMAR"],
+
+    "EV":     ["TSLA","NIO","LI","XPEV","LCID","RIVN","FSR","CHPT"],
+
+    "AI":     ["NVDA","AMD","MSFT","GOOGL","META","CRM","IBM","ADBE",
+               "NOW","PLTR","NET","DDOG","SOUN","AI"],
+
     "BIOTECH": ["AMGN","GILD","BIIB","REGN","VRTX","MRNA","ILMN","BNTX","INCY","EDIT"],
-    
-    "RESTAURANTS": ["MCD","SBUX","CMG","YUM","DRI","BLMN","TXRH","WING","QSR","FAT"],
-    
+
+    "RESTAURANTS": ["MCD","SBUX","CMG","YUM","DRI","BLMN","TXRH","WING","QSR"],
+
     "RETAIL": ["WMT","COST","AMZN","HD","TJX","TGT","ROST","DLTR","FIVE","CHWY"],
-    
-    "LUXURY": ["LVMH","KORS","RRL","TPR","EL","CPRI","TMHC","DECK","LULU","NKE"],
+
+    "LUXURY": ["TPR","EL","CPRI","DECK","LULU","NKE","RL","PVH"],
 }
 
 
@@ -467,22 +386,8 @@ def _atr(df, n=14):
                     (lo - cl.shift()).abs()], axis=1).max(axis=1)
     return tr.ewm(span=n, adjust=False).mean()
 
-# ── RRG ──────────────────────────────────────────────────────────
-
-def compute_rrg(stock_close, bench_close):
-    both  = pd.concat([stock_close.rename("s"), bench_close.rename("b")],
-                      axis=1).dropna()
-    rs    = 100 * both["s"] / both["b"]
-    rs1   = _ema(rs, 10); rs2 = _ema(rs, 26)
-    ratio = 100 + (rs1 - rs2) / rs2 * 100
-    mom   = 100 + (_ema(ratio, 10) - _ema(ratio, 26)) / _ema(ratio, 26) * 100
-    return ratio, mom
-
-def quadrant(ratio_val, mom_val):
-    if   ratio_val >= 100 and mom_val >= 100: return "Leading"
-    elif ratio_val >= 100 and mom_val <  100: return "Weakening"
-    elif ratio_val <  100 and mom_val >= 100: return "Improving"
-    else:                                      return "Lagging"
+# ── RRG — imported from rrg_engine ───────────────────────────────
+# compute_rrg, quadrant imported at top of file
 
 # ── StealthTrail ─────────────────────────────────────────────────
 
@@ -686,7 +591,7 @@ def _sector_alert(score):
 def run_sector_rotation(spy_df):
     """Score all sector ETFs vs SPY. Includes QTA backtest for each."""
     results = []
-    for etf, name in SECTOR_ETFS.items():
+    for etf, name in SECTOR_ETFS_EXTENDED.items():
         df = load_df(etf)
         if df is None or len(df) < 200:
             continue
@@ -793,10 +698,8 @@ def run_stock_drilldown(rotating_sectors, spy_df):
 #  §6  CHART GENERATION
 # ══════════════════════════════════════════════════════════════════
 
-Q_COLORS = {
-    "Leading":"#10b981","Weakening":"#f59e0b",
-    "Improving":"#3b82f6","Lagging":"#ef4444",
-}
+# Q_COLORS imported from rrg_engine as QUAD_COLORS — alias for local use
+Q_COLORS = QUAD_COLORS
 
 def _fig_to_b64(fig):
     buf = io.BytesIO()

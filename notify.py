@@ -23,6 +23,12 @@ from typing      import Optional
 import yfinance as yf
 from show_tracker import _yf_ticker, fetch_live_price  # canonical impls (pre-market aware, GBp-safe)
 
+try:
+    from rrg_engine import run_sector_rrg, chart_rrg_scatter, QUAD_EMOJI, QUAD_COLORS
+    _HAS_RRG = True
+except ImportError:
+    _HAS_RRG = False
+
 HERE       = Path(__file__).parent
 TRADES_CSV = HERE / "trades.csv"
 
@@ -581,6 +587,78 @@ def _conviction_tier_email(r: dict, multi_tickers: set) -> str:
         return "MED"
     return "LOW"
 
+# ── Metal spot snapshot (absorbed from metal_tracker.py) ─────────────────────
+_METAL_TICKERS = [
+    ("Gold",        "GC=F",   "$/oz"),
+    ("Silver",      "SI=F",   "$/oz"),
+    ("Copper",      "HG=F",   "$/lb"),
+    ("Crude Oil",   "CL=F",   "$/bbl"),
+    ("Aluminum",    "ALI=F",  "$/lb"),
+    ("Platinum",    "PL=F",   "$/oz"),
+    ("Rare Earths", "REMX",   "$ ETF"),
+    ("Lithium",     "LIT",    "$ ETF"),
+]
+
+def _fetch_metal_snapshot() -> list[dict]:
+    """Spot prices for key metals via yfinance. Fail-open returns []."""
+    results = []
+    for name, ticker, unit in _METAL_TICKERS:
+        try:
+            with _quiet():
+                hist = yf.Ticker(ticker).history(period="14d", interval="1d", auto_adjust=True)
+            if hist.empty or len(hist) < 2:
+                continue
+            c    = hist["Close"].dropna()
+            spot = float(c.iloc[-1])
+            p1d  = float(c.iloc[-2])
+            p7d  = float(c.iloc[max(0, len(c) - 8)])
+            results.append({
+                "name": name, "ticker": ticker, "unit": unit,
+                "spot": round(spot, 2),
+                "ch1d": round((spot - p1d) / p1d * 100, 1) if p1d else None,
+                "ch7d": round((spot - p7d) / p7d * 100, 1) if p7d else None,
+            })
+        except Exception:
+            pass
+    return results
+
+
+def _fetch_metal_events(n: int = 6) -> list[dict]:
+    """Top metal supply shock events via Google News RSS. Fail-open returns []."""
+    try:
+        import feedparser
+    except ImportError:
+        return []
+    _feeds = [
+        "https://news.google.com/rss/search?q=smelter+closure+production+halt+mine+shutdown&hl=en-US&gl=US&ceid=US:en",
+        "https://news.google.com/rss/search?q=copper+aluminum+nickel+supply+disruption+shortage&hl=en-US&gl=US&ceid=US:en",
+        "https://news.google.com/rss/search?q=rare+earth+lithium+cobalt+supply+deficit&hl=en-US&gl=US&ceid=US:en",
+    ]
+    seen, events = set(), []
+    for url in _feeds:
+        try:
+            feed = feedparser.parse(url)
+            for e in feed.entries[:4]:
+                title = e.get("title", "").strip()
+                if not title or title in seen:
+                    continue
+                seen.add(title)
+                parts = title.rsplit(" - ", 1)
+                clean = parts[0].strip()
+                src   = parts[1].strip() if len(parts) == 2 else ""
+                pub   = ""
+                try:
+                    from datetime import datetime as _dt
+                    pub = _dt(*e.published_parsed[:6]).strftime("%b %d")
+                except Exception:
+                    pass
+                events.append({"title": clean, "source": src, "pub": pub,
+                                "link": e.get("link", "#")})
+        except Exception:
+            pass
+    return events[:n]
+
+
 def _build_scanner_results_html() -> str:
     """Scanner results: leads with conviction cards, then full detail by strategy."""
     scan_json = HERE / "last_scan.json"
@@ -694,6 +772,14 @@ def _build_scanner_results_html() -> str:
         has_revert = any(s in _REVERSION_STRATS for s in strats_fired)
         if (is_bull and has_trend) or (is_neutral and has_revert):
             pts += 1
+        # Bottom-3 sector penalty (mirrors scan.py _rank_score)
+        if sector_excess:
+            ticker_sec = r.get("sector", "")
+            sec_etf = next((etf for etf, sn in _ETF_TO_SECTOR.items() if sn == ticker_sec), "")
+            if sec_etf and sec_etf in sector_excess:
+                ranked_vals = sorted(sector_excess.values())
+                if sector_excess[sec_etf] <= ranked_vals[2]:
+                    pts -= 1
         return pts
 
     _persistence = _load_persistence_counts()
@@ -730,8 +816,8 @@ def _build_scanner_results_html() -> str:
         f'<span style="font-size:12px;font-weight:700;color:{regime_col};">'
         f'{regime_icon} MARKET REGIME: {market_regime}</span>'
         f'<span style="font-size:11px;color:#94a3b8;margin-left:12px;">'
-        f'Elder Impulse: <b style="color:#e2e8f0;">{elder_count} signals</b>'
-        f'{"  · 🔥 Uptrend confirmed — favour trend strategies" if elder_count >= 15 else ("  · ⚠ Mixed — use high-conviction only" if elder_count >= 5 else "  · ❄️ Avoid longs — favour mean-reversion")}'
+        f'Market trend pulse: <b style="color:#e2e8f0;">{elder_count}/20 stocks in uptrend</b>'
+        f'{"  · 🔥 Strong uptrend — good time to enter momentum trades" if elder_count >= 15 else ("  · ⚠ Mixed market — only enter the highest-conviction setups" if elder_count >= 5 else "  · ❄️ Weak/falling market — avoid new longs, wait for recovery")}'
         f'</span>'
         f'</td></tr></table>'
     )
@@ -897,11 +983,14 @@ def _build_scanner_results_html() -> str:
                 f'<div style="margin-bottom:5px;">{strat_chips}{proven_badge}</div>'
                 f'<div style="font-size:11px;color:#d1fae5;">'
                 f'Price <b>{price_s}</b> &nbsp;·&nbsp; '
-                f'SL ~<b style="color:#fca5a5;">{sl_s}</b> &nbsp;·&nbsp; '
-                f'Hold <b>{hold_d}d</b> &nbsp;·&nbsp; '
-                f'RSI <b>{r.get("rsi", 0):.0f}</b> &nbsp;·&nbsp; '
-                f'ADX <b>{r.get("adx", 0):.0f}</b> &nbsp;·&nbsp; '
+                f'Stop Loss <b style="color:#fca5a5;">{sl_s}</b> &nbsp;·&nbsp; '
+                f'Hold <b>{hold_d} days</b> &nbsp;·&nbsp; '
+                f'Momentum <b>{r.get("rsi", 0):.0f}/100</b> &nbsp;·&nbsp; '
+                f'Trend Str. <b>{r.get("adx", 0):.0f}/50</b> &nbsp;·&nbsp; '
                 f'Score <b>{r.get("score", 0)}</b>'
+                f'</div>'
+                f'<div style="font-size:10px;color:#86efac;margin-top:3px;font-style:italic;">'
+                f'{"💡 Buy near " + price_s + ", set a stop at " + sl_s + " to limit downside, target to sell in " + str(hold_d) + " days."}'
                 f'</div>'
                 f'</td>'
                 f'<td style="width:90px;text-align:right;vertical-align:top;">'
@@ -927,12 +1016,12 @@ def _build_scanner_results_html() -> str:
             f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:14px 0 4px;">'
             f'<tr><td style="background:#1a1a0a;border-left:5px solid #d97706;padding:6px 12px;border-radius:4px 4px 0 0;">'
             f'<span style="font-size:12px;font-weight:700;color:#fcd34d;">'
-            f'👀 WATCHLIST &nbsp;·&nbsp; {len(med_picks)} stock(s) &nbsp;·&nbsp; ★★ MED — confirm before entering</span>'
+            f'👀 WATCHLIST &nbsp;·&nbsp; {len(med_picks)} stock(s) &nbsp;·&nbsp; ★★ MEDIUM — worth watching, but wait for a stronger signal before buying</span>'
             f'</td></tr></table>'
             f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:11px;margin-bottom:8px;">'
             f'<thead><tr style="background:#1a1a2e;">'
-            + _th("Ticker","left") + _th("Strategy","left") + _th("WR%","right")
-            + _th("Score","center") + _th("RSI","right") + _th("ADX","right") + _th("Price","right")
+            + _th("Ticker","left") + _th("Strategy","left") + _th("Win Rate","right")
+            + _th("Score","center") + _th("Momentum","right") + _th("Trend Str.","right") + _th("Price","right")
             + f'</tr></thead><tbody>'
         )
         for i, (tier, strat, r) in enumerate(med_picks[:12]):
@@ -1032,10 +1121,10 @@ def _build_scanner_results_html() -> str:
             f'<thead><tr>'
             f'<th style="padding:5px 8px;text-align:left;color:#888;background:#1a1a2e;">#</th>'
             f'<th style="padding:5px 8px;text-align:left;color:#888;background:#1a1a2e;">Strategy</th>'
-            f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;">WR% d5</th>'
-            f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;">Avg% d5</th>'
-            f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;font-style:italic;" title="Avg reward:risk multiple — higher = better exits">avgR</th>'
-            f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;">n</th>'
+            f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;" title="How often this strategy wins (5-day hold)">Win Rate</th>'
+            f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;" title="Average % gain/loss per trade (5-day hold)">Avg Return</th>'
+            f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;" title="Reward vs risk — e.g. 1.5R means you gain 1.5x what you risk">Reward/Risk</th>'
+            f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;" title="Number of completed trades tracked">Trades</th>'
             f'</tr></thead><tbody>'
             + sc_rows +
             f'</tbody></table>'
@@ -1168,6 +1257,140 @@ def _build_scanner_results_html() -> str:
             rows += "</tr>"
 
         html += thead + rows + "</tbody></table>"
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # METALS SNAPSHOT — spot prices + supply events (absorbed from metal_tracker)
+    # ══════════════════════════════════════════════════════════════════════════
+    metal_prices = _fetch_metal_snapshot()
+    if metal_prices:
+        def _chg_span(v):
+            if v is None: return '<span style="color:#484f58;">─</span>'
+            col  = "#4ade80" if v > 0 else ("#f87171" if v < 0 else "#94a3b8")
+            sign = "+" if v > 0 else ""
+            return f'<span style="color:{col};font-weight:700;">{sign}{v}%</span>'
+
+        metal_rows = "".join(
+            f'<tr style="background:{"#1a1a2e" if i % 2 else "#0f0f1a"};">'
+            f'<td style="padding:5px 8px;color:#e2e8f0;font-weight:700;font-size:11px;">{m["name"]}</td>'
+            f'<td style="padding:5px 8px;color:#94a3b8;font-size:10px;">{m["ticker"]}</td>'
+            f'<td style="padding:5px 8px;color:#e2e8f0;text-align:right;font-size:11px;">'
+            f'${m["spot"]:,.2f} <span style="color:#484f58;font-size:10px;">{m["unit"]}</span></td>'
+            f'<td style="padding:5px 8px;text-align:right;">{_chg_span(m["ch1d"])}</td>'
+            f'<td style="padding:5px 8px;text-align:right;">{_chg_span(m["ch7d"])}</td>'
+            f'</tr>'
+            for i, m in enumerate(metal_prices)
+        )
+        html += (
+            f'<br><table width="100%" cellpadding="0" cellspacing="0" style="margin:10px 0 4px;">'
+            f'<tr><td style="background:#1a1200;border-left:5px solid #f59e0b;padding:6px 12px;border-radius:4px 4px 0 0;">'
+            f'<span style="font-size:12px;font-weight:700;color:#fcd34d;">⬡ METALS SNAPSHOT &nbsp;·&nbsp; Live Spot Prices</span>'
+            f'</td></tr></table>'
+            f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:11px;margin-bottom:4px;">'
+            f'<thead><tr style="background:#1a1a2e;">'
+            f'<th style="padding:5px 8px;color:#94a3b8;text-align:left;">Metal</th>'
+            f'<th style="padding:5px 8px;color:#94a3b8;text-align:left;">Ticker</th>'
+            f'<th style="padding:5px 8px;color:#94a3b8;text-align:right;">Spot</th>'
+            f'<th style="padding:5px 8px;color:#94a3b8;text-align:right;">1-Day Δ</th>'
+            f'<th style="padding:5px 8px;color:#94a3b8;text-align:right;">7-Day Δ</th>'
+            f'</tr></thead><tbody>{metal_rows}</tbody></table>'
+        )
+
+    metal_events = _fetch_metal_events(n=6)
+    if metal_events:
+        ev_rows = "".join(
+            f'<tr style="background:{"#1a1a2e" if i % 2 else "#0f0f1a"};">'
+            f'<td style="padding:5px 8px;color:#94a3b8;font-size:10px;white-space:nowrap;">{e["pub"]}</td>'
+            f'<td style="padding:5px 8px;font-size:11px;">'
+            f'<a href="{e["link"]}" style="color:#c9d1d9;text-decoration:none;">{e["title"][:100]}</a>'
+            + (f'<br><span style="font-size:10px;color:#484f58;">{e["source"]}</span>'
+               if e.get("source") else "")
+            + f'</td></tr>'
+            for i, e in enumerate(metal_events)
+        )
+        html += (
+            f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;'
+            f'font-size:11px;margin-bottom:8px;">'
+            f'<thead><tr style="background:#1a1a2e;">'
+            f'<th style="padding:5px 8px;color:#94a3b8;text-align:left;width:55px;">Date</th>'
+            f'<th style="padding:5px 8px;color:#94a3b8;text-align:left;">Supply Shock Events</th>'
+            f'</tr></thead><tbody>{ev_rows}</tbody></table>'
+        )
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # RRG SECTOR ROTATION — Live quadrant analysis + scatter chart (bottom)
+    # ══════════════════════════════════════════════════════════════════════════
+    if _HAS_RRG:
+        try:
+            rrg_results = run_sector_rrg(lookback_days=365)
+        except Exception:
+            rrg_results = []
+
+        if rrg_results:
+            _QUAD_BG = {
+                "Leading":   "#052e16", "Improving": "#0c1a3a",
+                "Weakening": "#2d1f00", "Lagging":   "#3b0000",
+            }
+            _QUAD_COL = {
+                "Leading":   "#4ade80", "Improving": "#60a5fa",
+                "Weakening": "#fbbf24", "Lagging":   "#f87171",
+            }
+            rrg_rows = ""
+            for i, r in enumerate(rrg_results):
+                q         = r["quad"]
+                bg        = "#1a1a2e" if i % 2 else "#0f0f1a"
+                qbg       = _QUAD_BG.get(q, "#1e293b")
+                qcol      = _QUAD_COL.get(q, "#94a3b8")
+                emoji     = QUAD_EMOJI.get(q, "⚪")
+                ratio_col = "#4ade80" if r["rs_ratio"] >= 100 else "#f87171"
+                mom_col   = "#4ade80" if r["rs_mom"]   >= 100 else "#f87171"
+                rrg_rows += (
+                    f'<tr style="background:{bg};">'
+                    f'<td style="padding:5px 8px;color:#e2e8f0;font-weight:700;font-size:11px;">{r["etf"]}</td>'
+                    f'<td style="padding:5px 8px;color:#94a3b8;font-size:10px;">{r["name"]}</td>'
+                    f'<td style="padding:5px 8px;text-align:center;">'
+                    f'<span style="background:{qbg};color:{qcol};border-radius:3px;padding:2px 6px;'
+                    f'font-size:10px;font-weight:700;">{emoji} {q}</span></td>'
+                    f'<td style="padding:5px 8px;color:{ratio_col};text-align:right;font-size:11px;font-weight:600;">{r["rs_ratio"]:.2f}</td>'
+                    f'<td style="padding:5px 8px;color:{mom_col};text-align:right;font-size:11px;font-weight:600;">{r["rs_mom"]:.2f}</td>'
+                    f'</tr>'
+                )
+            html += (
+                f'<br><table width="100%" cellpadding="0" cellspacing="0" style="margin:10px 0 4px;">'
+                f'<tr><td style="background:#0a0a1a;border-left:5px solid #818cf8;padding:6px 12px;border-radius:4px 4px 0 0;">'
+                f'<span style="font-size:12px;font-weight:700;color:#a5b4fc;">'
+                f'📡 RRG SECTOR ROTATION &nbsp;·&nbsp; Live vs SPY &nbsp;·&nbsp; '
+                f'{sum(1 for r in rrg_results if r["quad"]=="Leading")} Leading &nbsp; '
+                f'{sum(1 for r in rrg_results if r["quad"]=="Improving")} Improving &nbsp; '
+                f'{sum(1 for r in rrg_results if r["quad"]=="Weakening")} Weakening &nbsp; '
+                f'{sum(1 for r in rrg_results if r["quad"]=="Lagging")} Lagging'
+                f'</span></td></tr></table>'
+                f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:11px;margin-bottom:8px;">'
+                f'<thead><tr style="background:#1a1a2e;">'
+                f'<th style="padding:5px 8px;color:#94a3b8;text-align:left;font-weight:600;">ETF</th>'
+                f'<th style="padding:5px 8px;color:#94a3b8;text-align:left;font-weight:600;">Sector</th>'
+                f'<th style="padding:5px 8px;color:#94a3b8;text-align:center;font-weight:600;">Status</th>'
+                f'<th style="padding:5px 8px;color:#94a3b8;text-align:right;font-weight:600;" title="vs SPY — above 100 means sector is beating the market">Beating Market?</th>'
+                f'<th style="padding:5px 8px;color:#94a3b8;text-align:right;font-weight:600;" title="above 100 = gap widening, below 100 = gap closing">Gap Widening?</th>'
+                f'</tr></thead>'
+                f'<tr style="background:#0a0a0a;">'
+                f'<td colspan="3" style="padding:4px 8px;font-size:10px;color:#484f58;font-style:italic;">'
+                f'🟢 Leading = best to trade now &nbsp; 🔵 Improving = gaining momentum &nbsp; 🟡 Weakening = slowing &nbsp; 🔴 Lagging = avoid</td>'
+                f'<td style="padding:4px 8px;font-size:10px;color:#484f58;font-style:italic;text-align:right;">&gt;100 = beating SPY</td>'
+                f'<td style="padding:4px 8px;font-size:10px;color:#484f58;font-style:italic;text-align:right;">&gt;100 = accelerating</td>'
+                f'</tr>'
+                f'<tbody>{rrg_rows}</tbody></table>'
+            )
+            try:
+                rrg_chart_b64 = chart_rrg_scatter(rrg_results)
+                if rrg_chart_b64:
+                    html += (
+                        f'<div style="margin:4px 0 12px;">'
+                        f'<img src="data:image/png;base64,{rrg_chart_b64}" '
+                        f'style="width:100%;max-width:700px;border-radius:6px;display:block;margin:0 auto;">'
+                        f'</div>'
+                    )
+            except Exception:
+                pass
 
     return html
 
