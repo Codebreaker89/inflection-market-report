@@ -831,6 +831,85 @@ def _load_persistence_counts() -> dict:
 
 _PERSISTENCE: dict = {}  # {ticker: n_scan_dates} — loaded in main()
 
+
+def _streak_leaders(min_streak: int = 5) -> list[dict]:
+    """Return tickers appearing in ≥1 scanner on each of the last min_streak consecutive trading days.
+    Returns list of dicts sorted by streak length desc: {ticker, streak, strategies, last_price, last_score}"""
+    import csv as _csv
+    from collections import defaultdict
+    from pathlib import Path as _Path
+    p = _Path(__file__).parent / "scan_history.csv"
+    if not p.exists(): return []
+    # Build {ticker: set of scan_dates} and {date: {ticker: [strategies]}}
+    ticker_dates: dict = defaultdict(set)
+    date_ticker_info: dict = defaultdict(lambda: defaultdict(list))
+    try:
+        with open(p, newline="") as f:
+            for row in _csv.DictReader(f):
+                t  = row.get("ticker","").strip()
+                sd = row.get("scan_date","").strip()
+                st = row.get("strategy","").strip()
+                if t and sd:
+                    ticker_dates[t].add(sd)
+                    date_ticker_info[sd][t].append({
+                        "strategy": st,
+                        "score":    row.get("score",""),
+                        "price":    row.get("price_at_scan",""),
+                    })
+    except Exception:
+        return []
+
+    all_dates = sorted(ticker_dates[next(iter(ticker_dates), "")] | set().union(*[v.keys() for v in [date_ticker_info]]))
+    all_dates = sorted(set(sd for t in ticker_dates for sd in ticker_dates[t]))
+    if len(all_dates) < min_streak:
+        return []
+
+    # Last N consecutive trading days present in scan_history
+    recent_dates = all_dates[-min_streak:]
+
+    results = []
+    for ticker, dates_seen in ticker_dates.items():
+        if all(d in dates_seen for d in recent_dates):
+            # Compute full streak (how many consecutive days back)
+            streak = 0
+            for d in reversed(all_dates):
+                if d in dates_seen:
+                    streak += 1
+                else:
+                    break
+            # Gather latest info
+            last_date = max(dates_seen)
+            entries   = date_ticker_info[last_date][ticker]
+            strats    = list({e["strategy"] for e in entries})
+            last_price = next((e["price"] for e in entries if e["price"]), "")
+            last_score = max((int(e["score"]) for e in entries if e["score"].isdigit()), default=0)
+            results.append({
+                "ticker":      ticker,
+                "streak":      streak,
+                "strategies":  strats,
+                "last_price":  last_price,
+                "last_score":  last_score,
+                "last_date":   last_date,
+            })
+
+    return sorted(results, key=lambda x: -x["streak"])
+
+
+def _print_streak_leaders(min_streak: int = 5) -> None:
+    leaders = _streak_leaders(min_streak)
+    if not leaders:
+        return
+    print()
+    print(BLD(f"  🔁  PERSISTENCE LEADERS  ·  seen ≥{min_streak} consecutive trading days"))
+    print(DIM("  " + "─" * 70))
+    for l in leaders:
+        strat_str = "+".join(l["strategies"])
+        price_str = f"  ${l['last_price']}" if l["last_price"] else ""
+        print(f"  {BLD(l['ticker']): <12}  streak={YLW(str(l['streak'])+'d')}  score={l['last_score']}  "
+              f"{DIM(strat_str)}{price_str}")
+    print()
+
+
 def _load_hist_stats() -> dict:
     import csv as _csv, math as _math
     from collections import defaultdict
@@ -1287,6 +1366,9 @@ def main():
     # ── LEAD WITH CONVICTION — what to act on ─────────────────────────────────
     elder_count = len(results_by_strategy.get("elder_impulse", []))
     _print_high_conviction(results_by_strategy, multi_tickers, with_backtest, sector_excess, elder_count)
+
+    # ── PERSISTENCE LEADERS (≥5 consecutive trading days) ─────────────────────
+    _print_streak_leaders(min_streak=5)
 
     # ── MULTI-STRATEGY OVERLAP MATRIX ─────────────────────────────────────────
     _print_matrix(results_by_strategy, strategies, upgrade_tickers)

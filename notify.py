@@ -459,6 +459,42 @@ def _build_matrix_html() -> str:
 
 
 
+def _load_streak_leaders(min_streak: int = 5) -> list:
+    """Return tickers seen in ≥1 scanner on each of the last min_streak consecutive trading days."""
+    import csv as _csv
+    from collections import defaultdict
+    csv_path = HERE / "scan_history.csv"
+    if not csv_path.exists(): return []
+    ticker_dates: dict = defaultdict(set)
+    date_ticker_strats: dict = defaultdict(lambda: defaultdict(list))
+    try:
+        with open(csv_path, newline="", encoding="utf-8") as f:
+            for row in _csv.DictReader(f):
+                t = row.get("ticker","").strip()
+                sd = row.get("scan_date","").strip()
+                st = row.get("strategy","").strip()
+                if t and sd:
+                    ticker_dates[t].add(sd)
+                    date_ticker_strats[sd][t].append(st)
+    except Exception:
+        return []
+    all_dates = sorted({sd for dates in ticker_dates.values() for sd in dates})
+    if len(all_dates) < min_streak:
+        return []
+    recent_dates = all_dates[-min_streak:]
+    results = []
+    for ticker, dates_seen in ticker_dates.items():
+        if all(d in dates_seen for d in recent_dates):
+            streak = 0
+            for d in reversed(all_dates):
+                if d in dates_seen: streak += 1
+                else: break
+            last_date = max(dates_seen)
+            strats = list({s for s in date_ticker_strats[last_date][ticker]})
+            results.append({"ticker": ticker, "streak": streak, "strategies": strats, "last_date": last_date})
+    return sorted(results, key=lambda x: -x["streak"])
+
+
 def _load_strategy_stats() -> dict:
     """Read scan_history.csv → per-strategy {n, wr, avg, avg_r} from filled ret_d5 rows."""
     csv_path = HERE / "scan_history.csv"
@@ -923,10 +959,40 @@ def _build_scanner_results_html() -> str:
             )
         html += '</tbody></table>'
 
+    # ══════════════════════════════════════════════════════════════════════════
+    # SECTION C: PERSISTENCE LEADERS — seen ≥5 consecutive trading days
+    # ══════════════════════════════════════════════════════════════════════════
+    streak_leaders = _load_streak_leaders(min_streak=5)
+    if streak_leaders:
+        html += (
+            f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:14px 0 4px;">'
+            f'<tr><td style="background:#0a0a1a;border-left:5px solid #818cf8;padding:6px 12px;border-radius:4px 4px 0 0;">'
+            f'<span style="font-size:12px;font-weight:700;color:#a5b4fc;">'
+            f'🔁 PERSISTENCE LEADERS &nbsp;·&nbsp; {len(streak_leaders)} stock(s) &nbsp;·&nbsp; ≥5 consecutive trading days</span>'
+            f'</td></tr></table>'
+            f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:11px;margin-bottom:8px;">'
+            f'<thead><tr style="background:#1a1a2e;">'
+            + _th("Ticker","left") + _th("Streak","center") + _th("Strategies (latest)","left") + _th("Last Seen","right")
+            + f'</tr></thead><tbody>'
+        )
+        for i, l in enumerate(streak_leaders[:15]):
+            bg = _C_ROW1 if i % 2 else _C_ROW0
+            strat_str = " · ".join(s.replace("_"," ").upper() for s in l["strategies"][:3])
+            streak_color = "#16a34a" if l["streak"] >= 10 else ("#a5b4fc" if l["streak"] >= 7 else "#d1d5db")
+            html += (
+                f'<tr style="background:{bg};">'
+                f'<td style="padding:4px 8px;color:#e2e8f0;font-weight:700;">{l["ticker"]}</td>'
+                f'<td style="padding:4px 8px;color:{streak_color};text-align:center;font-weight:700;">{l["streak"]}d</td>'
+                f'<td style="padding:4px 8px;color:#94a3b8;">{strat_str}</td>'
+                f'<td style="padding:4px 8px;color:#64748b;text-align:right;">{l["last_date"]}</td>'
+                f'</tr>'
+            )
+        html += '</tbody></table>'
+
     html += _kpi_table([
         ("HIGH Conviction", str(len(high_picks)), "#16a34a"),
         ("MED Watchlist",   str(len(med_picks)),  "#d97706"),
-        ("Total Signals",   str(total_hits),       _C_DIM),
+        ("Persistence",     str(len(streak_leaders)), "#818cf8"),
         ("Scan Date",       scan_date,             _C_DIM),
     ])
 
