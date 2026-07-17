@@ -1823,6 +1823,55 @@ def close_trade_interactive(args: list[str]):
     print(f"\n  Trade #{trade_id} closed — {result}  {pnl_str}")
 
 
+# ── STOP ENFORCEMENT ─────────────────────────────────────────────────────────
+
+def _enforce_stops(trades: list[dict], price_cache: dict) -> bool:
+    """
+    Auto-close any OPEN trade whose live price ≤ stop_loss_price.
+    Uses cached price if already fetched; fetches fresh otherwise.
+    Records exit_price = stop_loss_price, exit_reason = 'auto_stop'.
+    Returns True if any trade was closed (caller should save_trades).
+    """
+    changed = False
+    today_str = date.today().strftime("%Y-%m-%d")
+
+    for trade in trades:
+        if trade.get("status") != "OPEN":
+            continue
+        try:
+            sl = float(trade.get("stop_loss_price") or 0)
+            if sl <= 0:
+                continue
+            buy = float(trade.get("buy_price") or 0)
+        except (ValueError, TypeError):
+            continue
+
+        ticker = trade["ticker"]
+
+        # Use cached price or fetch fresh
+        if ticker in price_cache:
+            live_price, _ = price_cache[ticker]
+        else:
+            live_price, ccy = fetch_live_price(ticker)
+            if live_price is not None:
+                price_cache[ticker] = (live_price, ccy)
+
+        if live_price is None:
+            continue
+
+        if live_price <= sl:
+            pnl_pct = round((sl - buy) / buy * 100, 2)
+            print(f"\n  🛑  STOP HIT — auto-closing #{trade['id']} {ticker}  "
+                  f"live={live_price:.4f} ≤ stop={sl:.4f}  ({pnl_pct:+.2f}%)")
+            trade["status"]      = "CLOSED"
+            trade["exit_price"]  = sl          # exit at stop price, not current (realistic)
+            trade["exit_reason"] = "auto_stop"
+            trade["actual_sell_date"] = today_str
+            changed = True
+
+    return changed
+
+
 # ── MAIN ─────────────────────────────────────────────────────────────────────
 
 def main():
@@ -1867,6 +1916,11 @@ def main():
     # Backfill any missing analytics (first-time enrichment for old trades)
     changed = enrich_trades(trades, price_cache)
     if changed:
+        save_trades(trades)
+
+    # Auto-enforce stops: close any OPEN trade whose live price ≤ stop_loss_price
+    stop_changed = _enforce_stops(trades, price_cache)
+    if stop_changed:
         save_trades(trades)
 
     rows = [compute_row(t, price_cache, fx_cache) for t in trades]

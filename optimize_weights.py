@@ -309,8 +309,8 @@ def walk_forward(df: pd.DataFrame, best_thresh: dict, proposed_weights: dict):
     train = df[df["scan_date"].isin(train_dates)]
     test  = df[df["scan_date"].isin(test_dates)]
 
-    print(f"  Train: {[str(d.date()) for d in train_dates]}")
-    print(f"  Test:  {[str(d.date()) for d in test_dates]}")
+    print(f"  Train: {[str(pd.Timestamp(d).date()) for d in train_dates]}")
+    print(f"  Test:  {[str(pd.Timestamp(d).date()) for d in test_dates]}")
     print()
 
     def eval_subset(subset, label):
