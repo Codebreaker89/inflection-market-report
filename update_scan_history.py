@@ -262,7 +262,8 @@ def backfill_returns(rows: list[dict]) -> list[dict]:
             if p5 and p0:
                 ret5  = round((p5/p0 - 1)*100, 2)
                 # L021: filter data corruption (stock splits, yfinance adjusted-price errors)
-                if abs(ret5) > 15:
+                # d5 threshold: ±30% — individual stocks can move 20-25% in 5 days on news
+                if abs(ret5) > 30:
                     print(f"  [SKIP] {ticker} ret_d5={ret5:.1f}% — likely split/data error, not writing")
                     continue
                 spy5  = _spy_return(sd, target)
@@ -288,7 +289,8 @@ def backfill_returns(rows: list[dict]) -> list[dict]:
             pmin= _min_price_between(ticker, sd, target)
             if p10 and p0:
                 ret10  = round((p10/p0 - 1)*100, 2)
-                if abs(ret10) > 15:
+                # d10 threshold: ±40% — 10-day window allows larger swings
+                if abs(ret10) > 40:
                     print(f"  [SKIP] {ticker} ret_d10={ret10:.1f}% — likely split/data error, not writing")
                     continue
                 spy10  = _spy_return(sd, target)

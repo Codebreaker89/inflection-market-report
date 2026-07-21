@@ -1342,6 +1342,40 @@ def main():
         if (r.get("rsi") or 0) <= 75
     ]
 
+    # ── Data-driven signal quality filters (Jul 2026 backtest, n=1808) ───────────
+    #
+    # nr7: vol≥1.5x → WR 51%→67%;  score≥4 → WR 51%→75%. Both gates together.
+    results_by_strategy["nr7"] = [
+        r for r in results_by_strategy.get("nr7", [])
+        if (r.get("vol_ratio") or 0) >= 1.5 and (r.get("score") or 0) >= 4
+    ]
+
+    # connors_rsi2: vol≥1.5x → WR 49%→66%. Mean-reversion needs volume confirmation.
+    results_by_strategy["connors_rsi2"] = [
+        r for r in results_by_strategy.get("connors_rsi2", [])
+        if (r.get("vol_ratio") or 0) >= 1.5
+    ]
+
+    # momentum: tighten to RSI 55-70 + vol≥1.5x. Fires too broadly in non-trending markets.
+    # (scanner stays active — filter is signal quality, not regime gating)
+    results_by_strategy["momentum"] = [
+        r for r in results_by_strategy.get("momentum", [])
+        if 55 <= (r.get("rsi") or 0) <= 70
+        and (r.get("vol_ratio") or 0) >= 1.5
+    ]
+
+    # rs_line + raschke_8020: add vol≥1.5x + score≥4 quality gate.
+    # Both had 14-15% WR on low-quality signals — volume confirmation is minimum bar.
+    for _strat in ("rs_line", "raschke_8020"):
+        results_by_strategy[_strat] = [
+            r for r in results_by_strategy.get(_strat, [])
+            if (r.get("vol_ratio") or 0) >= 1.5 and (r.get("score") or 0) >= 4
+        ]
+
+    # Sync all_results with updated per-strategy lists
+    _keep = {id(r) for res in results_by_strategy.values() for r in res}
+    all_results = [r for r in all_results if id(r) in _keep]
+
     # Dollar-volume floor — $5M/day minimum (illiquid = wide spreads, hard to exit)
     # Fetch 20d avg volume for each unique ticker in signals (quick, batched).
     _DOLLAR_VOL_MIN = 5_000_000
