@@ -15,7 +15,7 @@ Available strategies: momentum, breakout, pocket_pivot, connors_rsi2, ema_ribbon
 """
 
 import sys, os, time, json, warnings as _warnings, contextlib
-from datetime import datetime
+from datetime import datetime, date
 from pathlib import Path
 import numpy as np
 import pandas as pd
