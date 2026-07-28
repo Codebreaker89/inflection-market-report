@@ -58,18 +58,18 @@
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 77.5,
+        "rsi": 77.4,
         "adx": 19.7,
-        "price": 2975.0,
-        "vol_ratio": 0.27,
+        "price": 2974.0,
+        "vol_ratio": 0.61,
         "atr_ratio": 1.05,
-        "vol_5d_ratio": 0.6,
+        "vol_5d_ratio": 0.59,
         "pivot_high": 3050.0,
         "pct_from_piv": -2.5,
         "strategy": "breakout"
       },
       {
-        "ticker": "CF",
+        "ticker": "TDY",
         "mkt": "US",
         "score": 4,
         "phase": "COIL",
@@ -77,102 +77,6 @@
           "NearPiv",
           "ADXcurl",
           "RSIbase",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 59.1,
-        "adx": 23.4,
-        "price": 123.39,
-        "vol_ratio": 0.21,
-        "atr_ratio": 1.02,
-        "vol_5d_ratio": 0.86,
-        "pivot_high": 127.35,
-        "pct_from_piv": -3.1,
-        "strategy": "breakout"
-      },
-      {
-        "ticker": "EOG",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 59.4,
-        "adx": 21.2,
-        "price": 142.21,
-        "vol_ratio": 0.18,
-        "atr_ratio": 0.97,
-        "vol_5d_ratio": 0.9,
-        "pivot_high": 146.39,
-        "pct_from_piv": -2.9,
-        "strategy": "breakout"
-      },
-      {
-        "ticker": "NTAP",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "VOLdry",
-          "NearPiv",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "VOLdry",
-          "NearPiv",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 53.4,
-        "adx": 25.5,
-        "price": 168.92,
-        "vol_ratio": 0.14,
-        "atr_ratio": 1.01,
-        "vol_5d_ratio": 0.62,
-        "pivot_high": 174.55,
-        "pct_from_piv": -3.2,
-        "strategy": "breakout"
-      },
-      {
-        "ticker": "BNP.PA",
-        "mkt": "FR",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RS~ok",
           "RngTght"
         ],
         "break_sigs": [],
@@ -182,47 +86,94 @@
         "conf": [
           "NearPiv",
           "ADXcurl",
-          "RS~ok",
+          "RSIbase",
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 76.0,
-        "adx": 22.5,
-        "price": 107.38,
-        "vol_ratio": 0.42,
-        "atr_ratio": 1.09,
-        "vol_5d_ratio": 1.36,
-        "pivot_high": 107.58,
-        "pct_from_piv": -0.2,
-        "strategy": "breakout"
+        "rsi": 52.4,
+        "adx": 20.1,
+        "price": 643.5,
+        "vol_ratio": 0.25,
+        "atr_ratio": 1.18,
+        "vol_5d_ratio": 1.59,
+        "pivot_high": 655.35,
+        "pct_from_piv": -1.8,
+        "strategy": "breakout",
+        "rs_vs_spy": 4.95
       }
     ],
-    "pocket_pivot": [],
+    "pocket_pivot": [
+      {
+        "ticker": "ORA.PA",
+        "mkt": "FR",
+        "score": 5,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "RSI45-70",
+          "ADX\u2191",
+          "VOL1.5x",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 69.0,
+        "adx": 24.1,
+        "price": 17.17,
+        "vol_ratio": 1.52,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "rs_vs_spy": 7.1
+      }
+    ],
     "connors_rsi2": [],
     "ema_ribbon": [],
     "nr7": [],
     "analyst_upgrade": [],
     "signal_velocity": [
       {
-        "ticker": "TJX",
-        "score": 9,
+        "ticker": "DXCM",
+        "score": 12,
+        "fresh": [
+          "SV+11"
+        ],
+        "conf": [
+          "SCORE:8/15",
+          "VEL+11"
+        ],
+        "minervini": 8,
+        "rsi": 53.1,
+        "adx": 15.3,
+        "price": 75.65,
+        "vol_ratio": 0.34,
+        "net_score": 8,
+        "velocity": 11,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity"
+      },
+      {
+        "ticker": "ORA.PA",
+        "score": 10,
         "fresh": [
           "SV+9"
         ],
         "conf": [
           "VEL+9",
+          "VOL1.5x",
           "ADX>20"
         ],
         "minervini": 8,
-        "rsi": 70.2,
-        "adx": 20.3,
-        "price": 160.68,
-        "vol_ratio": 0.25,
+        "rsi": 69.0,
+        "adx": 24.1,
+        "price": 17.17,
+        "vol_ratio": 1.52,
         "net_score": 7,
         "velocity": 9,
         "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity"
+        "mkt": "FR",
+        "strategy": "signal_velocity",
+        "rs_vs_spy": 7.1
       },
       {
         "ticker": "IFF",
@@ -234,10 +185,10 @@
           "VEL+9"
         ],
         "minervini": 8,
-        "rsi": 50.1,
+        "rsi": 49.6,
         "adx": 13.5,
-        "price": 78.96,
-        "vol_ratio": 0.13,
+        "price": 78.79,
+        "vol_ratio": 0.21,
         "net_score": 6,
         "velocity": 9,
         "hold_days": 5,
@@ -245,7 +196,28 @@
         "strategy": "signal_velocity"
       },
       {
-        "ticker": "ORA.PA",
+        "ticker": "RL",
+        "score": 9,
+        "fresh": [
+          "SV+9"
+        ],
+        "conf": [
+          "VEL+9"
+        ],
+        "minervini": 8,
+        "rsi": 52.0,
+        "adx": 19.7,
+        "price": 384.82,
+        "vol_ratio": 0.23,
+        "net_score": 7,
+        "velocity": 9,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "rs_vs_spy": 4.5
+      },
+      {
+        "ticker": "TJX",
         "score": 9,
         "fresh": [
           "SV+9"
@@ -255,14 +227,33 @@
           "ADX>20"
         ],
         "minervini": 8,
-        "rsi": 69.7,
-        "adx": 24.1,
-        "price": 17.25,
-        "vol_ratio": 0.65,
+        "rsi": 69.2,
+        "adx": 20.3,
+        "price": 160.0,
+        "vol_ratio": 0.35,
         "net_score": 7,
         "velocity": 9,
         "hold_days": 5,
-        "mkt": "FR",
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "rs_vs_spy": 7.77
+      },
+      {
+        "ticker": "CBK.DE",
+        "score": 7,
+        "fresh": [
+          "SV+7"
+        ],
+        "conf": [],
+        "minervini": 8,
+        "rsi": 51.0,
+        "adx": 14.0,
+        "price": 37.59,
+        "vol_ratio": 0.45,
+        "net_score": 6,
+        "velocity": 7,
+        "hold_days": 5,
+        "mkt": "DE",
         "strategy": "signal_velocity"
       },
       {
@@ -273,10 +264,10 @@
         ],
         "conf": [],
         "minervini": 8,
-        "rsi": 51.8,
-        "adx": 15.0,
-        "price": 466.26,
-        "vol_ratio": 0.26,
+        "rsi": 55.9,
+        "adx": 14.4,
+        "price": 473.22,
+        "vol_ratio": 0.44,
         "net_score": 7,
         "velocity": 6,
         "hold_days": 5,
@@ -287,28 +278,53 @@
     "chokepoint_inflection": [],
     "defensive_rotation": [
       {
-        "ticker": "CPR.MI",
-        "sector": "EU Consumer Staples",
-        "sector_etf": "EXH3.DE",
+        "ticker": "GSK.L",
+        "sector": "Healthcare",
+        "sector_etf": "XLV",
         "score": 5,
         "fresh": [
-          "ROT:EXH3.DE",
-          "ETF+3.6%vsS&P"
+          "ROT:XLV",
+          "ETF+6.78%vsS&P"
         ],
         "conf": [
-          "RS+7.6%",
-          "vsETF+4.0%",
+          "RS+7.0%",
+          "VOL\u2191",
           "MACD+",
           ">SMA200",
           "M\u22653"
         ],
-        "rsi": 67.0,
-        "adx": 20.4,
-        "vol_ratio": 1.05,
-        "minervini": 3,
-        "price": 5.85,
-        "rs_vs_spy": 7.64,
-        "rs_vs_sector": 4.03,
+        "rsi": 57.3,
+        "adx": 14.0,
+        "vol_ratio": 2.04,
+        "minervini": 5,
+        "price": 2029.0,
+        "rs_vs_spy": 7.01,
+        "rs_vs_sector": 0.24,
+        "mkt": "UK",
+        "hold_days": 10,
+        "strategy": "defensive_rotation"
+      },
+      {
+        "ticker": "MDT",
+        "sector": "Healthcare",
+        "sector_etf": "XLV",
+        "score": 3,
+        "fresh": [
+          "ROT:XLV",
+          "ETF+6.78%vsS&P"
+        ],
+        "conf": [
+          "RS+11.1%",
+          "vsETF+4.4%",
+          "MACD+"
+        ],
+        "rsi": 64.2,
+        "adx": 13.6,
+        "vol_ratio": 0.94,
+        "minervini": 2,
+        "price": 87.05,
+        "rs_vs_spy": 11.14,
+        "rs_vs_sector": 4.36,
         "mkt": "US",
         "hold_days": 10,
         "strategy": "defensive_rotation"
@@ -320,30 +336,30 @@
         "score": 5,
         "fresh": [
           "C&H",
-          "PIV@361.61"
+          "PIV@361.76"
         ],
         "conf": [
           "CUP27.9%",
-          "HDL5.6%",
+          "HDL5.7%",
           "VOLdry",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 53.5,
+        "rsi": 54.6,
         "adx": 22.4,
-        "vol_ratio": 0.26,
+        "vol_ratio": 0.37,
         "minervini": 8,
-        "price": 360.48,
+        "price": 361.76,
         "cup_depth_pct": 27.9,
         "cup_duration": 195,
-        "handle_depth_pct": 5.6,
+        "handle_depth_pct": 5.7,
         "handle_duration": 5,
-        "pivot": 361.61,
+        "pivot": 361.76,
         "vol_drying": true,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "rs_vs_spy": 1.82
+        "rs_vs_spy": 2.06
       },
       {
         "ticker": "TDY",
@@ -354,82 +370,53 @@
         ],
         "conf": [
           "CUP29.6%",
-          "HDL1.9%",
+          "HDL1.7%",
           "MACD+",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 52.0,
-        "adx": 20.3,
-        "vol_ratio": 0.18,
+        "rsi": 52.7,
+        "adx": 20.1,
+        "vol_ratio": 0.25,
         "minervini": 8,
-        "price": 642.92,
+        "price": 644.02,
         "cup_depth_pct": 29.6,
         "cup_duration": 195,
-        "handle_depth_pct": 1.9,
+        "handle_depth_pct": 1.7,
         "handle_duration": 5,
         "pivot": 655.35,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
-        "strategy": "cup_handle"
+        "strategy": "cup_handle",
+        "rs_vs_spy": 4.95
       },
       {
-        "ticker": "ABDN.L",
-        "score": 5,
+        "ticker": "CRL",
+        "score": 4,
         "fresh": [
           "C&H",
-          "PIV@249.2"
+          "PIV@235.84"
         ],
         "conf": [
-          "CUP29.0%",
-          "HDL1.8%",
-          "VOLdry",
+          "CUP34.6%",
+          "HDL7.3%",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 54.9,
-        "adx": 24.1,
-        "vol_ratio": 0.51,
+        "rsi": 55.9,
+        "adx": 29.4,
+        "vol_ratio": 0.52,
         "minervini": 8,
-        "price": 248.0,
-        "cup_depth_pct": 29.0,
-        "cup_duration": 195,
-        "handle_depth_pct": 1.8,
-        "handle_duration": 5,
-        "pivot": 249.2,
-        "vol_drying": true,
+        "price": 235.84,
+        "cup_depth_pct": 34.6,
+        "cup_duration": 183,
+        "handle_depth_pct": 7.3,
+        "handle_duration": 17,
+        "pivot": 235.84,
+        "vol_drying": false,
         "hold_days": 10,
-        "mkt": "UK",
-        "strategy": "cup_handle"
-      },
-      {
-        "ticker": "SY1.DE",
-        "score": 5,
-        "fresh": [
-          "C&H",
-          "PIV@89.04"
-        ],
-        "conf": [
-          "CUP28.1%",
-          "HDL3.9%",
-          "VOLdry",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 56.0,
-        "adx": 25.6,
-        "vol_ratio": 0.42,
-        "minervini": 8,
-        "price": 89.04,
-        "cup_depth_pct": 28.1,
-        "cup_duration": 193,
-        "handle_depth_pct": 3.9,
-        "handle_duration": 7,
-        "pivot": 89.04,
-        "vol_drying": true,
-        "hold_days": 10,
-        "mkt": "DE",
+        "mkt": "US",
         "strategy": "cup_handle"
       },
       {
@@ -445,11 +432,11 @@
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 64.9,
+        "rsi": 64.1,
         "adx": 31.6,
-        "vol_ratio": 0.18,
+        "vol_ratio": 0.29,
         "minervini": 8,
-        "price": 108.58,
+        "price": 108.24,
         "cup_depth_pct": 34.8,
         "cup_duration": 192,
         "handle_depth_pct": 2.8,
@@ -461,59 +448,59 @@
         "strategy": "cup_handle"
       },
       {
-        "ticker": "CRL",
+        "ticker": "GWW",
         "score": 4,
         "fresh": [
           "C&H",
-          "PIV@233.71"
+          "PIV@1404.56"
         ],
         "conf": [
-          "CUP34.6%",
-          "HDL6.4%",
+          "CUP34.8%",
+          "HDL3.6%",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 59.0,
-        "adx": 29.3,
-        "vol_ratio": 0.43,
+        "rsi": 64.3,
+        "adx": 34.0,
+        "vol_ratio": 0.19,
         "minervini": 8,
-        "price": 233.71,
-        "cup_depth_pct": 34.6,
-        "cup_duration": 182,
-        "handle_depth_pct": 6.4,
-        "handle_duration": 18,
-        "pivot": 233.71,
+        "price": 1404.56,
+        "cup_depth_pct": 34.8,
+        "cup_duration": 192,
+        "handle_depth_pct": 3.6,
+        "handle_duration": 8,
+        "pivot": 1404.56,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle"
       },
       {
-        "ticker": "GWW",
+        "ticker": "ABDN.L",
         "score": 4,
         "fresh": [
           "C&H",
-          "PIV@1406.67"
+          "PIV@249.2"
         ],
         "conf": [
-          "CUP34.8%",
-          "HDL3.7%",
+          "CUP29.0%",
+          "HDL1.8%",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 64.7,
-        "adx": 34.0,
-        "vol_ratio": 0.13,
+        "rsi": 56.0,
+        "adx": 24.1,
+        "vol_ratio": 0.99,
         "minervini": 8,
-        "price": 1406.67,
-        "cup_depth_pct": 34.8,
-        "cup_duration": 192,
-        "handle_depth_pct": 3.7,
-        "handle_duration": 8,
-        "pivot": 1406.67,
+        "price": 248.6,
+        "cup_depth_pct": 29.0,
+        "cup_duration": 195,
+        "handle_depth_pct": 1.8,
+        "handle_duration": 5,
+        "pivot": 249.2,
         "vol_drying": false,
         "hold_days": 10,
-        "mkt": "US",
+        "mkt": "UK",
         "strategy": "cup_handle"
       },
       {
@@ -529,11 +516,11 @@
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 56.1,
+        "rsi": 56.2,
         "adx": 26.0,
-        "vol_ratio": 0.41,
+        "vol_ratio": 0.69,
         "minervini": 8,
-        "price": 664.6,
+        "price": 664.8,
         "cup_depth_pct": 25.1,
         "cup_duration": 195,
         "handle_depth_pct": 2.9,
@@ -542,6 +529,34 @@
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "UK",
+        "strategy": "cup_handle"
+      },
+      {
+        "ticker": "SY1.DE",
+        "score": 4,
+        "fresh": [
+          "C&H",
+          "PIV@89.62"
+        ],
+        "conf": [
+          "CUP28.1%",
+          "HDL4.5%",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 58.1,
+        "adx": 25.8,
+        "vol_ratio": 1.02,
+        "minervini": 8,
+        "price": 89.62,
+        "cup_depth_pct": 28.1,
+        "cup_duration": 195,
+        "handle_depth_pct": 4.5,
+        "handle_duration": 5,
+        "pivot": 89.62,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "DE",
         "strategy": "cup_handle"
       }
     ],
@@ -562,10 +577,10 @@
           "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 62.6,
+        "rsi": 62.0,
         "adx": 33.0,
-        "price": 239.66,
-        "vol_ratio": 0.13,
+        "price": 239.15,
+        "vol_ratio": 0.24,
         "n_contractions": 3,
         "final_pct": 3.62,
         "base_high": 239.64,
@@ -573,6 +588,33 @@
         "mkt": "US",
         "strategy": "vcp",
         "spy_regime": "CHOPPY"
+      },
+      {
+        "ticker": "RL",
+        "score": 5,
+        "fresh": [
+          "VCP-3C"
+        ],
+        "conf": [
+          "TightFinal",
+          "VolDry",
+          "NearPivot",
+          "RSI50-65",
+          "M\u22657"
+        ],
+        "minervini": 8,
+        "rsi": 51.8,
+        "adx": 19.7,
+        "price": 384.33,
+        "vol_ratio": 0.23,
+        "n_contractions": 3,
+        "final_pct": 5.47,
+        "base_high": 399.0,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "vcp",
+        "spy_regime": "CHOPPY",
+        "rs_vs_spy": 4.5
       },
       {
         "ticker": "PNC",
@@ -588,10 +630,10 @@
           "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 64.0,
+        "rsi": 64.1,
         "adx": 29.9,
-        "price": 251.3,
-        "vol_ratio": 0.11,
+        "price": 251.34,
+        "vol_ratio": 0.16,
         "n_contractions": 3,
         "final_pct": 2.51,
         "base_high": 253.98,
@@ -599,6 +641,33 @@
         "mkt": "US",
         "strategy": "vcp",
         "spy_regime": "CHOPPY"
+      },
+      {
+        "ticker": "TJX",
+        "score": 5,
+        "fresh": [
+          "VCP-3C"
+        ],
+        "conf": [
+          "TightFinal",
+          "VolDry",
+          "NearPivot",
+          "RSI50-65",
+          "M\u22657"
+        ],
+        "minervini": 8,
+        "rsi": 64.6,
+        "adx": 21.2,
+        "price": 160.01,
+        "vol_ratio": 0.34,
+        "n_contractions": 3,
+        "final_pct": 3.54,
+        "base_high": 153.94,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "vcp",
+        "spy_regime": "CHOPPY",
+        "rs_vs_spy": 7.77
       },
       {
         "ticker": "GE",
@@ -613,10 +682,10 @@
           "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 53.4,
+        "rsi": 54.4,
         "adx": 22.4,
-        "price": 360.39,
-        "vol_ratio": 0.26,
+        "price": 361.61,
+        "vol_ratio": 0.37,
         "n_contractions": 3,
         "final_pct": 5.18,
         "base_high": 382.49,
@@ -624,7 +693,7 @@
         "mkt": "US",
         "strategy": "vcp",
         "spy_regime": "CHOPPY",
-        "rs_vs_spy": 1.82
+        "rs_vs_spy": 2.06
       },
       {
         "ticker": "NUE",
@@ -639,10 +708,10 @@
           "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 80.2,
+        "rsi": 81.3,
         "adx": 19.3,
-        "price": 261.77,
-        "vol_ratio": 0.66,
+        "price": 265.22,
+        "vol_ratio": 0.91,
         "n_contractions": 3,
         "final_pct": 3.39,
         "base_high": 249.04,
@@ -656,29 +725,73 @@
     "bollinger_pctb": [],
     "connors_r3": [],
     "connors_tps": [],
-    "turtle_soup": [],
+    "turtle_soup": [
+      {
+        "ticker": "ML.PA",
+        "strategy": "turtle_soup",
+        "score": 4,
+        "conf": [
+          "CloseStrong",
+          "VolSurge",
+          "ADX16-35",
+          "M>=5"
+        ],
+        "minervini": 8,
+        "rsi": 52.7,
+        "adx": 23.3,
+        "price": 34.46,
+        "vol_ratio": 1.58,
+        "prior_20d_low": 33.47,
+        "hold_days": 3,
+        "mkt": "FR"
+      }
+    ],
     "raschke_8020": [],
     "wyckoff_spring": [],
     "weinstein_stage2": [],
     "momentum_burst": [],
-    "ma50_reclaim": [],
+    "ma50_reclaim": [
+      {
+        "ticker": "ORA.PA",
+        "score": 5,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "ADX>15",
+          "M\u22656",
+          "TIGHT<3%"
+        ],
+        "minervini": 8,
+        "rsi": 69.0,
+        "adx": 24.1,
+        "price": 17.17,
+        "vol_ratio": 1.52,
+        "dist_50sma": 1.86,
+        "hold_days": 7,
+        "mkt": "FR",
+        "rs_vs_spy": 7.1
+      }
+    ],
     "turnover_momentum": [],
     "momentum": []
   },
   "sector_excess": {
-    "XLK": -5.81,
-    "XLI": 2.43,
-    "XLV": 7.53,
-    "XLF": 3.7,
-    "XLY": -1.8,
-    "XLP": 7.63,
-    "XLB": 5.18,
-    "XLE": 4.29,
-    "XLC": -0.29,
-    "XLU": 2.97,
-    "XLRE": 5.96
+    "XLK": -5.25,
+    "XLI": 2.59,
+    "XLV": 6.78,
+    "XLF": 3.62,
+    "XLY": -1.7,
+    "XLP": 6.33,
+    "XLB": 5.07,
+    "XLE": 2.08,
+    "XLC": -0.13,
+    "XLU": 1.92,
+    "XLRE": 5.23
   },
-  "spy_ret": -1.81,
+  "spy_ret": -1.37,
   "elder_impulse_count": 2,
   "market_regime": "BEAR"
 }
