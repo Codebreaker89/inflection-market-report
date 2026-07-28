@@ -1737,16 +1737,14 @@ def send_email(subject: str, html_body: str):
 def main():
     do_send = "--send" in sys.argv
 
-    trades = load_trades()
-    if not trades:
-        print("No trades found in trades.csv"); return
+    trades = load_trades()  # empty list is fine — digest still shows scanner signals
 
     print(f"\n  Building digest for {TODAY}...")
     html = build_email(trades)
 
     if do_send:
-        subject = f"📊 Trade Digest {TODAY} — {sum(1 for t in trades if t.get('status')=='OPEN')} open"
-        open_alerts = sum(1 for t in trades if t.get("status") == "OPEN")
+        open_count = sum(1 for t in trades if t.get('status') == 'OPEN')
+        subject = f"📊 Trade Digest {TODAY} — {open_count} open"
         print(f"\n  Sending email to {NOTIFY_TO}...", end=" ", flush=True)
         send_email(subject, html)
         print("✅  Sent!")
