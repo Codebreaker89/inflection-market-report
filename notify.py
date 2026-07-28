@@ -832,6 +832,11 @@ def _build_scanner_results_html() -> str:
                          "signal_velocity", "weinstein_stage2", "vcp", "power_earnings_gap"}
     _REVERSION_STRATS = {"connors_rsi2", "nr7", "wyckoff_spring", "raschke_8020",
                          "connors_3down", "bollinger_pctb"}
+    _ETF_TO_SECTOR = {
+        "XLK":"Technology","XLI":"Industrials","XLV":"Healthcare","XLF":"Financial Services",
+        "XLY":"Consumer Cyclical","XLP":"Consumer Defensive","XLB":"Basic Materials",
+        "XLE":"Energy","XLC":"Communication Services","XLU":"Utilities","XLRE":"Real Estate",
+    }
 
     def _email_rank_score(r: dict, strats_fired: list, persistence: dict) -> float:
         """Mirror of scan.py _rank_score — keep in sync."""
@@ -923,11 +928,6 @@ def _build_scanner_results_html() -> str:
         )
 
     # ── Sector Strength Panel ─────────────────────────────────────────────────
-    _ETF_TO_SECTOR = {
-        "XLK":"Technology","XLI":"Industrials","XLV":"Healthcare","XLF":"Financial Services",
-        "XLY":"Consumer Cyclical","XLP":"Consumer Defensive","XLB":"Basic Materials",
-        "XLE":"Energy","XLC":"Communication Services","XLU":"Utilities","XLRE":"Real Estate",
-    }
     if sector_excess:
         ranked_sectors = sorted(sector_excess.items(), key=lambda x: -x[1])
         top3  = ranked_sectors[:3]
