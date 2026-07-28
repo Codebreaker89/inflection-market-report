@@ -39,6 +39,8 @@ import yfinance as yf
 
 try:
     from config import HOLD_DAYS, DEFAULT_HOLD_DAYS, STOP_LOSS_PCT
+    if not isinstance(HOLD_DAYS, dict):   # GH Actions writes HOLD_DAYS = 7 (int)
+        HOLD_DAYS = {}
 except ImportError:
     HOLD_DAYS = {}; DEFAULT_HOLD_DAYS = 7; STOP_LOSS_PCT = 0.03
 
