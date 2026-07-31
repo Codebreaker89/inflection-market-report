@@ -1075,6 +1075,9 @@ def _build_scanner_results_html() -> str:
         "connors_tps":        "Time/Price Scale-In: 3-7 consecutive lower closes, RSI(2) declining each day, RSI(2)<25 on entry, volume orderly (declining). Designed for choppy/sideways markets. Hold 4d. (Connors — High Probability ETF Trading 2009)",
         "turtle_soup":        "New 20-day low (traps shorts) then reverses and closes above prior 20d low the same day. False breakdown reversal. Volume confirms. Works in sideways markets. Hold 3d. (Raschke & Connors — Street Smarts 1996)",
         "raschke_8020":       "Bullish 80-20: Opens in bottom 20% of yesterday's range (weak open), closes above yesterday's midpoint (failed breakdown). Next 1-2 days trend up. Pure price-action, any market condition. Hold 2d. (Linda Raschke — Street Smarts 1996)",
+        "three_weeks_tight":  "3 consecutive weekly closes within 1.5% of each other, volume declining week-over-week. Stock digesting a prior move under institutional holding. Entry near the weekly high. Hold 7d. (O'Neil / IBD — classic continuation setup)",
+        "episodic_pivot":     "Catalyst gap ≥8% on ≥2.5× volume, gap holds for 3+ days (no fill), stock not extended >25% from gap. Enter on the first pullback. Hold 10d. Historical WR ~70% when gap holds. (Gil Morales & Kacher — 'Trade Like an O'Neil Disciple' 2010)",
+        "combo_pp_ribbon":    "PREMIUM SETUP: Pocket Pivot AND EMA Ribbon fire simultaneously. PP = institutional accumulation signal. Ribbon = 8/13/21/34/55 EMAs stacked + expanding + pullback bounce. When both align: institutions buying INTO a strengthening trend. Minervini ≥6. Hold 7d. (Morales & Kacher's preferred entry combination)",
     }
 
     hist_stats = _load_strategy_stats()

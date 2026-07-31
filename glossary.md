@@ -22,6 +22,9 @@
 | **defensive_rotation_scanner.py** | Scanner: Defensive Rotation — detects institutional rotation into XLU/XLP/XLV/GLD + EU equivalents EXV1.DE/EXH1.DE/EXH3.DE (>1.5% 10d outperformance vs SPY + accelerating). Lowered threshold and shortened window vs original to catch early-stage rotations. Hold 10d. |
 | **cup_handle_scanner.py** | Scanner: Cup & Handle (O'Neil/IBD) — rounded base 12-35% deep over 30-200 days, tight handle ≤12% in upper half of cup, price within 3% of pivot. Minervini ≥5. Hold 10d. |
 | **power_earnings_gap_scanner.py** | Scanner: Power Earnings Gap (Gil Morales) — stock gaps ≥8% on earnings with 2× volume, gap not filled, not extended >20%. Tagged EG✓ (earnings verified) or EG~ (pattern only). Hold 10d. |
+| **three_weeks_tight_scanner.py** | Scanner: 3-Weeks-Tight (O'Neil/IBD) — 3 weekly closes within 1.5%, volume declining = pre-breakout coil under institutional holding. Hold 7d. |
+| **episodic_pivot_scanner.py** | Scanner: Episodic Pivot (Gil Morales/Kacher) — catalyst gap ≥8% on 2.5× volume, gap holds, entry on first pullback. Historical WR ~70%. Hold 10d. |
+| **combo_scanner.py** | Scanner: Combo PP+Ribbon (premium) — fires only when Pocket Pivot AND EMA Ribbon both signal simultaneously. Highest-conviction momentum setup. Minervini ≥6. Hold 7d. |
 | **show_tracker.py** | Portfolio tracker — shows open/closed trades with live P&L, stop loss, hold days. Generates `dashboard.html`. Subcommands: `add` (new trade), `close` (close existing trade interactively), `risk` (risk module: position limits, P&L tiers, stops, sector breakdown). |
 | **notify.py** | Daily email digest — fetches live prices, checks alerts (stop loss, hold expired, profit target, earnings), sends HTML email. |
 | **update_scan_history.py** | Appends today's scan results to `scan_history.csv` and backfills d5/d10 returns for past rows. |
@@ -186,7 +189,7 @@ open ~/Claude/Projects/fire/scan_history.csv    # historical dataset
 - **qty** — Shares purchased (= 1000 EUR × fx_at_entry ÷ buy_price)
 - **investment_eur** — Amount invested in EUR (default €1000, can vary)
 - **trade_type** — `practice` (paper trade) or `real` (actual money)
-- **strategy** — which scanner flagged it: `momentum`, `breakout`, `pocket_pivot`, `connors_rsi2`, `ema_ribbon`, `nr7`, `bb_squeeze`, `high_tight_flag`, `analyst_upgrade`, `signal_velocity`, `chokepoint_inflection`, `stage4_short`, `defensive_rotation`, `cup_handle`, `power_earnings_gap`
+- **strategy** — which scanner flagged it: `momentum`, `breakout`, `pocket_pivot`, `connors_rsi2`, `ema_ribbon`, `nr7`, `bb_squeeze`, `high_tight_flag`, `analyst_upgrade`, `signal_velocity`, `chokepoint_inflection`, `stage4_short`, `defensive_rotation`, `cup_handle`, `power_earnings_gap`, `three_weeks_tight`, `episodic_pivot`, `combo_pp_ribbon`
 - **hold_days** — planned hold duration in calendar days (varies by strategy)
 - **stop_loss_price** — price at which to exit to limit loss (= buy_price × 0.97)
 - **target_exit_date** — planned exit date (entry + hold_days business days)
@@ -624,6 +627,94 @@ Gil Morales / IBD strategy. When a company reports strong earnings and instituti
 - Do NOT buy if gap is already filling (price below gap day low) — that's a failed gap
 - Do NOT buy if >20% above gap close — risk/reward too poor
 - Best entries: 1-3 days after the gap, when stock consolidates tightly in a small range
+
+---
+
+## 3-Weeks-Tight Scanner (`three_weeks_tight_scanner.py`)
+
+O'Neil / IBD continuation setup. One of the highest-WR patterns in growth stock trading because it identifies stocks under quiet institutional accumulation — not distribution.
+
+### Conditions (all must pass)
+| Parameter | Value |
+|---|---|
+| Weekly close range | Last 3 weekly closes within **1.5%** of each other |
+| Volume direction | Declining week-over-week **OR** below 20d average |
+| Minervini | ≥ 5/8 (stock in healthy uptrend) |
+| ADX | 16–35 (trend present, not overextended) |
+| RSI | 45–70 (momentum zone) |
+
+### Signal Tags
+- **3WT** — 3-Weeks-Tight pattern confirmed
+- **TIGHT<1%** — closes within 1% (even tighter = better)
+- **VOL_DECLINING** — volume drying up week-over-week (institutions not distributing)
+- **NEAR_52H** — within 10% of 52-week high (relative strength intact)
+- **RSI50-65** — RSI in ideal momentum zone
+
+### When it fires
+Rare — requires 3 consecutive weekly closes in a tight band. When it does fire, a breakout typically follows within 2–4 weeks. Hold 7 days after the weekly close confirmation.
+
+---
+
+## Episodic Pivot Scanner (`episodic_pivot_scanner.py`)
+
+Gil Morales & Chris Kacher strategy. An EP is not just a big gap — it's a *permanent institutional repricing* caused by a single catalyst (earnings beat, FDA approval, major contract). The gap holds, creating a new support floor.
+
+### Hard Conditions (all must pass)
+| Parameter | Value |
+|---|---|
+| Gap size | ≥ 8% from prior close within last 10 trading days |
+| Gap-day volume | ≥ 2.5× 20d average (institutional conviction) |
+| Gap not filled | No close below gap-day open in any subsequent bar |
+| Not overextended | Current close ≤ 1.25× gap-day close (don't chase) |
+| Minervini | ≥ 4 (relaxed — EP can launch from any base) |
+| ADX | 16–45 (wider range post-gap) |
+
+### Signal Tags
+- **EP_GAP** — Episodic Pivot gap confirmed
+- **GAP≥10%** — gap exceeded 10% (higher conviction)
+- **VOL3x** — volume was 3×+ on gap day
+- **GAP_HELD** — price never returned to gap-day open (thesis intact)
+- **NOT_OVEREXT** — less than 25% extension from gap close (good R:R)
+- **ADX↑** — trend strengthening post-gap
+
+### Entry timing
+Do NOT buy the gap day — that's chasing. Wait for the first 1-3 day pullback that holds above gap-day open. That's the optimal R:R entry. Stop = below gap-day open.
+
+### Historical WR
+~70% when gap holds 3+ days. Famous examples: NVDA Dec 2023 (AI boom), MRNA Nov 2020 (COVID vaccine), AAPL Sep 2012 (first iPhone beat cycle).
+
+---
+
+## Combo PP+Ribbon Scanner (`combo_scanner.py`)
+
+The premium setup — Pocket Pivot and EMA Ribbon firing simultaneously on the same day. Extremely rare; extremely high conviction.
+
+### What it requires
+| Signal | Condition |
+|---|---|
+| **Pocket Pivot** | Up-day volume exceeds max down-day volume of prior 10 bars |
+| **EMA Ribbon** | EMAs 8>13>21>34>55 all stacked AND spread wider than 3 bars ago |
+| **Pullback** | Price touched EMA8 within last 3 bars, closes above it today |
+| **Minervini** | ≥ 6/8 (high bar — this is the premium setup) |
+| **ADX** | 18–40 |
+| **RSI** | 45–72 |
+| **Vol ratio** | ≥ 1.3× (volume confirming) |
+
+### Why it's powerful
+- PP = institutions *currently accumulating* (today's volume signature)
+- Ribbon = trend structure is *strengthening* (all EMAs fanned out and accelerating)
+- Pullback to EMA8 = optimal low-risk entry *within* the trend
+- When all three align: you're buying with the institutions, in a strengthening trend, at the best risk point
+
+### Signal Tags
+- **PP** + **EMA_RIBBON** — both signals present
+- **RIBBON_EXP** — ribbon expanding (spread increasing)
+- **PP_VOL** — pocket pivot volume confirmed
+- **PULLBACK** — touched EMA8 within last 3 bars
+- **RSI50-65** — RSI in momentum zone
+- **ADX18-40** — trend in optimal ADX zone
+
+Score starts at 3 (base for combo) + confirmations. Treat any combo signal as HIGH conviction.
 
 ---
 

@@ -140,6 +140,9 @@ from weinstein_stage2_scanner      import scan as scan_weinstein_stage2
 from momentum_burst_scanner        import scan as scan_momentum_burst
 from ma50_reclaim_scanner          import scan as scan_ma50_reclaim
 from turnover_momentum_scanner     import scan as scan_turnover_momentum
+from three_weeks_tight_scanner     import scan as scan_3wt
+from episodic_pivot_scanner        import scan as scan_ep
+from combo_scanner                 import scan as scan_combo
 from show_tracker                  import (add_trade_interactive, load_trades, save_trades,
                                            next_id, ticker_ccy, fetch_fx_on_date,
                                            fetch_company_name, fetch_sector, fetch_market_regime,
@@ -174,7 +177,8 @@ ALL_STRATEGIES = ["breakout", "pocket_pivot", "connors_rsi2",
                   "holy_grail", "connors_3down", "williams_pct_r", "bollinger_pctb",
                   "connors_r3", "connors_tps", "turtle_soup", "raschke_8020",
                   "wyckoff_spring", "weinstein_stage2",
-                  "momentum_burst", "ma50_reclaim", "turnover_momentum"]
+                  "momentum_burst", "ma50_reclaim", "turnover_momentum",
+                  "three_weeks_tight", "episodic_pivot", "combo_pp_ribbon"]
 
 SCANNER_MAP = {
     # "momentum":        scan_momentum,  # DISABLED: 0% WR, avg -4.40% across 5 signals (Jun 30 backtest)
@@ -210,6 +214,9 @@ SCANNER_MAP = {
     "momentum_burst":        scan_momentum_burst,
     "ma50_reclaim":          scan_ma50_reclaim,
     "turnover_momentum":     scan_turnover_momentum,
+    "three_weeks_tight":     scan_3wt,
+    "episodic_pivot":        scan_ep,
+    "combo_pp_ribbon":       scan_combo,
 }
 
 STRATEGY_LABELS = {
@@ -245,6 +252,9 @@ STRATEGY_LABELS = {
     "momentum_burst":        "💥  MOMENTUM BURST  (Stockbee — first explosive day ≥4% after NR compression, vol≥1.5x, fresh move)",
     "ma50_reclaim":          "📍  50 SMA RECLAIM  (Minervini/IBD — price reclaims 50 SMA after pullback, institutions add here)",
     "turnover_momentum":     "🔵  TURNOVER MOMENTUM  (Medhat & Schmeling RFS 2022 — top-33% 12-1m momentum × below-median turnover)",
+    "three_weeks_tight":     "🗜  3-WEEKS-TIGHT  (O'Neil/IBD — 3 weekly closes within 1.5% + volume drying = pre-breakout coil)",
+    "episodic_pivot":        "⚡  EPISODIC PIVOT  (Gil Morales/Kacher — catalyst gap ≥8% on 2.5× volume, permanently repriced, entry on pullback)",
+    "combo_pp_ribbon":       "🏆  COMBO PP+RIBBON  (Premium setup — Pocket Pivot AND EMA Ribbon fire simultaneously; highest-conviction momentum)",
 }
 
 STRATEGY_DESCRIPTIONS = {
@@ -423,6 +433,27 @@ STRATEGY_DESCRIPTIONS = {
         "Medhat & Schmeling (RFS 2022) — buys stocks in top-third of 12-1m momentum "
         "that also have BELOW-median share turnover. Low turnover = uncrowded position, "
         "dramatically reduces momentum crash risk. Hold 5 days."
+    ),
+    "three_weeks_tight": (
+        "O'Neil / IBD — Three weekly closing prices within 1.5% of each other, with volume\n"
+        "  declining week-over-week. The stock is digesting a prior move in a tight, orderly\n"
+        "  fashion — institutions holding, not distributing. Entry just below the weekly high.\n"
+        "  Hold 7 days. One of O'Neil's highest-WR continuation setups."
+    ),
+    "episodic_pivot": (
+        "Gil Morales & Chris Kacher ('Trade Like an O'Neil Disciple' 2010) — A single news\n"
+        "  catalyst (earnings beat, FDA approval, contract win) causes a permanent institutional\n"
+        "  repricing: gap ≥8% on ≥2.5× volume. Gap must hold for 3+ days (no fill). Enter on\n"
+        "  the first constructive pullback — not immediately into the gap. Hold 10 days.\n"
+        "  Historical WR ~70% when gap holds 3 days. NVDA Dec 2023 and MRNA COVID approval\n"
+        "  were textbook Episodic Pivots."
+    ),
+    "combo_pp_ribbon": (
+        "Premium setup: Pocket Pivot AND EMA Ribbon fire simultaneously on the same ticker.\n"
+        "  PP = institutional accumulation signal (volume surge on up-day).\n"
+        "  Ribbon = 8/13/21/34/55 EMAs all stacked and expanding + price pulls back and bounces.\n"
+        "  When both align: institutional buyers entering INTO a strengthening trend structure.\n"
+        "  Minervini ≥6 required. Hold 7 days. Gil Morales & Kacher's preferred entry combination."
     ),
 }
 
