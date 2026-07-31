@@ -170,7 +170,7 @@ def run_sector_rrg(lookback_days: int = 365) -> list[dict]:
 
 # ── Chart generation ──────────────────────────────────────────────────────────
 
-def chart_rrg_scatter(sector_results: list[dict]) -> str | None:
+def chart_rrg_scatter(sector_results: list[dict]) -> "str | None":
     """
     Generate RRG scatter plot with trailing arrows.
     Returns base64-encoded PNG string, or None if matplotlib unavailable.
