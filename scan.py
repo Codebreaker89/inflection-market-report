@@ -767,6 +767,7 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
 
     print(DIM(f"  {len(high_picks)} HIGH  ·  {len(med_picks)} MED  ·  Focus: HIGH only unless 2+ strategies confirmed"))
     print()
+    return _company_cache
 
 
 
@@ -1557,7 +1558,7 @@ def main():
     _thematic_check()
 
     # ── LEAD WITH CONVICTION — what to act on ─────────────────────────────────
-    _print_high_conviction(results_by_strategy, multi_tickers, with_backtest, sector_excess, elder_count)
+    _company_cache = _print_high_conviction(results_by_strategy, multi_tickers, with_backtest, sector_excess, elder_count)
 
     # ── PERSISTENCE LEADERS (≥5 consecutive trading days) ─────────────────────
     _print_streak_leaders(min_streak=5)
@@ -1580,6 +1581,12 @@ def main():
 
     # Persist latest scan results for notify.py / update_scan_history.py
     try:
+        # Enrich results with company names fetched during display
+        _co = _company_cache or {}
+        for res in results_by_strategy.values():
+            for r in res:
+                if not r.get("company"):
+                    r["company"] = _co.get(r["ticker"], "")
         payload = {
             "scan_date": datetime.now().strftime("%Y-%m-%d"),
             "strategies": strategies,

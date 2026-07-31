@@ -749,6 +749,93 @@ def _fetch_metal_events(n: int = 6) -> list[dict]:
     return events[:n]
 
 
+def _build_strategy_performance_html() -> str:
+    """Historical WR + avg return by strategy from scan_history.csv."""
+    import csv as _csv
+    from collections import defaultdict as _dd
+    h = HERE / "scan_history.csv"
+    if not h.exists():
+        return ""
+    rows = list(_csv.DictReader(open(h)))
+    strat: dict = _dd(list)
+    for r in rows:
+        if r.get("ret_d5"):
+            strat[r["strategy"]].append(float(r["ret_d5"]))
+
+    MIN_N = 5
+    data = []
+    for s, rets in strat.items():
+        if len(rets) < MIN_N:
+            continue
+        wins = sum(1 for r in rets if r > 0)
+        wr   = wins / len(rets) * 100
+        avg  = sum(rets) / len(rets)
+        data.append((s, len(rets), wr, avg))
+    data.sort(key=lambda x: -x[2])  # sort by WR desc
+
+    if not data:
+        return ""
+
+    STRAT_ALIAS = {
+        "pocket_pivot":"Pocket Pivot","ema_ribbon":"EMA Ribbon","cup_handle":"Cup Handle",
+        "connors_rsi2":"Connors RSI2","connors_r3":"Connors R3","connors_tps":"Connors TPS",
+        "signal_velocity":"Signal Velocity","breakout":"Breakout","vcp":"VCP",
+        "darvas_box":"Darvas Box","rs_line":"RS Line","nr7":"NR7",
+        "williams_pct_r":"Williams %R","bollinger_pctb":"BB %B",
+        "turtle_soup":"Turtle Soup","raschke_8020":"Raschke 80/20",
+        "wyckoff_spring":"Wyckoff Spring","weinstein_stage2":"Weinstein S2",
+        "momentum_burst":"Momentum Burst","ma50_reclaim":"MA50 Reclaim",
+        "holy_grail":"Holy Grail","analyst_upgrade":"Analyst Upgrade",
+        "chokepoint_inflection":"Chokepoint","defensive_rotation":"Defensive Rot.",
+        "momentum":"Momentum","elder_impulse":"Elder Impulse","stage4_short":"Stage4 Short",
+        "turnover_momentum":"Turnover Mom.","connors_3down":"Connors 3↓",
+        "high_tight_flag":"High Tight Flag","power_earnings_gap":"Power EG",
+    }
+
+    def _wr_col(wr):
+        if wr >= 65: return "#4ade80"
+        if wr >= 55: return "#fbbf24"
+        return "#f87171"
+
+    def _avg_col(avg):
+        if avg > 1.0: return "#4ade80"
+        if avg > 0:   return "#a3e635"
+        return "#f87171"
+
+    rows_html = ""
+    for i, (s, n, wr, avg) in enumerate(data):
+        bg = "#0d1f12" if i % 2 == 0 else "#111827"
+        name = STRAT_ALIAS.get(s, s.replace("_"," ").title())
+        wr_c  = _wr_col(wr)
+        avg_c = _avg_col(avg)
+        bar_w = int(wr * 0.6)  # scale to max ~60px for 100%
+        rows_html += (
+            f'<tr style="background:{bg};">'
+            f'<td style="padding:6px 10px;font-size:12px;color:#e2e8f0;white-space:nowrap;">{name}</td>'
+            f'<td style="padding:6px 8px;font-size:11px;color:#94a3b8;text-align:center;">{n}</td>'
+            f'<td style="padding:6px 10px;">'
+            f'  <table cellpadding="0" cellspacing="0"><tr>'
+            f'  <td style="width:{bar_w}px;background:{wr_c};height:8px;border-radius:3px;opacity:0.7;"></td>'
+            f'  <td style="padding-left:6px;font-size:12px;font-weight:700;color:{wr_c};">{wr:.0f}%</td>'
+            f'  </tr></table>'
+            f'</td>'
+            f'<td style="padding:6px 10px;font-size:12px;font-weight:700;color:{avg_c};text-align:right;">{avg:+.2f}%</td>'
+            f'</tr>'
+        )
+
+    return (
+        f'{_section_head("📊","Strategy Performance","historical win rate · 5-day return","#2563eb")}'
+        f'<table width="100%" cellpadding="0" cellspacing="0" style="border-radius:4px;overflow:hidden;margin-bottom:16px;">'
+        f'<thead><tr style="background:#1e293b;">'
+        f'<th style="padding:7px 10px;font-size:11px;color:#94a3b8;text-align:left;font-weight:600;">STRATEGY</th>'
+        f'<th style="padding:7px 8px;font-size:11px;color:#94a3b8;text-align:center;font-weight:600;">N</th>'
+        f'<th style="padding:7px 10px;font-size:11px;color:#94a3b8;text-align:left;font-weight:600;">WIN RATE</th>'
+        f'<th style="padding:7px 10px;font-size:11px;color:#94a3b8;text-align:right;font-weight:600;">AVG RET</th>'
+        f'</tr></thead>'
+        f'<tbody>{rows_html}</tbody></table>'
+    )
+
+
 def _build_scanner_results_html() -> str:
     """Scanner results: leads with conviction cards, then full detail by strategy."""
     scan_json = HERE / "last_scan.json"
@@ -1486,6 +1573,8 @@ def _build_scanner_results_html() -> str:
 
 
 def build_email(trades: list[dict]) -> str:
+    # Practice trades excluded everywhere in the email
+    trades        = [t for t in trades if t.get("trade_type") == "real"]
     open_trades   = [t for t in trades if t.get("status") == "OPEN"]
     closed_trades = [t for t in trades if t.get("status") == "CLOSED"]
 
@@ -1566,40 +1655,25 @@ def build_email(trades: list[dict]) -> str:
         action_html = (f'<p style="color:{_C_DIM};font-style:italic;font-size:13px;'
                        f'padding:10px 0;">✓ No actions required — all positions within parameters.</p>')
 
-    # ── Section 2: Portfolio — split real vs practice ─────────────────────────
-    real_res     = [(t, r) for t, r in results if t.get("trade_type") == "real"]
-    practice_res = [(t, r) for t, r in results if t.get("trade_type") != "real"]
-
+    # ── Section 2: Portfolio — real trades only ───────────────────────────────
     snapshot_html = ""
-
-    def _group_kpi(res_slice, label, accent):
-        invested  = sum(float(t["investment_eur"] or 0) for t, _ in res_slice)
-        pnls      = [r["pnl_eur"] for _, r in res_slice if r["pnl_eur"] is not None]
+    if results:
+        invested  = sum(float(t["investment_eur"] or 0) for t, _ in results)
+        pnls      = [r["pnl_eur"] for _, r in results if r["pnl_eur"] is not None]
         total_pnl = sum(pnls) if pnls else None
-        wins      = sum(1 for _, r in res_slice if (r["ret_pct"] or 0) > 0)
-        pnl_c     = _c(total_pnl)
-        items     = [
-            (label,       label,              accent),
-            ("Invested",  f"€{invested:.0f}", _C_BODY),
-            ("Open P&L",  _eur(total_pnl),    pnl_c),
-            ("Positions", str(len(res_slice)), _C_BODY),
-            ("In Profit", str(wins),           _C_POS if wins else _C_DIM),
+        wins      = sum(1 for _, r in results if (r["ret_pct"] or 0) > 0)
+        kpi_items = [
+            ("REAL",       "REAL",             _C_POS),
+            ("Invested",   f"€{invested:.0f}", _C_BODY),
+            ("Open P&L",   _eur(total_pnl),    _c(total_pnl)),
+            ("Positions",  str(len(results)),   _C_BODY),
+            ("In Profit",  str(wins),           _C_POS if wins else _C_DIM),
         ]
-        return _kpi_table(items)
-
-    if real_res:
-        snapshot_html += _section_head("💰", "Real Trades", f"{len(real_res)} position(s)", _C_POS)
-        snapshot_html += _group_kpi(real_res, "REAL", _C_POS)
-        snapshot_html += _portfolio_table(real_res, alert_tickers)
-
-    if practice_res:
-        if real_res: snapshot_html += '<br>'
-        snapshot_html += _section_head("🧪", "Practice Trades", f"{len(practice_res)} position(s)", _C_WARN)
-        snapshot_html += _group_kpi(practice_res, "PRACTICE", _C_WARN)
-        snapshot_html += _portfolio_table(practice_res, alert_tickers)
+        snapshot_html += _kpi_table(kpi_items)
+        snapshot_html += _portfolio_table(results, alert_tickers)
 
     if not snapshot_html:
-        snapshot_html = f'<p style="color:{_C_DIM};font-style:italic;">No open positions.</p>'
+        snapshot_html = f'<p style="color:{_C_DIM};font-style:italic;">No open real positions.</p>'
 
     # ── Section 3: Weekly P&L (Fridays only) ──────────────────────────────────
     weekly_html = ""
@@ -1642,10 +1716,13 @@ def build_email(trades: list[dict]) -> str:
             weekly_html = (f'<br>{_section_head("📅","Week Closed Trades",f"{week_start} → {TODAY}","#2c3e50")}'
                            + thead + rows + '</tbody></table>')
 
-    # ── Section 4: Scanner results (per-strategy detail) ─────────────────────
+    # ── Section 4: Strategy performance table ────────────────────────────────
+    perf_html = _build_strategy_performance_html()
+
+    # ── Section 5: Scanner results ────────────────────────────────────────────
     scanner_html = _build_scanner_results_html()
 
-    # ── Section 5: Cross-strategy matrix ─────────────────────────────────────
+    # ── Section 6: Cross-strategy matrix ─────────────────────────────────────
     matrix_html = _build_matrix_html()
 
     # ── Top-level KPI bar ─────────────────────────────────────────────────────
@@ -1698,10 +1775,12 @@ def build_email(trades: list[dict]) -> str:
   {_section_head("🚨","Action Required",f"{total_alerts} alert(s)","#c0392b")}
   {action_html}
 
-  {_section_head("📈","Open Positions",f"{len(open_trades)} trade(s)","#2c3e50")}
+  {_section_head("📈","Open Positions (Real)",f"{len(open_trades)} trade(s)","#2c3e50")}
   {snapshot_html}
 
   {weekly_html}
+
+  {perf_html}
 
   {scanner_html}
 

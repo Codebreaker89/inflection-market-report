@@ -136,7 +136,7 @@ def ticker_ccy(ticker: str) -> str:
     for sfx, ccy in SUFFIX_CCY.items():
         if ticker.upper().endswith(sfx):
             return ccy
-    return "EUR"   # default: user inputs everything in EUR
+    return "USD"   # default: no suffix = US stock, priced in USD
 
 def fetch_fx_now(ccy: str) -> float:
     if ccy == "EUR": return 1.0
