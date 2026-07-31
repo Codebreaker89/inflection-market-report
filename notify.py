@@ -591,6 +591,194 @@ def _load_streak_leaders(min_streak: int = 5) -> list:
     return sorted(results, key=lambda x: -x["streak"])
 
 
+# Regime colour palette — shared across scorecard, scan detail, regime map, conviction cards
+REGIME_COLORS = {
+    "All-weather": {"icon": "🌤", "color": "#4ade80", "bg": "#052e16"},
+    "Defensive":   {"icon": "🛡",  "color": "#38bdf8", "bg": "#0c1a2e"},
+    "Momentum":    {"icon": "📈", "color": "#a78bfa", "bg": "#1e1b4b"},
+    "Momentum+":   {"icon": "📈", "color": "#818cf8", "bg": "#1e1b4b"},
+    "Neutral":     {"icon": "〰", "color": "#94a3b8", "bg": "#1e293b"},
+    "":            {"icon": "─",  "color": "#4b5563", "bg": "#111827"},
+}
+
+_regime_cache: dict = {}   # strategy → (icon, label, color, bg)
+
+def _load_regime_characters() -> dict:
+    """Compute regime character for each strategy from scan_history.csv. Cached."""
+    global _regime_cache
+    if _regime_cache:
+        return _regime_cache
+    import csv as _csv, math as _math
+    from collections import defaultdict as _dd
+    csv_path = HERE / "scan_history.csv"
+    if not csv_path.exists():
+        return {}
+    strats = _dd(lambda: {"bear": [], "neut": [], "bull": []})
+    try:
+        with open(csv_path, newline="", encoding="utf-8") as f:
+            for row in _csv.DictReader(f):
+                if not row.get("ret_d5") or not row.get("spy_ret_d5"): continue
+                try:
+                    ret = float(row["ret_d5"]); spy = float(row["spy_ret_d5"])
+                    if _math.isnan(ret) or abs(ret) > 15: continue
+                    s = row["strategy"]
+                    if spy <= -1:   strats[s]["bear"].append(ret)
+                    elif spy >= 1:  strats[s]["bull"].append(ret)
+                    else:           strats[s]["neut"].append(ret)
+                except (ValueError, TypeError):
+                    pass
+    except Exception:
+        return {}
+
+    def _wr(lst): return sum(1 for x in lst if x > 0) / len(lst) * 100 if len(lst) >= 3 else None
+
+    def _classify(s, d):
+        bull_wr = _wr(d["bull"]); bear_wr = _wr(d["bear"]); neut_wr = _wr(d["neut"])
+        n = sum(len(v) for v in d.values())
+        if n < 8: return ("─", "", "#4b5563", "#111827")
+        if bull_wr is None or bear_wr is None:
+            lbl = "Momentum" if (neut_wr and neut_wr >= 60) else "Neutral"
+        else:
+            diff = bull_wr - bear_wr
+            if bear_wr >= 60:                   lbl = "All-weather"
+            elif abs(diff) <= 10 and (bull_wr or 0) >= 50: lbl = "All-weather"
+            elif diff >= 20:                    lbl = "Momentum"
+            elif diff >= 10:                    lbl = "Momentum+"
+            elif diff <= -10:                   lbl = "Defensive"
+            else:                               lbl = "Neutral"
+        meta = REGIME_COLORS.get(lbl, REGIME_COLORS[""])
+        return (meta["icon"], lbl, meta["color"], meta["bg"])
+
+    _regime_cache = {s: _classify(s, d) for s, d in strats.items()}
+    return _regime_cache
+
+
+def _regime_badge(strategy: str) -> str:
+    """Inline HTML badge for a strategy's regime character."""
+    chars = _load_regime_characters()
+    if strategy not in chars: return ""
+    icon, lbl, col, bg = chars[strategy]
+    if not lbl: return ""
+    return (f'<span style="background:{bg};color:{col};font-size:9px;font-weight:700;'
+            f'border-radius:3px;padding:1px 5px;margin-left:5px;white-space:nowrap;">'
+            f'{icon} {lbl}</span>')
+
+
+def _build_regime_map_html() -> str:
+    """Strategy × market-regime WR grid — shows which strategies are all-weather vs momentum-only."""
+    import csv as _csv, math as _math
+    from collections import defaultdict as _dd
+    csv_path = HERE / "scan_history.csv"
+    if not csv_path.exists():
+        return ""
+
+    strats = _dd(lambda: {"bear": [], "neut": [], "bull": []})
+    try:
+        with open(csv_path, newline="", encoding="utf-8") as f:
+            for row in _csv.DictReader(f):
+                if not row.get("ret_d5") or not row.get("spy_ret_d5"):
+                    continue
+                try:
+                    ret = float(row["ret_d5"])
+                    spy = float(row["spy_ret_d5"])
+                    if _math.isnan(ret) or abs(ret) > 15: continue
+                    s = row["strategy"]
+                    if spy <= -1:        strats[s]["bear"].append(ret)
+                    elif spy >= 1:       strats[s]["bull"].append(ret)
+                    else:                strats[s]["neut"].append(ret)
+                except (ValueError, TypeError):
+                    pass
+    except Exception:
+        return ""
+
+    MIN_N = 8
+
+    def _wr(lst):
+        if len(lst) < 3: return None
+        return sum(1 for x in lst if x > 0) / len(lst) * 100
+
+    def _cell(wr, n):
+        if wr is None:
+            return (f'<td style="padding:6px 8px;text-align:center;color:#4b5563;font-size:11px;">─</td>')
+        bg  = "#052e16" if wr >= 65 else ("#1e3a00" if wr >= 55 else ("#3b1a00" if wr >= 45 else "#3b0000"))
+        col = "#4ade80" if wr >= 65 else ("#a3e635" if wr >= 55 else ("#fb923c" if wr >= 45 else "#f87171"))
+        return (f'<td style="padding:6px 8px;text-align:center;background:{bg};font-size:12px;'
+                f'font-weight:700;color:{col};">{wr:.0f}%<span style="font-size:9px;color:{col};'
+                f'opacity:0.7;font-weight:400;"> n={n}</span></td>')
+
+    STRAT_ALIAS = {
+        "pocket_pivot":"Pocket Pivot","ema_ribbon":"EMA Ribbon","cup_handle":"Cup Handle",
+        "connors_rsi2":"Connors RSI2","signal_velocity":"Signal Velocity","breakout":"Breakout",
+        "vcp":"VCP","nr7":"NR7","wyckoff_spring":"Wyckoff Spring","darvas_box":"Darvas Box",
+        "raschke_8020":"Raschke 80/20","high_tight_flag":"High Tight Flag","stage4_short":"Stage4 Short",
+        "connors_3down":"Connors 3↓","holy_grail":"Holy Grail","weinstein_stage2":"Weinstein S2",
+        "defensive_rotation":"Def. Rotation","rs_line":"RS Line","williams_pct_r":"Williams %R",
+        "bollinger_pctb":"BB %B","turnover_momentum":"Turnover Mom.","elder_impulse":"Elder Impulse",
+        "ma50_reclaim":"MA50 Reclaim","momentum_burst":"Mom. Burst","analyst_upgrade":"Analyst Upg.",
+    }
+
+    def _label(bull_wr, bear_wr, neut_wr):
+        if bull_wr is None or bear_wr is None:
+            if neut_wr and neut_wr >= 60: return ("📈", "Momentum", "#818cf8")
+            return ("─", "", _C_DIM)
+        diff = bull_wr - bear_wr
+        if bear_wr >= 60:                  return ("🌤", "All-weather", "#4ade80")
+        if abs(diff) <= 10 and bull_wr>=50: return ("🌤", "All-weather", "#4ade80")
+        if diff >= 20:                     return ("📈", "Momentum", "#818cf8")
+        if diff >= 10:                     return ("📈", "Momentum+", "#a78bfa")
+        if diff <= -10:                    return ("🛡", "Defensive", "#38bdf8")
+        return ("〰", "Neutral", _C_DIM)
+
+    # Sort: all-weather first, then momentum, then bear-sensitive
+    rows_data = []
+    for s, d in strats.items():
+        n = sum(len(v) for v in d.values())
+        if n < MIN_N: continue
+        bull_wr = _wr(d["bull"])
+        bear_wr = _wr(d["bear"])
+        neut_wr = _wr(d["neut"])
+        icon, lbl, lcol = _label(bull_wr, bear_wr, neut_wr)
+        rows_data.append((s, d, bull_wr, bear_wr, neut_wr, icon, lbl, lcol, n))
+
+    # Sort: all-weather > defensive > momentum > neutral; within each by bull WR
+    order = {"All-weather": 0, "Defensive": 1, "Momentum+": 2, "Momentum": 3, "Neutral": 4, "": 5}
+    rows_data.sort(key=lambda x: (order.get(x[6], 9), -(x[2] or 0)))
+
+    rows_html = ""
+    for i, (s, d, bull_wr, bear_wr, neut_wr, icon, lbl, lcol, n) in enumerate(rows_data):
+        bg = _C_ROW1 if i % 2 else _C_ROW0
+        name = STRAT_ALIAS.get(s, s.replace("_", " ").title())
+        rows_html += (
+            f'<tr style="background:{bg};">'
+            f'<td style="padding:6px 10px;font-size:12px;font-weight:600;color:{_C_BODY};white-space:nowrap;">{name}</td>'
+            + _cell(bear_wr, len(d["bear"]))
+            + _cell(neut_wr, len(d["neut"]))
+            + _cell(bull_wr, len(d["bull"]))
+            + f'<td style="padding:6px 10px;font-size:11px;color:{lcol};white-space:nowrap;">{icon} {lbl}</td>'
+            f'</tr>'
+        )
+
+    if not rows_html:
+        return ""
+
+    return (
+        f'<br><table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:0;">'
+        f'<tr><td style="background:#1e1b4b;border-left:4px solid #818cf8;padding:7px 10px;border-radius:3px 3px 0 0;">'
+        f'<span style="font-size:11px;font-weight:700;color:#a5b4fc;letter-spacing:.04em;">'
+        f'🗺 STRATEGY REGIME MAP &nbsp;·&nbsp; win rate by market condition (SPY 5d return)</span>'
+        f'<span style="font-size:10px;color:#6366f1;margin-left:12px;">🌤 all-weather &nbsp; 📈 momentum &nbsp; 🛡 defensive</span>'
+        f'</td></tr></table>'
+        f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">'
+        f'<thead><tr style="background:#1e1b4b;">'
+        f'<th style="padding:6px 10px;text-align:left;font-size:11px;color:#818cf8;">Strategy</th>'
+        f'<th style="padding:6px 8px;text-align:center;font-size:11px;color:#f87171;">🐻 Bear<br><span style="font-weight:400;font-size:9px;">SPY ≤ −1%</span></th>'
+        f'<th style="padding:6px 8px;text-align:center;font-size:11px;color:#94a3b8;">〰 Neutral<br><span style="font-weight:400;font-size:9px;">−1% to +1%</span></th>'
+        f'<th style="padding:6px 8px;text-align:center;font-size:11px;color:#4ade80;">🐂 Bull<br><span style="font-weight:400;font-size:9px;">SPY ≥ +1%</span></th>'
+        f'<th style="padding:6px 10px;text-align:left;font-size:11px;color:#818cf8;">Character</th>'
+        f'</tr></thead><tbody>{rows_html}</tbody></table>'
+    )
+
+
 def _load_strategy_stats() -> dict:
     """Read scan_history.csv → per-strategy {n, wr, avg, avg_r} from filled ret_d5 rows."""
     csv_path = HERE / "scan_history.csv"
@@ -600,7 +788,7 @@ def _load_strategy_stats() -> dict:
     import csv as _csv, math as _math
     # Strategies with known tracking issues — exclude from scorecard
     _EXCLUDED_FROM_STATS = {"stage4_short"}  # L020: ret tracking inverted for shorts
-    stats = defaultdict(lambda: {"wins": 0, "total": 0, "sum": 0.0, "r_sum": 0.0, "r_n": 0})
+    stats = defaultdict(lambda: {"wins":0,"total":0,"sum":0.0,"r_sum":0.0,"r_n":0,"sl":0,"ex_sum":0.0,"ex_n":0})
     try:
         with open(csv_path, newline="", encoding="utf-8") as f:
             for row in _csv.DictReader(f):
@@ -609,21 +797,26 @@ def _load_strategy_stats() -> dict:
                     continue
                 try:
                     ret = float(row["ret_d5"])
-                    if _math.isnan(ret):
-                        continue
-                    # L021: skip corrupted data (stock splits/yfinance errors)
-                    if abs(ret) > 15:
+                    if _math.isnan(ret) or abs(ret) > 15:
                         continue
                     stats[strat]["total"] += 1
                     stats[strat]["sum"]   += ret
                     if ret > 0:
                         stats[strat]["wins"] += 1
+                    if row.get("hit_stop_loss_d5") == "1":
+                        stats[strat]["sl"] += 1
                     rm_raw = row.get("r_multiple_d5", "")
                     if rm_raw:
                         rm = float(rm_raw)
                         if not _math.isnan(rm):
                             stats[strat]["r_sum"] += rm
                             stats[strat]["r_n"]   += 1
+                    ex_raw = row.get("excess_ret_d5", "")
+                    if ex_raw:
+                        ex = float(ex_raw)
+                        if not _math.isnan(ex):
+                            stats[strat]["ex_sum"] += ex
+                            stats[strat]["ex_n"]   += 1
                 except (ValueError, TypeError, KeyError):
                     pass
     except Exception:
@@ -634,10 +827,12 @@ def _load_strategy_stats() -> dict:
         if n < 1:
             continue
         out[s] = {
-            "n":     n,
-            "wr":    round(100 * d["wins"] / n, 1),
-            "avg":   round(d["sum"] / n, 2),
-            "avg_r": round(d["r_sum"] / d["r_n"], 2) if d["r_n"] > 0 else None,
+            "n":      n,
+            "wr":     round(100 * d["wins"] / n, 1),
+            "avg":    round(d["sum"] / n, 2),
+            "avg_r":  round(d["r_sum"] / d["r_n"], 2) if d["r_n"] > 0 else None,
+            "sl_pct": round(100 * d["sl"] / n, 1),
+            "excess": round(d["ex_sum"] / d["ex_n"], 2) if d["ex_n"] > 0 else None,
         }
     return out
 
@@ -1107,7 +1302,7 @@ def _build_scanner_results_html() -> str:
                 f'{" " + str(int(hist_stats[s]["wr"])) + "%" if hist_stats.get(s, {}).get("n", 0) >= 5 else ""}'
                 f'</span>'
                 for s in strats_fired[:4]
-            )
+            ) + _regime_badge(strat)
             price_s  = f'${r["price"]:.2f}' if r.get("price") else "─"
             sl_approx = r["price"] * 0.97 if r.get("price") else None
             sl_s     = f'${sl_approx:.2f}' if sl_approx else "─"
@@ -1268,24 +1463,37 @@ def _build_scanner_results_html() -> str:
             [(s, d) for s, d in hist_stats.items() if d["n"] >= 3],
             key=lambda x: (-x[1]["wr"], -x[1]["avg"])
         )
+        _rc = _load_regime_characters()
         sc_rows = ""
-        for rank, (s, d) in enumerate(scored[:10], 1):
+        for rank, (s, d) in enumerate(scored[:12], 1):
             proven = d["n"] >= 10 and d["wr"] >= 60
-            wr_color = "#16a34a" if d["wr"] >= 60 else ("#d97706" if d["wr"] >= 45 else "#dc2626")
-            avg_color = "#16a34a" if d["avg"] >= 0 else "#dc2626"
+            wr_color  = "#16a34a" if d["wr"] >= 60 else ("#d97706" if d["wr"] >= 50 else "#dc2626")
+            avg_color = "#16a34a" if d["avg"] > 0 else "#dc2626"
             badge = ('<span style="background:#16a34a;color:#fff;font-size:9px;font-weight:700;'
-                     'border-radius:3px;padding:1px 4px;margin-left:6px;">PROVEN EDGE ✓</span>') if proven else ""
-            s_label = s.replace("_", " ").upper()
-            avg_r = d.get("avg_r")
-            avg_r_col = "#16a34a" if (avg_r or 0) >= 1.0 else ("#d97706" if (avg_r or 0) >= 0.5 else _C_DIM)
-            avg_r_s = f'{avg_r:.2f}R' if avg_r is not None else '─'
+                     'border-radius:3px;padding:1px 4px;margin-left:6px;">✓</span>') if proven else ""
+            s_label  = s.replace("_", " ").title()
+            avg_r    = d.get("avg_r")
+            sl_pct   = d.get("sl_pct")
+            excess   = d.get("excess")
+            avg_r_col  = "#16a34a" if (avg_r or 0) >= 0.5 else ("#d97706" if (avg_r or 0) >= 0 else "#dc2626")
+            sl_col     = "#dc2626" if (sl_pct or 0) >= 20 else ("#d97706" if (sl_pct or 0) >= 12 else "#16a34a")
+            excess_col = "#16a34a" if (excess or 0) > 0 else "#dc2626"
+            _rchar = _rc.get(s, ("─", "", "#4b5563", "#111827"))
+            _r_icon, _r_lbl, _r_col, _r_bg = _rchar
+            _row_border = f'border-left:3px solid {_r_col};'
+            _regime_sc_badge = (
+                f'<span style="background:{_r_bg};color:{_r_col};font-size:9px;font-weight:700;'
+                f'border-radius:3px;padding:1px 4px;margin-left:5px;">{_r_icon} {_r_lbl}</span>'
+            ) if _r_lbl else ""
             sc_rows += (
                 f'<tr style="background:{_C_ROW1 if rank%2 else _C_ROW0};">'
-                f'<td style="padding:5px 8px;font-size:11px;color:{_C_BODY};">{rank}</td>'
-                f'<td style="padding:5px 8px;font-size:11px;font-weight:600;color:{_C_BODY};">{s_label}{badge}</td>'
-                f'<td style="padding:5px 8px;font-size:11px;text-align:right;color:{wr_color};font-weight:700;">{d["wr"]:.0f}%</td>'
+                f'<td style="padding:5px 8px;font-size:11px;color:{_C_DIM};{_row_border}">{rank}</td>'
+                f'<td style="padding:5px 8px;font-size:11px;font-weight:600;color:{_C_BODY};">{s_label}{badge}{_regime_sc_badge}</td>'
+                f'<td style="padding:5px 8px;font-size:12px;text-align:right;color:{wr_color};font-weight:700;">{d["wr"]:.0f}%</td>'
                 f'<td style="padding:5px 8px;font-size:11px;text-align:right;color:{avg_color};">{d["avg"]:+.2f}%</td>'
-                f'<td style="padding:5px 8px;font-size:11px;text-align:right;color:{avg_r_col};font-weight:600;">{avg_r_s}</td>'
+                f'<td style="padding:5px 8px;font-size:11px;text-align:right;color:{avg_r_col};">{f"{avg_r:.2f}R" if avg_r is not None else "─"}</td>'
+                f'<td style="padding:5px 8px;font-size:11px;text-align:right;color:{sl_col};">{f"{sl_pct:.0f}%" if sl_pct is not None else "─"}</td>'
+                f'<td style="padding:5px 8px;font-size:11px;text-align:right;color:{excess_col};">{f"{excess:+.2f}%" if excess is not None else "─"}</td>'
                 f'<td style="padding:5px 8px;font-size:11px;text-align:right;color:{_C_DIM};">{d["n"]}</td>'
                 '</tr>'
             )
@@ -1293,19 +1501,24 @@ def _build_scanner_results_html() -> str:
             f'<br><table width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px;margin-bottom:0;">'
             f'<tr><td style="background:#1a2a1a;border-left:4px solid #16a34a;padding:6px 10px;border-radius:3px 3px 0 0;">'
             f'<span style="font-size:11px;font-weight:700;color:#16a34a;letter-spacing:.05em;">'
-            f'📊 STRATEGY SCORECARD &nbsp;·&nbsp; LIVE from scan_history.csv</span></td></tr></table>'
+            f'📊 STRATEGY SCORECARD &nbsp;·&nbsp; live from scan_history.csv &nbsp;·&nbsp; ✓ = proven edge (WR≥60%, n≥10)</span></td></tr></table>'
             f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:11px;">'
-            f'<thead><tr>'
-            f'<th style="padding:5px 8px;text-align:left;color:#888;background:#1a1a2e;">#</th>'
-            f'<th style="padding:5px 8px;text-align:left;color:#888;background:#1a1a2e;">Strategy</th>'
-            f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;" title="How often this strategy wins (5-day hold)">Win Rate</th>'
-            f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;" title="Average % gain/loss per trade (5-day hold)">Avg Return</th>'
-            f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;" title="Reward vs risk — e.g. 1.5R means you gain 1.5x what you risk">Reward/Risk</th>'
-            f'<th style="padding:5px 8px;text-align:right;color:#888;background:#1a1a2e;" title="Number of completed trades tracked">Trades</th>'
+            f'<thead><tr style="background:#1a1a2e;">'
+            f'<th style="padding:5px 8px;text-align:left;color:#888;">#</th>'
+            f'<th style="padding:5px 8px;text-align:left;color:#888;">Strategy</th>'
+            f'<th style="padding:5px 8px;text-align:right;color:#888;" title="5-day win rate">WR%</th>'
+            f'<th style="padding:5px 8px;text-align:right;color:#888;" title="Avg 5-day return">Avg Ret</th>'
+            f'<th style="padding:5px 8px;text-align:right;color:#888;" title="Avg reward/risk multiple">R:R</th>'
+            f'<th style="padding:5px 8px;text-align:right;color:#888;" title="% of signals that hit stop loss">SL Hit</th>'
+            f'<th style="padding:5px 8px;text-align:right;color:#888;" title="Avg excess return vs SPY over same period">vs SPY</th>'
+            f'<th style="padding:5px 8px;text-align:right;color:#888;" title="Number of signals tracked">N</th>'
             f'</tr></thead><tbody>'
             + sc_rows +
             f'</tbody></table>'
         )
+
+    # ── Regime Map ───────────────────────────────────────────────────────────
+    html += _build_regime_map_html()
 
     # ══════════════════════════════════════════════════════════════════════════
     # SECTION C: FULL STRATEGY DETAIL (reference — scroll past if acted on above)
@@ -1318,6 +1531,7 @@ def _build_scanner_results_html() -> str:
         f'</td></tr></table>'
     )
 
+    _rc_detail = _load_regime_characters()
     for strat, results in active:
         is_short = "short" in strat
         fg, bg_badge = _STRAT_COLORS.get(strat, ("#333333", "#eeeeee"))
@@ -1345,13 +1559,23 @@ def _build_scanner_results_html() -> str:
         if proven:
             proven_badge = ('<span style="background:#16a34a;color:#fff;font-size:9px;font-weight:700;'
                             'border-radius:3px;padding:1px 5px;margin-left:8px;">PROVEN EDGE ✓</span>')
+        # Regime badge on strategy header
+        _drchar = _rc_detail.get(strat, ("─", "", "#4b5563", "#111827"))
+        _d_icon, _d_lbl, _d_col, _d_bg = _drchar
+        _detail_regime = (
+            f'<span style="background:{_d_bg};color:{_d_col};font-size:9px;font-weight:700;'
+            f'border-radius:3px;padding:1px 5px;margin-left:8px;">{_d_icon} {_d_lbl}</span>'
+        ) if _d_lbl else ""
+        # Use regime colour for border if available, else fall back to strategy colour
+        _header_border_col = _d_col if _d_lbl else fg
         html += (f'<table width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;margin-bottom:0;">'
-                 f'<tr><td style="background:{bg_badge};border-left:4px solid {fg};'
+                 f'<tr><td style="background:{bg_badge};border-left:4px solid {_header_border_col};'
                  f'padding:6px 10px;border-radius:3px 3px 0 0;">'
                  f'<span style="font-size:11px;font-weight:700;color:{fg};'
                  f'letter-spacing:.05em;text-transform:uppercase;">'
                  f'{strat_label} &nbsp;·&nbsp; {len(results)} signal(s)</span>'
                  + proven_badge
+                 + _detail_regime
                  + live_note
                  + (f'<span style="font-size:10px;color:{fg};margin-left:12px;">{bt_note}</span>' if bt_note else "")
                  + (f'<br><span style="font-size:10px;color:{fg};opacity:0.8;font-style:italic;">{desc_text}</span>' if desc_text else "")
@@ -1361,16 +1585,14 @@ def _build_scanner_results_html() -> str:
                  f'style="border-collapse:collapse;font-size:11px;{_FONT}">'
                  '<thead><tr>'
                  + _th("Ticker", "left")
+                 + _th("Company", "left")
                  + _th("Mkt",   "center")
                  + _th("Scr",   "center", title="Scanner score")
                  + _th("Price", "right")
                  + _th("RSI",   "right")
                  + _th("ADX",   "right")
-                 + _th("M/8",   "right",  title="Minervini score /8")
                  + _th("Vol×",  "right",  title="Volume ratio vs 20d avg")
                  + _th("Signals/Context", "left")
-                 + _th("WR%",   "right",  title="Backtest win rate")
-                 + _th("Avg%",  "right",  title="Backtest avg return")
                  + '</tr></thead><tbody>')
 
         rows = ""
@@ -1410,11 +1632,12 @@ def _build_scanner_results_html() -> str:
             rsi_c   = (_C_WARN if rsi_v and rsi_v > 70
                        else (_C_POS if rsi_v and rsi_v < 40 else _C_BODY))
             vol_c   = _C_POS if (vol_v or 0) >= 1.5 else _C_DIM
-            m_c     = _C_POS if (m_v or 0) >= 6 else _C_DIM
             tick_c  = _C_NEG if is_short else _C_BODY
+            company_s = str(r.get("company") or "")[:22] or "─"
 
             rows += "<tr>"
             rows += _td(f'<b style="color:{tick_c}">{r["ticker"]}</b>', "left", bg=bg)
+            rows += _td(f'<span style="color:{_C_DIM};font-size:10px;">{company_s}</span>', "left", bg=bg)
             rows += _td(
                 f'<span style="background:#f0f4ff;color:#334;border-radius:3px;'
                 f'padding:1px 5px;font-size:10px;">{mkt}</span>',
@@ -1423,14 +1646,9 @@ def _build_scanner_results_html() -> str:
             rows += _td(f'${price_v:.2f}' if price_v else "─", "right", _C_DIM, bg=bg)
             rows += _td(f'{rsi_v:.0f}' if rsi_v else "─", "right", rsi_c, bg=bg)
             rows += _td(f'{adx_v:.0f}' if adx_v else "─", "right", _C_DIM, bg=bg)
-            rows += _td(f'{int(m_v)}/8' if m_v is not None else "─", "right", m_c, bg=bg)
             rows += _td(f'{vol_v:.1f}×' if vol_v else "─", "right", vol_c, bg=bg)
             rows += _td(sigs_str, "left", _C_DIM, bg=bg,
-                        extra="font-size:10px;max-width:220px;overflow:hidden;")
-            rows += _td(f'{wr_v:.0f}%' if wr_v is not None else "─",
-                        "right", _C_POS if (wr_v or 0) >= 60 else _C_DIM, bg=bg)
-            rows += _td(_pct(avg_v) if avg_v is not None else "─",
-                        "right", _c(avg_v) if avg_v is not None else _C_DIM, bg=bg)
+                        extra="font-size:10px;max-width:200px;overflow:hidden;")
             rows += "</tr>"
 
         html += thead + rows + "</tbody></table>"
@@ -1716,10 +1934,7 @@ def build_email(trades: list[dict]) -> str:
             weekly_html = (f'<br>{_section_head("📅","Week Closed Trades",f"{week_start} → {TODAY}","#2c3e50")}'
                            + thead + rows + '</tbody></table>')
 
-    # ── Section 4: Strategy performance table ────────────────────────────────
-    perf_html = _build_strategy_performance_html()
-
-    # ── Section 5: Scanner results ────────────────────────────────────────────
+    # ── Section 4: Scanner results ────────────────────────────────────────────
     scanner_html = _build_scanner_results_html()
 
     # ── Section 6: Cross-strategy matrix ─────────────────────────────────────
@@ -1779,8 +1994,6 @@ def build_email(trades: list[dict]) -> str:
   {snapshot_html}
 
   {weekly_html}
-
-  {perf_html}
 
   {scanner_html}
 
