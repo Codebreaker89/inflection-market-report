@@ -78,6 +78,7 @@ def _quiet():
 SUFFIX_CCY = {
     ".L":  "GBP",  ".DE": "EUR",  ".PA": "EUR",  ".AS": "EUR",
     ".MC": "EUR",  ".MI": "EUR",  ".BR": "EUR",  ".LS": "EUR",
+    ".NS": "INR",  ".BO": "INR",   # India NSE / BSE
     ".HE": "EUR",  ".SW": "CHF",  ".ST": "SEK",  ".CO": "DKK",
     ".OL": "NOK",  ".TO": "CAD",
 }
@@ -89,6 +90,7 @@ FX_PAIR = {          # yfinance symbol: 1 EUR = X local
     "SEK": "EURSEK=X",
     "DKK": "EURDKK=X",
     "NOK": "EURNOK=X",
+    "INR": "EURINR=X",   # Indian Rupee
 }
 
 # Exchange prefix (Google Finance / Bloomberg format) → yfinance suffix + currency

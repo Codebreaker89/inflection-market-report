@@ -2,15 +2,22 @@ name: Fire Daily Scan
 
 on:
   schedule:
-    # 14:00 UTC = 16:00 CEST = 15:00 BST = 10:00 EDT
-    # US–EU overlap window: US opens 13:30 UTC, EU closes 15:30 UTC
+    # India job: 23:30 UTC = 05:00 IST+1 = 05:00am local (30min before NSE open at 09:15 IST)
+    - cron: '30 23 * * 0-4'   # Sun–Thu UTC = Mon–Fri IST
+    # Intl job: 14:00 UTC = 16:00 CEST = 15:00 BST = 10:00 EDT
     - cron: '0 14 * * 1-5'
   workflow_dispatch:   # manual trigger: gh workflow run fire_scan.yml
 
 jobs:
-  scan:
+  # ── India scan (runs at 23:30 UTC → 05:00 IST) ───────────────────────────────
+  scan-india:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
+    # Only run on the 23:30 UTC cron (Sun–Thu) or manual trigger
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'schedule' &&
+       startsWith(github.event.schedule, '30 23'))
 
     steps:
       - name: Checkout repo
@@ -40,13 +47,68 @@ jobs:
           DEFAULT_HOLD_DAYS  = 7
           EOF
 
-      - name: Run scan (all strategies)
+      - name: Run India scan
+        run: python3 scan.py --no-backtest --india
+
+      - name: Update scan history (India)
+        run: python3 update_scan_history.py --india
+
+      - name: Send India email digest
+        run: python3 notify.py --send --india
+
+      - name: Commit India scan data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f scan_history.csv last_scan_india.json
+          git diff --staged --quiet || git commit -m "scan-india: $(date +%Y-%m-%d)"
+          git push
+
+  # ── Intl scan (runs at 14:00 UTC) ────────────────────────────────────────────
+  scan-intl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Only run on the 14:00 UTC cron (Mon–Fri) or manual trigger
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'schedule' &&
+       startsWith(github.event.schedule, '0 14'))
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Write config.py from secrets
+        run: |
+          cat > config.py << EOF
+          GMAIL_USER         = "${{ secrets.GMAIL_USER }}"
+          GMAIL_APP_PASSWORD = "${{ secrets.GMAIL_APP_PASSWORD }}"
+          NOTIFY_TO          = "${{ secrets.GMAIL_USER }}"
+          STOP_LOSS_PCT      = 0.03
+          PROFIT_TARGET      = 0.08
+          EARNINGS_WARN      = 7
+          HOLD_DAYS          = 7
+          DEFAULT_HOLD_DAYS  = 7
+          EOF
+
+      - name: Run Intl scan (all strategies)
         run: python3 scan.py --no-backtest
 
       - name: Update scan history
         run: python3 update_scan_history.py
 
-      - name: Send email digest
+      - name: Send Intl email digest
         run: python3 notify.py --send
 
       - name: Commit updated data back to repo

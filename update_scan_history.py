@@ -20,6 +20,7 @@ import pandas   as pd
 
 HERE     = Path(__file__).parent
 HISTORY  = HERE / "scan_history.csv"
+# Overridden to last_scan_india.json when --india flag passed
 SCAN_JSON= HERE / "last_scan.json"
 
 STOP_LOSS_PCT = 0.03   # 3% — must match config
@@ -311,6 +312,10 @@ def backfill_returns(rows: list[dict]) -> list[dict]:
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 def main():
+    global SCAN_JSON
+    if "--india" in sys.argv:
+        SCAN_JSON = HERE / "last_scan_india.json"
+        print("\n  🇮🇳 India mode — reading last_scan_india.json")
     print("\n  Updating scan history...")
     rows = load_history()
     rows = append_new_rows(rows)

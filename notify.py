@@ -1031,9 +1031,9 @@ def _build_strategy_performance_html() -> str:
     )
 
 
-def _build_scanner_results_html() -> str:
+def _build_scanner_results_html(india_mode: bool = False) -> str:
     """Scanner results: leads with conviction cards, then full detail by strategy."""
-    scan_json = HERE / "last_scan.json"
+    scan_json = HERE / ("last_scan_india.json" if india_mode else "last_scan.json")
     if not scan_json.exists():
         return ""
     try:
@@ -1209,6 +1209,15 @@ def _build_scanner_results_html() -> str:
     _is_friday = (_scan_weekday == 4)
 
     html = f'<br>{_section_head("📡","Scanner Results",f"scan {scan_date} · {len(active)} strategies fired · {total_hits} signals","#1a5a8a")}'
+
+    # ── India banner ──────────────────────────────────────────────────────────
+    if india_mode:
+        html += (
+            f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px;">'
+            f'<tr><td style="background:#0a1a0a;border-left:5px solid #ff9933;padding:7px 14px;border-radius:4px;">'
+            f'<span style="font-size:12px;font-weight:700;color:#ff9933;">🇮🇳 INDIA SCAN — Nifty 500 universe · benchmark ^NSEI</span>'
+            f'</td></tr></table>'
+        )
 
     # ── Market Regime Bar ─────────────────────────────────────────────────────
     html += (
@@ -1816,7 +1825,7 @@ def _build_scanner_results_html() -> str:
     return html
 
 
-def build_email(trades: list[dict]) -> str:
+def build_email(trades: list[dict], india_mode: bool = False) -> str:
     # Practice trades excluded everywhere in the email
     trades        = [t for t in trades if t.get("trade_type") == "real"]
     open_trades   = [t for t in trades if t.get("status") == "OPEN"]
@@ -1961,7 +1970,7 @@ def build_email(trades: list[dict]) -> str:
                            + thead + rows + '</tbody></table>')
 
     # ── Section 4: Scanner results ────────────────────────────────────────────
-    scanner_html = _build_scanner_results_html()
+    scanner_html = _build_scanner_results_html(india_mode=india_mode)
 
     # ── Section 6: Cross-strategy matrix ─────────────────────────────────────
     matrix_html = _build_matrix_html()
@@ -2053,21 +2062,26 @@ def send_email(subject: str, html_body: str):
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
-    do_send = "--send" in sys.argv
+    do_send    = "--send"  in sys.argv
+    india_mode = "--india" in sys.argv
 
     trades = load_trades()  # empty list is fine — digest still shows scanner signals
 
-    print(f"\n  Building digest for {TODAY}...")
-    html = build_email(trades)
+    print(f"\n  Building {'🇮🇳 India' if india_mode else '🌍 Intl'} digest for {TODAY}...")
+    html = build_email(trades, india_mode=india_mode)
 
     if do_send:
         open_count = sum(1 for t in trades if t.get('status') == 'OPEN')
-        subject = f"📊 Trade Digest {TODAY} — {open_count} open"
+        if india_mode:
+            subject = f"🇮🇳 India Scan — {TODAY} · {open_count} open"
+        else:
+            subject = f"🌍 Intl Scan — {TODAY} · {open_count} open"
         print(f"\n  Sending email to {NOTIFY_TO}...", end=" ", flush=True)
         send_email(subject, html)
         print("✅  Sent!")
     else:
-        out = HERE / "digest_preview.html"
+        fname = "digest_preview_india.html" if india_mode else "digest_preview.html"
+        out = HERE / fname
         out.write_text(html, encoding="utf-8")
         print(f"\n  Dry-run — preview saved to: {out}")
         print("  Run with --send to actually email it.")

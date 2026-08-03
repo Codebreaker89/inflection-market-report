@@ -1278,6 +1278,7 @@ def _tracker_prompt(all_results: list):
 def main():
     args_raw      = sys.argv[1:]
     with_backtest = "--no-backtest" not in args_raw
+    india_mode    = "--india" in args_raw
 
     # Parse --strategies flag
     strategies = list(ALL_STRATEGIES)  # default: all
@@ -1310,8 +1311,15 @@ def main():
 
     # Build shared universe once
     t0 = time.time()
-    universe     = build_universe()
-    bench_returns = compute_bench_returns(set(universe.values()))
+    if india_mode:
+        from nifty500_fetcher import get_nifty500, INDIA_BENCH
+        _india_tickers = get_nifty500()
+        universe = {t: INDIA_BENCH for t in _india_tickers}
+        bench_returns = compute_bench_returns({INDIA_BENCH})
+        print(DIM(f"  🇮🇳 India mode — {len(universe)} Nifty 500 tickers  ·  benchmark {INDIA_BENCH}"))
+    else:
+        universe     = build_universe()
+        bench_returns = compute_bench_returns(set(universe.values()))
 
     # ── Minervini Trend Template pre-filter ───────────────────────────────────
     # Only scan Stage 2 stocks: MA stack aligned, 200MA trending up, near 52w high.
@@ -1528,9 +1536,23 @@ def main():
 
     total_time = time.time() - t0
 
-    # Sector pulse (fetch 10d sector ETF returns vs SPY)
+    # Sector pulse
     print(DIM("  Fetching sector pulse..."), flush=True)
-    sector_excess, spy_ret = _fetch_sector_pulse()
+    if india_mode:
+        # Use Nifty 10d return as regime proxy; no sector ETF breakdown for India
+        sector_excess = {}
+        try:
+            with contextlib.suppress(Exception):
+                _nifty_df = yf.download("^NSEI", period="20d", interval="1d",
+                                        progress=False, auto_adjust=True, threads=False)
+                if isinstance(_nifty_df.columns, pd.MultiIndex):
+                    _nifty_df.columns = _nifty_df.columns.droplevel(1)
+                _nc = _nifty_df["Close"].dropna()
+                spy_ret = float((_nc.iloc[-1] - _nc.iloc[-11]) / _nc.iloc[-11] * 100) if len(_nc) >= 11 else 0.0
+        except Exception:
+            spy_ret = 0.0
+    else:
+        sector_excess, spy_ret = _fetch_sector_pulse()
 
     # Derive market regime from SPY 10d return (elder_impulse disabled — WR 50%)
     if spy_ret >= 3.0:       elder_count = 18
@@ -1621,6 +1643,7 @@ def main():
             for r in res:
                 if not r.get("company"):
                     r["company"] = _co.get(r["ticker"], "")
+        _out_file = HERE / ("last_scan_india.json" if india_mode else "last_scan.json")
         payload = {
             "scan_date": datetime.now().strftime("%Y-%m-%d"),
             "strategies": strategies,
@@ -1632,8 +1655,10 @@ def main():
             "spy_ret": spy_ret,
             "elder_impulse_count": elder_count,
             "market_regime": "BULL" if elder_count >= 15 else ("NEUTRAL" if elder_count >= 5 else "BEAR"),
+            "india_mode": india_mode,
         }
-        LAST_SCAN_JSON.write_text(json.dumps(payload, indent=2))
+        _out_file.write_text(json.dumps(payload, indent=2))
+        LAST_SCAN_JSON = _out_file  # keep reference consistent
         print(DIM(f"  Saved last_scan.json ({sum(len(v) for v in payload['results_by_strategy'].values())} results)"))
     except Exception as e:
         print(f"  WARNING: could not save last_scan.json — {e}")
