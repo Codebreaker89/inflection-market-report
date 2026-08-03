@@ -21,7 +21,7 @@ from email.mime.text      import MIMEText
 from typing      import Optional
 
 import yfinance as yf
-from show_tracker import _yf_ticker, fetch_live_price  # canonical impls (pre-market aware, GBp-safe)
+from show_tracker import _yf_ticker, fetch_live_price, fetch_company_name  # canonical impls (pre-market aware, GBp-safe)
 
 try:
     from rrg_engine import run_sector_rrg, chart_rrg_scatter, QUAD_EMOJI, QUAD_COLORS
@@ -1049,6 +1049,27 @@ def _build_scanner_results_html() -> str:
     except Exception:
         return ""
 
+    # ── Batch-fill missing company names ─────────────────────────────────────
+    _all_tickers = list({r["ticker"] for res in rbs.values() for r in res})
+    _need_fetch  = [t for res in rbs.values() for r in res
+                    if not r.get("company") or r.get("company") == "MISSING"
+                    for t in [r["ticker"]]]
+    _need_fetch  = list(dict.fromkeys(_need_fetch))  # dedupe, preserve order
+    if _need_fetch:
+        from concurrent.futures import ThreadPoolExecutor as _TPE
+        try:
+            with _TPE(max_workers=12) as _ex:
+                _fetched = dict(zip(_need_fetch, _ex.map(fetch_company_name, _need_fetch)))
+        except Exception:
+            _fetched = {}
+        # Write names back into every result row
+        for res in rbs.values():
+            for r in res:
+                if not r.get("company") or r.get("company") == "MISSING":
+                    r["company"] = _fetched.get(r["ticker"], r.get("ticker", ""))
+    else:
+        _fetched = {}
+
     # Strategy descriptions pulled from scan.py definitions
     _STRAT_DESC = {
         "momentum":       "Finds stocks that just entered momentum — MACD, RSI(14), EMA9/21 crossovers within last 3 bars. ADX≥22, Minervini≥6. Hold 5d. (O'Neil / IBD)",
@@ -1395,7 +1416,7 @@ def _build_scanner_results_html() -> str:
             f'</td></tr></table>'
             f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:11px;margin-bottom:8px;">'
             f'<thead><tr style="background:#1a1a2e;">'
-            + _th("Ticker","left") + _th("Strategy","left") + _th("Win Rate","right")
+            + _th("Ticker","left") + _th("Company","left") + _th("Strategy","left") + _th("Win Rate","right")
             + _th("Score","center") + _th("Momentum","right") + _th("Trend Str.","right") + _th("Price","right")
             + f'</tr></thead><tbody>'
         )
@@ -1410,9 +1431,11 @@ def _build_scanner_results_html() -> str:
             wr_v = h.get("wr")
             wr_c = "#16a34a" if (wr_v or 0) >= 60 else "#d97706"
             price_s = f'${r["price"]:.2f}' if r.get("price") else "─"
+            co_s = str(r.get("company") or "")[:20] or "─"
             html += (
                 f'<tr style="background:{bg};">'
                 + _td(f'<b>{r["ticker"]}</b>{pb}', "left", bg=bg)
+                + _td(f'<span style="font-size:10px;color:{_C_DIM};">{co_s}</span>', "left", bg=bg)
                 + _td(strat_str, "left", _C_DIM, bg=bg)
                 + _td(f'<span style="color:{wr_c};font-weight:700;">{wr_v:.0f}%</span>' if wr_v else "─", "right", bg=bg)
                 + _td(str(r.get("score",0)), "center", bg=bg)

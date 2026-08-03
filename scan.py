@@ -679,8 +679,11 @@ def _print_high_conviction(results_by_strategy: dict, multi_tickers: set, with_b
     high_picks = [p for p in picks if p[0] == 0]
     med_picks  = [p for p in picks if p[0] == 1]
 
-    # ── Batch-fetch company name + sector ETF (one yf.info call per ticker) ──
-    display_tickers = [p[1]["ticker"] for p in high_picks + med_picks]
+    # ── Batch-fetch company name + sector ETF for ALL tickers in results ─────
+    display_tickers = list(dict.fromkeys(
+        [p[1]["ticker"] for p in high_picks + med_picks]  # conviction picks first
+        + [r["ticker"] for res in results_by_strategy.values() for r in res]  # then rest
+    ))
     _company_cache: dict[str, str] = {}
     _sector_etf_cache: dict[str, str] = {}  # ticker → ETF code e.g. "XLF"
 
