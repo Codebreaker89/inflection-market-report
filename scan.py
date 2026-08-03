@@ -1637,6 +1637,14 @@ def main():
 
     # Persist latest scan results for notify.py / update_scan_history.py
     try:
+        # Update persistent company name cache with all tickers in this scan
+        try:
+            from company_cache import update_cache as _update_cache
+            _scan_tickers = list({r["ticker"] for res in results_by_strategy.values() for r in res})
+            _update_cache(_scan_tickers, max_workers=15)
+        except Exception:
+            pass
+
         # Enrich results with company names fetched during display
         _co = _company_cache or {}
         for res in results_by_strategy.values():

@@ -1049,26 +1049,14 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
     except Exception:
         return ""
 
-    # ── Batch-fill missing company names ─────────────────────────────────────
-    _all_tickers = list({r["ticker"] for res in rbs.values() for r in res})
-    _need_fetch  = [t for res in rbs.values() for r in res
-                    if not r.get("company") or r.get("company") == "MISSING"
-                    for t in [r["ticker"]]]
-    _need_fetch  = list(dict.fromkeys(_need_fetch))  # dedupe, preserve order
-    if _need_fetch:
-        from concurrent.futures import ThreadPoolExecutor as _TPE
-        try:
-            with _TPE(max_workers=12) as _ex:
-                _fetched = dict(zip(_need_fetch, _ex.map(fetch_company_name, _need_fetch)))
-        except Exception:
-            _fetched = {}
-        # Write names back into every result row
-        for res in rbs.values():
-            for r in res:
-                if not r.get("company") or r.get("company") == "MISSING":
-                    r["company"] = _fetched.get(r["ticker"], r.get("ticker", ""))
-    else:
-        _fetched = {}
+    # ── Populate company names from persistent cache (reliable in CI) ────────
+    from company_cache import get_names as _get_names
+    _all_tickers  = list(dict.fromkeys(r["ticker"] for res in rbs.values() for r in res))
+    _name_map     = _get_names(_all_tickers)
+    for res in rbs.values():
+        for r in res:
+            if not r.get("company") or r.get("company") == "MISSING":
+                r["company"] = _name_map.get(r["ticker"], r["ticker"])
 
     # Strategy descriptions pulled from scan.py definitions
     _STRAT_DESC = {
