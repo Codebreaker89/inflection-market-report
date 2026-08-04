@@ -1,0 +1,345 @@
+{
+  "scan_date": "2026-08-04",
+  "strategies": [
+    "breakout",
+    "pocket_pivot",
+    "connors_rsi2",
+    "ema_ribbon",
+    "nr7",
+    "high_tight_flag",
+    "analyst_upgrade",
+    "signal_velocity",
+    "chokepoint_inflection",
+    "stage4_short",
+    "defensive_rotation",
+    "cup_handle",
+    "power_earnings_gap",
+    "darvas_box",
+    "rs_line",
+    "vcp",
+    "elder_impulse",
+    "holy_grail",
+    "connors_3down",
+    "williams_pct_r",
+    "bollinger_pctb",
+    "connors_r3",
+    "connors_tps",
+    "turtle_soup",
+    "raschke_8020",
+    "wyckoff_spring",
+    "weinstein_stage2",
+    "momentum_burst",
+    "ma50_reclaim",
+    "turnover_momentum",
+    "three_weeks_tight",
+    "episodic_pivot",
+    "combo_pp_ribbon"
+  ],
+  "results_by_strategy": {
+    "breakout": [],
+    "pocket_pivot": [
+      {
+        "ticker": "APOLLOHOSP.NS",
+        "mkt": "US",
+        "score": 4,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "RSI45-70",
+          "Near52H",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 59.9,
+        "adx": 26.3,
+        "price": 8988.0,
+        "vol_ratio": 0.98,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "rs_vs_spy": null,
+        "company": "APOLLO HOSPITALS ENTER. L"
+      },
+      {
+        "ticker": "EICHERMOT.NS",
+        "mkt": "US",
+        "score": 4,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "ADX\u2191",
+          "Near52H",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 79.0,
+        "adx": 17.4,
+        "price": 7833.5,
+        "vol_ratio": 1.25,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "company": "EICHER MOTORS LTD"
+      },
+      {
+        "ticker": "IFCI.NS",
+        "mkt": "US",
+        "score": 3,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "RSI45-70",
+          "VOL1.5x"
+        ],
+        "minervini": 8,
+        "rsi": 50.2,
+        "adx": 18.1,
+        "price": 76.54,
+        "vol_ratio": 2.43,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "rs_vs_spy": null,
+        "company": "IFCI LTD"
+      }
+    ],
+    "connors_rsi2": [],
+    "ema_ribbon": [],
+    "nr7": [],
+    "analyst_upgrade": [],
+    "signal_velocity": [
+      {
+        "ticker": "IFCI.NS",
+        "score": 12,
+        "fresh": [
+          "SV+9"
+        ],
+        "conf": [
+          "SCORE:8/15",
+          "VEL+9",
+          "VOL1.5x"
+        ],
+        "minervini": 8,
+        "rsi": 50.2,
+        "adx": 18.1,
+        "price": 76.54,
+        "vol_ratio": 2.43,
+        "net_score": 8,
+        "velocity": 9,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "rs_vs_spy": null,
+        "company": "IFCI LTD"
+      }
+    ],
+    "chokepoint_inflection": [],
+    "defensive_rotation": [],
+    "cup_handle": [
+      {
+        "ticker": "APOLLOHOSP.NS",
+        "score": 5,
+        "fresh": [
+          "C&H",
+          "PIV@8988.0"
+        ],
+        "conf": [
+          "CUP24.1%",
+          "HDL2.0%",
+          "VOLdry",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 59.9,
+        "adx": 26.3,
+        "vol_ratio": 0.98,
+        "minervini": 8,
+        "price": 8988.0,
+        "cup_depth_pct": 24.1,
+        "cup_duration": 195,
+        "handle_depth_pct": 2.0,
+        "handle_duration": 5,
+        "pivot": 8988.0,
+        "vol_drying": true,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "rs_vs_spy": null,
+        "company": "APOLLO HOSPITALS ENTER. L"
+      },
+      {
+        "ticker": "SHYAMMETL.NS",
+        "score": 5,
+        "fresh": [
+          "C&H",
+          "PIV@1035.1"
+        ],
+        "conf": [
+          "CUP28.3%",
+          "HDL1.2%",
+          "VOLdry",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 51.1,
+        "adx": 27.5,
+        "vol_ratio": 0.67,
+        "minervini": 8,
+        "price": 1031.3,
+        "cup_depth_pct": 28.3,
+        "cup_duration": 195,
+        "handle_depth_pct": 1.2,
+        "handle_duration": 5,
+        "pivot": 1035.1,
+        "vol_drying": true,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "company": "SHYAM METALICS AND ENGY L"
+      },
+      {
+        "ticker": "ASTERDM.NS",
+        "score": 4,
+        "fresh": [
+          "C&H",
+          "PIV@824.6"
+        ],
+        "conf": [
+          "CUP34.3%",
+          "HDL4.9%",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 53.1,
+        "adx": 18.3,
+        "vol_ratio": 0.85,
+        "minervini": 8,
+        "price": 822.15,
+        "cup_depth_pct": 34.3,
+        "cup_duration": 187,
+        "handle_depth_pct": 4.9,
+        "handle_duration": 13,
+        "pivot": 824.6,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "company": "ASTER DM QUALITY CARE LTD"
+      }
+    ],
+    "darvas_box": [],
+    "rs_line": [],
+    "vcp": [],
+    "williams_pct_r": [],
+    "bollinger_pctb": [],
+    "connors_r3": [],
+    "connors_tps": [],
+    "turtle_soup": [],
+    "raschke_8020": [],
+    "wyckoff_spring": [],
+    "weinstein_stage2": [],
+    "momentum_burst": [],
+    "ma50_reclaim": [
+      {
+        "ticker": "NETWEB.NS",
+        "score": 5,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
+          "M\u22656",
+          "TIGHT<3%"
+        ],
+        "minervini": 8,
+        "rsi": 55.0,
+        "adx": 13.9,
+        "price": 4524.0,
+        "vol_ratio": 4.51,
+        "dist_50sma": 0.99,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "NETWEB TECH INDIA LTD"
+      },
+      {
+        "ticker": "KIRLOSENG.NS",
+        "score": 5,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "ADX>15",
+          "M\u22656",
+          "TIGHT<3%"
+        ],
+        "minervini": 8,
+        "rsi": 32.1,
+        "adx": 21.7,
+        "price": 2189.8,
+        "vol_ratio": 1.3,
+        "dist_50sma": 2.26,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "KIRLOSKAR OIL ENG LTD"
+      },
+      {
+        "ticker": "RBLBANK.NS",
+        "score": 4,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 48.0,
+        "adx": 13.5,
+        "price": 378.05,
+        "vol_ratio": 2.05,
+        "dist_50sma": 4.37,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "RBL BANK LIMITED"
+      },
+      {
+        "ticker": "CGCL.NS",
+        "score": 4,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "ADX>15",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 31.0,
+        "adx": 51.9,
+        "price": 232.38,
+        "vol_ratio": 1.22,
+        "dist_50sma": 4.01,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "CAPRI GLOBAL CAPITAL LTD"
+      }
+    ],
+    "turnover_momentum": [],
+    "three_weeks_tight": [],
+    "episodic_pivot": [],
+    "combo_pp_ribbon": [],
+    "momentum": []
+  },
+  "sector_excess": {},
+  "spy_ret": 0.20258986920629174,
+  "elder_impulse_count": 5,
+  "market_regime": "NEUTRAL",
+  "india_mode": true
+}
