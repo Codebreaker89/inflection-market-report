@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-08-07",
+  "scan_date": "2026-08-09",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -40,14 +40,13 @@
       {
         "ticker": "ABCAPITAL.NS",
         "mkt": "US",
-        "score": 5,
+        "score": 4,
         "phase": "COIL",
         "coil_sigs": [
           "NearPiv",
           "ADXcurl",
           "RSIbase",
-          "RS~ok",
-          "RngTght"
+          "RS~ok"
         ],
         "break_sigs": [],
         "fresh": [
@@ -57,24 +56,22 @@
           "NearPiv",
           "ADXcurl",
           "RSIbase",
-          "RS~ok",
-          "RngTght"
+          "RS~ok"
         ],
         "minervini": 8,
-        "rsi": 61.3,
-        "adx": 18.7,
-        "price": 421.5,
-        "vol_ratio": 0.61,
-        "atr_ratio": 1.04,
-        "vol_5d_ratio": 1.41,
+        "rsi": 53.2,
+        "adx": 17.4,
+        "price": 408.05,
+        "vol_ratio": 1.2,
+        "atr_ratio": 1.07,
+        "vol_5d_ratio": 1.69,
         "pivot_high": 424.7,
-        "pct_from_piv": -0.8,
+        "pct_from_piv": -3.9,
         "strategy": "breakout",
-        "rs_vs_spy": 3.45,
         "company": "ADITYA BIRLA CAPITAL LTD."
       },
       {
-        "ticker": "CHENNPETRO.NS",
+        "ticker": "APOLLOHOSP.NS",
         "mkt": "US",
         "score": 4,
         "phase": "COIL",
@@ -95,19 +92,53 @@
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 60.5,
-        "adx": 26.3,
-        "price": 1238.3,
-        "vol_ratio": 0.58,
-        "atr_ratio": 1.16,
-        "vol_5d_ratio": 0.97,
-        "pivot_high": 1270.3,
-        "pct_from_piv": -2.5,
+        "rsi": 52.0,
+        "adx": 18.7,
+        "price": 8945.0,
+        "vol_ratio": 1.05,
+        "atr_ratio": 1.04,
+        "vol_5d_ratio": 1.13,
+        "pivot_high": 9050.0,
+        "pct_from_piv": -1.2,
         "strategy": "breakout",
-        "company": "CHENNAI PETROLEUM CORP LT"
+        "rs_vs_spy": -3.48,
+        "company": "APOLLO HOSPITALS ENTER. L"
       },
       {
-        "ticker": "HSCL.NS",
+        "ticker": "KARURVYSYA.NS",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "VOLdry",
+          "NearPiv",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "VOLdry",
+          "NearPiv",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 75.9,
+        "adx": 30.5,
+        "price": 335.55,
+        "vol_ratio": 0.11,
+        "atr_ratio": 0.95,
+        "vol_5d_ratio": 0.3,
+        "pivot_high": 348.1,
+        "pct_from_piv": -3.6,
+        "strategy": "breakout",
+        "company": "KARUR VYSYA BANK LTD"
+      },
+      {
+        "ticker": "OFSS.NS",
         "mkt": "US",
         "score": 4,
         "phase": "COIL",
@@ -128,22 +159,77 @@
           "RS~ok"
         ],
         "minervini": 8,
-        "rsi": 54.6,
-        "adx": 23.8,
-        "price": 761.0,
-        "vol_ratio": 0.28,
-        "atr_ratio": 1.05,
-        "vol_5d_ratio": 0.35,
-        "pivot_high": 790.45,
-        "pct_from_piv": -3.7,
+        "rsi": 53.3,
+        "adx": 18.8,
+        "price": 11805.0,
+        "vol_ratio": 0.41,
+        "atr_ratio": 1.09,
+        "vol_5d_ratio": 0.51,
+        "pivot_high": 11805.0,
+        "pct_from_piv": 0.0,
         "strategy": "breakout",
-        "rs_vs_spy": -7.63,
-        "company": "HIMADRI SPECIALITY CHEM L"
+        "company": "ORACLE FIN SERV SOFT LTD."
+      },
+      {
+        "ticker": "SYRMA.NS",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 61.2,
+        "adx": 25.6,
+        "price": 1424.7,
+        "vol_ratio": 0.37,
+        "atr_ratio": 1.08,
+        "vol_5d_ratio": 1.03,
+        "pivot_high": 1434.1,
+        "pct_from_piv": -0.7,
+        "strategy": "breakout",
+        "company": "SYRMA SGS TECHNOLOGY LTD"
       }
     ],
     "pocket_pivot": [
       {
-        "ticker": "APOLLOHOSP.NS",
+        "ticker": "ANANDRATHI.NS",
+        "mkt": "US",
+        "score": 5,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "RSI45-70",
+          "ADX\u2191",
+          "Near52H",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 54.1,
+        "adx": 27.4,
+        "price": 2101.5,
+        "vol_ratio": 0.97,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "rs_vs_spy": -2.22,
+        "company": "ANAND RATHI WEALTH LTD"
+      },
+      {
+        "ticker": "CARBORUNIV.NS",
         "mkt": "US",
         "score": 4,
         "fresh": [
@@ -151,48 +237,45 @@
         ],
         "conf": [
           "RSI45-70",
-          "Near52H",
-          "EMA9>21"
+          "ADX\u2191",
+          "VOL1.5x"
         ],
         "minervini": 8,
-        "rsi": 54.0,
-        "adx": 21.8,
-        "price": 8974.5,
-        "vol_ratio": 1.46,
+        "rsi": 53.5,
+        "adx": 18.2,
+        "price": 1097.0,
+        "vol_ratio": 3.32,
         "hold_days": 7,
         "strategy": "pocket_pivot",
-        "rs_vs_spy": -2.74,
-        "company": "APOLLO HOSPITALS ENTER. L"
+        "company": "CARBORUNDUM UNIVERSAL LTD"
       }
     ],
     "connors_rsi2": [
       {
-        "ticker": "EMCURE.NS",
+        "ticker": "VIJAYA.NS",
         "mkt": "US",
-        "score": 3,
+        "score": 2,
         "fresh": [
           "RSI2=0.0"
         ],
         "conf": [
           "RSI14>40",
-          "ADX>20",
           "Near52H"
         ],
         "minervini": 8,
-        "rsi": 65.5,
+        "rsi": 54.1,
         "rsi2": 0.0,
-        "adx": 30.2,
-        "price": 1936.7,
-        "vol_ratio": 1.82,
+        "adx": 18.0,
+        "price": 1351.1,
+        "vol_ratio": 2.99,
         "hold_days": 5,
         "strategy": "connors_rsi2",
-        "rs_vs_spy": -0.42,
-        "company": "EMCURE PHARMACEUTICALS L"
+        "company": "VIJAYA DIAGNOSTIC CEN LTD"
       }
     ],
     "ema_ribbon": [
       {
-        "ticker": "EMCURE.NS",
+        "ticker": "SAILIFE.NS",
         "mkt": "US",
         "score": 4,
         "fresh": [
@@ -205,183 +288,140 @@
           "ADX>25"
         ],
         "minervini": 8,
-        "rsi": 65.5,
-        "adx": 30.2,
-        "price": 1936.7,
-        "vol_ratio": 1.82,
+        "rsi": 61.6,
+        "adx": 32.5,
+        "price": 1365.2,
+        "vol_ratio": 2.11,
         "hold_days": 7,
         "strategy": "ema_ribbon",
-        "rs_vs_spy": -0.42,
-        "company": "EMCURE PHARMACEUTICALS L"
-      },
-      {
-        "ticker": "AUROPHARMA.NS",
-        "mkt": "US",
-        "score": 3,
-        "fresh": [
-          "EMA-RIBBON"
-        ],
-        "conf": [
-          "RSI50-70",
-          "MACD+",
-          "ADX>25"
-        ],
-        "minervini": 8,
-        "rsi": 56.7,
-        "adx": 26.1,
-        "price": 1588.9,
-        "vol_ratio": 1.33,
-        "hold_days": 7,
-        "strategy": "ema_ribbon",
-        "rs_vs_spy": 0.29,
-        "company": "AUROBINDO PHARMA LTD"
+        "company": "SAI LIFE SCIENCES LIMITED"
       }
     ],
     "nr7": [],
     "analyst_upgrade": [],
-    "signal_velocity": [
-      {
-        "ticker": "NAM-INDIA.NS",
-        "score": 11,
-        "fresh": [
-          "SV+8"
-        ],
-        "conf": [
-          "SCORE:9/15",
-          "VEL+8",
-          "VOL1.5x",
-          "ADX>20"
-        ],
-        "minervini": 8,
-        "rsi": 52.9,
-        "adx": 20.6,
-        "price": 1215.0,
-        "vol_ratio": 2.17,
-        "net_score": 9,
-        "velocity": 8,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "rs_vs_spy": null,
-        "company": "NIPPON L I A M LTD"
-      },
-      {
-        "ticker": "CPPLUS.NS",
-        "score": 9,
-        "fresh": [
-          "SV+7"
-        ],
-        "conf": [
-          "SCORE:8/15",
-          "ADX>20"
-        ],
-        "minervini": 6,
-        "rsi": 44.5,
-        "adx": 21.6,
-        "price": 3656.2,
-        "vol_ratio": 1.17,
-        "net_score": 8,
-        "velocity": 7,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "ADITYA INFOTECH LIMITED"
-      }
-    ],
+    "signal_velocity": [],
     "chokepoint_inflection": [],
     "defensive_rotation": [],
     "cup_handle": [
       {
-        "ticker": "APOLLOHOSP.NS",
+        "ticker": "CREDITACC.NS",
         "score": 5,
+        "fresh": [
+          "C&H",
+          "PIV@1558.2"
+        ],
+        "conf": [
+          "CUP29.7%",
+          "HDL2.2%",
+          "VOLdry",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 53.5,
+        "adx": 25.5,
+        "vol_ratio": 0.49,
+        "minervini": 8,
+        "price": 1523.6,
+        "cup_depth_pct": 29.7,
+        "cup_duration": 195,
+        "handle_depth_pct": 2.2,
+        "handle_duration": 5,
+        "pivot": 1558.2,
+        "vol_drying": true,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "company": "CREDITACCESS GRAMEEN LTD"
+      },
+      {
+        "ticker": "THELEELA.NS",
+        "score": 5,
+        "fresh": [
+          "C&H",
+          "PIV@518.0"
+        ],
+        "conf": [
+          "CUP22.4%",
+          "HDL3.5%",
+          "MACD+",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 64.7,
+        "adx": 23.9,
+        "vol_ratio": 0.95,
+        "minervini": 8,
+        "price": 518.0,
+        "cup_depth_pct": 22.4,
+        "cup_duration": 195,
+        "handle_depth_pct": 3.5,
+        "handle_duration": 5,
+        "pivot": 518.0,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "company": "LEELA PALACES HOTEL LTD"
+      },
+      {
+        "ticker": "ANANDRATHI.NS",
+        "score": 4,
+        "fresh": [
+          "C&H",
+          "PIV@2101.5"
+        ],
+        "conf": [
+          "CUP34.0%",
+          "HDL3.2%",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 54.1,
+        "adx": 27.4,
+        "vol_ratio": 0.97,
+        "minervini": 8,
+        "price": 2101.5,
+        "cup_depth_pct": 34.0,
+        "cup_duration": 195,
+        "handle_depth_pct": 3.2,
+        "handle_duration": 5,
+        "pivot": 2101.5,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "rs_vs_spy": -2.22,
+        "company": "ANAND RATHI WEALTH LTD"
+      },
+      {
+        "ticker": "APOLLOHOSP.NS",
+        "score": 4,
         "fresh": [
           "C&H",
           "PIV@9050.0"
         ],
         "conf": [
-          "CUP24.1%",
-          "HDL2.7%",
-          "VOLdry",
+          "CUP24.5%",
+          "HDL2.5%",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 54.0,
-        "adx": 21.8,
-        "vol_ratio": 1.46,
-        "minervini": 8,
-        "price": 8974.5,
-        "cup_depth_pct": 24.1,
-        "cup_duration": 190,
-        "handle_depth_pct": 2.7,
-        "handle_duration": 10,
-        "pivot": 9050.0,
-        "vol_drying": true,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "rs_vs_spy": -2.74,
-        "company": "APOLLO HOSPITALS ENTER. L"
-      },
-      {
-        "ticker": "ABCAPITAL.NS",
-        "score": 5,
-        "fresh": [
-          "C&H",
-          "PIV@424.7"
-        ],
-        "conf": [
-          "CUP28.7%",
-          "HDL7.2%",
-          "MACD+",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 61.3,
+        "rsi": 52.0,
         "adx": 18.7,
-        "vol_ratio": 0.61,
+        "vol_ratio": 1.05,
         "minervini": 8,
-        "price": 421.5,
-        "cup_depth_pct": 28.7,
+        "price": 8945.0,
+        "cup_depth_pct": 24.5,
         "cup_duration": 195,
-        "handle_depth_pct": 7.2,
+        "handle_depth_pct": 2.5,
         "handle_duration": 5,
-        "pivot": 424.7,
+        "pivot": 9050.0,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "rs_vs_spy": 3.45,
-        "company": "ADITYA BIRLA CAPITAL LTD."
-      },
-      {
-        "ticker": "RBLBANK.NS",
-        "score": 5,
-        "fresh": [
-          "C&H",
-          "PIV@389.8"
-        ],
-        "conf": [
-          "CUP24.2%",
-          "HDL4.8%",
-          "MACD+",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 62.5,
-        "adx": 16.7,
-        "vol_ratio": 1.07,
-        "minervini": 8,
-        "price": 389.8,
-        "cup_depth_pct": 24.2,
-        "cup_duration": 195,
-        "handle_depth_pct": 4.8,
-        "handle_duration": 5,
-        "pivot": 389.8,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "company": "RBL BANK LIMITED"
+        "rs_vs_spy": -3.48,
+        "company": "APOLLO HOSPITALS ENTER. L"
       }
     ],
     "darvas_box": [],
@@ -401,10 +441,10 @@
           "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 56.7,
-        "adx": 26.1,
-        "price": 1588.9,
-        "vol_ratio": 1.33,
+        "rsi": 64.5,
+        "adx": 27.8,
+        "price": 1658.0,
+        "vol_ratio": 2.0,
         "n_contractions": 3,
         "final_pct": 4.4,
         "base_high": 1636.8,
@@ -412,8 +452,34 @@
         "mkt": "US",
         "strategy": "vcp",
         "spy_regime": "BULL",
-        "rs_vs_spy": 0.29,
+        "rs_vs_spy": 2.39,
         "company": "AUROBINDO PHARMA LTD"
+      },
+      {
+        "ticker": "AARTIIND.NS",
+        "score": 4,
+        "fresh": [
+          "VCP-3C"
+        ],
+        "conf": [
+          "VolDry",
+          "NearPivot",
+          "RSI50-65",
+          "M\u22657"
+        ],
+        "minervini": 8,
+        "rsi": 53.6,
+        "adx": 16.1,
+        "price": 502.1,
+        "vol_ratio": 0.99,
+        "n_contractions": 3,
+        "final_pct": 7.04,
+        "base_high": 510.9,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "vcp",
+        "spy_regime": "BULL",
+        "company": "AARTI INDUSTRIES LTD"
       },
       {
         "ticker": "EMCURE.NS",
@@ -428,10 +494,10 @@
           "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 65.5,
-        "adx": 30.2,
-        "price": 1936.7,
-        "vol_ratio": 1.82,
+        "rsi": 65.6,
+        "adx": 32.2,
+        "price": 1978.4,
+        "vol_ratio": 0.92,
         "n_contractions": 3,
         "final_pct": 4.08,
         "base_high": 1840.0,
@@ -439,35 +505,7 @@
         "mkt": "US",
         "strategy": "vcp",
         "spy_regime": "BULL",
-        "rs_vs_spy": -0.42,
         "company": "EMCURE PHARMACEUTICALS L"
-      },
-      {
-        "ticker": "HSCL.NS",
-        "score": 4,
-        "fresh": [
-          "VCP-3C"
-        ],
-        "conf": [
-          "TightFinal",
-          "VolDry",
-          "RSI50-65",
-          "M\u22657"
-        ],
-        "minervini": 8,
-        "rsi": 54.6,
-        "adx": 23.8,
-        "price": 761.0,
-        "vol_ratio": 0.28,
-        "n_contractions": 3,
-        "final_pct": 5.97,
-        "base_high": 819.5,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "vcp",
-        "spy_regime": "BULL",
-        "rs_vs_spy": -7.63,
-        "company": "HIMADRI SPECIALITY CHEM L"
       },
       {
         "ticker": "MINDACORP.NS",
@@ -482,10 +520,10 @@
           "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 67.5,
-        "adx": 28.7,
-        "price": 723.0,
-        "vol_ratio": 0.99,
+        "rsi": 65.7,
+        "adx": 28.9,
+        "price": 721.65,
+        "vol_ratio": 0.94,
         "n_contractions": 3,
         "final_pct": 4.05,
         "base_high": 711.5,
@@ -507,10 +545,10 @@
           "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 70.9,
-        "adx": 19.1,
-        "price": 308.6,
-        "vol_ratio": 2.38,
+        "rsi": 68.0,
+        "adx": 20.3,
+        "price": 304.75,
+        "vol_ratio": 4.68,
         "n_contractions": 3,
         "final_pct": 4.09,
         "base_high": 330.0,
@@ -518,6 +556,7 @@
         "mkt": "US",
         "strategy": "vcp",
         "spy_regime": "BULL",
+        "rs_vs_spy": 2.76,
         "company": "SHIPPING CORP OF INDIA LT"
       }
     ],
@@ -526,13 +565,82 @@
     "connors_r3": [],
     "connors_tps": [],
     "turtle_soup": [],
-    "raschke_8020": [],
+    "raschke_8020": [
+      {
+        "ticker": "AUROPHARMA.NS",
+        "strategy": "raschke_8020",
+        "score": 4,
+        "conf": [
+          "StrongClose",
+          "VolAboveAvg",
+          "ADX16-35",
+          "M>=5"
+        ],
+        "minervini": 8,
+        "rsi": 64.5,
+        "adx": 27.8,
+        "price": 1658.0,
+        "vol_ratio": 2.0,
+        "yest_high": 1634.4,
+        "hold_days": 2,
+        "mkt": "US",
+        "rs_vs_spy": 2.39,
+        "company": "AUROBINDO PHARMA LTD"
+      }
+    ],
     "wyckoff_spring": [],
     "weinstein_stage2": [],
-    "momentum_burst": [],
+    "momentum_burst": [
+      {
+        "ticker": "MOTHERSON.NS",
+        "score": 4,
+        "fresh": [
+          "BURST"
+        ],
+        "conf": [
+          "BURST\u22654%",
+          "VOL\u22651.5x",
+          "TI\u22651.03",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 79.7,
+        "adx": 19.6,
+        "price": 168.5,
+        "vol_ratio": 5.22,
+        "burst_pct": 8.71,
+        "hold_days": 5,
+        "mkt": "US",
+        "company": "SAMVRDHNA MTHRSN INTL LTD"
+      },
+      {
+        "ticker": "AUROPHARMA.NS",
+        "score": 5,
+        "fresh": [
+          "BURST"
+        ],
+        "conf": [
+          "BURST\u22654%",
+          "VOL\u22651.5x",
+          "TI\u22651.03",
+          "M\u22656",
+          "RSI50-70"
+        ],
+        "minervini": 8,
+        "rsi": 64.5,
+        "adx": 27.8,
+        "price": 1658.0,
+        "vol_ratio": 2.0,
+        "burst_pct": 4.35,
+        "hold_days": 5,
+        "mkt": "US",
+        "rs_vs_spy": 2.39,
+        "company": "AUROBINDO PHARMA LTD"
+      }
+    ],
     "ma50_reclaim": [
       {
-        "ticker": "NAM-INDIA.NS",
+        "ticker": "ENRIN.NS",
         "score": 5,
         "fresh": [
           "50SMA_RECLAIM"
@@ -545,18 +653,17 @@
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 52.9,
-        "adx": 20.6,
-        "price": 1215.0,
-        "vol_ratio": 2.17,
-        "dist_50sma": 6.1,
+        "rsi": 63.2,
+        "adx": 23.1,
+        "price": 3648.8,
+        "vol_ratio": 10.39,
+        "dist_50sma": 4.52,
         "hold_days": 7,
         "mkt": "US",
-        "rs_vs_spy": null,
-        "company": "NIPPON L I A M LTD"
+        "company": "SIEMENS ENERGY INDIA LTD"
       },
       {
-        "ticker": "PNBHOUSING.NS",
+        "ticker": "GRASIM.NS",
         "score": 5,
         "fresh": [
           "50SMA_RECLAIM"
@@ -569,17 +676,40 @@
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 61.8,
-        "adx": 17.8,
-        "price": 1150.0,
-        "vol_ratio": 1.87,
-        "dist_50sma": 10.32,
+        "rsi": 64.5,
+        "adx": 17.7,
+        "price": 3323.0,
+        "vol_ratio": 2.03,
+        "dist_50sma": 6.22,
         "hold_days": 7,
         "mkt": "US",
-        "company": "PNB HOUSING FIN LTD."
+        "company": "GRASIM INDUSTRIES LTD"
       },
       {
-        "ticker": "NETWEB.NS",
+        "ticker": "NAVINFLUOR.NS",
+        "score": 5,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
+          "ADX>15",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 57.4,
+        "adx": 20.9,
+        "price": 8271.0,
+        "vol_ratio": 1.75,
+        "dist_50sma": 10.18,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "NAVIN FLUORINE INT. LTD"
+      },
+      {
+        "ticker": "SCI.NS",
         "score": 4,
         "fresh": [
           "50SMA_RECLAIM"
@@ -591,46 +721,25 @@
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 69.5,
-        "adx": 16.9,
-        "price": 4893.8,
-        "vol_ratio": 1.63,
-        "dist_50sma": 8.05,
+        "rsi": 68.0,
+        "adx": 20.3,
+        "price": 304.75,
+        "vol_ratio": 4.68,
+        "dist_50sma": 3.19,
         "hold_days": 7,
         "mkt": "US",
-        "company": "NETWEB TECH INDIA LTD"
+        "rs_vs_spy": 2.76,
+        "company": "SHIPPING CORP OF INDIA LT"
       }
     ],
     "turnover_momentum": [],
-    "three_weeks_tight": [
-      {
-        "ticker": "KARURVYSYA.NS",
-        "mkt": "US",
-        "score": 2,
-        "fresh": [
-          "3WT"
-        ],
-        "conf": [
-          "VOL_DECLINING",
-          "NEAR_52H"
-        ],
-        "minervini": 8,
-        "rsi": 69.3,
-        "adx": 30.9,
-        "price": 337.5,
-        "vol_ratio": 0.23,
-        "spread_pct": 1.47,
-        "hold_days": 7,
-        "strategy": "three_weeks_tight",
-        "company": "KARUR VYSYA BANK LTD"
-      }
-    ],
+    "three_weeks_tight": [],
     "episodic_pivot": [],
     "combo_pp_ribbon": [],
     "momentum": []
   },
   "sector_excess": {},
-  "spy_ret": 3.2107802525685827,
+  "spy_ret": 3.3794168001897287,
   "elder_impulse_count": 18,
   "market_regime": "BULL",
   "india_mode": true
