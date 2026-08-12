@@ -32,6 +32,71 @@ except ImportError:
 HERE       = Path(__file__).parent
 TRADES_CSV = HERE / "trades.csv"
 
+
+# ── Bad-price-print detection ────────────────────────────────────────────────
+# scan_history.csv occasionally records an implausible price (a bad yfinance
+# tick), which then produces a fake ±70% "return". The old defence was a blunt
+# `abs(ret) > 15` filter, but that also discarded ~50 REAL large moves and
+# systematically flattered the stats: it censored big losses from strategies
+# like vcp (+2.39% -> -0.29% once they are counted) and three_weeks_tight
+# (+1.76% -> +0.02%). We now drop only rows whose *price* is implausible,
+# judged against that ticker's own median observed price.
+_SUSPECT_KEYS: Optional[set] = None
+_SUSPECT_RATIO_HI = 2.0
+_SUSPECT_RATIO_LO = 0.5
+
+
+def _load_suspect_price_keys() -> set:
+    """Return {(scan_date, ticker, strategy)} for rows with a bad price print."""
+    global _SUSPECT_KEYS
+    if _SUSPECT_KEYS is not None:
+        return _SUSPECT_KEYS
+    _SUSPECT_KEYS = set()
+    path = HERE / "scan_history.csv"
+    if not path.exists():
+        return _SUSPECT_KEYS
+    try:
+        from collections import defaultdict as _dd
+        rows_by_ticker = _dd(list)
+        with open(path, newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                t = (row.get("ticker") or "").strip()
+                if t:
+                    rows_by_ticker[t].append(row)
+
+        def _f(v):
+            try:
+                x = float(v)
+                return x if x > 0 else None
+            except (TypeError, ValueError):
+                return None
+
+        for t, rows in rows_by_ticker.items():
+            obs = [x for r in rows
+                   for x in (_f(r.get("price_at_scan")), _f(r.get("price_d5")), _f(r.get("price_d10")))
+                   if x is not None]
+            if len(obs) < 4:
+                continue
+            obs.sort()
+            med = obs[len(obs) // 2]
+            if med <= 0:
+                continue
+            for r in rows:
+                for col in ("price_at_scan", "price_d5", "price_d10"):
+                    v = _f(r.get(col))
+                    if v is not None and (v / med > _SUSPECT_RATIO_HI or v / med < _SUSPECT_RATIO_LO):
+                        _SUSPECT_KEYS.add((r.get("scan_date", ""), t, r.get("strategy", "")))
+                        break
+    except Exception:
+        pass
+    return _SUSPECT_KEYS
+
+
+def _is_suspect_row(row: dict) -> bool:
+    """True if this scan_history row has an implausible price print."""
+    return (row.get("scan_date", ""), (row.get("ticker") or "").strip(),
+            row.get("strategy", "")) in _load_suspect_price_keys()
+
 # ── Config ────────────────────────────────────────────────────────────────────
 try:
     from config import (GMAIL_USER, GMAIL_APP_PASSWORD, NOTIFY_TO,
@@ -348,7 +413,7 @@ def _strat_badge(strat: str) -> str:
     fg, bg = _STRAT_COLORS.get(key, ("#333", "#eee"))
     return (f'<span style="background:{bg};color:{fg};border-radius:3px;'
             f'padding:2px 6px;font-size:10px;font-weight:700;'
-            f'letter-spacing:.04em;white-space:nowrap;">{strat.upper()}</span>')
+            f'letter-spacing:.04em;white-space:nowrap;">{_strat_short(key)}</span>')
 
 def _trade_badge(tt: str) -> str:
     if tt == "real":
@@ -394,10 +459,145 @@ def _kpi_table(items: list[tuple]) -> str:
     return (f'<table cellpadding="0" cellspacing="0" style="margin:10px 0 14px;">'
             f'<tr>{cells}</tr></table>')
 
-_CCY_SYM = {"USD": "$", "GBP": "£", "EUR": "€", "CAD": "CA$"}
+_CCY_SYM = {"USD": "$", "GBP": "£", "EUR": "€", "CAD": "CA$",
+            "INR": "₹", "CHF": "CHF ", "SEK": "kr", "DKK": "kr", "NOK": "kr"}
 
 def _ccy_sym(ccy: str) -> str:
     return _CCY_SYM.get(ccy, ccy + " ")
+
+
+# ── Ticker → currency, for scanner rows (which carry no currency field) ───────
+# Scanner results only have a ticker, so prices were being printed with a
+# hardcoded "$" — showing Indian stocks as "$1121.00" and London stocks as
+# "$6335.00" (which is also pence, not pounds).
+_SUFFIX_CCY = {
+    ".L": "GBP", ".DE": "EUR", ".PA": "EUR", ".AS": "EUR", ".BR": "EUR",
+    ".MI": "EUR", ".MC": "EUR", ".LS": "EUR", ".VI": "EUR", ".HE": "EUR",
+    ".IR": "EUR", ".TO": "CAD", ".V": "CAD", ".NS": "INR", ".BO": "INR",
+    ".SW": "CHF", ".ST": "SEK", ".CO": "DKK", ".OL": "NOK",
+}
+
+
+def _ticker_ccy(ticker: str) -> str:
+    """Infer trading currency from the ticker suffix. Defaults to USD."""
+    for sfx, ccy in _SUFFIX_CCY.items():
+        if (ticker or "").endswith(sfx):
+            return ccy
+    return "USD"
+
+
+def _fmt_price(ticker: str, value) -> str:
+    """Format a scanner price with the right currency unit.
+
+    London quotes arrive from yfinance in pence, so .L values are suffixed "p"
+    rather than divided by 100 — pence is how the LSE actually quotes, and
+    labelling the unit cannot be wrong the way a conversion can. Everything
+    else gets its currency symbol from the ticker suffix.
+    """
+    if value in (None, "") or value != value:      # None / NaN
+        return "─"
+    try:
+        v = float(value)
+    except (TypeError, ValueError):
+        return "─"
+    ccy = _ticker_ccy(ticker)
+    dec = 0 if abs(v) >= 1000 else 2               # ₹36,050 not ₹36050.00
+    if ccy == "GBP":
+        return f"{v:,.{dec}f}p"                    # LSE quotes in pence
+    return f"{_ccy_sym(ccy)}{v:,.{dec}f}"
+
+
+# ── Canonical strategy display names ─────────────────────────────────────────
+# Previously each render site did s.replace("_"," ").title(), which produced
+# "Vcp", "Nr7", "Ema Ribbon", "Ma50 Reclaim", "Bb Squeeze" and "Connors Rsi2".
+# One map, used everywhere.
+STRAT_LABEL = {
+    "pocket_pivot": "Pocket Pivot",     "ema_ribbon": "EMA Ribbon",
+    "cup_handle": "Cup Handle",         "connors_rsi2": "Connors RSI2",
+    "signal_velocity": "Signal Velocity", "breakout": "Breakout",
+    "vcp": "VCP",                       "nr7": "NR7",
+    "wyckoff_spring": "Wyckoff Spring", "darvas_box": "Darvas Box",
+    "raschke_8020": "Raschke 80/20",    "high_tight_flag": "High Tight Flag",
+    "stage4_short": "Stage-4 Short",    "connors_3down": "Connors 3↓",
+    "holy_grail": "Holy Grail",         "weinstein_stage2": "Weinstein Stage-2",
+    "defensive_rotation": "Def. Rotation", "rs_line": "RS Line",
+    "williams_pct_r": "Williams %R",    "bollinger_pctb": "BB %B",
+    "turnover_momentum": "Turnover Mom.", "elder_impulse": "Elder Impulse",
+    "ma50_reclaim": "MA50 Reclaim",     "momentum_burst": "Momentum Burst",
+    "analyst_upgrade": "Analyst Upgrade", "bb_squeeze": "BB Squeeze",
+    "connors_r3": "Connors R3",         "momentum": "Momentum",
+    "power_earnings_gap": "Power Earnings Gap",
+    "three_weeks_tight": "3-Weeks-Tight", "episodic_pivot": "Episodic Pivot",
+    "combo_pp_ribbon": "Combo PP+Ribbon",
+}
+
+# Compact forms for narrow table cells and chips
+STRAT_SHORT = {
+    "pocket_pivot": "POCKET PIVOT",    "ema_ribbon": "EMA RIBBON",
+    "cup_handle": "CUP & HANDLE",      "connors_rsi2": "CONNORS RSI2",
+    "signal_velocity": "SIGNAL VEL.",  "breakout": "BREAKOUT",
+    "vcp": "VCP",                      "nr7": "NR7",
+    "wyckoff_spring": "WYCKOFF",       "darvas_box": "DARVAS",
+    "raschke_8020": "RASCHKE 80/20",   "high_tight_flag": "HTF",
+    "stage4_short": "STAGE-4 SHORT",   "connors_3down": "CONNORS 3↓",
+    "holy_grail": "HOLY GRAIL",        "weinstein_stage2": "WEINSTEIN S2",
+    "defensive_rotation": "DEF. ROT.", "rs_line": "RS LINE",
+    "williams_pct_r": "WILLIAMS %R",   "bollinger_pctb": "BB %B",
+    "turnover_momentum": "TURNOVER",   "elder_impulse": "ELDER IMPULSE",
+    "ma50_reclaim": "MA50 RECLAIM",    "momentum_burst": "MOM. BURST",
+    "analyst_upgrade": "ANALYST UPG.", "bb_squeeze": "BB SQUEEZE",
+    "connors_r3": "CONNORS R3",        "momentum": "MOMENTUM",
+    "power_earnings_gap": "POWER EPS GAP",
+    "three_weeks_tight": "3-WEEKS-TIGHT", "episodic_pivot": "EPISODIC PIVOT",
+    "combo_pp_ribbon": "COMBO PP+RIB",
+}
+
+
+# Ultra-compact codes for the cross-strategy matrix, which needs one narrow
+# column per strategy. Slicing to 6 chars produced unreadable stubs like
+# "MA50_R", "THREE_", "EPISOD", "COMBO_", "WYCKOF", "WEINST", "TURNOV".
+_MATRIX_ABBR = {
+    "three_weeks_tight": "3WT",   "episodic_pivot": "EPIV",
+    "combo_pp_ribbon": "COMBO",   "wyckoff_spring": "WYCK",
+    "weinstein_stage2": "WEIN",   "ma50_reclaim": "MA50",
+    "turnover_momentum": "TURN",  "momentum_burst": "BURST",
+    "momentum": "MNTM",           "elder_impulse": "ELDER",
+    "connors_rsi2": "RSI2",       "connors_3down": "C3DN",
+    "connors_r3": "CR3",          "raschke_8020": "R8020",
+    "holy_grail": "HGRL",         "williams_pct_r": "WM%R",
+    "bollinger_pctb": "BB%B",     "bb_squeeze": "BBSQ",
+    "rs_line": "RSLN",            "darvas_box": "DRVS",
+    "vcp": "VCP",                 "nr7": "NR7",
+    "ema_ribbon": "RIBBON",       "pocket_pivot": "PP",
+    "connors_tps": "CTPS",        "turtle_soup": "TSOUP",
+    "signal_velocity": "SVEL",    "high_tight_flag": "HTF",
+    "analyst_upgrade": "UPGRD",   "defensive_rotation": "DEFR",
+    "power_earnings_gap": "PEG",  "stage4_short": "S4SH",
+    "cup_handle": "C&H",          "breakout": "BREAK",
+}
+
+
+def _strat_label(s: str) -> str:
+    """Human-readable strategy name — never Title-cases an acronym."""
+    return STRAT_LABEL.get(s, (s or "").replace("_", " ").title())
+
+
+def _strat_short(s: str) -> str:
+    """Compact upper-case strategy name for chips and narrow cells."""
+    return STRAT_SHORT.get(s, (s or "").replace("_", " ").upper())
+
+
+def _company_label(r: dict, maxlen: int = 22) -> str:
+    """Company name, blank when it is just the ticker echoed back.
+
+    The name cache falls back to the ticker when yfinance has no name, which
+    rendered as "AMZN AMZN" / a duplicated ticker under the card headline.
+    """
+    co = str(r.get("company") or "").strip()
+    tk = str(r.get("ticker") or "").strip()
+    if not co or co.upper() == tk.upper():
+        return ""
+    return co[:maxlen]
 
 def _sl_eur_str(t: dict) -> str:
     if not t.get("stop_loss_price"):
@@ -411,14 +611,29 @@ def _sl_eur_str(t: dict) -> str:
         return str(t.get("stop_loss_price", "─"))
 
 def _portfolio_table(results_slice: list, alert_tickers: set) -> str:
+    """Open-positions table.
+
+    Consolidated from 16 columns to 9. At 16 the table could not fit an email
+    client's width, so every cell wrapped and company names broke mid-word
+    ("Air Products and Chemi" spread over three lines). Related fields are now
+    stacked two-per-cell instead of each taking its own column:
+        Ticker + company + type   →  Position
+        Entry + target dates      →  Dates      (held / remaining underneath)
+        Buy + current price       →  Buy → Now
+        Qty + invested            →  Size
+    """
     thead = ('<table width="100%" cellpadding="0" cellspacing="0" '
              f'style="border-collapse:collapse;font-size:12px;{_FONT}">'
              '<thead><tr>'
-             + _th("Ticker", "left") + _th("Company", "left") + _th("Type", "left")
-             + _th("Strategy", "left") + _th("Entry") + _th("Exit→", title="Target exit date")
-             + _th("Held", title="Calendar days held") + _th("Rem", title="Days to target exit")
-             + _th("Buy") + _th("Now") + _th("Qty") + _th("Inv€")
-             + _th("Ret%") + _th("P&L€") + _th("R", title="Current R-multiple (1R = initial risk)") + _th("SL", title="Stop-loss price (native currency)")
+             + _th("Position", "left")
+             + _th("Strategy", "left")
+             + _th("Dates", "left", title="Entry date → target exit date; days held / days remaining")
+             + _th("Buy → Now", title="Entry price → current price (native currency)")
+             + _th("Size", title="Quantity and amount invested")
+             + _th("Ret%")
+             + _th("P&L€")
+             + _th("R", title="Current R-multiple (1R = initial risk)")
+             + _th("SL", title="Stop-loss price (native currency)")
              + '</tr></thead><tbody>')
     rows = ""
     for i, (t, r) in enumerate(results_slice):
@@ -440,25 +655,50 @@ def _portfolio_table(results_slice: list, alert_tickers: set) -> str:
         except Exception:
             rem_c = _C_DIM; days_rem_s = "─"
 
-        # Ticker cell — highlight if alerted
+        # ── Position: ticker + company + type badge, stacked ──────────────────
         tick_color = _C_NEG if has_alert else _C_BODY
+        _co = _company_label(t, 26)
+        _pos_cell = (
+            f'<div style="white-space:nowrap;">'
+            f'<b style="color:{tick_color};font-size:13px;">{t["ticker"]}</b> '
+            f'{_trade_badge(t.get("trade_type","practice"))}</div>'
+            + (f'<div style="font-size:10px;color:{_C_DIM};margin-top:1px;">{_co}</div>' if _co else "")
+        )
         rows += f"<tr>"
-        rows += _td(f'<b style="color:{tick_color}">{t["ticker"]}</b>', "left", bg=bg)
-        rows += _td(str(t.get("company",""))[:22], "left", _C_DIM, bg=bg)
-        rows += _td(_trade_badge(t.get("trade_type","practice")), "left", bg=bg)
-        rows += _td(_strat_badge(t.get("strategy","")), "left", bg=bg)
-        rows += _td(t["entry_date"], "right", _C_DIM, bg=bg)
-        rows += _td(target or "─", "right", _C_DIM, bg=bg)
-        rows += _td(days_held, "right", _C_DIM, bg=bg)
-        rows += _td(days_rem_s, "right", rem_c, bg=bg)
-        _buy_sym = _ccy_sym(t.get("currency", "EUR"))
-        _buy_px  = float(t["buy_price"]) if t.get("buy_price") else None
-        rows += _td(f'{_buy_sym}{_buy_px:.2f}' if _buy_px else "─", "right", _C_DIM, bg=bg)
-        _now_sym = _ccy_sym(t.get("currency", "EUR"))
-        _now_px  = r.get("curr_native")
-        rows += _td(f'{_now_sym}{_now_px:.2f}' if _now_px else "─", "right", _C_BODY, bg=bg)
-        rows += _td(f'{float(t["qty"]):.0f}', "right", _C_DIM, bg=bg)
-        rows += _td(f'€{float(t["investment_eur"]):.0f}', "right", _C_DIM, bg=bg)
+        rows += _td(_pos_cell, "left", bg=bg)
+        rows += _td(_strat_badge(t.get("strategy","")), "left", bg=bg, extra="white-space:nowrap;")
+
+        # ── Dates: entry → target on line 1, held / remaining on line 2 ───────
+        _dates_cell = (
+            f'<div style="white-space:nowrap;font-size:11px;color:{_C_DIM};">'
+            f'{t["entry_date"]} → {target or "─"}</div>'
+            f'<div style="white-space:nowrap;font-size:10px;color:{_C_DIM};margin-top:1px;">'
+            f'held {days_held} &nbsp;·&nbsp; <span style="color:{rem_c};font-weight:700;">'
+            f'{days_rem_s} left</span></div>'
+        )
+        rows += _td(_dates_cell, "left", bg=bg)
+
+        # ── Buy → Now, one cell ───────────────────────────────────────────────
+        _sym    = _ccy_sym(t.get("currency", "EUR"))
+        _buy_px = float(t["buy_price"]) if t.get("buy_price") else None
+        _now_px = r.get("curr_native")
+        _px_cell = (
+            f'<div style="white-space:nowrap;">'
+            f'<span style="color:{_C_DIM};">{f"{_sym}{_buy_px:,.2f}" if _buy_px else "─"}</span>'
+            f'<span style="color:{_C_DIM};"> → </span>'
+            f'<b style="color:{_C_BODY};">{f"{_sym}{_now_px:,.2f}" if _now_px else "─"}</b>'
+            f'</div>'
+        )
+        rows += _td(_px_cell, "right", bg=bg)
+
+        # ── Size: qty on line 1, invested on line 2 ───────────────────────────
+        _size_cell = (
+            f'<div style="white-space:nowrap;font-size:11px;color:{_C_BODY};">'
+            f'{float(t["qty"]):.4g}</div>'
+            f'<div style="white-space:nowrap;font-size:10px;color:{_C_DIM};">'
+            f'€{float(t["investment_eur"]):,.0f}</div>'
+        )
+        rows += _td(_size_cell, "right", bg=bg)
         rows += _td(_pct(r["ret_pct"]), "right", ret_c, bold=True, bg=bg)
         rows += _td(_eur(r["pnl_eur"]), "right", pnl_c, bold=True, bg=bg)
         # R-multiple cell — colour coded: green ≥1R, orange ≥0, red <0
@@ -518,11 +758,14 @@ def _build_matrix_html() -> str:
 
     # header
     th_row = (_th("Str", "center") + _th("Ticker", "left") + _th("Company", "left")
-              + "".join(_th(col_labels.get(s, s[:6].upper()), "center", title=s) for s in strategies))
+              + "".join(_th(col_labels.get(s) or _MATRIX_ABBR.get(s) or _strat_short(s),
+                            "center", title=_strat_label(s)) for s in strategies))
     rows = ""
     multi_count = 0
     for i, (ticker, strat_map) in enumerate(sorted_t[:50]):
-        company = next((r.get("company","") or "" for r in strat_map.values()), "")
+        company = next((_company_label({**r, "ticker": ticker}, 28)
+                        for r in strat_map.values()
+                        if _company_label({**r, "ticker": ticker}, 28)), "")
         passes  = len(strat_map)
         multi   = passes > 1
         if multi: multi_count += 1
@@ -531,7 +774,7 @@ def _build_matrix_html() -> str:
         rows += "<tr>"
         rows += _td(str(passes), "center", _C_DIM if not multi else _C_NEG, bg=bg)
         rows += _td(f'<b style="color:{tc}">{ticker}</b>', "left", bg=bg)
-        rows += _td(company[:28], "left", _C_DIM if not multi else _C_NEG, bg=bg)
+        rows += _td(company or "─", "left", _C_DIM if not multi else _C_NEG, bg=bg)
         for s in strategies:
             if s in strat_map:
                 r   = strat_map[s]
@@ -620,7 +863,7 @@ def _load_regime_characters() -> dict:
                 if not row.get("ret_d5") or not row.get("spy_ret_d5"): continue
                 try:
                     ret = float(row["ret_d5"]); spy = float(row["spy_ret_d5"])
-                    if _math.isnan(ret) or abs(ret) > 15: continue
+                    if _math.isnan(ret) or _is_suspect_row(row): continue
                     s = row["strategy"]
                     if spy <= -1:   strats[s]["bear"].append(ret)
                     elif spy >= 1:  strats[s]["bull"].append(ret)
@@ -681,7 +924,7 @@ def _build_regime_map_html() -> str:
                 try:
                     ret = float(row["ret_d5"])
                     spy = float(row["spy_ret_d5"])
-                    if _math.isnan(ret) or abs(ret) > 15: continue
+                    if _math.isnan(ret) or _is_suspect_row(row): continue
                     s = row["strategy"]
                     if spy <= -1:        strats[s]["bear"].append(ret)
                     elif spy >= 1:       strats[s]["bull"].append(ret)
@@ -706,17 +949,6 @@ def _build_regime_map_html() -> str:
                 f'font-weight:700;color:{col};">{wr:.0f}%<span style="font-size:9px;color:{col};'
                 f'opacity:0.7;font-weight:400;"> n={n}</span></td>')
 
-    STRAT_ALIAS = {
-        "pocket_pivot":"Pocket Pivot","ema_ribbon":"EMA Ribbon","cup_handle":"Cup Handle",
-        "connors_rsi2":"Connors RSI2","signal_velocity":"Signal Velocity","breakout":"Breakout",
-        "vcp":"VCP","nr7":"NR7","wyckoff_spring":"Wyckoff Spring","darvas_box":"Darvas Box",
-        "raschke_8020":"Raschke 80/20","high_tight_flag":"High Tight Flag","stage4_short":"Stage4 Short",
-        "connors_3down":"Connors 3↓","holy_grail":"Holy Grail","weinstein_stage2":"Weinstein S2",
-        "defensive_rotation":"Def. Rotation","rs_line":"RS Line","williams_pct_r":"Williams %R",
-        "bollinger_pctb":"BB %B","turnover_momentum":"Turnover Mom.","elder_impulse":"Elder Impulse",
-        "ma50_reclaim":"MA50 Reclaim","momentum_burst":"Mom. Burst","analyst_upgrade":"Analyst Upg.",
-    }
-
     def _label(bull_wr, bear_wr, neut_wr):
         if bull_wr is None or bear_wr is None:
             if neut_wr and neut_wr >= 60: return ("📈", "Momentum", "#818cf8")
@@ -737,6 +969,12 @@ def _build_regime_map_html() -> str:
         bull_wr = _wr(d["bull"])
         bear_wr = _wr(d["bear"])
         neut_wr = _wr(d["neut"])
+        # The point of this grid is regime *comparison*. A row with only one
+        # populated cell (e.g. "Elder Impulse ─ 53% ─ ─") says nothing about
+        # regime dependence and got no Character label either — it was pure
+        # visual noise. Require at least two regimes to compare.
+        if sum(x is not None for x in (bull_wr, bear_wr, neut_wr)) < 2:
+            continue
         icon, lbl, lcol = _label(bull_wr, bear_wr, neut_wr)
         rows_data.append((s, d, bull_wr, bear_wr, neut_wr, icon, lbl, lcol, n))
 
@@ -747,7 +985,7 @@ def _build_regime_map_html() -> str:
     rows_html = ""
     for i, (s, d, bull_wr, bear_wr, neut_wr, icon, lbl, lcol, n) in enumerate(rows_data):
         bg = _C_ROW1 if i % 2 else _C_ROW0
-        name = STRAT_ALIAS.get(s, s.replace("_", " ").title())
+        name = _strat_label(s)
         rows_html += (
             f'<tr style="background:{bg};">'
             f'<td style="padding:6px 10px;font-size:12px;font-weight:600;color:{_C_BODY};white-space:nowrap;">{name}</td>'
@@ -797,7 +1035,7 @@ def _load_strategy_stats() -> dict:
                     continue
                 try:
                     ret = float(row["ret_d5"])
-                    if _math.isnan(ret) or abs(ret) > 15:
+                    if _math.isnan(ret) or _is_suspect_row(row):
                         continue
                     stats[strat]["total"] += 1
                     stats[strat]["sum"]   += ret
@@ -1000,7 +1238,7 @@ def _build_strategy_performance_html() -> str:
     rows_html = ""
     for i, (s, n, wr, avg) in enumerate(data):
         bg = "#0d1f12" if i % 2 == 0 else "#111827"
-        name = STRAT_ALIAS.get(s, s.replace("_"," ").title())
+        name = _strat_label(s)
         wr_c  = _wr_col(wr)
         avg_c = _avg_col(avg)
         bar_w = int(wr * 0.6)  # scale to max ~60px for 100%
@@ -1131,6 +1369,19 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
         "XLY":"Consumer Cyclical","XLP":"Consumer Defensive","XLB":"Basic Materials",
         "XLE":"Energy","XLC":"Communication Services","XLU":"Utilities","XLRE":"Real Estate",
     }
+    # Explicit abbreviations. Slicing the full name to 6 chars collided:
+    # "Consumer Cyclical" and "Consumer Defensive" both became "Consum", so the
+    # same label appeared in HOT and COLD in the same digest.
+    _SECTOR_ABBR = {
+        "Technology":"Tech", "Industrials":"Industrial", "Healthcare":"Health",
+        "Financial Services":"Financials", "Consumer Cyclical":"Cons Cyc",
+        "Consumer Defensive":"Cons Def", "Basic Materials":"Materials",
+        "Energy":"Energy", "Communication Services":"Comms",
+        "Utilities":"Utilities", "Real Estate":"Real Est",
+    }
+
+    def _sector_abbr(name: str) -> str:
+        return _SECTOR_ABBR.get(name, (name or "")[:10])
 
     def _email_rank_score(r: dict, strats_fired: list, persistence: dict) -> float:
         """Mirror of scan.py _rank_score — keep in sync."""
@@ -1244,7 +1495,7 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
             sign = "+" if ex >= 0 else ""
             return (f'<span style="background:{bg};color:{col};border-radius:3px;'
                     f'padding:2px 7px;font-size:10px;font-weight:700;margin-right:4px;">'
-                    f'{sector_name[:6]} {sign}{ex:.1f}%</span>')
+                    f'{_sector_abbr(sector_name)} {sign}{ex:.1f}%</span>')
 
         top_chips = "".join(_sec_chip(e, x) for e, x in top3)
         bot_chips = "".join(_sec_chip(e, x) for e, x in bot3)
@@ -1319,14 +1570,14 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
                 f'<span style="background:{"#052e16" if s in _PROVEN_EDGE_SET else "#1c1c2e"};'
                 f'color:{"#4ade80" if s in _PROVEN_EDGE_SET else "#a5b4fc"};'
                 f'border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">'
-                f'{s.replace("_"," ").upper()}'
+                f'{_strat_short(s)}'
                 f'{" " + str(int(hist_stats[s]["wr"])) + "%" if hist_stats.get(s, {}).get("n", 0) >= 5 else ""}'
                 f'</span>'
                 for s in strats_fired[:4]
             ) + _regime_badge(strat)
-            price_s  = f'${r["price"]:.2f}' if r.get("price") else "─"
+            price_s  = _fmt_price(r["ticker"], r.get("price"))
             sl_approx = r["price"] * 0.97 if r.get("price") else None
-            sl_s     = f'${sl_approx:.2f}' if sl_approx else "─"
+            sl_s     = _fmt_price(r["ticker"], sl_approx)
             hold_d   = {"pocket_pivot":7,"ema_ribbon":7,"cup_handle":10,"vcp":10,"connors_rsi2":5,"nr7":3,"breakout":5}.get(strat, 5)
 
             # Sector tag for this card
@@ -1336,9 +1587,9 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
             if sec_ex is not None:
                 ranked_vals = sorted(sector_excess.values(), reverse=True)
                 if sec_ex >= ranked_vals[2]:
-                    sec_tag = f'<span style="background:#052e16;color:#4ade80;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-left:4px;">🔥 {ticker_sec[:8]} +{sec_ex:.1f}%</span>'
+                    sec_tag = f'<span style="background:#052e16;color:#4ade80;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-left:4px;">🔥 {_sector_abbr(ticker_sec)} +{sec_ex:.1f}%</span>'
                 elif sec_ex <= ranked_vals[-3]:
-                    sec_tag = f'<span style="background:#3b0000;color:#f87171;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-left:4px;">❄️ {ticker_sec[:8]} {sec_ex:.1f}%</span>'
+                    sec_tag = f'<span style="background:#3b0000;color:#f87171;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-left:4px;">❄️ {_sector_abbr(ticker_sec)} {sec_ex:.1f}%</span>'
                 else:
                     sec_tag = ""
             else:
@@ -1369,7 +1620,7 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
                 f'<td style="width:140px;vertical-align:top;">'
                 + (f'<div style="margin-bottom:4px;">{rank_badge}</div>' if rank_badge else '')
                 + f'<div style="font-size:20px;font-weight:800;color:#f0fdf4;font-family:monospace;">{r["ticker"]}</div>'
-                f'<div style="font-size:11px;color:#86efac;">{str(r.get("company","") or "")[:20]}{sec_tag}</div>'
+                f'<div style="font-size:11px;color:#86efac;">{_company_label(r)}{sec_tag}</div>'
                 + (f'<div style="margin-top:4px;">{_sig_badges}</div>' if _sig_badges else '')
                 + f'</td>'
                 f'<td style="vertical-align:top;padding-left:12px;">'
@@ -1424,11 +1675,11 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
             pb = (' <span style="background:#16a34a;color:#fff;font-size:8px;border-radius:2px;padding:0 3px;">✦</span>'
                   if proven else "")
             strats_fired = [s for s, res in rbs.items() if any(x["ticker"] == r["ticker"] for x in res)]
-            strat_str = " + ".join(s.replace("_"," ").upper()[:8] for s in strats_fired[:2])
+            strat_str = " + ".join(_strat_short(s) for s in strats_fired[:2])
             wr_v = h.get("wr")
             wr_c = "#16a34a" if (wr_v or 0) >= 60 else "#d97706"
-            price_s = f'${r["price"]:.2f}' if r.get("price") else "─"
-            co_s = str(r.get("company") or "")[:20] or "─"
+            price_s = _fmt_price(r["ticker"], r.get("price"))
+            co_s = _company_label(r, 20) or "─"
             html += (
                 f'<tr style="background:{bg};">'
                 + _td(f'<b>{r["ticker"]}</b>{pb}', "left", bg=bg)
@@ -1461,7 +1712,7 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
         )
         for i, l in enumerate(streak_leaders[:15]):
             bg = _C_ROW1 if i % 2 else _C_ROW0
-            strat_str = " · ".join(s.replace("_"," ").upper() for s in l["strategies"][:3])
+            strat_str = " · ".join(_strat_short(s) for s in l["strategies"][:3])
             streak_color = "#16a34a" if l["streak"] >= 10 else ("#a5b4fc" if l["streak"] >= 7 else "#d1d5db")
             html += (
                 f'<tr style="background:{bg};">'
@@ -1494,7 +1745,7 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
             avg_color = "#16a34a" if d["avg"] > 0 else "#dc2626"
             badge = ('<span style="background:#16a34a;color:#fff;font-size:9px;font-weight:700;'
                      'border-radius:3px;padding:1px 4px;margin-left:6px;">✓</span>') if proven else ""
-            s_label  = s.replace("_", " ").title()
+            s_label  = _strat_label(s)
             avg_r    = d.get("avg_r")
             sl_pct   = d.get("sl_pct")
             excess   = d.get("excess")
@@ -1656,7 +1907,7 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
                        else (_C_POS if rsi_v and rsi_v < 40 else _C_BODY))
             vol_c   = _C_POS if (vol_v or 0) >= 1.5 else _C_DIM
             tick_c  = _C_NEG if is_short else _C_BODY
-            company_s = str(r.get("company") or "")[:22] or "─"
+            company_s = _company_label(r, 22) or "─"
 
             rows += "<tr>"
             rows += _td(f'<b style="color:{tick_c}">{r["ticker"]}</b>', "left", bg=bg)
@@ -1666,7 +1917,7 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
                 f'padding:1px 5px;font-size:10px;">{mkt}</span>',
                 "center", bg=bg)
             rows += _td(str(score_v), "center", score_c, bold=True, bg=bg)
-            rows += _td(f'${price_v:.2f}' if price_v else "─", "right", _C_DIM, bg=bg)
+            rows += _td(_fmt_price(r["ticker"], price_v), "right", _C_DIM, bg=bg)
             rows += _td(f'{rsi_v:.0f}' if rsi_v else "─", "right", rsi_c, bg=bg)
             rows += _td(f'{adx_v:.0f}' if adx_v else "─", "right", _C_DIM, bg=bg)
             rows += _td(f'{vol_v:.1f}×' if vol_v else "─", "right", vol_c, bg=bg)
@@ -1886,7 +2137,7 @@ def build_email(trades: list[dict], india_mode: bool = False) -> str:
                             f'<td style="width:90px;font-weight:700;font-size:13px;'
                             f'color:{_C_BODY};{_FONT}">{t["ticker"]}</td>'
                             f'<td style="width:160px;font-size:11px;color:{_C_DIM};{_FONT}">'
-                            f'{str(t.get("company",""))[:28]}</td>'
+                            f'{_company_label(t, 28)}</td>'
                             f'<td style="width:50px;">{_trade_badge(tt)}</td>'
                             f'<td style="font-size:12px;color:{_C_BODY};{_FONT}">{amsg}</td>'
                             f'</tr></table></td></tr>')
@@ -1904,7 +2155,6 @@ def build_email(trades: list[dict], india_mode: bool = False) -> str:
         total_pnl = sum(pnls) if pnls else None
         wins      = sum(1 for _, r in results if (r["ret_pct"] or 0) > 0)
         kpi_items = [
-            ("REAL",       "REAL",             _C_POS),
             ("Invested",   f"€{invested:.0f}", _C_BODY),
             ("Open P&L",   _eur(total_pnl),    _c(total_pnl)),
             ("Positions",  str(len(results)),   _C_BODY),
@@ -1945,7 +2195,7 @@ def build_email(trades: list[dict], india_mode: bool = False) -> str:
                     ret = None; pnl = None; ret_c = _C_DIM; pnl_c = _C_DIM
                 rows += "<tr>"
                 rows += _td(f'<b>{t["ticker"]}</b>', "left", bg=bg)
-                rows += _td(t.get("company","")[:22], "left", _C_DIM, bg=bg)
+                rows += _td(_company_label(t, 22) or "─", "left", _C_DIM, bg=bg)
                 rows += _td(_trade_badge(t.get("trade_type","practice")), "left", bg=bg)
                 rows += _td(_strat_badge(t.get("strategy","")), "left", bg=bg)
                 rows += _td(t["entry_date"], "right", _C_DIM, bg=bg)
