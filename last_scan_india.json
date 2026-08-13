@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-08-12",
+  "scan_date": "2026-08-13",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -38,15 +38,82 @@
   "results_by_strategy": {
     "breakout": [
       {
-        "ticker": "MANAPPURAM.NS",
+        "ticker": "ACMESOLAR.NS",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 51.8,
+        "adx": 19.9,
+        "price": 372.6,
+        "vol_ratio": 0.33,
+        "atr_ratio": 0.99,
+        "vol_5d_ratio": 0.68,
+        "pivot_high": 382.25,
+        "pct_from_piv": -2.5,
+        "strategy": "breakout",
+        "rs_vs_spy": -0.85,
+        "company": "ACME SOLAR HOLDINGS LTD"
+      },
+      {
+        "ticker": "RBLBANK.NS",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "VOLdry",
+          "NearPiv",
+          "ADXcurl",
+          "RS~ok"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "VOLdry",
+          "NearPiv",
+          "ADXcurl",
+          "RS~ok"
+        ],
+        "minervini": 8,
+        "rsi": 86.9,
+        "adx": 20.0,
+        "price": 389.8,
+        "vol_ratio": 0.41,
+        "atr_ratio": 0.92,
+        "vol_5d_ratio": 0.54,
+        "pivot_high": 392.0,
+        "pct_from_piv": -0.6,
+        "strategy": "breakout",
+        "company": "RBL BANK LIMITED"
+      },
+      {
+        "ticker": "SHRIRAMFIN.NS",
         "mkt": "US",
         "score": 4,
         "phase": "COIL",
         "coil_sigs": [
           "NearPiv",
           "ADXcurl",
-          "RSIbase",
-          "RS~ok"
+          "RS~ok",
+          "RngTght"
         ],
         "break_sigs": [],
         "fresh": [
@@ -55,70 +122,71 @@
         "conf": [
           "NearPiv",
           "ADXcurl",
-          "RSIbase",
-          "RS~ok"
+          "RS~ok",
+          "RngTght"
         ],
         "minervini": 8,
-        "rsi": 57.2,
-        "adx": 20.4,
-        "price": 360.0,
-        "vol_ratio": 1.09,
-        "atr_ratio": 1.07,
-        "vol_5d_ratio": 1.05,
-        "pivot_high": 370.15,
-        "pct_from_piv": -2.7,
+        "rsi": 67.1,
+        "adx": 20.2,
+        "price": 1117.2,
+        "vol_ratio": 0.62,
+        "atr_ratio": 1.04,
+        "vol_5d_ratio": 1.04,
+        "pivot_high": 1141.0,
+        "pct_from_piv": -2.1,
         "strategy": "breakout",
-        "rs_vs_spy": -5.98,
-        "company": "MANAPPURAM FINANCE LTD"
+        "company": "SHRIRAM FINANCE LIMITED"
       }
     ],
     "pocket_pivot": [
       {
-        "ticker": "CARBORUNIV.NS",
-        "mkt": "US",
-        "score": 5,
-        "fresh": [
-          "PP"
-        ],
-        "conf": [
-          "RSI45-70",
-          "ADX\u2191",
-          "VOL1.5x",
-          "EMA9>21"
-        ],
-        "minervini": 8,
-        "rsi": 59.9,
-        "adx": 19.4,
-        "price": 1121.0,
-        "vol_ratio": 2.28,
-        "hold_days": 7,
-        "strategy": "pocket_pivot",
-        "company": "CARBORUNDUM UNIVERSAL LTD"
-      },
-      {
-        "ticker": "POWERINDIA.NS",
-        "mkt": "US",
-        "score": 5,
-        "fresh": [
-          "PP"
-        ],
-        "conf": [
-          "RSI45-70",
-          "ADX\u2191",
-          "VOL1.5x",
-          "EMA9>21"
-        ],
-        "minervini": 8,
-        "rsi": 69.9,
-        "adx": 17.2,
-        "price": 36050.0,
-        "vol_ratio": 4.92,
-        "hold_days": 7,
-        "strategy": "pocket_pivot",
-        "company": "HITACHI ENERGY INDIA LTD"
-      },
-      {
         "ticker": "ANANDRATHI.NS",
+        "mkt": "US",
+        "score": 5,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "ADX\u2191",
+          "VOL1.5x",
+          "Near52H",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 76.1,
+        "adx": 31.2,
+        "price": 2189.0,
+        "vol_ratio": 2.65,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "rs_vs_spy": 3.19,
+        "company": "ANAND RATHI WEALTH LTD"
+      },
+      {
+        "ticker": "AARTIIND.NS",
+        "mkt": "US",
+        "score": 5,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "ADX\u2191",
+          "VOL1.5x",
+          "Near52H",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 76.2,
+        "adx": 20.7,
+        "price": 530.9,
+        "vol_ratio": 3.15,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "rs_vs_spy": 6.41,
+        "company": "AARTI INDUSTRIES LTD"
+      },
+      {
+        "ticker": "BHEL.NS",
         "mkt": "US",
         "score": 5,
         "fresh": [
@@ -131,17 +199,16 @@
           "EMA9>21"
         ],
         "minervini": 8,
-        "rsi": 63.4,
-        "adx": 29.7,
-        "price": 2158.0,
-        "vol_ratio": 1.2,
+        "rsi": 58.0,
+        "adx": 17.2,
+        "price": 420.0,
+        "vol_ratio": 1.14,
         "hold_days": 7,
         "strategy": "pocket_pivot",
-        "rs_vs_spy": 0.26,
-        "company": "ANAND RATHI WEALTH LTD"
+        "company": "BHEL"
       },
       {
-        "ticker": "EICHERMOT.NS",
+        "ticker": "AUBANK.NS",
         "mkt": "US",
         "score": 4,
         "fresh": [
@@ -153,39 +220,18 @@
           "EMA9>21"
         ],
         "minervini": 8,
-        "rsi": 70.3,
-        "adx": 27.9,
-        "price": 8000.0,
-        "vol_ratio": 1.08,
+        "rsi": 76.4,
+        "adx": 21.7,
+        "price": 1091.4,
+        "vol_ratio": 0.9,
         "hold_days": 7,
         "strategy": "pocket_pivot",
-        "rs_vs_spy": -1.72,
-        "company": "EICHER MOTORS LTD"
-      },
-      {
-        "ticker": "KPIL.NS",
-        "mkt": "US",
-        "score": 3,
-        "fresh": [
-          "PP"
-        ],
-        "conf": [
-          "RSI45-70",
-          "VOL1.5x"
-        ],
-        "minervini": 8,
-        "rsi": 51.4,
-        "adx": 19.3,
-        "price": 1347.7,
-        "vol_ratio": 2.71,
-        "hold_days": 7,
-        "strategy": "pocket_pivot",
-        "company": "KALPATARU PROJECT INT LTD"
+        "company": "AU SMALL FINANCE BANK LTD"
       }
     ],
     "connors_rsi2": [
       {
-        "ticker": "LLOYDSME.NS",
+        "ticker": "GRASIM.NS",
         "mkt": "US",
         "score": 3,
         "fresh": [
@@ -197,14 +243,35 @@
           "Near52H"
         ],
         "minervini": 8,
-        "rsi": 60.5,
+        "rsi": 65.1,
         "rsi2": 0.0,
-        "adx": 39.5,
-        "price": 1986.2,
-        "vol_ratio": 2.18,
+        "adx": 24.6,
+        "price": 3307.8,
+        "vol_ratio": 3.36,
         "hold_days": 5,
         "strategy": "connors_rsi2",
-        "company": "LLOYDS METALS N ENERGY L"
+        "company": "GRASIM INDUSTRIES LTD"
+      },
+      {
+        "ticker": "MANAPPURAM.NS",
+        "mkt": "US",
+        "score": 2,
+        "fresh": [
+          "RSI2=0.0"
+        ],
+        "conf": [
+          "RSI14>40",
+          "Near52H"
+        ],
+        "minervini": 8,
+        "rsi": 51.9,
+        "rsi2": 0.0,
+        "adx": 18.9,
+        "price": 352.6,
+        "vol_ratio": 4.56,
+        "hold_days": 5,
+        "strategy": "connors_rsi2",
+        "company": "MANAPPURAM FINANCE LTD"
       }
     ],
     "ema_ribbon": [
@@ -222,113 +289,90 @@
         ],
         "minervini": 8,
         "rsi": 62.8,
-        "adx": 28.8,
+        "adx": 29.1,
         "price": 721.45,
-        "vol_ratio": 1.11,
+        "vol_ratio": 1.08,
         "hold_days": 7,
         "strategy": "ema_ribbon",
-        "rs_vs_spy": -0.1,
+        "rs_vs_spy": null,
         "company": "MINDA CORPORATION LTD"
       },
       {
-        "ticker": "EICHERMOT.NS",
+        "ticker": "HONASA.NS",
         "mkt": "US",
         "score": 2,
         "fresh": [
           "EMA-RIBBON"
         ],
         "conf": [
-          "MACD+",
+          "RSI50-70",
           "ADX>25"
         ],
         "minervini": 8,
-        "rsi": 70.3,
-        "adx": 27.9,
-        "price": 8000.0,
-        "vol_ratio": 1.08,
+        "rsi": 58.0,
+        "adx": 25.9,
+        "price": 467.4,
+        "vol_ratio": 1.23,
         "hold_days": 7,
         "strategy": "ema_ribbon",
-        "rs_vs_spy": -1.72,
-        "company": "EICHER MOTORS LTD"
+        "company": "HONASA CONSUMER LIMITED"
       }
     ],
     "nr7": [],
     "analyst_upgrade": [],
     "signal_velocity": [
       {
-        "ticker": "MCX.NS",
-        "score": 13,
+        "ticker": "ACMESOLAR.NS",
+        "score": 10,
         "fresh": [
-          "SV+11"
+          "SV+8"
         ],
         "conf": [
           "SCORE:8/15",
-          "VEL+11",
-          "VOL1.5x"
+          "VEL+8"
         ],
         "minervini": 8,
-        "rsi": 56.8,
-        "adx": 19.6,
-        "price": 2895.0,
-        "vol_ratio": 2.16,
+        "rsi": 56.4,
+        "adx": 19.3,
+        "price": 372.6,
+        "vol_ratio": 0.33,
         "net_score": 8,
-        "velocity": 11,
+        "velocity": 8,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "rs_vs_spy": 0.9,
-        "company": "MULTI COMMODITY EXCHANGE"
-      },
-      {
-        "ticker": "HFCL.NS",
-        "score": 11,
-        "fresh": [
-          "SV+9"
-        ],
-        "conf": [
-          "SCORE:11/15",
-          "VEL+9"
-        ],
-        "minervini": 8,
-        "rsi": 47.9,
-        "adx": 16.3,
-        "price": 214.24,
-        "vol_ratio": 0.57,
-        "net_score": 11,
-        "velocity": 9,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "HFCL LIMITED"
+        "rs_vs_spy": -0.85,
+        "company": "ACME SOLAR HOLDINGS LTD"
       }
     ],
     "chokepoint_inflection": [],
     "defensive_rotation": [
       {
-        "ticker": "KGC",
+        "ticker": "DRD",
         "sector": "Gold",
         "sector_etf": "GLD",
-        "score": 3,
+        "score": 4,
         "fresh": [
           "ROT:GLD",
-          "ETF+4.54%vsS&P"
+          "ETF+3.22%vsS&P"
         ],
         "conf": [
-          "RS+11.9%",
-          "vsETF+7.3%",
+          "RS+12.5%",
+          "vsETF+7.1%",
+          "VOL\u2191",
           "MACD+"
         ],
-        "rsi": 69.8,
-        "adx": 19.1,
-        "vol_ratio": 0.9,
+        "rsi": 66.8,
+        "adx": 21.6,
+        "vol_ratio": 1.2,
         "minervini": 2,
-        "price": 27.24,
-        "rs_vs_spy": 11.86,
-        "rs_vs_sector": 7.31,
+        "price": 24.16,
+        "rs_vs_spy": 12.5,
+        "rs_vs_sector": 7.15,
         "mkt": "US",
         "hold_days": 10,
         "strategy": "defensive_rotation",
-        "company": "Kinross Gold Corporation"
+        "company": "DRDGOLD Limited"
       }
     ],
     "cup_handle": [
@@ -337,91 +381,30 @@
         "score": 5,
         "fresh": [
           "C&H",
-          "PIV@1557.6"
+          "PIV@1547.0"
         ],
         "conf": [
           "CUP29.7%",
-          "HDL2.2%",
+          "HDL1.5%",
           "VOLdry",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 54.4,
-        "adx": 24.4,
-        "vol_ratio": 0.62,
+        "rsi": 56.0,
+        "adx": 23.9,
+        "vol_ratio": 0.49,
         "minervini": 8,
-        "price": 1530.5,
+        "price": 1540.3,
         "cup_depth_pct": 29.7,
         "cup_duration": 195,
-        "handle_depth_pct": 2.2,
+        "handle_depth_pct": 1.5,
         "handle_duration": 5,
-        "pivot": 1557.6,
+        "pivot": 1547.0,
         "vol_drying": true,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
         "company": "CREDITACCESS GRAMEEN LTD"
-      },
-      {
-        "ticker": "GRASIM.NS",
-        "score": 5,
-        "fresh": [
-          "C&H",
-          "PIV@3380.5"
-        ],
-        "conf": [
-          "CUP22.4%",
-          "HDL5.0%",
-          "MACD+",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 60.5,
-        "adx": 22.8,
-        "vol_ratio": 1.17,
-        "minervini": 8,
-        "price": 3322.2,
-        "cup_depth_pct": 22.4,
-        "cup_duration": 195,
-        "handle_depth_pct": 5.0,
-        "handle_duration": 5,
-        "pivot": 3380.5,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "company": "GRASIM INDUSTRIES LTD"
-      },
-      {
-        "ticker": "ANANDRATHI.NS",
-        "score": 5,
-        "fresh": [
-          "C&H",
-          "PIV@2158.0"
-        ],
-        "conf": [
-          "CUP34.0%",
-          "HDL5.6%",
-          "MACD+",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 63.4,
-        "adx": 29.7,
-        "vol_ratio": 1.2,
-        "minervini": 8,
-        "price": 2158.0,
-        "cup_depth_pct": 34.0,
-        "cup_duration": 195,
-        "handle_depth_pct": 5.6,
-        "handle_duration": 5,
-        "pivot": 2158.0,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "rs_vs_spy": 0.26,
-        "company": "ANAND RATHI WEALTH LTD"
       },
       {
         "ticker": "THELEELA.NS",
@@ -432,19 +415,19 @@
         ],
         "conf": [
           "CUP22.4%",
-          "HDL3.5%",
+          "HDL3.0%",
           "MACD+",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 60.5,
-        "adx": 24.3,
-        "vol_ratio": 0.51,
+        "rsi": 61.2,
+        "adx": 24.5,
+        "vol_ratio": 0.52,
         "minervini": 8,
-        "price": 507.0,
+        "price": 512.25,
         "cup_depth_pct": 22.4,
         "cup_duration": 195,
-        "handle_depth_pct": 3.5,
+        "handle_depth_pct": 3.0,
         "handle_duration": 5,
         "pivot": 518.0,
         "vol_drying": false,
@@ -468,8 +451,8 @@
           "M\u22656"
         ],
         "rsi": 62.8,
-        "adx": 28.8,
-        "vol_ratio": 1.11,
+        "adx": 29.1,
+        "vol_ratio": 1.08,
         "minervini": 8,
         "price": 721.45,
         "cup_depth_pct": 33.9,
@@ -481,38 +464,38 @@
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "rs_vs_spy": -0.1,
+        "rs_vs_spy": null,
         "company": "MINDA CORPORATION LTD"
       },
       {
-        "ticker": "MANAPPURAM.NS",
-        "score": 4,
+        "ticker": "NESTLEIND.NS",
+        "score": 5,
         "fresh": [
           "C&H",
-          "PIV@369.3"
+          "PIV@1540.0"
         ],
         "conf": [
-          "CUP32.3%",
-          "HDL2.5%",
+          "CUP24.1%",
+          "HDL3.0%",
+          "VOLdry",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 57.2,
-        "adx": 20.4,
-        "vol_ratio": 1.09,
+        "rsi": 64.5,
+        "adx": 19.9,
+        "vol_ratio": 0.77,
         "minervini": 8,
-        "price": 360.0,
-        "cup_depth_pct": 32.3,
+        "price": 1507.0,
+        "cup_depth_pct": 24.1,
         "cup_duration": 195,
-        "handle_depth_pct": 2.5,
+        "handle_depth_pct": 3.0,
         "handle_duration": 5,
-        "pivot": 369.3,
-        "vol_drying": false,
+        "pivot": 1540.0,
+        "vol_drying": true,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "rs_vs_spy": -5.98,
-        "company": "MANAPPURAM FINANCE LTD"
+        "company": "NESTLE INDIA LIMITED"
       },
       {
         "ticker": "STARHEALTH.NS",
@@ -548,34 +531,6 @@
     "rs_line": [],
     "vcp": [
       {
-        "ticker": "ANANDRATHI.NS",
-        "score": 5,
-        "fresh": [
-          "VCP-3C"
-        ],
-        "conf": [
-          "TightFinal",
-          "VolDry",
-          "NearPivot",
-          "RSI50-65",
-          "M\u22657"
-        ],
-        "minervini": 8,
-        "rsi": 63.4,
-        "adx": 29.7,
-        "price": 2158.0,
-        "vol_ratio": 1.2,
-        "n_contractions": 3,
-        "final_pct": 4.09,
-        "base_high": 2176.2,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "vcp",
-        "spy_regime": "BULL",
-        "rs_vs_spy": 0.26,
-        "company": "ANAND RATHI WEALTH LTD"
-      },
-      {
         "ticker": "AUROPHARMA.NS",
         "score": 5,
         "fresh": [
@@ -589,10 +544,10 @@
           "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 62.9,
-        "adx": 28.6,
-        "price": 1648.0,
-        "vol_ratio": 1.12,
+        "rsi": 62.8,
+        "adx": 31.2,
+        "price": 1667.0,
+        "vol_ratio": 0.87,
         "n_contractions": 3,
         "final_pct": 4.4,
         "base_high": 1636.8,
@@ -601,34 +556,36 @@
         "strategy": "vcp",
         "spy_regime": "BULL",
         "company": "AUROBINDO PHARMA LTD"
-      }
-    ],
-    "williams_pct_r": [
+      },
       {
-        "ticker": "IPCALAB.NS",
-        "score": 5,
+        "ticker": "ANANDRATHI.NS",
+        "score": 4,
         "fresh": [
-          "WR-CROSS"
+          "VCP-3C"
         ],
         "conf": [
-          "RSI40-55",
-          "DeepOversold",
-          "ADX>20",
-          "M\u22655",
-          "NearSMA50"
+          "TightFinal",
+          "VolDry",
+          "NearPivot",
+          "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 44.1,
-        "adx": 21.1,
-        "price": 1748.4,
-        "vol_ratio": 0.99,
-        "williams_r": -41.9,
-        "hold_days": 3,
+        "rsi": 76.1,
+        "adx": 31.2,
+        "price": 2189.0,
+        "vol_ratio": 2.65,
+        "n_contractions": 3,
+        "final_pct": 4.09,
+        "base_high": 2176.2,
+        "hold_days": 10,
         "mkt": "US",
-        "strategy": "williams_pct_r",
-        "company": "IPCA LABORATORIES LTD"
+        "strategy": "vcp",
+        "spy_regime": "BULL",
+        "rs_vs_spy": 3.19,
+        "company": "ANAND RATHI WEALTH LTD"
       }
     ],
+    "williams_pct_r": [],
     "bollinger_pctb": [],
     "connors_r3": [],
     "connors_tps": [],
@@ -638,7 +595,7 @@
     "weinstein_stage2": [],
     "momentum_burst": [
       {
-        "ticker": "GLAND.NS",
+        "ticker": "AARTIIND.NS",
         "score": 4,
         "fresh": [
           "BURST"
@@ -650,73 +607,73 @@
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 78.4,
-        "adx": 40.7,
-        "price": 2924.4,
-        "vol_ratio": 10.06,
-        "burst_pct": 10.47,
+        "rsi": 76.2,
+        "adx": 20.7,
+        "price": 530.9,
+        "vol_ratio": 3.15,
+        "burst_pct": 5.07,
         "hold_days": 5,
         "mkt": "US",
-        "company": "GLAND PHARMA LIMITED"
-      },
-      {
-        "ticker": "CHENNPETRO.NS",
-        "score": 5,
-        "fresh": [
-          "BURST"
-        ],
-        "conf": [
-          "BURST\u22654%",
-          "VOL\u22651.5x",
-          "TI\u22651.03",
-          "M\u22656",
-          "RSI50-70"
-        ],
-        "minervini": 8,
-        "rsi": 65.1,
-        "adx": 29.7,
-        "price": 1426.1,
-        "vol_ratio": 5.65,
-        "burst_pct": 15.0,
-        "hold_days": 5,
-        "mkt": "US",
-        "company": "CHENNAI PETROLEUM CORP LT"
+        "rs_vs_spy": 6.41,
+        "company": "AARTI INDUSTRIES LTD"
       }
     ],
     "ma50_reclaim": [
       {
         "ticker": "MCX.NS",
-        "score": 5,
+        "score": 4,
         "fresh": [
           "50SMA_RECLAIM"
         ],
         "conf": [
           "50SMA_RECLAIM",
           "VOL\u22651.2x",
-          "RSI35-65",
           "ADX>15",
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 56.8,
+        "rsi": 65.7,
         "adx": 19.6,
-        "price": 2895.0,
-        "vol_ratio": 2.16,
-        "dist_50sma": 3.71,
+        "price": 2970.1,
+        "vol_ratio": 2.81,
+        "dist_50sma": 6.28,
         "hold_days": 7,
         "mkt": "US",
-        "rs_vs_spy": 0.9,
         "company": "MULTI COMMODITY EXCHANGE"
       }
     ],
     "turnover_momentum": [],
-    "three_weeks_tight": [],
+    "three_weeks_tight": [
+      {
+        "ticker": "INDUSINDBK.NS",
+        "mkt": "US",
+        "score": 4,
+        "fresh": [
+          "3WT"
+        ],
+        "conf": [
+          "TIGHT<1%",
+          "VOL_DECLINING",
+          "NEAR_52H",
+          "RSI50-65"
+        ],
+        "minervini": 8,
+        "rsi": 54.8,
+        "adx": 22.9,
+        "price": 1017.5,
+        "vol_ratio": 0.43,
+        "spread_pct": 0.94,
+        "hold_days": 7,
+        "strategy": "three_weeks_tight",
+        "company": "INDUSIND BANK LIMITED"
+      }
+    ],
     "episodic_pivot": [],
     "combo_pp_ribbon": [],
     "momentum": []
   },
   "sector_excess": {},
-  "spy_ret": 2.4497949930676777,
+  "spy_ret": 2.027694477235819,
   "elder_impulse_count": 15,
   "market_regime": "BULL",
   "india_mode": true
