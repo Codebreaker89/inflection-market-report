@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-08-13",
+  "scan_date": "2026-08-14",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -36,108 +36,7 @@
     "combo_pp_ribbon"
   ],
   "results_by_strategy": {
-    "breakout": [
-      {
-        "ticker": "ACMESOLAR.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 51.8,
-        "adx": 19.9,
-        "price": 372.6,
-        "vol_ratio": 0.33,
-        "atr_ratio": 0.99,
-        "vol_5d_ratio": 0.68,
-        "pivot_high": 382.25,
-        "pct_from_piv": -2.5,
-        "strategy": "breakout",
-        "rs_vs_spy": -0.85,
-        "company": "ACME SOLAR HOLDINGS LTD"
-      },
-      {
-        "ticker": "RBLBANK.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "VOLdry",
-          "NearPiv",
-          "ADXcurl",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "VOLdry",
-          "NearPiv",
-          "ADXcurl",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 86.9,
-        "adx": 20.0,
-        "price": 389.8,
-        "vol_ratio": 0.41,
-        "atr_ratio": 0.92,
-        "vol_5d_ratio": 0.54,
-        "pivot_high": 392.0,
-        "pct_from_piv": -0.6,
-        "strategy": "breakout",
-        "company": "RBL BANK LIMITED"
-      },
-      {
-        "ticker": "SHRIRAMFIN.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 67.1,
-        "adx": 20.2,
-        "price": 1117.2,
-        "vol_ratio": 0.62,
-        "atr_ratio": 1.04,
-        "vol_5d_ratio": 1.04,
-        "pivot_high": 1141.0,
-        "pct_from_piv": -2.1,
-        "strategy": "breakout",
-        "company": "SHRIRAM FINANCE LIMITED"
-      }
-    ],
+    "breakout": [],
     "pocket_pivot": [
       {
         "ticker": "ANANDRATHI.NS",
@@ -153,14 +52,14 @@
           "EMA9>21"
         ],
         "minervini": 8,
-        "rsi": 76.1,
+        "rsi": 70.4,
         "adx": 31.2,
         "price": 2189.0,
-        "vol_ratio": 2.65,
+        "vol_ratio": 2.51,
         "hold_days": 7,
         "strategy": "pocket_pivot",
-        "rs_vs_spy": 3.19,
-        "company": "ANAND RATHI WEALTH LTD"
+        "rs_vs_spy": null,
+        "company": "ANANDRATHI.NS"
       },
       {
         "ticker": "AARTIIND.NS",
@@ -182,8 +81,8 @@
         "vol_ratio": 3.15,
         "hold_days": 7,
         "strategy": "pocket_pivot",
-        "rs_vs_spy": 6.41,
-        "company": "AARTI INDUSTRIES LTD"
+        "rs_vs_spy": null,
+        "company": "AARTIIND.NS"
       },
       {
         "ticker": "BHEL.NS",
@@ -205,7 +104,29 @@
         "vol_ratio": 1.14,
         "hold_days": 7,
         "strategy": "pocket_pivot",
-        "company": "BHEL"
+        "company": "BHEL.NS"
+      },
+      {
+        "ticker": "VIJAYA.NS",
+        "mkt": "US",
+        "score": 5,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "ADX\u2191",
+          "VOL1.5x",
+          "Near52H",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 80.8,
+        "adx": 23.9,
+        "price": 1510.6,
+        "vol_ratio": 5.17,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "company": "VIJAYA DIAGNOSTIC CEN LTD"
       },
       {
         "ticker": "AUBANK.NS",
@@ -243,14 +164,14 @@
           "Near52H"
         ],
         "minervini": 8,
-        "rsi": 65.1,
+        "rsi": 59.3,
         "rsi2": 0.0,
-        "adx": 24.6,
+        "adx": 24.1,
         "price": 3307.8,
-        "vol_ratio": 3.36,
+        "vol_ratio": 3.06,
         "hold_days": 5,
         "strategy": "connors_rsi2",
-        "company": "GRASIM INDUSTRIES LTD"
+        "company": "GRASIM.NS"
       },
       {
         "ticker": "MANAPPURAM.NS",
@@ -271,32 +192,10 @@
         "vol_ratio": 4.56,
         "hold_days": 5,
         "strategy": "connors_rsi2",
-        "company": "MANAPPURAM FINANCE LTD"
+        "company": "MANAPPURAM.NS"
       }
     ],
     "ema_ribbon": [
-      {
-        "ticker": "MINDACORP.NS",
-        "mkt": "US",
-        "score": 3,
-        "fresh": [
-          "EMA-RIBBON"
-        ],
-        "conf": [
-          "RSI50-70",
-          "MACD+",
-          "ADX>25"
-        ],
-        "minervini": 8,
-        "rsi": 62.8,
-        "adx": 29.1,
-        "price": 721.45,
-        "vol_ratio": 1.08,
-        "hold_days": 7,
-        "strategy": "ema_ribbon",
-        "rs_vs_spy": null,
-        "company": "MINDA CORPORATION LTD"
-      },
       {
         "ticker": "HONASA.NS",
         "mkt": "US",
@@ -315,12 +214,36 @@
         "vol_ratio": 1.23,
         "hold_days": 7,
         "strategy": "ema_ribbon",
-        "company": "HONASA CONSUMER LIMITED"
+        "company": "HONASA.NS"
       }
     ],
     "nr7": [],
     "analyst_upgrade": [],
     "signal_velocity": [
+      {
+        "ticker": "CREDITACC.NS",
+        "score": 10,
+        "fresh": [
+          "SV+8"
+        ],
+        "conf": [
+          "SCORE:8/15",
+          "VEL+8",
+          "ADX>20"
+        ],
+        "minervini": 8,
+        "rsi": 51.7,
+        "adx": 23.4,
+        "price": 1545.4,
+        "vol_ratio": 0.69,
+        "net_score": 8,
+        "velocity": 8,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "rs_vs_spy": null,
+        "company": "CREDITACC.NS"
+      },
       {
         "ticker": "ACMESOLAR.NS",
         "score": 10,
@@ -332,8 +255,8 @@
           "VEL+8"
         ],
         "minervini": 8,
-        "rsi": 56.4,
-        "adx": 19.3,
+        "rsi": 51.8,
+        "adx": 19.9,
         "price": 372.6,
         "vol_ratio": 0.33,
         "net_score": 8,
@@ -341,40 +264,11 @@
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "rs_vs_spy": -0.85,
         "company": "ACME SOLAR HOLDINGS LTD"
       }
     ],
     "chokepoint_inflection": [],
-    "defensive_rotation": [
-      {
-        "ticker": "DRD",
-        "sector": "Gold",
-        "sector_etf": "GLD",
-        "score": 4,
-        "fresh": [
-          "ROT:GLD",
-          "ETF+3.22%vsS&P"
-        ],
-        "conf": [
-          "RS+12.5%",
-          "vsETF+7.1%",
-          "VOL\u2191",
-          "MACD+"
-        ],
-        "rsi": 66.8,
-        "adx": 21.6,
-        "vol_ratio": 1.2,
-        "minervini": 2,
-        "price": 24.16,
-        "rs_vs_spy": 12.5,
-        "rs_vs_sector": 7.15,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "DRDGOLD Limited"
-      }
-    ],
+    "defensive_rotation": [],
     "cup_handle": [
       {
         "ticker": "CREDITACC.NS",
@@ -390,11 +284,11 @@
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 56.0,
-        "adx": 23.9,
-        "vol_ratio": 0.49,
+        "rsi": 51.7,
+        "adx": 23.4,
+        "vol_ratio": 0.69,
         "minervini": 8,
-        "price": 1540.3,
+        "price": 1545.4,
         "cup_depth_pct": 29.7,
         "cup_duration": 195,
         "handle_depth_pct": 1.5,
@@ -404,68 +298,38 @@
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "company": "CREDITACCESS GRAMEEN LTD"
-      },
-      {
-        "ticker": "THELEELA.NS",
-        "score": 5,
-        "fresh": [
-          "C&H",
-          "PIV@518.0"
-        ],
-        "conf": [
-          "CUP22.4%",
-          "HDL3.0%",
-          "MACD+",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 61.2,
-        "adx": 24.5,
-        "vol_ratio": 0.52,
-        "minervini": 8,
-        "price": 512.25,
-        "cup_depth_pct": 22.4,
-        "cup_duration": 195,
-        "handle_depth_pct": 3.0,
-        "handle_duration": 5,
-        "pivot": 518.0,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "company": "LEELA PALACES HOTEL LTD"
-      },
-      {
-        "ticker": "MINDACORP.NS",
-        "score": 5,
-        "fresh": [
-          "C&H",
-          "PIV@736.1"
-        ],
-        "conf": [
-          "CUP33.9%",
-          "HDL2.6%",
-          "MACD+",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 62.8,
-        "adx": 29.1,
-        "vol_ratio": 1.08,
-        "minervini": 8,
-        "price": 721.45,
-        "cup_depth_pct": 33.9,
-        "cup_duration": 195,
-        "handle_depth_pct": 2.6,
-        "handle_duration": 5,
-        "pivot": 736.1,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
         "rs_vs_spy": null,
-        "company": "MINDA CORPORATION LTD"
+        "company": "CREDITACC.NS"
+      },
+      {
+        "ticker": "KARURVYSYA.NS",
+        "score": 5,
+        "fresh": [
+          "C&H",
+          "PIV@338.8"
+        ],
+        "conf": [
+          "CUP31.3%",
+          "HDL2.2%",
+          "VOLdry",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 55.5,
+        "adx": 33.0,
+        "vol_ratio": 0.25,
+        "minervini": 8,
+        "price": 338.8,
+        "cup_depth_pct": 31.3,
+        "cup_duration": 195,
+        "handle_depth_pct": 2.2,
+        "handle_duration": 5,
+        "pivot": 338.8,
+        "vol_drying": true,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "company": "KARURVYSYA.NS"
       },
       {
         "ticker": "NESTLEIND.NS",
@@ -482,8 +346,8 @@
           "M\u22656"
         ],
         "rsi": 64.5,
-        "adx": 19.9,
-        "vol_ratio": 0.77,
+        "adx": 21.7,
+        "vol_ratio": 0.86,
         "minervini": 8,
         "price": 1507.0,
         "cup_depth_pct": 24.1,
@@ -502,29 +366,29 @@
         "score": 4,
         "fresh": [
           "C&H",
-          "PIV@588.1"
+          "PIV@584.7"
         ],
         "conf": [
           "CUP30.3%",
-          "HDL3.1%",
+          "HDL2.5%",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 52.2,
-        "adx": 30.8,
-        "vol_ratio": 0.88,
+        "rsi": 52.9,
+        "adx": 30.4,
+        "vol_ratio": 0.48,
         "minervini": 8,
-        "price": 584.7,
+        "price": 583.25,
         "cup_depth_pct": 30.3,
         "cup_duration": 195,
-        "handle_depth_pct": 3.1,
+        "handle_depth_pct": 2.5,
         "handle_duration": 5,
-        "pivot": 588.1,
+        "pivot": 584.7,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "company": "STAR HEALTH & AL INS CO L"
+        "company": "STARHEALTH.NS"
       }
     ],
     "darvas_box": [],
@@ -570,10 +434,10 @@
           "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 76.1,
+        "rsi": 70.4,
         "adx": 31.2,
         "price": 2189.0,
-        "vol_ratio": 2.65,
+        "vol_ratio": 2.51,
         "n_contractions": 3,
         "final_pct": 4.09,
         "base_high": 2176.2,
@@ -581,8 +445,59 @@
         "mkt": "US",
         "strategy": "vcp",
         "spy_regime": "BULL",
-        "rs_vs_spy": 3.19,
-        "company": "ANAND RATHI WEALTH LTD"
+        "rs_vs_spy": null,
+        "company": "ANANDRATHI.NS"
+      },
+      {
+        "ticker": "GRANULES.NS",
+        "score": 4,
+        "fresh": [
+          "VCP-3C"
+        ],
+        "conf": [
+          "VolDry",
+          "NearPivot",
+          "RSI50-65",
+          "M\u22657"
+        ],
+        "minervini": 8,
+        "rsi": 54.0,
+        "adx": 21.8,
+        "price": 864.8,
+        "vol_ratio": 0.3,
+        "n_contractions": 3,
+        "final_pct": 6.09,
+        "base_high": 908.11,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "vcp",
+        "spy_regime": "BULL",
+        "company": "GRANULES.NS"
+      },
+      {
+        "ticker": "SCI.NS",
+        "score": 3,
+        "fresh": [
+          "VCP-3C"
+        ],
+        "conf": [
+          "TightFinal",
+          "VolDry",
+          "M\u22657"
+        ],
+        "minervini": 8,
+        "rsi": 71.4,
+        "adx": 18.5,
+        "price": 298.8,
+        "vol_ratio": 0.71,
+        "n_contractions": 3,
+        "final_pct": 4.09,
+        "base_high": 330.0,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "vcp",
+        "spy_regime": "BULL",
+        "company": "SHIPPING CORP OF INDIA LT"
       }
     ],
     "williams_pct_r": [],
@@ -614,11 +529,33 @@
         "burst_pct": 5.07,
         "hold_days": 5,
         "mkt": "US",
-        "rs_vs_spy": 6.41,
-        "company": "AARTI INDUSTRIES LTD"
+        "rs_vs_spy": null,
+        "company": "AARTIIND.NS"
       }
     ],
     "ma50_reclaim": [
+      {
+        "ticker": "KPIL.NS",
+        "score": 4,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "ADX>15",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 65.8,
+        "adx": 21.5,
+        "price": 1396.8,
+        "vol_ratio": 12.09,
+        "dist_50sma": 5.27,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "KPIL.NS"
+      },
       {
         "ticker": "MCX.NS",
         "score": 4,
@@ -639,41 +576,17 @@
         "dist_50sma": 6.28,
         "hold_days": 7,
         "mkt": "US",
-        "company": "MULTI COMMODITY EXCHANGE"
+        "company": "MCX.NS"
       }
     ],
     "turnover_momentum": [],
-    "three_weeks_tight": [
-      {
-        "ticker": "INDUSINDBK.NS",
-        "mkt": "US",
-        "score": 4,
-        "fresh": [
-          "3WT"
-        ],
-        "conf": [
-          "TIGHT<1%",
-          "VOL_DECLINING",
-          "NEAR_52H",
-          "RSI50-65"
-        ],
-        "minervini": 8,
-        "rsi": 54.8,
-        "adx": 22.9,
-        "price": 1017.5,
-        "vol_ratio": 0.43,
-        "spread_pct": 0.94,
-        "hold_days": 7,
-        "strategy": "three_weeks_tight",
-        "company": "INDUSIND BANK LIMITED"
-      }
-    ],
+    "three_weeks_tight": [],
     "episodic_pivot": [],
     "combo_pp_ribbon": [],
     "momentum": []
   },
   "sector_excess": {},
-  "spy_ret": 2.027694477235819,
+  "spy_ret": 1.8786451592887228,
   "elder_impulse_count": 15,
   "market_regime": "BULL",
   "india_mode": true
