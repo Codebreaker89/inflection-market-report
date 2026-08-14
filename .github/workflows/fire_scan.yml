@@ -2,22 +2,27 @@ name: Fire Daily Scan
 
 on:
   schedule:
-    # India job: 23:30 UTC = 05:00 IST+1 = 05:00am local (30min before NSE open at 09:15 IST)
-    - cron: '30 23 * * 0-4'   # Sun–Thu UTC = Mon–Fri IST
-    # Intl job: 14:00 UTC = 16:00 CEST = 15:00 BST = 10:00 EDT
+    # GitHub Actions cron is ALWAYS UTC and does not observe daylight saving.
+    # Times below are tuned for CEST (UTC+2, late Mar – late Oct). During CET
+    # (UTC+1, winter) each job lands one hour earlier in local time.
+    #
+    # India job: 03:30 UTC = 05:30 CEST = 09:00 IST (NSE pre-open 09:00–09:15)
+    - cron: '30 3 * * 1-5'
+    # Intl job:  14:00 UTC = 16:00 CEST = 15:00 BST = 10:00 EDT
     - cron: '0 14 * * 1-5'
   workflow_dispatch:   # manual trigger: gh workflow run fire_scan.yml
 
 jobs:
-  # ── India scan (runs at 23:30 UTC → 05:00 IST) ───────────────────────────────
+  # ── India scan (03:30 UTC → 05:30 CEST → 09:00 IST) ─────────────────────────
   scan-india:
     runs-on: ubuntu-latest
     timeout-minutes: 35
-    # Only run on the 23:30 UTC cron (Sun–Thu) or manual trigger
+    # Exact-match the cron string, not a prefix — a prefix like '30 3' would
+    # also match a future '30 30 …' entry and fire the wrong job.
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'schedule' &&
-       startsWith(github.event.schedule, '30 23'))
+       github.event.schedule == '30 3 * * 1-5')
 
     steps:
       - name: Checkout repo
@@ -64,15 +69,14 @@ jobs:
           git diff --staged --quiet || git commit -m "scan-india: $(date +%Y-%m-%d)"
           git push
 
-  # ── Intl scan (runs at 14:00 UTC) ────────────────────────────────────────────
+  # ── Intl scan (14:00 UTC → 16:00 CEST) ──────────────────────────────────────
   scan-intl:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    # Only run on the 14:00 UTC cron (Mon–Fri) or manual trigger
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'schedule' &&
-       startsWith(github.event.schedule, '0 14'))
+       github.event.schedule == '0 14 * * 1-5')
 
     steps:
       - name: Checkout repo

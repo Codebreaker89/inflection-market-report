@@ -355,17 +355,37 @@ _FONT  = "font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;"
 _W     = "max-width:860px;margin:0 auto;"
 _BG    = "background:#ffffff;"
 
-# Colour palette (light theme, high contrast)
-_C_POS   = "#1a7f4b"   # green
-_C_NEG   = "#c0392b"   # red
-_C_WARN  = "#b7590a"   # orange
-_C_DIM   = "#888888"
-_C_BODY  = "#1a1a1a"
-_C_HEAD  = "#ffffff"
-_C_THEAD = "#2c3e50"   # dark navy header row
+# ── Design tokens ────────────────────────────────────────────────────────────
+# ONE light palette for the whole digest. Previously the portfolio sections were
+# light and the scanner sections were near-black, so the email visibly changed
+# theme halfway down. Light-only is also the safer choice across clients: Apple
+# Mail aggressively auto-inverts dark palettes, Gmail inverts only some of them,
+# and classic Outlook on Windows ignores dark mode entirely — a dark design is
+# the one thing guaranteed to render three different ways.
+_C_POS   = "#1a7f4b"   # green   — gains, pass
+_C_NEG   = "#c0392b"   # red     — losses, fail
+_C_WARN  = "#b7590a"   # orange  — caution
+_C_DIM   = "#64748b"   # slate   — secondary text (was #888888: too low contrast)
+_C_BODY  = "#1a1a1a"   # primary text
+_C_HEAD  = "#ffffff"   # text on dark header row
+_C_THEAD = "#2c3e50"   # navy table header
 _C_ROW0  = "#ffffff"
-_C_ROW1  = "#f7f8fa"
-_C_BORD  = "#e0e4ea"
+_C_ROW1  = "#f7f8fa"   # zebra stripe
+_C_BORD  = "#e0e4ea"   # hairline
+
+# Semantic accents — used for section headers and badges
+_A_BLUE   = "#1d4ed8"   # scanner / informational
+_A_INDIGO = "#4f46e5"   # regime map, matrix
+_A_GREEN  = "#15803d"   # conviction, proven edge
+_A_AMBER  = "#b45309"   # watchlist, warnings
+_A_RED    = "#b91c1c"   # action required
+
+# Tinted surfaces — 50/100-level backgrounds, all safely light
+_S_GREEN  = "#f0fdf4"; _S_GREEN2 = "#dcfce7"
+_S_RED    = "#fef2f2"; _S_RED2   = "#fee2e2"
+_S_AMBER  = "#fffbeb"; _S_AMBER2 = "#fef3c7"
+_S_BLUE   = "#eff6ff"; _S_BLUE2  = "#dbeafe"
+_S_INDIGO = "#eef2ff"; _S_SLATE  = "#f1f5f9"
 
 _STRAT_COLORS = {
     "momentum":              ("#1a4a8a", "#dbeafe"),
@@ -836,12 +856,12 @@ def _load_streak_leaders(min_streak: int = 5) -> list:
 
 # Regime colour palette — shared across scorecard, scan detail, regime map, conviction cards
 REGIME_COLORS = {
-    "All-weather": {"icon": "🌤", "color": "#4ade80", "bg": "#052e16"},
-    "Defensive":   {"icon": "🛡",  "color": "#38bdf8", "bg": "#0c1a2e"},
-    "Momentum":    {"icon": "📈", "color": "#a78bfa", "bg": "#1e1b4b"},
-    "Momentum+":   {"icon": "📈", "color": "#818cf8", "bg": "#1e1b4b"},
-    "Neutral":     {"icon": "〰", "color": "#94a3b8", "bg": "#1e293b"},
-    "":            {"icon": "─",  "color": "#4b5563", "bg": "#111827"},
+    "All-weather": {"icon": "🌤", "color": "#15803d", "bg": "#dcfce7"},
+    "Defensive":   {"icon": "🛡",  "color": "#0369a1", "bg": "#e0f2fe"},
+    "Momentum":    {"icon": "📈", "color": "#6d28d9", "bg": "#ede9fe"},
+    "Momentum+":   {"icon": "📈", "color": "#4f46e5", "bg": "#e0e7ff"},
+    "Neutral":     {"icon": "〰", "color": "#475569", "bg": "#f1f5f9"},
+    "":            {"icon": "─",  "color": "#64748b", "bg": "#f8fafc"},
 }
 
 _regime_cache: dict = {}   # strategy → (icon, label, color, bg)
@@ -878,7 +898,7 @@ def _load_regime_characters() -> dict:
     def _classify(s, d):
         bull_wr = _wr(d["bull"]); bear_wr = _wr(d["bear"]); neut_wr = _wr(d["neut"])
         n = sum(len(v) for v in d.values())
-        if n < 8: return ("─", "", "#4b5563", "#111827")
+        if n < 8: return ("─", "", "#94a3b8", "#111827")
         if bull_wr is None or bear_wr is None:
             lbl = "Momentum" if (neut_wr and neut_wr >= 60) else "Neutral"
         else:
@@ -905,6 +925,154 @@ def _regime_badge(strategy: str) -> str:
     return (f'<span style="background:{bg};color:{col};font-size:9px;font-weight:700;'
             f'border-radius:3px;padding:1px 5px;margin-left:5px;white-space:nowrap;">'
             f'{icon} {lbl}</span>')
+
+
+def _regime_for(strategy: str) -> tuple:
+    """(icon, label, colour, bg) for a strategy — empty tuple values if unknown."""
+    return _load_regime_characters().get(strategy, ("", "", _C_DIM, _S_SLATE))
+
+
+# Hold period per strategy. Was an inline literal at the conviction-card render
+# site, so any strategy missing from it silently reported "Hold 5 days" —
+# including three_weeks_tight, episodic_pivot and combo_pp_ribbon.
+HOLD_DAYS_MAP = {
+    "pocket_pivot": 7,      "ema_ribbon": 7,       "cup_handle": 10,
+    "vcp": 10,              "connors_rsi2": 5,     "nr7": 3,
+    "breakout": 5,          "wyckoff_spring": 10,  "ma50_reclaim": 7,
+    "signal_velocity": 5,   "darvas_box": 7,       "high_tight_flag": 10,
+    "momentum_burst": 5,    "elder_impulse": 7,    "rs_line": 10,
+    "three_weeks_tight": 7, "episodic_pivot": 10,  "combo_pp_ribbon": 7,
+    "bb_squeeze": 5,        "connors_3down": 5,    "connors_r3": 5,
+    "raschke_8020": 5,      "holy_grail": 7,       "weinstein_stage2": 10,
+    "defensive_rotation": 10, "stage4_short": 5,   "momentum": 5,
+    "power_earnings_gap": 10, "turnover_momentum": 5, "analyst_upgrade": 5,
+}
+
+
+# Populated by _build_scanner_results_html(); read by build_email() to render
+# the hero block. Reset on every scanner render so a stale pick can't leak
+# into a later digest.
+_TOP_PICK: dict = {}
+
+
+def _build_hero_html() -> str:
+    """The lead block: today's single best new pick, above everything else.
+
+    Built from _TOP_PICK, which _build_scanner_results_html() fills from the same
+    ranked list that produces the "#1 BEST" card, so the two can never disagree.
+    Returns "" when there is no HIGH-conviction pick — the digest then opens on
+    a plain "no setup today" note rather than an empty frame.
+    """
+    p = _TOP_PICK
+    if not p or not p.get("ticker"):
+        return (
+            f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
+            f'style="margin:0 0 18px;">'
+            f'<tr><td style="background:{_S_SLATE};border:1px solid {_C_BORD};'
+            f'border-left:4px solid {_C_DIM};border-radius:6px;padding:16px 18px;">'
+            f'<div style="font-size:11px;font-weight:700;color:{_C_DIM};'
+            f'letter-spacing:.08em;text-transform:uppercase;">Today\'s call</div>'
+            f'<div style="font-size:15px;font-weight:600;color:{_C_BODY};margin-top:6px;">'
+            f'No high-conviction setup today.</div>'
+            f'<div style="font-size:12px;color:{_C_DIM};margin-top:3px;">'
+            f'Sitting out is a valid trade. Watchlist below.</div>'
+            f'</td></tr></table>'
+        )
+
+    tk    = p["ticker"]
+    price = _fmt_price(tk, p.get("price"))
+    stop  = _fmt_price(tk, p.get("stop"))
+    hold  = p.get("hold", 5)
+    wr    = p.get("wr")
+    avg   = p.get("avg")
+    _icon, _rlbl, _rcol, _rbg = p.get("regime") or ("", "", _C_DIM, _S_SLATE)
+
+    # Strategy chips — proven-edge strategies get the green surface
+    chips = " ".join(
+        f'<span style="background:{_S_GREEN2 if s in _PROVEN_EDGE_SET else _S_BLUE2};'
+        f'color:{_A_GREEN if s in _PROVEN_EDGE_SET else _A_BLUE};border-radius:3px;'
+        f'padding:2px 7px;font-size:10px;font-weight:700;white-space:nowrap;">'
+        f'{_strat_short(s)}</span>'
+        for s in (p.get("fired") or [])[:3]
+    )
+
+    # Corroborating signals, only shown when actually present
+    marks = []
+    if p.get("proven"):
+        marks.append(f'<span style="color:{_A_GREEN};font-weight:700;">✦ Proven edge</span>')
+    if (p.get("vol") or 0) >= 1.5:
+        marks.append(f'<span style="color:{_A_AMBER};font-weight:700;">⚡ {p["vol"]:.1f}× volume</span>')
+    if (p.get("persist") or 0) >= 2:
+        marks.append(f'<span style="color:{_A_BLUE};font-weight:700;">🔁 {p["persist"]}d persistent</span>')
+    if _rlbl:
+        marks.append(f'<span style="color:{_rcol};font-weight:700;">{_icon} {_rlbl}</span>')
+    marks_html = ' &nbsp;·&nbsp; '.join(marks)
+
+    # One metric row: the numbers that decide the trade
+    def _metric(label, value, colour=None):
+        return (f'<td style="padding:0 18px 0 0;vertical-align:top;">'
+                f'<div style="font-size:9px;font-weight:700;color:{_C_DIM};'
+                f'letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;">{label}</div>'
+                f'<div style="font-size:15px;font-weight:700;color:{colour or _C_BODY};'
+                f'margin-top:2px;white-space:nowrap;">{value}</div></td>')
+
+    wr_col = _A_GREEN if (wr or 0) >= 60 else _A_AMBER
+    metrics = (
+        _metric("Entry", price)
+        + _metric("Stop", stop, _C_NEG)
+        + _metric("Hold", f"{hold} days")
+        + _metric("Win rate", f"{wr:.0f}%" if wr is not None else "─", wr_col)
+        + _metric("Avg return", f"{avg:+.2f}%" if avg is not None else "─",
+                  _A_GREEN if (avg or 0) > 0 else _C_NEG)
+    )
+
+    extra = ""
+    if (p.get("n_high") or 0) > 1:
+        extra = (f'<div style="font-size:11px;color:{_C_DIM};margin-top:10px;'
+                 f'padding-top:9px;border-top:1px solid {_C_BORD};">'
+                 f'+{p["n_high"] - 1} more high-conviction pick'
+                 f'{"s" if p["n_high"] > 2 else ""} below</div>')
+
+    parts = [
+        # shell
+        f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
+        f'style="margin:0 0 18px;">'
+        f'<tr><td style="background:{_S_GREEN};border:1px solid #bbf7d0;'
+        f'border-left:4px solid {_A_GREEN};border-radius:6px;padding:16px 18px;">',
+
+        # eyebrow
+        f'<div style="font-size:11px;font-weight:700;color:{_A_GREEN};'
+        f'letter-spacing:.08em;text-transform:uppercase;">★ Today\'s call</div>',
+
+        # ticker + company
+        f'<table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:7px;">'
+        f'<tr><td style="vertical-align:baseline;white-space:nowrap;">'
+        f'<span style="font-size:27px;font-weight:800;color:{_C_BODY};'
+        f'font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:-.01em;">{tk}</span>'
+        f'</td><td style="vertical-align:baseline;padding-left:11px;">'
+        f'<span style="font-size:13px;color:{_C_DIM};">{p.get("company","")}</span>'
+        f'</td></tr></table>',
+
+        # strategy chips
+        f'<div style="margin-top:9px;">{chips}</div>' if chips else '',
+
+        # metric row — entry / stop / hold / WR / avg
+        f'<table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:13px;">'
+        f'<tr>{metrics}</tr></table>',
+
+        # supporting signals
+        f'<div style="font-size:11px;margin-top:11px;">{marks_html}</div>' if marks_html else '',
+
+        # plain-language instruction
+        f'<div style="font-size:12px;color:{_C_BODY};margin-top:12px;padding:9px 11px;'
+        f'background:#ffffff;border:1px solid #bbf7d0;border-radius:4px;">'
+        f'Buy near <b>{price}</b>, stop at <b style="color:{_C_NEG};">{stop}</b>, '
+        f'sell in <b>{hold} days</b>.</div>',
+
+        extra,
+        '</td></tr></table>',
+    ]
+    return "".join(parts)
 
 
 def _build_regime_map_html() -> str:
@@ -942,23 +1110,23 @@ def _build_regime_map_html() -> str:
 
     def _cell(wr, n):
         if wr is None:
-            return (f'<td style="padding:6px 8px;text-align:center;color:#4b5563;font-size:11px;">─</td>')
-        bg  = "#052e16" if wr >= 65 else ("#1e3a00" if wr >= 55 else ("#3b1a00" if wr >= 45 else "#3b0000"))
-        col = "#4ade80" if wr >= 65 else ("#a3e635" if wr >= 55 else ("#fb923c" if wr >= 45 else "#f87171"))
+            return (f'<td style="padding:6px 8px;text-align:center;color:#6b7280;font-size:11px;">─</td>')
+        bg  = "#dcfce7" if wr >= 65 else ("#ecfccb" if wr >= 55 else ("#ffedd5" if wr >= 45 else "#fee2e2"))
+        col = "#15803d" if wr >= 65 else ("#4d7c0f" if wr >= 55 else ("#c2410c" if wr >= 45 else "#b91c1c"))
         return (f'<td style="padding:6px 8px;text-align:center;background:{bg};font-size:12px;'
                 f'font-weight:700;color:{col};">{wr:.0f}%<span style="font-size:9px;color:{col};'
                 f'opacity:0.7;font-weight:400;"> n={n}</span></td>')
 
     def _label(bull_wr, bear_wr, neut_wr):
         if bull_wr is None or bear_wr is None:
-            if neut_wr and neut_wr >= 60: return ("📈", "Momentum", "#818cf8")
+            if neut_wr and neut_wr >= 60: return ("📈", "Momentum", "#4f46e5")
             return ("─", "", _C_DIM)
         diff = bull_wr - bear_wr
-        if bear_wr >= 60:                  return ("🌤", "All-weather", "#4ade80")
-        if abs(diff) <= 10 and bull_wr>=50: return ("🌤", "All-weather", "#4ade80")
-        if diff >= 20:                     return ("📈", "Momentum", "#818cf8")
-        if diff >= 10:                     return ("📈", "Momentum+", "#a78bfa")
-        if diff <= -10:                    return ("🛡", "Defensive", "#38bdf8")
+        if bear_wr >= 60:                  return ("🌤", "All-weather", "#15803d")
+        if abs(diff) <= 10 and bull_wr>=50: return ("🌤", "All-weather", "#15803d")
+        if diff >= 20:                     return ("📈", "Momentum", "#4f46e5")
+        if diff >= 10:                     return ("📈", "Momentum+", "#6d28d9")
+        if diff <= -10:                    return ("🛡", "Defensive", "#0369a1")
         return ("〰", "Neutral", _C_DIM)
 
     # Sort: all-weather first, then momentum, then bear-sensitive
@@ -1001,18 +1169,18 @@ def _build_regime_map_html() -> str:
 
     return (
         f'<br><table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:0;">'
-        f'<tr><td style="background:#1e1b4b;border-left:4px solid #818cf8;padding:7px 10px;border-radius:3px 3px 0 0;">'
-        f'<span style="font-size:11px;font-weight:700;color:#a5b4fc;letter-spacing:.04em;">'
+        f'<tr><td style="background:#eef2ff;border-left:4px solid #818cf8;padding:7px 10px;border-radius:3px 3px 0 0;">'
+        f'<span style="font-size:11px;font-weight:700;color:#4338ca;letter-spacing:.04em;">'
         f'🗺 STRATEGY REGIME MAP &nbsp;·&nbsp; win rate by market condition (SPY 5d return)</span>'
-        f'<span style="font-size:10px;color:#6366f1;margin-left:12px;">🌤 all-weather &nbsp; 📈 momentum &nbsp; 🛡 defensive</span>'
+        f'<span style="font-size:10px;color:#4f46e5;margin-left:12px;">🌤 all-weather &nbsp; 📈 momentum &nbsp; 🛡 defensive</span>'
         f'</td></tr></table>'
         f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">'
-        f'<thead><tr style="background:#1e1b4b;">'
-        f'<th style="padding:6px 10px;text-align:left;font-size:11px;color:#818cf8;">Strategy</th>'
-        f'<th style="padding:6px 8px;text-align:center;font-size:11px;color:#f87171;">🐻 Bear<br><span style="font-weight:400;font-size:9px;">SPY ≤ −1%</span></th>'
-        f'<th style="padding:6px 8px;text-align:center;font-size:11px;color:#94a3b8;">〰 Neutral<br><span style="font-weight:400;font-size:9px;">−1% to +1%</span></th>'
-        f'<th style="padding:6px 8px;text-align:center;font-size:11px;color:#4ade80;">🐂 Bull<br><span style="font-weight:400;font-size:9px;">SPY ≥ +1%</span></th>'
-        f'<th style="padding:6px 10px;text-align:left;font-size:11px;color:#818cf8;">Character</th>'
+        f'<thead><tr style="background:#eef2ff;">'
+        f'<th style="padding:6px 10px;text-align:left;font-size:11px;color:#4f46e5;">Strategy</th>'
+        f'<th style="padding:6px 8px;text-align:center;font-size:11px;color:#b91c1c;">🐻 Bear<br><span style="font-weight:400;font-size:9px;">SPY ≤ −1%</span></th>'
+        f'<th style="padding:6px 8px;text-align:center;font-size:11px;color:#64748b;">〰 Neutral<br><span style="font-weight:400;font-size:9px;">−1% to +1%</span></th>'
+        f'<th style="padding:6px 8px;text-align:center;font-size:11px;color:#15803d;">🐂 Bull<br><span style="font-weight:400;font-size:9px;">SPY ≥ +1%</span></th>'
+        f'<th style="padding:6px 10px;text-align:left;font-size:11px;color:#4f46e5;">Character</th>'
         f'</tr></thead><tbody>{rows_html}</tbody></table>'
     )
 
@@ -1226,14 +1394,14 @@ def _build_strategy_performance_html() -> str:
     }
 
     def _wr_col(wr):
-        if wr >= 65: return "#4ade80"
-        if wr >= 55: return "#fbbf24"
-        return "#f87171"
+        if wr >= 65: return "#15803d"
+        if wr >= 55: return "#b45309"
+        return "#b91c1c"
 
     def _avg_col(avg):
-        if avg > 1.0: return "#4ade80"
-        if avg > 0:   return "#a3e635"
-        return "#f87171"
+        if avg > 1.0: return "#15803d"
+        if avg > 0:   return "#4d7c0f"
+        return "#b91c1c"
 
     rows_html = ""
     for i, (s, n, wr, avg) in enumerate(data):
@@ -1244,8 +1412,8 @@ def _build_strategy_performance_html() -> str:
         bar_w = int(wr * 0.6)  # scale to max ~60px for 100%
         rows_html += (
             f'<tr style="background:{bg};">'
-            f'<td style="padding:6px 10px;font-size:12px;color:#e2e8f0;white-space:nowrap;">{name}</td>'
-            f'<td style="padding:6px 8px;font-size:11px;color:#94a3b8;text-align:center;">{n}</td>'
+            f'<td style="padding:6px 10px;font-size:12px;color:#334155;white-space:nowrap;">{name}</td>'
+            f'<td style="padding:6px 8px;font-size:11px;color:#64748b;text-align:center;">{n}</td>'
             f'<td style="padding:6px 10px;">'
             f'  <table cellpadding="0" cellspacing="0"><tr>'
             f'  <td style="width:{bar_w}px;background:{wr_c};height:8px;border-radius:3px;opacity:0.7;"></td>'
@@ -1259,11 +1427,11 @@ def _build_strategy_performance_html() -> str:
     return (
         f'{_section_head("📊","Strategy Performance","historical win rate · 5-day return","#2563eb")}'
         f'<table width="100%" cellpadding="0" cellspacing="0" style="border-radius:4px;overflow:hidden;margin-bottom:16px;">'
-        f'<thead><tr style="background:#1e293b;">'
-        f'<th style="padding:7px 10px;font-size:11px;color:#94a3b8;text-align:left;font-weight:600;">STRATEGY</th>'
-        f'<th style="padding:7px 8px;font-size:11px;color:#94a3b8;text-align:center;font-weight:600;">N</th>'
-        f'<th style="padding:7px 10px;font-size:11px;color:#94a3b8;text-align:left;font-weight:600;">WIN RATE</th>'
-        f'<th style="padding:7px 10px;font-size:11px;color:#94a3b8;text-align:right;font-weight:600;">AVG RET</th>'
+        f'<thead><tr style="background:#e2e8f0;">'
+        f'<th style="padding:7px 10px;font-size:11px;color:#64748b;text-align:left;font-weight:600;">STRATEGY</th>'
+        f'<th style="padding:7px 8px;font-size:11px;color:#64748b;text-align:center;font-weight:600;">N</th>'
+        f'<th style="padding:7px 10px;font-size:11px;color:#64748b;text-align:left;font-weight:600;">WIN RATE</th>'
+        f'<th style="padding:7px 10px;font-size:11px;color:#64748b;text-align:right;font-weight:600;">AVG RET</th>'
         f'</tr></thead>'
         f'<tbody>{rows_html}</tbody></table>'
     )
@@ -1433,6 +1601,38 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
             _persistence,
         )
     )
+    # Stash the #1 ranked pick so build_email() can lead the digest with it.
+    # Taken from the same ranked list the cards use, so the hero can never
+    # disagree with "#1 BEST" further down.
+    global _TOP_PICK
+    _TOP_PICK = {}
+    if high_picks:
+        _t_tier, _t_strat, _t_r = high_picks[0]
+        _t_fired = sorted(
+            [s for s, res in rbs.items() if any(z["ticker"] == _t_r["ticker"] for z in res)],
+            key=lambda s: -(hist_stats.get(s, {}).get("wr", 0))
+        )
+        _t_h = hist_stats.get(_t_strat, {})
+        _TOP_PICK = {
+            "ticker":  _t_r.get("ticker", ""),
+            "company": _company_label(_t_r, 34),
+            "price":   _t_r.get("price"),
+            "stop":    (_t_r["price"] * 0.97) if _t_r.get("price") else None,
+            "strat":   _t_strat,
+            "fired":   _t_fired,
+            "wr":      _t_h.get("wr"),
+            "avg":     _t_h.get("avg"),
+            "rsi":     _t_r.get("rsi"),
+            "adx":     _t_r.get("adx"),
+            "vol":     _t_r.get("vol_ratio"),
+            "score":   _t_r.get("score"),
+            "hold":    HOLD_DAYS_MAP.get(_t_strat, 5),
+            "persist": _persistence.get(_t_r.get("ticker", ""), 0),
+            "proven":  any(s in _PROVEN_EDGE_SET for s in _t_fired),
+            "regime":  _regime_for(_t_strat),
+            "n_high":  len(high_picks),
+        }
+
     med_picks = sorted(
         [(tier, s, r) for t, (rank, tier, s, r) in best_by_ticker.items() if tier == "MED"],
         key=lambda x: (x[2].get("score", 99))
@@ -1453,7 +1653,7 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
     if india_mode:
         html += (
             f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px;">'
-            f'<tr><td style="background:#0a1a0a;border-left:5px solid #ff9933;padding:7px 14px;border-radius:4px;">'
+            f'<tr><td style="background:#f0fdf4;border-left:5px solid #ff9933;padding:7px 14px;border-radius:4px;">'
             f'<span style="font-size:12px;font-weight:700;color:#ff9933;">🇮🇳 INDIA SCAN — Nifty 500 universe · benchmark ^NSEI</span>'
             f'</td></tr></table>'
         )
@@ -1461,11 +1661,11 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
     # ── Market Regime Bar ─────────────────────────────────────────────────────
     html += (
         f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px;">'
-        f'<tr><td style="background:#0f172a;padding:7px 14px;border-radius:4px;border-left:4px solid {regime_col};">'
+        f'<tr><td style="background:{_S_SLATE};padding:7px 14px;border-radius:4px;border-left:4px solid {regime_col};">'
         f'<span style="font-size:12px;font-weight:700;color:{regime_col};">'
         f'{regime_icon} MARKET REGIME: {market_regime}</span>'
-        f'<span style="font-size:11px;color:#94a3b8;margin-left:12px;">'
-        f'Market trend pulse: <b style="color:#e2e8f0;">{elder_count}/20 stocks in uptrend</b>'
+        f'<span style="font-size:11px;color:#64748b;margin-left:12px;">'
+        f'Market trend pulse: <b style="color:#334155;">{elder_count}/20 stocks in uptrend</b>'
         f'{"  · 🔥 Strong uptrend — good time to enter momentum trades" if elder_count >= 15 else ("  · ⚠ Mixed market — only enter the highest-conviction setups" if elder_count >= 5 else "  · ❄️ Weak/falling market — avoid new longs, wait for recovery")}'
         f'</span>'
         f'</td></tr></table>'
@@ -1475,9 +1675,9 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
     if _is_friday:
         html += (
             '<table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px;">'
-            '<tr><td style="background:#3b1a00;border-left:5px solid #f97316;padding:8px 14px;border-radius:4px;">'
-            '<span style="font-size:12px;font-weight:800;color:#fb923c;">⚠ FRIDAY SCAN — Historical WR=45%, avg -0.31%</span>'
-            '<span style="font-size:11px;color:#fed7aa;margin-left:10px;">Hold entry until Monday. Consider existing positions only.</span>'
+            '<tr><td style="background:#ffedd5;border-left:5px solid #f97316;padding:8px 14px;border-radius:4px;">'
+            '<span style="font-size:12px;font-weight:800;color:#c2410c;">⚠ FRIDAY SCAN — Historical WR=45%, avg -0.31%</span>'
+            '<span style="font-size:11px;color:#92400e;margin-left:10px;">Hold entry until Monday. Consider existing positions only.</span>'
             '</td></tr></table>'
         )
 
@@ -1490,8 +1690,8 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
 
         def _sec_chip(etf, ex):
             sector_name = _ETF_TO_SECTOR.get(etf, etf)
-            bg   = "#052e16" if ex >= 1.0 else ("#3b0000" if ex <= -1.0 else "#1e293b")
-            col  = "#4ade80" if ex >= 1.0 else ("#f87171" if ex <= -1.0 else "#94a3b8")
+            bg   = "#dcfce7" if ex >= 1.0 else ("#fee2e2" if ex <= -1.0 else "#f1f5f9")
+            col  = "#15803d" if ex >= 1.0 else ("#b91c1c" if ex <= -1.0 else "#64748b")
             sign = "+" if ex >= 0 else ""
             return (f'<span style="background:{bg};color:{col};border-radius:3px;'
                     f'padding:2px 7px;font-size:10px;font-weight:700;margin-right:4px;">'
@@ -1520,11 +1720,11 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
 
         html += (
             f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 10px;">'
-            f'<tr><td style="background:#0f1923;padding:8px 14px;border-radius:4px;border-left:4px solid #0ea5e9;">'
+            f'<tr><td style="background:#f1f5f9;padding:8px 14px;border-radius:4px;border-left:4px solid #0ea5e9;">'
             f'<div style="font-size:11px;font-weight:700;color:#7dd3fc;margin-bottom:4px;">📊 SECTOR STRENGTH vs SPY (10d) &nbsp;·&nbsp; {spy_s}</div>'
-            f'<div style="margin-bottom:3px;"><span style="font-size:10px;color:#94a3b8;margin-right:6px;">HOT 🔥</span>{top_chips}</div>'
-            f'<div style="margin-bottom:4px;"><span style="font-size:10px;color:#94a3b8;margin-right:6px;">COLD ❄️</span>{bot_chips}</div>'
-            + (f'<div style="font-size:10px;color:#4ade80;">✓ HIGH conviction picks in HOT sectors: <b>{", ".join(aligned)}</b></div>'
+            f'<div style="margin-bottom:3px;"><span style="font-size:10px;color:#64748b;margin-right:6px;">HOT 🔥</span>{top_chips}</div>'
+            f'<div style="margin-bottom:4px;"><span style="font-size:10px;color:#64748b;margin-right:6px;">COLD ❄️</span>{bot_chips}</div>'
+            + (f'<div style="font-size:10px;color:#15803d;">✓ HIGH conviction picks in HOT sectors: <b>{", ".join(aligned)}</b></div>'
                if aligned else
                f'<div style="font-size:10px;color:#f59e0b;">⚠ No HIGH conviction picks in top sectors today — consider reducing size</div>')
             + f'</td></tr></table>'
@@ -1545,10 +1745,10 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
     if high_picks:
         html += (
             f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:12px 0 4px;">'
-            f'<tr><td style="background:#052e16;border-left:5px solid #16a34a;padding:8px 12px;border-radius:4px 4px 0 0;">'
-            f'<span style="font-size:13px;font-weight:800;color:#4ade80;letter-spacing:.06em;">'
+            f'<tr><td style="background:#dcfce7;border-left:5px solid #16a34a;padding:8px 12px;border-radius:4px 4px 0 0;">'
+            f'<span style="font-size:13px;font-weight:800;color:#15803d;letter-spacing:.06em;">'
             f'🎯 ACT ON THESE &nbsp;·&nbsp; {len(high_picks)} stock(s) &nbsp;·&nbsp; ★★★ HIGH CONVICTION</span>'
-            f'<br><span style="font-size:10px;color:#86efac;">Ranked by: PROVEN edge · multi-strategy (74% WR) · vol 1.5-2x · RSI 50-65 · persistence</span>'
+            f'<br><span style="font-size:10px;color:#166534;">Ranked by: PROVEN edge · multi-strategy (74% WR) · vol 1.5-2x · RSI 50-65 · persistence</span>'
             f'</td></tr></table>'
         )
         for card_idx, (tier, strat, r) in enumerate(high_picks):
@@ -1567,8 +1767,8 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
                 'border-radius:3px;padding:1px 5px;margin-left:6px;">✦ PROVEN EDGE</span>'
             ) if proven else ""
             strat_chips = " ".join(
-                f'<span style="background:{"#052e16" if s in _PROVEN_EDGE_SET else "#1c1c2e"};'
-                f'color:{"#4ade80" if s in _PROVEN_EDGE_SET else "#a5b4fc"};'
+                f'<span style="background:{"#dcfce7" if s in _PROVEN_EDGE_SET else "#f1f5f9"};'
+                f'color:{"#15803d" if s in _PROVEN_EDGE_SET else "#a5b4fc"};'
                 f'border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">'
                 f'{_strat_short(s)}'
                 f'{" " + str(int(hist_stats[s]["wr"])) + "%" if hist_stats.get(s, {}).get("n", 0) >= 5 else ""}'
@@ -1578,7 +1778,7 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
             price_s  = _fmt_price(r["ticker"], r.get("price"))
             sl_approx = r["price"] * 0.97 if r.get("price") else None
             sl_s     = _fmt_price(r["ticker"], sl_approx)
-            hold_d   = {"pocket_pivot":7,"ema_ribbon":7,"cup_handle":10,"vcp":10,"connors_rsi2":5,"nr7":3,"breakout":5}.get(strat, 5)
+            hold_d   = HOLD_DAYS_MAP.get(strat, 5)
 
             # Sector tag for this card
             ticker_sec = r.get("sector", "")
@@ -1587,9 +1787,9 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
             if sec_ex is not None:
                 ranked_vals = sorted(sector_excess.values(), reverse=True)
                 if sec_ex >= ranked_vals[2]:
-                    sec_tag = f'<span style="background:#052e16;color:#4ade80;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-left:4px;">🔥 {_sector_abbr(ticker_sec)} +{sec_ex:.1f}%</span>'
+                    sec_tag = f'<span style="background:#dcfce7;color:#15803d;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-left:4px;">🔥 {_sector_abbr(ticker_sec)} +{sec_ex:.1f}%</span>'
                 elif sec_ex <= ranked_vals[-3]:
-                    sec_tag = f'<span style="background:#3b0000;color:#f87171;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-left:4px;">❄️ {_sector_abbr(ticker_sec)} {sec_ex:.1f}%</span>'
+                    sec_tag = f'<span style="background:#fee2e2;color:#b91c1c;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-left:4px;">❄️ {_sector_abbr(ticker_sec)} {sec_ex:.1f}%</span>'
                 else:
                     sec_tag = ""
             else:
@@ -1601,53 +1801,53 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
             _rs  = r.get("rs_vs_spy") or 0
             _sig_badges = ""
             if _days_seen >= 3:
-                _sig_badges += '<span style="background:#1e3a5f;color:#93c5fd;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-right:3px;">🔁 PERSIST {_days_seen}d</span>'.replace("{_days_seen}", str(_days_seen))
+                _sig_badges += '<span style="background:#dbeafe;color:#1d4ed8;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-right:3px;">🔁 PERSIST {_days_seen}d</span>'.replace("{_days_seen}", str(_days_seen))
             elif _days_seen >= 2:
-                _sig_badges += '<span style="background:#1e3a5f;color:#93c5fd;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-right:3px;">🔁 2d</span>'
+                _sig_badges += '<span style="background:#dbeafe;color:#1d4ed8;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-right:3px;">🔁 2d</span>'
             if _vol >= 2.0:
-                _sig_badges += f'<span style="background:#3b2200;color:#fb923c;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-right:3px;">⚡ VOL {_vol:.1f}x</span>'
+                _sig_badges += f'<span style="background:#fef3c7;color:#c2410c;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-right:3px;">⚡ VOL {_vol:.1f}x</span>'
             elif _vol >= 1.5:
-                _sig_badges += f'<span style="background:#3b2200;color:#fbbf24;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-right:3px;">⚡ {_vol:.1f}x</span>'
+                _sig_badges += f'<span style="background:#fef3c7;color:#b45309;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-right:3px;">⚡ {_vol:.1f}x</span>'
             if _rs > 0:
-                _sig_badges += f'<span style="background:#052e16;color:#4ade80;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-right:3px;">↑RS +{_rs:.1f}%</span>'
+                _sig_badges += f'<span style="background:#dcfce7;color:#15803d;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;margin-right:3px;">↑RS +{_rs:.1f}%</span>'
 
             border_col = "#16a34a" if card_idx == 0 else ("#2563eb" if card_idx == 1 else "#d97706" if card_idx == 2 else "#16a34a")
             html += (
                 f'<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:6px;border-radius:0 0 4px 4px;">'
-                f'<tr style="background:#0f2a1a;">'
-                f'<td style="padding:10px 14px;border-left:5px solid {border_col};border-bottom:1px solid #1a4a2a;">'
+                f'<tr style="background:#f0fdf4;">'
+                f'<td style="padding:10px 14px;border-left:5px solid {border_col};border-bottom:1px solid #bbf7d0;">'
                 f'<table width="100%" cellpadding="0" cellspacing="0"><tr>'
                 f'<td style="width:140px;vertical-align:top;">'
                 + (f'<div style="margin-bottom:4px;">{rank_badge}</div>' if rank_badge else '')
-                + f'<div style="font-size:20px;font-weight:800;color:#f0fdf4;font-family:monospace;">{r["ticker"]}</div>'
-                f'<div style="font-size:11px;color:#86efac;">{_company_label(r)}{sec_tag}</div>'
+                + f'<div style="font-size:20px;font-weight:800;color:#0f172a;font-family:monospace;">{r["ticker"]}</div>'
+                f'<div style="font-size:11px;color:#166534;">{_company_label(r)}{sec_tag}</div>'
                 + (f'<div style="margin-top:4px;">{_sig_badges}</div>' if _sig_badges else '')
                 + f'</td>'
                 f'<td style="vertical-align:top;padding-left:12px;">'
                 f'<div style="margin-bottom:5px;">{strat_chips}{proven_badge}</div>'
-                f'<div style="font-size:11px;color:#d1fae5;">'
+                f'<div style="font-size:11px;color:#14532d;">'
                 f'Price <b>{price_s}</b> &nbsp;·&nbsp; '
-                f'Stop Loss <b style="color:#fca5a5;">{sl_s}</b> &nbsp;·&nbsp; '
+                f'Stop Loss <b style="color:#b91c1c;">{sl_s}</b> &nbsp;·&nbsp; '
                 f'Hold <b>{hold_d} days</b> &nbsp;·&nbsp; '
                 f'Momentum <b>{r.get("rsi", 0):.0f}/100</b> &nbsp;·&nbsp; '
                 f'Trend Str. <b>{r.get("adx", 0):.0f}/50</b> &nbsp;·&nbsp; '
                 f'Score <b>{r.get("score", 0)}</b>'
                 f'</div>'
-                f'<div style="font-size:10px;color:#86efac;margin-top:3px;font-style:italic;">'
+                f'<div style="font-size:10px;color:#166534;margin-top:3px;font-style:italic;">'
                 f'{"💡 Buy near " + price_s + ", set a stop at " + sl_s + " to limit downside, target to sell in " + str(hold_d) + " days."}'
                 f'</div>'
                 f'</td>'
                 f'<td style="width:90px;text-align:right;vertical-align:top;">'
                 + (f'<div style="font-size:18px;font-weight:800;color:{wr_col};">{wr_val:.0f}% WR</div>'
-                   f'<div style="font-size:10px;color:#86efac;">{avg_val:+.2f}% avg</div>'
+                   f'<div style="font-size:10px;color:#166534;">{avg_val:+.2f}% avg</div>'
                    if wr_val else '')
                 + f'</td></tr></table></td></tr></table>'
             )
     else:
         html += (
             f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:12px 0 4px;">'
-            f'<tr><td style="background:#1a1a00;border-left:5px solid #facc15;padding:8px 12px;border-radius:4px;">'
-            f'<span style="font-size:12px;font-weight:700;color:#fde68a;">'
+            f'<tr><td style="background:#fefce8;border-left:5px solid #facc15;padding:8px 12px;border-radius:4px;">'
+            f'<span style="font-size:12px;font-weight:700;color:#92400e;">'
             f'⚠ No HIGH conviction signals today — see WATCHLIST below or wait for better setup</span>'
             f'</td></tr></table>'
         )
@@ -1658,12 +1858,12 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
     if med_picks:
         html += (
             f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:14px 0 4px;">'
-            f'<tr><td style="background:#1a1a0a;border-left:5px solid #d97706;padding:6px 12px;border-radius:4px 4px 0 0;">'
-            f'<span style="font-size:12px;font-weight:700;color:#fcd34d;">'
+            f'<tr><td style="background:#fefce8;border-left:5px solid #d97706;padding:6px 12px;border-radius:4px 4px 0 0;">'
+            f'<span style="font-size:12px;font-weight:700;color:#b45309;">'
             f'👀 WATCHLIST &nbsp;·&nbsp; {len(med_picks)} stock(s) &nbsp;·&nbsp; ★★ MEDIUM — worth watching, but wait for a stronger signal before buying</span>'
             f'</td></tr></table>'
             f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:11px;margin-bottom:8px;">'
-            f'<thead><tr style="background:#1a1a2e;">'
+            f'<thead><tr style="background:#f1f5f9;">'
             + _th("Ticker","left") + _th("Company","left") + _th("Strategy","left") + _th("Win Rate","right")
             + _th("Score","center") + _th("Momentum","right") + _th("Trend Str.","right") + _th("Price","right")
             + f'</tr></thead><tbody>'
@@ -1701,12 +1901,12 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
     if streak_leaders:
         html += (
             f'<table width="100%" cellpadding="0" cellspacing="0" style="margin:14px 0 4px;">'
-            f'<tr><td style="background:#0a0a1a;border-left:5px solid #818cf8;padding:6px 12px;border-radius:4px 4px 0 0;">'
-            f'<span style="font-size:12px;font-weight:700;color:#a5b4fc;">'
+            f'<tr><td style="background:#f8fafc;border-left:5px solid #818cf8;padding:6px 12px;border-radius:4px 4px 0 0;">'
+            f'<span style="font-size:12px;font-weight:700;color:#4338ca;">'
             f'🔁 PERSISTENCE LEADERS &nbsp;·&nbsp; {len(streak_leaders)} stock(s) &nbsp;·&nbsp; ≥5 consecutive trading days</span>'
             f'</td></tr></table>'
             f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:11px;margin-bottom:8px;">'
-            f'<thead><tr style="background:#1a1a2e;">'
+            f'<thead><tr style="background:#f1f5f9;">'
             + _th("Ticker","left") + _th("Streak","center") + _th("Strategies (latest)","left") + _th("Last Seen","right")
             + f'</tr></thead><tbody>'
         )
@@ -1716,9 +1916,9 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
             streak_color = "#16a34a" if l["streak"] >= 10 else ("#a5b4fc" if l["streak"] >= 7 else "#d1d5db")
             html += (
                 f'<tr style="background:{bg};">'
-                f'<td style="padding:4px 8px;color:#e2e8f0;font-weight:700;">{l["ticker"]}</td>'
+                f'<td style="padding:4px 8px;color:#334155;font-weight:700;">{l["ticker"]}</td>'
                 f'<td style="padding:4px 8px;color:{streak_color};text-align:center;font-weight:700;">{l["streak"]}d</td>'
-                f'<td style="padding:4px 8px;color:#94a3b8;">{strat_str}</td>'
+                f'<td style="padding:4px 8px;color:#64748b;">{strat_str}</td>'
                 f'<td style="padding:4px 8px;color:#64748b;text-align:right;">{l["last_date"]}</td>'
                 f'</tr>'
             )
@@ -1727,7 +1927,7 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
     html += _kpi_table([
         ("HIGH Conviction", str(len(high_picks)), "#16a34a"),
         ("MED Watchlist",   str(len(med_picks)),  "#d97706"),
-        ("Persistence",     str(len(streak_leaders)), "#818cf8"),
+        ("Persistence",     str(len(streak_leaders)), "#4f46e5"),
         ("Scan Date",       scan_date,             _C_DIM),
     ])
 
@@ -1752,7 +1952,7 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
             avg_r_col  = "#16a34a" if (avg_r or 0) >= 0.5 else ("#d97706" if (avg_r or 0) >= 0 else "#dc2626")
             sl_col     = "#dc2626" if (sl_pct or 0) >= 20 else ("#d97706" if (sl_pct or 0) >= 12 else "#16a34a")
             excess_col = "#16a34a" if (excess or 0) > 0 else "#dc2626"
-            _rchar = _rc.get(s, ("─", "", "#4b5563", "#111827"))
+            _rchar = _rc.get(s, ("─", "", "#94a3b8", "#111827"))
             _r_icon, _r_lbl, _r_col, _r_bg = _rchar
             _row_border = f'border-left:3px solid {_r_col};'
             _regime_sc_badge = (
@@ -1773,11 +1973,11 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
             )
         html += (
             f'<br><table width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px;margin-bottom:0;">'
-            f'<tr><td style="background:#1a2a1a;border-left:4px solid #16a34a;padding:6px 10px;border-radius:3px 3px 0 0;">'
+            f'<tr><td style="background:#f0fdf4;border-left:4px solid #16a34a;padding:6px 10px;border-radius:3px 3px 0 0;">'
             f'<span style="font-size:11px;font-weight:700;color:#16a34a;letter-spacing:.05em;">'
             f'📊 STRATEGY SCORECARD &nbsp;·&nbsp; live from scan_history.csv &nbsp;·&nbsp; ✓ = proven edge (WR≥60%, n≥10)</span></td></tr></table>'
             f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:11px;">'
-            f'<thead><tr style="background:#1a1a2e;">'
+            f'<thead><tr style="background:#f1f5f9;">'
             f'<th style="padding:5px 8px;text-align:left;color:#888;">#</th>'
             f'<th style="padding:5px 8px;text-align:left;color:#888;">Strategy</th>'
             f'<th style="padding:5px 8px;text-align:right;color:#888;" title="5-day win rate">WR%</th>'
@@ -1799,8 +1999,8 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
     # ══════════════════════════════════════════════════════════════════════════
     html += (
         f'<br><table width="100%" cellpadding="0" cellspacing="0" style="margin:18px 0 4px;">'
-        f'<tr><td style="background:#1a1a2e;border-left:4px solid #4f46e5;padding:6px 12px;border-radius:4px;">'
-        f'<span style="font-size:11px;font-weight:600;color:#a5b4fc;letter-spacing:.04em;">'
+        f'<tr><td style="background:#f1f5f9;border-left:4px solid #4f46e5;padding:6px 12px;border-radius:4px;">'
+        f'<span style="font-size:11px;font-weight:600;color:#4338ca;letter-spacing:.04em;">'
         f'📋 FULL SCAN DETAIL — {total_hits} signals across {len(active)} strategies</span>'
         f'</td></tr></table>'
     )
@@ -1834,7 +2034,7 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
             proven_badge = ('<span style="background:#16a34a;color:#fff;font-size:9px;font-weight:700;'
                             'border-radius:3px;padding:1px 5px;margin-left:8px;">PROVEN EDGE ✓</span>')
         # Regime badge on strategy header
-        _drchar = _rc_detail.get(strat, ("─", "", "#4b5563", "#111827"))
+        _drchar = _rc_detail.get(strat, ("─", "", "#94a3b8", "#111827"))
         _d_icon, _d_lbl, _d_col, _d_bg = _drchar
         _detail_regime = (
             f'<span style="background:{_d_bg};color:{_d_col};font-size:9px;font-weight:700;'
@@ -1933,17 +2133,17 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
     metal_prices = _fetch_metal_snapshot()
     if metal_prices:
         def _chg_span(v):
-            if v is None: return '<span style="color:#484f58;">─</span>'
-            col  = "#4ade80" if v > 0 else ("#f87171" if v < 0 else "#94a3b8")
+            if v is None: return '<span style="color:#94a3b8;">─</span>'
+            col  = "#15803d" if v > 0 else ("#b91c1c" if v < 0 else "#64748b")
             sign = "+" if v > 0 else ""
             return f'<span style="color:{col};font-weight:700;">{sign}{v}%</span>'
 
         metal_rows = "".join(
-            f'<tr style="background:{"#1a1a2e" if i % 2 else "#0f0f1a"};">'
-            f'<td style="padding:5px 8px;color:#e2e8f0;font-weight:700;font-size:11px;">{m["name"]}</td>'
-            f'<td style="padding:5px 8px;color:#94a3b8;font-size:10px;">{m["ticker"]}</td>'
-            f'<td style="padding:5px 8px;color:#e2e8f0;text-align:right;font-size:11px;">'
-            f'${m["spot"]:,.2f} <span style="color:#484f58;font-size:10px;">{m["unit"]}</span></td>'
+            f'<tr style="background:{_C_ROW1 if i % 2 else _C_ROW0};">'
+            f'<td style="padding:5px 8px;color:#334155;font-weight:700;font-size:11px;">{m["name"]}</td>'
+            f'<td style="padding:5px 8px;color:#64748b;font-size:10px;">{m["ticker"]}</td>'
+            f'<td style="padding:5px 8px;color:#334155;text-align:right;font-size:11px;">'
+            f'${m["spot"]:,.2f} <span style="color:#94a3b8;font-size:10px;">{m["unit"]}</span></td>'
             f'<td style="padding:5px 8px;text-align:right;">{_chg_span(m["ch1d"])}</td>'
             f'<td style="padding:5px 8px;text-align:right;">{_chg_span(m["ch7d"])}</td>'
             f'</tr>'
@@ -1951,27 +2151,27 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
         )
         html += (
             f'<br><table width="100%" cellpadding="0" cellspacing="0" style="margin:10px 0 4px;">'
-            f'<tr><td style="background:#1a1200;border-left:5px solid #f59e0b;padding:6px 12px;border-radius:4px 4px 0 0;">'
-            f'<span style="font-size:12px;font-weight:700;color:#fcd34d;">⬡ METALS SNAPSHOT &nbsp;·&nbsp; Live Spot Prices</span>'
+            f'<tr><td style="background:#fefce8;border-left:5px solid #f59e0b;padding:6px 12px;border-radius:4px 4px 0 0;">'
+            f'<span style="font-size:12px;font-weight:700;color:#b45309;">⬡ METALS SNAPSHOT &nbsp;·&nbsp; Live Spot Prices</span>'
             f'</td></tr></table>'
             f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:11px;margin-bottom:4px;">'
-            f'<thead><tr style="background:#1a1a2e;">'
-            f'<th style="padding:5px 8px;color:#94a3b8;text-align:left;">Metal</th>'
-            f'<th style="padding:5px 8px;color:#94a3b8;text-align:left;">Ticker</th>'
-            f'<th style="padding:5px 8px;color:#94a3b8;text-align:right;">Spot</th>'
-            f'<th style="padding:5px 8px;color:#94a3b8;text-align:right;">1-Day Δ</th>'
-            f'<th style="padding:5px 8px;color:#94a3b8;text-align:right;">7-Day Δ</th>'
+            f'<thead><tr style="background:#f1f5f9;">'
+            f'<th style="padding:5px 8px;color:#64748b;text-align:left;">Metal</th>'
+            f'<th style="padding:5px 8px;color:#64748b;text-align:left;">Ticker</th>'
+            f'<th style="padding:5px 8px;color:#64748b;text-align:right;">Spot</th>'
+            f'<th style="padding:5px 8px;color:#64748b;text-align:right;">1-Day Δ</th>'
+            f'<th style="padding:5px 8px;color:#64748b;text-align:right;">7-Day Δ</th>'
             f'</tr></thead><tbody>{metal_rows}</tbody></table>'
         )
 
     metal_events = _fetch_metal_events(n=6)
     if metal_events:
         ev_rows = "".join(
-            f'<tr style="background:{"#1a1a2e" if i % 2 else "#0f0f1a"};">'
-            f'<td style="padding:5px 8px;color:#94a3b8;font-size:10px;white-space:nowrap;">{e["pub"]}</td>'
+            f'<tr style="background:{_C_ROW1 if i % 2 else _C_ROW0};">'
+            f'<td style="padding:5px 8px;color:#64748b;font-size:10px;white-space:nowrap;">{e["pub"]}</td>'
             f'<td style="padding:5px 8px;font-size:11px;">'
             f'<a href="{e["link"]}" style="color:#c9d1d9;text-decoration:none;">{e["title"][:100]}</a>'
-            + (f'<br><span style="font-size:10px;color:#484f58;">{e["source"]}</span>'
+            + (f'<br><span style="font-size:10px;color:#94a3b8;">{e["source"]}</span>'
                if e.get("source") else "")
             + f'</td></tr>'
             for i, e in enumerate(metal_events)
@@ -1979,9 +2179,9 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
         html += (
             f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;'
             f'font-size:11px;margin-bottom:8px;">'
-            f'<thead><tr style="background:#1a1a2e;">'
-            f'<th style="padding:5px 8px;color:#94a3b8;text-align:left;width:55px;">Date</th>'
-            f'<th style="padding:5px 8px;color:#94a3b8;text-align:left;">Supply Shock Events</th>'
+            f'<thead><tr style="background:#f1f5f9;">'
+            f'<th style="padding:5px 8px;color:#64748b;text-align:left;width:55px;">Date</th>'
+            f'<th style="padding:5px 8px;color:#64748b;text-align:left;">Supply Shock Events</th>'
             f'</tr></thead><tbody>{ev_rows}</tbody></table>'
         )
 
@@ -1996,26 +2196,26 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
 
         if rrg_results:
             _QUAD_BG = {
-                "Leading":   "#052e16", "Improving": "#0c1a3a",
-                "Weakening": "#2d1f00", "Lagging":   "#3b0000",
+                "Leading":   "#dcfce7", "Improving": "#dbeafe",
+                "Weakening": "#fef3c7", "Lagging":   "#fee2e2",
             }
             _QUAD_COL = {
-                "Leading":   "#4ade80", "Improving": "#60a5fa",
-                "Weakening": "#fbbf24", "Lagging":   "#f87171",
+                "Leading":   "#15803d", "Improving": "#1d4ed8",
+                "Weakening": "#b45309", "Lagging":   "#b91c1c",
             }
             rrg_rows = ""
             for i, r in enumerate(rrg_results):
                 q         = r["quad"]
-                bg        = "#1a1a2e" if i % 2 else "#0f0f1a"
-                qbg       = _QUAD_BG.get(q, "#1e293b")
-                qcol      = _QUAD_COL.get(q, "#94a3b8")
+                bg        = _C_ROW1 if i % 2 else _C_ROW0
+                qbg       = _QUAD_BG.get(q, "#f1f5f9")
+                qcol      = _QUAD_COL.get(q, "#64748b")
                 emoji     = QUAD_EMOJI.get(q, "⚪")
-                ratio_col = "#4ade80" if r["rs_ratio"] >= 100 else "#f87171"
-                mom_col   = "#4ade80" if r["rs_mom"]   >= 100 else "#f87171"
+                ratio_col = "#15803d" if r["rs_ratio"] >= 100 else "#b91c1c"
+                mom_col   = "#15803d" if r["rs_mom"]   >= 100 else "#b91c1c"
                 rrg_rows += (
                     f'<tr style="background:{bg};">'
-                    f'<td style="padding:5px 8px;color:#e2e8f0;font-weight:700;font-size:11px;">{r["etf"]}</td>'
-                    f'<td style="padding:5px 8px;color:#94a3b8;font-size:10px;">{r["name"]}</td>'
+                    f'<td style="padding:5px 8px;color:#334155;font-weight:700;font-size:11px;">{r["etf"]}</td>'
+                    f'<td style="padding:5px 8px;color:#64748b;font-size:10px;">{r["name"]}</td>'
                     f'<td style="padding:5px 8px;text-align:center;">'
                     f'<span style="background:{qbg};color:{qcol};border-radius:3px;padding:2px 6px;'
                     f'font-size:10px;font-weight:700;">{emoji} {q}</span></td>'
@@ -2025,8 +2225,8 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
                 )
             html += (
                 f'<br><table width="100%" cellpadding="0" cellspacing="0" style="margin:10px 0 4px;">'
-                f'<tr><td style="background:#0a0a1a;border-left:5px solid #818cf8;padding:6px 12px;border-radius:4px 4px 0 0;">'
-                f'<span style="font-size:12px;font-weight:700;color:#a5b4fc;">'
+                f'<tr><td style="background:#f8fafc;border-left:5px solid #818cf8;padding:6px 12px;border-radius:4px 4px 0 0;">'
+                f'<span style="font-size:12px;font-weight:700;color:#4338ca;">'
                 f'📡 RRG SECTOR ROTATION &nbsp;·&nbsp; Live vs SPY &nbsp;·&nbsp; '
                 f'{sum(1 for r in rrg_results if r["quad"]=="Leading")} Leading &nbsp; '
                 f'{sum(1 for r in rrg_results if r["quad"]=="Improving")} Improving &nbsp; '
@@ -2034,18 +2234,18 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
                 f'{sum(1 for r in rrg_results if r["quad"]=="Lagging")} Lagging'
                 f'</span></td></tr></table>'
                 f'<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:11px;margin-bottom:8px;">'
-                f'<thead><tr style="background:#1a1a2e;">'
-                f'<th style="padding:5px 8px;color:#94a3b8;text-align:left;font-weight:600;">ETF</th>'
-                f'<th style="padding:5px 8px;color:#94a3b8;text-align:left;font-weight:600;">Sector</th>'
-                f'<th style="padding:5px 8px;color:#94a3b8;text-align:center;font-weight:600;">Status</th>'
-                f'<th style="padding:5px 8px;color:#94a3b8;text-align:right;font-weight:600;" title="vs SPY — above 100 means sector is beating the market">Beating Market?</th>'
-                f'<th style="padding:5px 8px;color:#94a3b8;text-align:right;font-weight:600;" title="above 100 = gap widening, below 100 = gap closing">Gap Widening?</th>'
+                f'<thead><tr style="background:#f1f5f9;">'
+                f'<th style="padding:5px 8px;color:#64748b;text-align:left;font-weight:600;">ETF</th>'
+                f'<th style="padding:5px 8px;color:#64748b;text-align:left;font-weight:600;">Sector</th>'
+                f'<th style="padding:5px 8px;color:#64748b;text-align:center;font-weight:600;">Status</th>'
+                f'<th style="padding:5px 8px;color:#64748b;text-align:right;font-weight:600;" title="vs SPY — above 100 means sector is beating the market">Beating Market?</th>'
+                f'<th style="padding:5px 8px;color:#64748b;text-align:right;font-weight:600;" title="above 100 = gap widening, below 100 = gap closing">Gap Widening?</th>'
                 f'</tr></thead>'
-                f'<tr style="background:#0a0a0a;">'
-                f'<td colspan="3" style="padding:4px 8px;font-size:10px;color:#484f58;font-style:italic;">'
+                f'<tr style="background:#f8fafc;">'
+                f'<td colspan="3" style="padding:4px 8px;font-size:10px;color:#94a3b8;font-style:italic;">'
                 f'🟢 Leading = best to trade now &nbsp; 🔵 Improving = gaining momentum &nbsp; 🟡 Weakening = slowing &nbsp; 🔴 Lagging = avoid</td>'
-                f'<td style="padding:4px 8px;font-size:10px;color:#484f58;font-style:italic;text-align:right;">&gt;100 = beating SPY</td>'
-                f'<td style="padding:4px 8px;font-size:10px;color:#484f58;font-style:italic;text-align:right;">&gt;100 = accelerating</td>'
+                f'<td style="padding:4px 8px;font-size:10px;color:#94a3b8;font-style:italic;text-align:right;">&gt;100 = beating SPY</td>'
+                f'<td style="padding:4px 8px;font-size:10px;color:#94a3b8;font-style:italic;text-align:right;">&gt;100 = accelerating</td>'
                 f'</tr>'
                 f'<tbody>{rrg_rows}</tbody></table>'
             )
@@ -2227,6 +2427,9 @@ def build_email(trades: list[dict], india_mode: bool = False) -> str:
     ])
 
     # ── Assemble ──────────────────────────────────────────────────────────────
+    # Must come after scanner_html was built — that call populates _TOP_PICK.
+    hero_html = _build_hero_html()
+
     alert_banner = ""
     if total_alerts:
         alert_banner = (f'<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:6px;">'
@@ -2256,6 +2459,8 @@ def build_email(trades: list[dict], india_mode: bool = False) -> str:
       </td>
     </tr>
   </table>
+
+  {hero_html}
 
   {alert_banner}
   {top_kpi}
