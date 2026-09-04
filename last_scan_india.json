@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-08-24",
+  "scan_date": "2026-09-04",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -36,603 +36,591 @@
     "combo_pp_ribbon"
   ],
   "results_by_strategy": {
-    "breakout": [
+    "breakout": [],
+    "pocket_pivot": [
       {
-        "ticker": "HONASA.NS",
+        "ticker": "GRASIM.NS",
         "mkt": "US",
         "score": 5,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
         "fresh": [
-          "COIL"
+          "PP"
         ],
         "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
+          "RSI45-70",
+          "VOL1.5x",
+          "Near52H",
+          "EMA9>21"
         ],
         "minervini": 8,
-        "rsi": 61.6,
-        "adx": 22.1,
-        "price": 483.7,
-        "vol_ratio": 0.06,
-        "atr_ratio": 1.13,
-        "vol_5d_ratio": 0.69,
-        "pivot_high": 502.8,
-        "pct_from_piv": -3.8,
-        "strategy": "breakout",
-        "company": "HONASA CONSUMER LIMITED"
+        "rsi": 58.6,
+        "adx": 23.4,
+        "price": 3310.0,
+        "vol_ratio": 1.79,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "rs_vs_spy": null,
+        "company": "GRASIM INDUSTRIES LTD"
       },
       {
-        "ticker": "RBLBANK.NS",
+        "ticker": "KARURVYSYA.NS",
         "mkt": "US",
         "score": 5,
-        "phase": "COIL",
-        "coil_sigs": [
-          "VOLdry",
-          "NearPiv",
-          "ADXcurl",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
         "fresh": [
-          "COIL"
+          "PP"
         ],
         "conf": [
-          "VOLdry",
-          "NearPiv",
-          "ADXcurl",
-          "RS~ok",
-          "RngTght"
+          "ADX\u2191",
+          "VOL1.5x",
+          "Near52H",
+          "EMA9>21"
         ],
         "minervini": 8,
-        "rsi": 67.7,
-        "adx": 20.1,
-        "price": 393.0,
-        "vol_ratio": 0.08,
-        "atr_ratio": 0.84,
-        "vol_5d_ratio": 0.6,
-        "pivot_high": 393.0,
-        "pct_from_piv": 0.0,
-        "strategy": "breakout",
-        "company": "RBL BANK LIMITED"
-      },
-      {
-        "ticker": "SHRIRAMFIN.NS",
-        "mkt": "US",
-        "score": 5,
-        "phase": "COIL",
-        "coil_sigs": [
-          "VOLdry",
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "VOLdry",
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 61.1,
-        "adx": 21.4,
-        "price": 1129.3,
-        "vol_ratio": 0.08,
-        "atr_ratio": 0.89,
-        "vol_5d_ratio": 0.58,
-        "pivot_high": 1137.8,
-        "pct_from_piv": -0.7,
-        "strategy": "breakout",
-        "rs_vs_spy": 0.95,
-        "company": "SHRIRAM FINANCE LIMITED"
-      },
-      {
-        "ticker": "AARTIIND.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "VOLdry",
-          "NearPiv",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "VOLdry",
-          "NearPiv",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 75.8,
-        "adx": 25.4,
-        "price": 531.0,
-        "vol_ratio": 0.06,
-        "atr_ratio": 1.05,
-        "vol_5d_ratio": 0.53,
-        "pivot_high": 538.2,
-        "pct_from_piv": -1.3,
-        "strategy": "breakout",
-        "company": "AARTI INDUSTRIES LTD"
-      },
-      {
-        "ticker": "EXIDEIND.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "VOLdry",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "VOLdry",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 50.2,
-        "adx": 30.0,
-        "price": 458.7,
-        "vol_ratio": 0.06,
-        "atr_ratio": 0.97,
-        "vol_5d_ratio": 0.4,
-        "pivot_high": 490.65,
-        "pct_from_piv": -6.5,
-        "strategy": "breakout",
-        "company": "EXIDE INDUSTRIES LTD"
-      },
-      {
-        "ticker": "AEGISLOG.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 56.8,
-        "adx": 27.3,
-        "price": 1416.4,
-        "vol_ratio": 0.19,
-        "atr_ratio": 0.94,
-        "vol_5d_ratio": 1.13,
-        "pivot_high": 1417.9,
-        "pct_from_piv": -0.1,
-        "strategy": "breakout",
-        "company": "AEGIS LOGISTICS LIMITED"
-      },
-      {
-        "ticker": "CARBORUNIV.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 60.7,
-        "adx": 26.3,
-        "price": 1157.8,
-        "vol_ratio": 0.08,
-        "atr_ratio": 1.12,
-        "vol_5d_ratio": 1.58,
-        "pivot_high": 1184.6,
-        "pct_from_piv": -2.3,
-        "strategy": "breakout",
-        "company": "CARBORUNDUM UNIVERSAL LTD"
-      },
-      {
-        "ticker": "NAVINFLUOR.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "VOLdry",
-          "NearPiv",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "VOLdry",
-          "NearPiv",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 64.3,
-        "adx": 30.9,
-        "price": 8263.0,
-        "vol_ratio": 0.04,
-        "atr_ratio": 1.01,
-        "vol_5d_ratio": 0.32,
-        "pivot_high": 8356.5,
-        "pct_from_piv": -1.1,
-        "strategy": "breakout",
-        "rs_vs_spy": 2.28,
-        "company": "NAVIN FLUORINE INT. LTD"
-      },
-      {
-        "ticker": "SIEMENS.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "VOLdry",
-          "NearPiv",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "VOLdry",
-          "NearPiv",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 52.2,
-        "adx": 28.1,
-        "price": 4022.3,
-        "vol_ratio": 0.24,
-        "atr_ratio": 0.96,
-        "vol_5d_ratio": 0.53,
-        "pivot_high": 4022.3,
-        "pct_from_piv": 0.0,
-        "strategy": "breakout",
-        "rs_vs_spy": 1.39,
-        "company": "SIEMENS LTD"
-      },
-      {
-        "ticker": "SAILIFE.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 61.8,
-        "adx": 32.9,
-        "price": 1449.8,
-        "vol_ratio": 0.08,
-        "atr_ratio": 1.14,
-        "vol_5d_ratio": 0.66,
-        "pivot_high": 1471.6,
-        "pct_from_piv": -1.5,
-        "strategy": "breakout",
-        "rs_vs_spy": 1.28,
-        "company": "SAI LIFE SCIENCES LIMITED"
-      },
-      {
-        "ticker": "SYRMA.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 56.3,
-        "adx": 25.5,
-        "price": 1457.2,
-        "vol_ratio": 0.13,
-        "atr_ratio": 0.99,
-        "vol_5d_ratio": 0.73,
-        "pivot_high": 1514.85,
-        "pct_from_piv": -3.8,
-        "strategy": "breakout",
-        "company": "SYRMA SGS TECHNOLOGY LTD"
+        "rsi": 71.3,
+        "adx": 31.8,
+        "price": 350.0,
+        "vol_ratio": 1.66,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "company": "KARUR VYSYA BANK LTD"
       }
     ],
-    "pocket_pivot": [],
     "connors_rsi2": [],
-    "ema_ribbon": [],
+    "ema_ribbon": [
+      {
+        "ticker": "GLENMARK.NS",
+        "mkt": "US",
+        "score": 2,
+        "fresh": [
+          "EMA-RIBBON"
+        ],
+        "conf": [
+          "RSI50-70",
+          "MACD+"
+        ],
+        "minervini": 8,
+        "rsi": 66.1,
+        "adx": 23.8,
+        "price": 2459.0,
+        "vol_ratio": 0.92,
+        "hold_days": 7,
+        "strategy": "ema_ribbon",
+        "company": "GLENMARK PHARMACEUTICALS"
+      }
+    ],
     "nr7": [],
     "analyst_upgrade": [],
     "signal_velocity": [
       {
-        "ticker": "MANAPPURAM.NS",
-        "score": 8,
+        "ticker": "WOCKPHARMA.NS",
+        "score": 13,
         "fresh": [
-          "SV+6"
+          "SV+12"
         ],
         "conf": [
-          "SCORE:9/15"
+          "SCORE:10/15",
+          "VEL+12",
+          "VOL1.5x"
         ],
         "minervini": 8,
-        "rsi": 54.2,
-        "adx": 14.2,
-        "price": 360.95,
-        "vol_ratio": 0.26,
-        "net_score": 9,
-        "velocity": 6,
+        "rsi": 51.7,
+        "adx": 10.8,
+        "price": 1950.6,
+        "vol_ratio": 1.51,
+        "net_score": 10,
+        "velocity": 12,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "MANAPPURAM FINANCE LTD"
+        "rs_vs_spy": null,
+        "company": "WOCKHARDT LIMITED"
+      },
+      {
+        "ticker": "GRANULES.NS",
+        "score": 12,
+        "fresh": [
+          "SV+9"
+        ],
+        "conf": [
+          "SCORE:8/15",
+          "VEL+9",
+          "VOL1.5x"
+        ],
+        "minervini": 8,
+        "rsi": 48.2,
+        "adx": 18.5,
+        "price": 853.85,
+        "vol_ratio": 4.26,
+        "net_score": 8,
+        "velocity": 9,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "GRANULES INDIA LIMITED"
+      },
+      {
+        "ticker": "ACE.NS",
+        "score": 8,
+        "fresh": [
+          "SV+8"
+        ],
+        "conf": [
+          "VEL+8",
+          "ADX>20"
+        ],
+        "minervini": 8,
+        "rsi": 60.2,
+        "adx": 28.1,
+        "price": 1145.5,
+        "vol_ratio": 0.96,
+        "net_score": 7,
+        "velocity": 8,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "ACTION CONST EQUIP LTD"
+      },
+      {
+        "ticker": "PFOCUS.NS",
+        "score": 7,
+        "fresh": [
+          "SV+7"
+        ],
+        "conf": [
+          "ADX>20"
+        ],
+        "minervini": 8,
+        "rsi": 61.3,
+        "adx": 23.6,
+        "price": 291.65,
+        "vol_ratio": 0.78,
+        "net_score": 6,
+        "velocity": 7,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "PRIME FOCUS LIMITED"
       }
     ],
     "chokepoint_inflection": [],
-    "defensive_rotation": [
-      {
-        "ticker": "CPB",
-        "sector": "Consumer Staples",
-        "sector_etf": "XLP",
-        "score": 5,
-        "fresh": [
-          "ROT:XLP",
-          "ETF+2.0%vsS&P"
-        ],
-        "conf": [
-          "RS+4.9%",
-          "vsETF+2.9%",
-          "MACD+",
-          ">SMA200",
-          "M\u22653"
-        ],
-        "rsi": 64.8,
-        "adx": 21.6,
-        "vol_ratio": 0.94,
-        "minervini": 3,
-        "price": 23.95,
-        "rs_vs_spy": 4.88,
-        "rs_vs_sector": 2.88,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "The Campbell's Company"
-      },
-      {
-        "ticker": "PEP",
-        "sector": "Consumer Staples",
-        "sector_etf": "XLP",
-        "score": 3,
-        "fresh": [
-          "ROT:XLP",
-          "ETF+2.0%vsS&P"
-        ],
-        "conf": [
-          "RS+4.2%",
-          "vsETF+2.2%",
-          "MACD+"
-        ],
-        "rsi": 62.9,
-        "adx": 12.9,
-        "vol_ratio": 0.96,
-        "minervini": 2,
-        "price": 143.48,
-        "rs_vs_spy": 4.18,
-        "rs_vs_sector": 2.19,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "Pepsico, Inc."
-      },
-      {
-        "ticker": "KR",
-        "sector": "Consumer Staples",
-        "sector_etf": "XLP",
-        "score": 3,
-        "fresh": [
-          "ROT:XLP",
-          "ETF+2.0%vsS&P"
-        ],
-        "conf": [
-          "RS+3.7%",
-          "vsETF+1.7%",
-          "MACD+"
-        ],
-        "rsi": 50.5,
-        "adx": 13.2,
-        "vol_ratio": 0.94,
-        "minervini": 1,
-        "price": 57.9,
-        "rs_vs_spy": 3.74,
-        "rs_vs_sector": 1.74,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "Kroger Company (The)"
-      }
-    ],
+    "defensive_rotation": [],
     "cup_handle": [
       {
-        "ticker": "AUBANK.NS",
+        "ticker": "GRASIM.NS",
         "score": 5,
         "fresh": [
           "C&H",
-          "PIV@1108.2"
+          "PIV@3371.0"
         ],
         "conf": [
-          "CUP23.3%",
-          "HDL3.0%",
-          "MACD+",
+          "CUP25.4%",
+          "HDL2.4%",
           "RSI50-70",
-          "M\u22656"
+          "M\u22656",
+          "VOL1.5x"
         ],
-        "rsi": 64.2,
-        "adx": 25.3,
-        "vol_ratio": 0.08,
+        "rsi": 58.6,
+        "adx": 23.4,
+        "vol_ratio": 1.79,
         "minervini": 8,
-        "price": 1105.0,
-        "cup_depth_pct": 23.3,
+        "price": 3310.0,
+        "cup_depth_pct": 25.4,
         "cup_duration": 195,
-        "handle_depth_pct": 3.0,
+        "handle_depth_pct": 2.4,
         "handle_duration": 5,
-        "pivot": 1108.2,
+        "pivot": 3371.0,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "company": "AU SMALL FINANCE BANK LTD"
-      },
-      {
-        "ticker": "AUROPHARMA.NS",
-        "score": 5,
-        "fresh": [
-          "C&H",
-          "PIV@1645.0"
-        ],
-        "conf": [
-          "CUP32.7%",
-          "HDL2.2%",
-          "VOLdry",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 57.0,
-        "adx": 26.8,
-        "vol_ratio": 0.14,
-        "minervini": 8,
-        "price": 1623.9,
-        "cup_depth_pct": 32.7,
-        "cup_duration": 195,
-        "handle_depth_pct": 2.2,
-        "handle_duration": 5,
-        "pivot": 1645.0,
-        "vol_drying": true,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "rs_vs_spy": -1.12,
-        "company": "AUROBINDO PHARMA LTD"
+        "rs_vs_spy": null,
+        "company": "GRASIM INDUSTRIES LTD"
       },
       {
         "ticker": "SIEMENS.NS",
         "score": 5,
         "fresh": [
           "C&H",
-          "PIV@4020.2"
+          "PIV@4089.0"
         ],
         "conf": [
-          "CUP29.5%",
-          "HDL3.5%",
+          "CUP31.1%",
+          "HDL1.7%",
           "VOLdry",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 52.0,
-        "adx": 28.1,
-        "vol_ratio": 0.25,
+        "rsi": 58.4,
+        "adx": 30.3,
+        "vol_ratio": 0.94,
         "minervini": 8,
-        "price": 4020.2,
-        "cup_depth_pct": 29.5,
+        "price": 4030.0,
+        "cup_depth_pct": 31.1,
         "cup_duration": 195,
-        "handle_depth_pct": 3.5,
+        "handle_depth_pct": 1.7,
         "handle_duration": 5,
-        "pivot": 4020.2,
+        "pivot": 4089.0,
         "vol_drying": true,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "rs_vs_spy": 1.39,
         "company": "SIEMENS LTD"
+      },
+      {
+        "ticker": "LALPATHLAB.NS",
+        "score": 4,
+        "fresh": [
+          "C&H",
+          "PIV@1934.6"
+        ],
+        "conf": [
+          "CUP33.9%",
+          "HDL1.6%",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 52.1,
+        "adx": 31.2,
+        "vol_ratio": 0.85,
+        "minervini": 8,
+        "price": 1925.2,
+        "cup_depth_pct": 33.9,
+        "cup_duration": 195,
+        "handle_depth_pct": 1.6,
+        "handle_duration": 5,
+        "pivot": 1934.6,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "company": "DR. LAL PATH LABS LTD."
       }
     ],
     "darvas_box": [],
-    "rs_line": [],
-    "vcp": [],
-    "williams_pct_r": [],
+    "rs_line": [
+      {
+        "ticker": "RBLBANK.NS",
+        "score": 5,
+        "fresh": [
+          "RS-NEW-HIGH"
+        ],
+        "conf": [
+          "RS_LEADS",
+          "NEAR_HIGH",
+          "VOL\u22651.5x",
+          "RSI45-70",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 68.3,
+        "adx": 17.8,
+        "price": 408.1,
+        "vol_ratio": 7.06,
+        "rs_lead_days": 0,
+        "pct_from_high": 0.0,
+        "hold_days": 7,
+        "strategy": "rs_line",
+        "mkt": "US",
+        "rs_vs_spy": null,
+        "company": "RBL BANK LIMITED"
+      }
+    ],
+    "vcp": [
+      {
+        "ticker": "NYKAA.NS",
+        "score": 5,
+        "fresh": [
+          "VCP-3C"
+        ],
+        "conf": [
+          "TightFinal",
+          "VolDry",
+          "NearPivot",
+          "RSI50-65",
+          "M\u22657"
+        ],
+        "minervini": 8,
+        "rsi": 52.3,
+        "adx": 26.1,
+        "price": 334.2,
+        "vol_ratio": 0.61,
+        "n_contractions": 3,
+        "final_pct": 2.13,
+        "base_high": 348.0,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "vcp",
+        "spy_regime": "CHOPPY",
+        "company": "FSN E COMMERCE VENTURES"
+      },
+      {
+        "ticker": "NAVINFLUOR.NS",
+        "score": 4,
+        "fresh": [
+          "VCP-3C"
+        ],
+        "conf": [
+          "TightFinal",
+          "VolDry",
+          "NearPivot",
+          "M\u22657"
+        ],
+        "minervini": 8,
+        "rsi": 69.6,
+        "adx": 33.5,
+        "price": 8697.0,
+        "vol_ratio": 0.86,
+        "n_contractions": 3,
+        "final_pct": 3.98,
+        "base_high": 8775.5,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "vcp",
+        "spy_regime": "CHOPPY",
+        "company": "NAVIN FLUORINE INT. LTD"
+      }
+    ],
+    "williams_pct_r": [
+      {
+        "ticker": "KEI.NS",
+        "score": 5,
+        "fresh": [
+          "WR-CROSS"
+        ],
+        "conf": [
+          "DeepOversold",
+          "ADX>20",
+          "VOL>avg",
+          "M\u22655",
+          "NearSMA50"
+        ],
+        "minervini": 8,
+        "rsi": 38.6,
+        "adx": 23.8,
+        "price": 5327.0,
+        "vol_ratio": 1.47,
+        "williams_r": -68.1,
+        "hold_days": 3,
+        "mkt": "US",
+        "strategy": "williams_pct_r",
+        "company": "KEI INDUSTRIES LTD."
+      },
+      {
+        "ticker": "FINCABLES.NS",
+        "score": 4,
+        "fresh": [
+          "WR-CROSS"
+        ],
+        "conf": [
+          "RSI40-55",
+          "DeepOversold",
+          "ADX>20",
+          "M\u22655"
+        ],
+        "minervini": 8,
+        "rsi": 52.9,
+        "adx": 35.4,
+        "price": 1263.9,
+        "vol_ratio": 0.81,
+        "williams_r": -32.8,
+        "hold_days": 3,
+        "mkt": "US",
+        "strategy": "williams_pct_r",
+        "company": "FINOLEX CABLES LTD"
+      },
+      {
+        "ticker": "NETWEB.NS",
+        "score": 4,
+        "fresh": [
+          "WR-CROSS"
+        ],
+        "conf": [
+          "DeepOversold",
+          "ADX>20",
+          "VOL>avg",
+          "M\u22655"
+        ],
+        "minervini": 8,
+        "rsi": 56.8,
+        "adx": 33.2,
+        "price": 5270.0,
+        "vol_ratio": 1.16,
+        "williams_r": -72.5,
+        "hold_days": 3,
+        "mkt": "US",
+        "strategy": "williams_pct_r",
+        "company": "NETWEB TECH INDIA LTD"
+      }
+    ],
     "bollinger_pctb": [],
-    "connors_r3": [],
+    "connors_r3": [
+      {
+        "ticker": "AARTIIND.NS",
+        "score": 3,
+        "conf": [
+          "RSI2_sub5",
+          "ADX16-35",
+          "M>=5"
+        ],
+        "minervini": 8,
+        "rsi": 0.0,
+        "adx": 23.7,
+        "price": 501.9,
+        "vol_ratio": 0.39,
+        "hold_days": 3,
+        "mkt": "US",
+        "strategy": "connors_r3",
+        "company": "AARTI INDUSTRIES LTD"
+      }
+    ],
     "connors_tps": [],
     "turtle_soup": [],
     "raschke_8020": [],
     "wyckoff_spring": [],
     "weinstein_stage2": [],
-    "momentum_burst": [],
-    "ma50_reclaim": [],
+    "momentum_burst": [
+      {
+        "ticker": "RBLBANK.NS",
+        "score": 5,
+        "fresh": [
+          "BURST"
+        ],
+        "conf": [
+          "BURST\u22654%",
+          "VOL\u22651.5x",
+          "TI\u22651.03",
+          "M\u22656",
+          "RSI50-70"
+        ],
+        "minervini": 8,
+        "rsi": 68.3,
+        "adx": 17.8,
+        "price": 408.1,
+        "vol_ratio": 7.06,
+        "burst_pct": 4.8,
+        "hold_days": 5,
+        "mkt": "US",
+        "rs_vs_spy": null,
+        "company": "RBL BANK LIMITED"
+      },
+      {
+        "ticker": "CGCL.NS",
+        "score": 4,
+        "fresh": [
+          "BURST"
+        ],
+        "conf": [
+          "BURST\u22654%",
+          "VOL\u22651.5x",
+          "TI\u22651.03",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 75.4,
+        "adx": 32.9,
+        "price": 271.5,
+        "vol_ratio": 1.91,
+        "burst_pct": 5.88,
+        "hold_days": 5,
+        "mkt": "US",
+        "company": "CAPRI GLOBAL CAPITAL LTD"
+      }
+    ],
+    "ma50_reclaim": [
+      {
+        "ticker": "INDUSINDBK.NS",
+        "score": 5,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
+          "M\u22656",
+          "TIGHT<3%"
+        ],
+        "minervini": 8,
+        "rsi": 44.8,
+        "adx": 11.8,
+        "price": 1004.8,
+        "vol_ratio": 1.61,
+        "dist_50sma": 0.02,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "INDUSIND BANK LIMITED"
+      },
+      {
+        "ticker": "WOCKPHARMA.NS",
+        "score": 5,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
+          "M\u22656",
+          "TIGHT<3%"
+        ],
+        "minervini": 8,
+        "rsi": 51.7,
+        "adx": 10.8,
+        "price": 1950.6,
+        "vol_ratio": 1.51,
+        "dist_50sma": 2.3,
+        "hold_days": 7,
+        "mkt": "US",
+        "rs_vs_spy": null,
+        "company": "WOCKHARDT LIMITED"
+      },
+      {
+        "ticker": "MAHABANK.NS",
+        "score": 4,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "ADX>15",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 68.8,
+        "adx": 19.2,
+        "price": 86.32,
+        "vol_ratio": 3.01,
+        "dist_50sma": 4.99,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "BANK OF MAHARASHTRA"
+      },
+      {
+        "ticker": "USHAMART.NS",
+        "score": 3,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 65.6,
+        "adx": 10.7,
+        "price": 515.65,
+        "vol_ratio": 1.39,
+        "dist_50sma": 3.54,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "USHA MARTIN LTD."
+      }
+    ],
     "turnover_momentum": [],
     "three_weeks_tight": [
       {
-        "ticker": "AUROPHARMA.NS",
+        "ticker": "GRASIM.NS",
         "mkt": "US",
         "score": 4,
         "fresh": [
@@ -645,18 +633,18 @@
           "RSI50-65"
         ],
         "minervini": 8,
-        "rsi": 57.0,
-        "adx": 26.8,
-        "price": 1623.8,
-        "vol_ratio": 0.14,
-        "spread_pct": 0.15,
+        "rsi": 58.6,
+        "adx": 23.4,
+        "price": 3310.0,
+        "vol_ratio": 1.79,
+        "spread_pct": 0.61,
         "hold_days": 7,
         "strategy": "three_weeks_tight",
-        "rs_vs_spy": -1.12,
-        "company": "AUROBINDO PHARMA LTD"
+        "rs_vs_spy": null,
+        "company": "GRASIM INDUSTRIES LTD"
       },
       {
-        "ticker": "GRANULES.NS",
+        "ticker": "ELGIEQUIP.NS",
         "mkt": "US",
         "score": 4,
         "fresh": [
@@ -669,86 +657,14 @@
           "RSI50-65"
         ],
         "minervini": 8,
-        "rsi": 61.9,
-        "adx": 16.9,
-        "price": 858.85,
-        "vol_ratio": 0.12,
-        "spread_pct": 0.08,
+        "rsi": 56.4,
+        "adx": 22.1,
+        "price": 630.35,
+        "vol_ratio": 0.65,
+        "spread_pct": 0.87,
         "hold_days": 7,
         "strategy": "three_weeks_tight",
-        "company": "GRANULES INDIA LIMITED"
-      },
-      {
-        "ticker": "NAVINFLUOR.NS",
-        "mkt": "US",
-        "score": 4,
-        "fresh": [
-          "3WT"
-        ],
-        "conf": [
-          "TIGHT<1%",
-          "VOL_DECLINING",
-          "NEAR_52H",
-          "RSI50-65"
-        ],
-        "minervini": 8,
-        "rsi": 64.3,
-        "adx": 30.9,
-        "price": 8264.5,
-        "vol_ratio": 0.04,
-        "spread_pct": 0.71,
-        "hold_days": 7,
-        "strategy": "three_weeks_tight",
-        "rs_vs_spy": 2.28,
-        "company": "NAVIN FLUORINE INT. LTD"
-      },
-      {
-        "ticker": "SHRIRAMFIN.NS",
-        "mkt": "US",
-        "score": 4,
-        "fresh": [
-          "3WT"
-        ],
-        "conf": [
-          "TIGHT<1%",
-          "VOL_DECLINING",
-          "NEAR_52H",
-          "RSI50-65"
-        ],
-        "minervini": 8,
-        "rsi": 61.3,
-        "adx": 21.4,
-        "price": 1129.9,
-        "vol_ratio": 0.08,
-        "spread_pct": 0.71,
-        "hold_days": 7,
-        "strategy": "three_weeks_tight",
-        "rs_vs_spy": 0.95,
-        "company": "SHRIRAM FINANCE LIMITED"
-      },
-      {
-        "ticker": "SAILIFE.NS",
-        "mkt": "US",
-        "score": 4,
-        "fresh": [
-          "3WT"
-        ],
-        "conf": [
-          "TIGHT<1%",
-          "VOL_DECLINING",
-          "NEAR_52H",
-          "RSI50-65"
-        ],
-        "minervini": 8,
-        "rsi": 61.6,
-        "adx": 32.9,
-        "price": 1448.9,
-        "vol_ratio": 0.08,
-        "spread_pct": 0.59,
-        "hold_days": 7,
-        "strategy": "three_weeks_tight",
-        "rs_vs_spy": 1.28,
-        "company": "SAI LIFE SCIENCES LIMITED"
+        "company": "ELGI EQUIPMENTS LTD"
       }
     ],
     "episodic_pivot": [],
@@ -756,7 +672,7 @@
     "momentum": []
   },
   "sector_excess": {},
-  "spy_ret": -1.239438826348588,
+  "spy_ret": -1.4790467768764104,
   "elder_impulse_count": 2,
   "market_regime": "BEAR",
   "india_mode": true
