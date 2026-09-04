@@ -1,8 +1,14 @@
 # Credentials — never commit
 config.py
 
-# Local-only personal data
-trades.csv
+# trades.csv used to be listed here as "local-only personal data" — but that
+# meant load_trades() found nothing on every GitHub Actions checkout (fresh
+# clone, file never committed), so CI operated on an empty ledger every run:
+# added Friday's practice trades, emailed them, then threw them away when the
+# job ended. Nothing ever carried forward. Now tracked and committed by CI
+# alongside scan_history.csv, exactly like the rest of the scan state — this
+# repo is private, so real position data in git history is an accepted risk
+# the user explicitly signed off on (2026-09-04).
 
 # Generated outputs (rebuilt on each run)
 digest_preview.html
@@ -19,3 +25,7 @@ __pycache__/
 
 # macOS
 .DS_Store
+digest_preview.html
+digest_preview_india.html
+cron.log
+*.log

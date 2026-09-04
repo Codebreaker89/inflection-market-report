@@ -256,12 +256,23 @@ def fetch_live_price(ticker: str) -> tuple[Optional[float], Optional[str]]:
     return price, ccy
 
 def fetch_company_name(ticker: str) -> str:
+    """Company name, or "" when unknown — never the ticker.
+
+    Returning the ticker on failure made a failed lookup indistinguishable from
+    a real name, and scan.py writes this value into the `company` column of
+    trades.csv (`r.get("company") or fetch_company_name(...)`). Rows for DCC.L,
+    BNY and VTRS ended up with company == ticker permanently. Same class of bug
+    as the one fixed in company_cache.py; this was the other half of it.
+
+    Also normalises the symbol via _yf_ticker() so prefixed tickers like
+    "ETR:ENR" resolve instead of always raising.
+    """
     try:
         with _quiet():
-            info = yf.Ticker(ticker).info
-        return info.get("shortName") or info.get("longName") or ticker
+            info = yf.Ticker(_yf_ticker(ticker)).info
+        return info.get("shortName") or info.get("longName") or ""
     except Exception:
-        return ticker
+        return ""
 
 
 # ── CSV HELPERS ───────────────────────────────────────────────────────────────

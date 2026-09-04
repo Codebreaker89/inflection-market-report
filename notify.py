@@ -39,11 +39,27 @@ TRADES_CSV = HERE / "trades.csv"
 # `abs(ret) > 15` filter, but that also discarded ~50 REAL large moves and
 # systematically flattered the stats: it censored big losses from strategies
 # like vcp (+2.39% -> -0.29% once they are counted) and three_weeks_tight
-# (+1.76% -> +0.02%). We now drop only rows whose *price* is implausible,
-# judged against that ticker's own median observed price.
+# (+1.76% -> +0.02%).
+#
+# We therefore judge the PRICE, not the return. Two rules matter:
+#
+#   1. Only `price_at_scan` is tested. price_d5 / price_d10 are OUTCOMES — an
+#      earlier version tested those too, which silently dropped any stock that
+#      legitimately doubled and so reintroduced exactly the win-side censoring
+#      this replaced.
+#   2. Dispersion is measured with the median absolute deviation, not a fixed
+#      ±2x band. A bad tick inflates the mean and the standard deviation but
+#      barely moves the MAD, so the outlier cannot hide its own detection.
+#
+# Limitation, stated rather than papered over: a ticker with fewer than
+# MIN_OBS scan-time observations has no internal reference to compare against,
+# so a bad print on a one-off ticker is not detectable here and will pass
+# through. Detecting that needs an external price source.
 _SUSPECT_KEYS: Optional[set] = None
-_SUSPECT_RATIO_HI = 2.0
-_SUSPECT_RATIO_LO = 0.5
+_SUSPECT_MIN_OBS  = 3      # scan-time prices needed before a ticker is testable
+_SUSPECT_MAD_MULT = 8.0    # flag beyond 8 MADs from the median
+_SUSPECT_MIN_RATIO = 1.6   # …and at least 1.6x / 0.625x off, so tight series
+                           # (where MAD ≈ 0) don't flag ordinary daily moves
 
 
 def _load_suspect_price_keys() -> set:
@@ -71,22 +87,27 @@ def _load_suspect_price_keys() -> set:
             except (TypeError, ValueError):
                 return None
 
+        def _median(xs):
+            s = sorted(xs); n = len(s)
+            return s[n // 2] if n % 2 else (s[n // 2 - 1] + s[n // 2]) / 2.0
+
         for t, rows in rows_by_ticker.items():
-            obs = [x for r in rows
-                   for x in (_f(r.get("price_at_scan")), _f(r.get("price_d5")), _f(r.get("price_d10")))
-                   if x is not None]
-            if len(obs) < 4:
+            # Entry-time prices only — never outcomes.
+            priced = [(r, _f(r.get("price_at_scan"))) for r in rows]
+            obs = [v for _r, v in priced if v is not None]
+            if len(obs) < _SUSPECT_MIN_OBS:
                 continue
-            obs.sort()
-            med = obs[len(obs) // 2]
+            med = _median(obs)
             if med <= 0:
                 continue
-            for r in rows:
-                for col in ("price_at_scan", "price_d5", "price_d10"):
-                    v = _f(r.get(col))
-                    if v is not None and (v / med > _SUSPECT_RATIO_HI or v / med < _SUSPECT_RATIO_LO):
-                        _SUSPECT_KEYS.add((r.get("scan_date", ""), t, r.get("strategy", "")))
-                        break
+            mad = _median([abs(v - med) for v in obs]) or (med * 0.02)
+            for r, v in priced:
+                if v is None:
+                    continue
+                ratio = v / med
+                if (abs(v - med) > _SUSPECT_MAD_MULT * mad
+                        and (ratio > _SUSPECT_MIN_RATIO or ratio < 1.0 / _SUSPECT_MIN_RATIO)):
+                    _SUSPECT_KEYS.add((r.get("scan_date", ""), t, r.get("strategy", "")))
     except Exception:
         pass
     return _SUSPECT_KEYS
@@ -507,12 +528,23 @@ def _ticker_ccy(ticker: str) -> str:
 
 
 def _fmt_price(ticker: str, value) -> str:
-    """Format a scanner price with the right currency unit.
+    """Format a LIVE SCANNER price with the right currency unit.
 
-    London quotes arrive from yfinance in pence, so .L values are suffixed "p"
-    rather than divided by 100 — pence is how the LSE actually quotes, and
-    labelling the unit cannot be wrong the way a conversion can. Everything
-    else gets its currency symbol from the ticker suffix.
+    London quotes arrive from yfinance's raw Close column in pence, so .L
+    values are suffixed "p" rather than divided by 100 — pence is how the LSE
+    actually quotes at that layer, and labelling the unit cannot be wrong the
+    way a conversion can. Everything else gets its currency symbol from the
+    ticker suffix.
+
+    Use this ONLY for values read straight from the scanner (last_scan.json /
+    r["price"]) — the hero pick, conviction cards, scan detail tables. Do NOT
+    use it for trades.csv fields (buy_price, stop_loss_price) or a live price
+    from show_tracker.fetch_live_price(): both of those are already converted
+    to true pounds upstream (scan.py's practice-trade writer divides by 100
+    before storing; fetch_live_price's _normalise_ccy divides GBp by 100 on
+    read). Reapplying the pence suffix to an already-converted pounds value
+    would understate it 100x on screen while the stored number is correct.
+    Use _fmt_position_price for those instead.
     """
     if value in (None, "") or value != value:      # None / NaN
         return "─"
@@ -524,6 +556,25 @@ def _fmt_price(ticker: str, value) -> str:
     dec = 0 if abs(v) >= 1000 else 2               # ₹36,050 not ₹36050.00
     if ccy == "GBP":
         return f"{v:,.{dec}f}p"                    # LSE quotes in pence
+    return f"{_ccy_sym(ccy)}{v:,.{dec}f}"
+
+
+def _fmt_position_price(ticker: str, value) -> str:
+    """Format a price that is ALREADY in true native units (pounds, not pence).
+
+    For trades.csv fields (buy_price, stop_loss_price) and any value returned
+    by show_tracker.fetch_live_price() — both are pre-converted to real GBP,
+    unlike the raw scanner Close used by _fmt_price. See that function's
+    docstring for the bug this distinction fixes.
+    """
+    if value in (None, "") or value != value:
+        return "─"
+    try:
+        v = float(value)
+    except (TypeError, ValueError):
+        return "─"
+    ccy = _ticker_ccy(ticker)
+    dec = 0 if abs(v) >= 1000 else 2
     return f"{_ccy_sym(ccy)}{v:,.{dec}f}"
 
 
@@ -620,15 +671,20 @@ def _company_label(r: dict, maxlen: int = 22) -> str:
     return co[:maxlen]
 
 def _sl_eur_str(t: dict) -> str:
+    """Stop-loss price, formatted from the TICKER's currency.
+
+    Deliberately ignores the stored `currency` column: it's wrong on some
+    legacy rows (GWW and CVS are booked EUR but are USD stocks — a one-off
+    data-fix script corrects the existing rows; see fix_legacy_currency.py).
+    Deriving from the ticker suffix is more robust than trusting that column.
+
+    Uses _fmt_position_price, NOT _fmt_price: stop_loss_price in trades.csv is
+    stored in true pounds for .L tickers (scan.py converts pence→pounds before
+    writing), so it must not get the scanner's pence-suffix treatment.
+    """
     if not t.get("stop_loss_price"):
         return "─"
-    try:
-        sl_native = float(t["stop_loss_price"])
-        ccy = t.get("currency", "EUR")
-        sym = _ccy_sym(ccy)
-        return f"{sym}{sl_native:.2f}"
-    except Exception:
-        return str(t.get("stop_loss_price", "─"))
+    return _fmt_position_price(t.get("ticker", ""), t.get("stop_loss_price"))
 
 def _portfolio_table(results_slice: list, alert_tickers: set) -> str:
     """Open-positions table.
@@ -699,24 +755,33 @@ def _portfolio_table(results_slice: list, alert_tickers: set) -> str:
         rows += _td(_dates_cell, "left", bg=bg)
 
         # ── Buy → Now, one cell ───────────────────────────────────────────────
-        _sym    = _ccy_sym(t.get("currency", "EUR"))
-        _buy_px = float(t["buy_price"]) if t.get("buy_price") else None
-        _now_px = r.get("curr_native")
+        # Formatted from the ticker suffix, not the stored currency column —
+        # see _sl_eur_str for why that column cannot be trusted.
+        _tk      = t.get("ticker", "")
+        # _fmt_position_price, not _fmt_price: both values here are already in
+        # true native units (buy_price post-fix in scan.py; curr_native via
+        # show_tracker.fetch_live_price's own pence->pounds conversion) —
+        # see _fmt_price's docstring for why reapplying "p" would be wrong.
         _px_cell = (
             f'<div style="white-space:nowrap;">'
-            f'<span style="color:{_C_DIM};">{f"{_sym}{_buy_px:,.2f}" if _buy_px else "─"}</span>'
+            f'<span style="color:{_C_DIM};">{_fmt_position_price(_tk, t.get("buy_price"))}</span>'
             f'<span style="color:{_C_DIM};"> → </span>'
-            f'<b style="color:{_C_BODY};">{f"{_sym}{_now_px:,.2f}" if _now_px else "─"}</b>'
+            f'<b style="color:{_C_BODY};">{_fmt_position_price(_tk, r.get("curr_native"))}</b>'
             f'</div>'
         )
         rows += _td(_px_cell, "right", bg=bg)
 
         # ── Size: qty on line 1, invested on line 2 ───────────────────────────
+        # `or 0` guards: a single blank cell here used to take down the whole email
+        try:    _qty_v = float(t.get("qty") or 0)
+        except (TypeError, ValueError): _qty_v = 0.0
+        try:    _inv_v = float(t.get("investment_eur") or 0)
+        except (TypeError, ValueError): _inv_v = 0.0
         _size_cell = (
             f'<div style="white-space:nowrap;font-size:11px;color:{_C_BODY};">'
-            f'{float(t["qty"]):.4g}</div>'
+            f'{_qty_v:.4g}</div>'
             f'<div style="white-space:nowrap;font-size:10px;color:{_C_DIM};">'
-            f'€{float(t["investment_eur"]):,.0f}</div>'
+            f'€{_inv_v:,.0f}</div>'
         )
         rows += _td(_size_cell, "right", bg=bg)
         rows += _td(_pct(r["ret_pct"]), "right", ret_c, bold=True, bg=bg)
@@ -1439,6 +1504,12 @@ def _build_strategy_performance_html() -> str:
 
 def _build_scanner_results_html(india_mode: bool = False) -> str:
     """Scanner results: leads with conviction cards, then full detail by strategy."""
+    # Reset BEFORE any early return. If this sat further down (after the JSON is
+    # parsed), a missing last_scan_india.json would leave the previous render's
+    # pick in place and the India hero card would show a US ticker.
+    global _TOP_PICK
+    _TOP_PICK = {}
+
     scan_json = HERE / ("last_scan_india.json" if india_mode else "last_scan.json")
     if not scan_json.exists():
         return ""
@@ -1603,9 +1674,8 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
     )
     # Stash the #1 ranked pick so build_email() can lead the digest with it.
     # Taken from the same ranked list the cards use, so the hero can never
-    # disagree with "#1 BEST" further down.
-    global _TOP_PICK
-    _TOP_PICK = {}
+    # disagree with "#1 BEST" further down. (_TOP_PICK was already cleared at
+    # the top of this function, before the early returns.)
     if high_picks:
         _t_tier, _t_strat, _t_r = high_picks[0]
         _t_fired = sorted(

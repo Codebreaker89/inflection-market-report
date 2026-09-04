@@ -65,9 +65,19 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f scan_history.csv last_scan_india.json
+          git add -f scan_history.csv last_scan_india.json trades.csv
           git diff --staged --quiet || git commit -m "scan-india: $(date +%Y-%m-%d)"
-          git push
+          # Retry on push rejection: if scan-intl pushed in the gap between our
+          # checkout and this push (e.g. both jobs triggered together via
+          # workflow_dispatch), `git push` fails outright with no retry. Rebase
+          # onto the new remote HEAD and try again, a few times, before giving up.
+          for i in 1 2 3 4 5; do
+            git push && break
+            echo "Push rejected (attempt $i/5) — rebasing onto latest origin/main and retrying..."
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort; exit 1; }
+            sleep $((i * 3))
+          done
 
   # ── Intl scan (14:00 UTC → 16:00 CEST) ──────────────────────────────────────
   scan-intl:
@@ -119,6 +129,94 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f scan_history.csv last_scan.json
+          git add -f scan_history.csv last_scan.json trades.csv
           git diff --staged --quiet || git commit -m "scan: $(date +%Y-%m-%d)"
-          git push
+          # Retry on push rejection — see the matching comment in scan-india.
+          for i in 1 2 3 4 5; do
+            git push && break
+            echo "Push rejected (attempt $i/5) — rebasing onto latest origin/main and retrying..."
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort; exit 1; }
+            sleep $((i * 3))
+          done
+
+  # ── Failure / recovery notifier ──────────────────────────────────────────────
+  # Runs after every trigger regardless of outcome (needs + if: always()). If
+  # either scan job failed, opens (or updates) a single tracking issue with the
+  # specific error pulled from the log and a direct link to the fix — so a dead
+  # Gmail app password shows up as a GitHub notification instead of silence.
+  # If both jobs succeeded and a tracking issue is still open, closes it.
+  notify:
+    needs: [scan-india, scan-intl]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      actions: read
+    steps:
+      - name: Report failure
+        if: needs.scan-india.result == 'failure' || needs.scan-intl.result == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FAILED=""
+          [ "${{ needs.scan-india.result }}" = "failure" ] && FAILED="$FAILED scan-india"
+          [ "${{ needs.scan-intl.result }}"  = "failure" ] && FAILED="$FAILED scan-intl"
+
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          # Pull the last ~40 log lines from each failed job and grep for the
+          # kind of error worth naming explicitly. Falls back to "see the run"
+          # if nothing recognizable is found (log grep is best-effort — a gh
+          # CLI or API hiccup here must not crash this step).
+          DIAGNOSIS="See the failed step in the run log: $RUN_URL"
+          LOG=$(gh run view ${{ github.run_id }} --repo ${{ github.repository }} --log-failed 2>/dev/null || true)
+          if echo "$LOG" | grep -qi "SMTPAuthenticationError\|BadCredentials\|Username and Password not accepted"; then
+            DIAGNOSIS="**Gmail app password has expired or was revoked.**
+
+          1. Generate a new one: https://myaccount.google.com/apppasswords
+          2. Update it here: ${{ github.server_url }}/${{ github.repository }}/settings/secrets/actions
+             (secret name: \`GMAIL_APP_PASSWORD\`)
+          3. Re-run this workflow from the Actions tab, or just wait for tomorrow's scheduled run."
+          elif echo "$LOG" | grep -qi "ModuleNotFoundError\|No matching distribution\|ResolutionImpossible"; then
+            DIAGNOSIS="**A Python dependency failed to install.** Check requirements.txt against the error in the run log: $RUN_URL"
+          elif echo "$LOG" | grep -qi "rebase\|non-fast-forward\|failed to push"; then
+            DIAGNOSIS="**Git push conflict** that survived the retry loop. Usually only happens when both jobs are triggered together manually. Run log: $RUN_URL"
+          fi
+
+          BODY="Failed job(s):**$FAILED**
+
+          $DIAGNOSIS
+
+          _This issue is updated automatically on each failure and closes itself once a scan succeeds again — no need to close it by hand._"
+
+          # gh issue create fails outright if the label doesn't exist yet — create
+          # it defensively (idempotent: errors if it already exists, which we ignore).
+          gh label create scan-failure --repo ${{ github.repository }} \
+            --color "d73a4a" --description "Auto-filed by fire_scan.yml on failure" 2>/dev/null || true
+
+          EXISTING=$(gh issue list --repo ${{ github.repository }} --label scan-failure --state open --json number --jq '.[0].number' 2>/dev/null || true)
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --repo ${{ github.repository }} --body "$BODY"
+          else
+            gh issue create --repo ${{ github.repository }} --title "🔴 Fire Daily Scan failed" --label scan-failure --body "$BODY"
+          fi
+
+      - name: Close tracking issue on recovery
+        # On a normal scheduled day only ONE of these jobs runs — the other's
+        # `if` was false, so its result is "skipped", not "success". Requiring
+        # both to be "success" would mean this step never fires outside a
+        # manual workflow_dispatch (which runs both). Correct condition: no
+        # failure occurred, and at least one job actually ran.
+        if: >
+          needs.scan-india.result != 'failure' &&
+          needs.scan-intl.result != 'failure' &&
+          (needs.scan-india.result == 'success' || needs.scan-intl.result == 'success')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING=$(gh issue list --repo ${{ github.repository }} --label scan-failure --state open --json number --jq '.[0].number' 2>/dev/null || true)
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --repo ${{ github.repository }} --body "✅ Both scans succeeded — closing."
+            gh issue close "$EXISTING" --repo ${{ github.repository }}
+          fi

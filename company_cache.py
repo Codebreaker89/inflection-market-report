@@ -48,7 +48,14 @@ def _save(cache: dict):
 
 
 def _fetch_one(ticker: str) -> tuple:
-    """Fetch company name from yfinance. Returns (ticker, name)."""
+    """Fetch company name from yfinance. Returns (ticker, name-or-EMPTY).
+
+    Returns "" — never the ticker — when the lookup fails. A failure must not
+    look like a successful result, because anything non-empty gets written to
+    company_names.csv and then permanently satisfies the cache, so the name
+    would never be retried. That bug left 23 of 44 cached entries stuck as bare
+    ticker symbols in the digest regardless of network health.
+    """
     try:
         import yfinance as yf
         with _quiet():
@@ -60,9 +67,9 @@ def _fetch_one(ticker: str) -> tuple:
         with _quiet():
             fi = yf.Ticker(ticker).fast_info
         name = getattr(fi, "longName", "") or getattr(fi, "shortName", "") or ""
-        return ticker, name or ticker
+        return ticker, name or ""
     except Exception:
-        return ticker, ticker
+        return ticker, ""
 
 
 def get_names(tickers: list, max_workers: int = 15) -> dict:
@@ -71,8 +78,11 @@ def get_names(tickers: list, max_workers: int = 15) -> dict:
     Uses disk cache first; fetches only unknowns from yfinance.
     Writes any new names back to disk automatically.
     """
-    cache   = _load()
-    missing = [t for t in tickers if t not in cache]
+    cache = _load()
+    # A cached value equal to the ticker is a poisoned entry from an older
+    # failed fetch, not a real name — treat it as missing so it gets retried.
+    missing = [t for t in tickers
+               if t not in cache or cache[t].strip().upper() == t.strip().upper()]
 
     if missing:
         fetched = {}
@@ -81,20 +91,49 @@ def get_names(tickers: list, max_workers: int = 15) -> dict:
                 futures = {ex.submit(_fetch_one, t): t for t in missing}
                 for fut in as_completed(futures):
                     t, name = fut.result()
-                    fetched[t] = name
+                    if name:                 # only real names enter the cache
+                        fetched[t] = name
         except Exception:
-            for t in missing:
-                fetched[t] = t
+            pass                             # nothing fetched; retry next run
 
-        cache.update(fetched)
-        try:
-            _save(cache)
-        except Exception:
-            pass   # read-only FS in CI — cache still works in-memory for this run
+        if fetched:
+            cache.update(fetched)
+            try:
+                _save(cache)
+            except Exception:
+                pass   # read-only FS in CI — cache still works in-memory for this run
 
-    return {t: cache.get(t, t) for t in tickers}
+    # Callers still get the ticker as a display fallback — it just isn't persisted.
+    return {t: cache.get(t) or t for t in tickers}
 
 
 def update_cache(tickers: list, max_workers: int = 15):
     """Fetch and persist names for a list of tickers (called from scan.py)."""
     get_names(tickers, max_workers=max_workers)
+
+
+def purge_fallbacks() -> int:
+    """Drop cache rows whose name is just the ticker. Returns rows removed.
+
+    Those are poisoned entries from failed lookups. Removing them lets the next
+    run with working network fetch the real name.
+    """
+    cache = _load()
+    bad = [t for t, n in cache.items() if n.strip().upper() == t.strip().upper()]
+    for t in bad:
+        del cache[t]
+    if bad:
+        _save(cache)
+    return len(bad)
+
+
+if __name__ == "__main__":
+    import sys
+    if "--purge" in sys.argv:
+        n = purge_fallbacks()
+        print(f"Purged {n} ticker-fallback row(s). They will re-fetch on the next run.")
+    else:
+        c = _load()
+        bad = [t for t, n in c.items() if n.strip().upper() == t.strip().upper()]
+        print(f"{len(c)} cached name(s), {len(bad)} poisoned: {bad}")
+        print("Run with --purge to remove them.")

@@ -610,8 +610,10 @@ def _rank_score(r: dict, strats_fired: list, elder_count: int = 0,
     if 7 <= (r.get("score") or 0) <= 10:
         pts -= 1
     vr = r.get("vol_ratio", 0) or 0
+    # 2026-09 recal: vol≥2x WR=47.5% (n=158, -7.1% delta) — high vol often means news/gap; no extra bonus.
+    # vol 1.5-2x WR=60.1% (n=148, +6.5% delta) — sweet spot, keep +1.
     if vr >= 2.0:
-        pts += 2
+        pts += 1   # was +2; recalibrated 2026-09
     elif 1.5 <= vr < 2.0:
         pts += 1
     days_seen = _PERSISTENCE.get(r.get("ticker", ""), 0)
@@ -1733,7 +1735,13 @@ def _auto_add_practice_trades(results_by_strategy: dict, multi_tickers: set, is_
 
     # Fetch regime once for bear suppression
     _regime_today = fetch_market_regime(date.today())
-    _is_bear = isinstance(_regime_today, dict) and _regime_today.get("elder_count", 10) == 0
+    # Was `isinstance(_regime_today, dict) and ...` — fetch_market_regime()
+    # returns the STRING "BULL"/"BEAR"/"", never a dict, so that check was
+    # always False and this suppression never fired. Confirmed live on
+    # 2026-08-17: the India digest was headlined "🔴 MARKET REGIME: BEAR"
+    # while still handing out 8 HIGH-conviction trend-strategy longs — this
+    # exact guard should have blocked those.
+    _is_bear = (_regime_today == "BEAR")
 
     for _, r, strategy in picks:
         ticker = r["ticker"]
@@ -1753,6 +1761,20 @@ def _auto_add_practice_trades(results_by_strategy: dict, multi_tickers: set, is_
             price    = float(r.get("price") or 0)
             if not price:
                 continue
+            # yfinance quotes LSE ordinaries (.L) in pence, but ticker_ccy()
+            # labels them "GBP" (pounds). r["price"] here is that raw pence
+            # value straight from the scanner's Close column. Storing it
+            # unconverted under a "GBP" label broke two things downstream:
+            # (1) qty = invest_eur*fx/price came out 100x too small, so a
+            #     trade "worth €1000" only deployed ~€10 of real exposure —
+            #     confirmed against trades.csv id 15 (DCC.L): qty=0.1351 at
+            #     a real price of 63.35 GBP is €10.00, not the claimed €1000.
+            # (2) buy_price stored 100x high, so P&L vs the live price (which
+            #     IS correctly pence-converted by show_tracker.fetch_live_price)
+            #     read as a ~-99% loss on a position that hadn't moved.
+            # Converting here, before qty/sl are computed, fixes both at once.
+            if ticker.upper().endswith(".L"):
+                price = round(price / 100.0, 4)
             sl       = trade_stop_loss(price)
             hold_d   = trade_hold_days(strategy)
             exit_dt  = biz_days_add(today, hold_d)
