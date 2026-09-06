@@ -2334,7 +2334,18 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
     return html
 
 
+def _is_india_ticker(ticker: str) -> bool:
+    """India-listed tickers carry an NSE/BSE suffix (INFY.NS, RELIANCE.BO, ...)."""
+    return ticker.upper().endswith((".NS", ".BO"))
+
+
 def build_email(trades: list[dict], india_mode: bool = False) -> str:
+    # trades.csv has no market column, so India vs Intl is inferred from ticker
+    # suffix. Without this filter, both digests showed every OPEN position
+    # (e.g. a US ticker's stop-loss alert appearing in the India email, and
+    # vice versa) — same root cause class as the currency-suffix bugs already
+    # fixed (ticker suffix is the only signal of what market a row belongs to).
+    trades = [t for t in trades if _is_india_ticker(t.get("ticker", "")) == india_mode]
     # Practice trades excluded everywhere in the email
     trades        = [t for t in trades if t.get("trade_type") == "real"]
     open_trades   = [t for t in trades if t.get("status") == "OPEN"]
@@ -2584,7 +2595,9 @@ def main():
     html = build_email(trades, india_mode=india_mode)
 
     if do_send:
-        open_count = sum(1 for t in trades if t.get('status') == 'OPEN')
+        open_count = sum(1 for t in trades
+                          if t.get('status') == 'OPEN' and t.get('trade_type') == 'real'
+                          and _is_india_ticker(t.get('ticker', '')) == india_mode)
         if india_mode:
             subject = f"🇮🇳 India Scan — {TODAY} · {open_count} open"
         else:
