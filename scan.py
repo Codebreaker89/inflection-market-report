@@ -149,6 +149,7 @@ from show_tracker                  import (add_trade_interactive, load_trades, s
                                            trade_stop_loss, trade_hold_days, biz_days_add,
                                            _yf_ticker as _yf_sym)
 from scanner_utils                 import _quiet as _quiet_ctx
+from scanner_utils                 import install_price_cache, price_cache_report
 
 # ANSI helpers (inline — no shared module dependency)
 import os as _os
@@ -1338,6 +1339,8 @@ def main():
     all_results = []
     results_by_strategy = {}
 
+    install_price_cache()  # share one price fetch per ticker across all 33 scanners below
+
     for strategy in strategies:
         scanner = SCANNER_MAP.get(strategy)
         if scanner is None:
@@ -1353,6 +1356,8 @@ def main():
         print(DIM(f"  [{strategy}] done in {elapsed:.0f}s — {len(res)} signal(s)"))
         results_by_strategy[strategy] = res
         all_results.extend(res)
+
+    print(DIM(f"  {price_cache_report()}"))
 
     # Score cap: score>=6 WR drops to 25-56%, avg turns negative (Jun 30 backtest, 620 trades)
     # Exception: signal_velocity uses 0-13 scale so cap doesn't apply
