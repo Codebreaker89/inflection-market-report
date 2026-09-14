@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-09-11",
+  "scan_date": "2026-09-14",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -38,7 +38,7 @@
   "results_by_strategy": {
     "breakout": [
       {
-        "ticker": "CF",
+        "ticker": "PANW",
         "mkt": "US",
         "score": 4,
         "phase": "COIL",
@@ -59,16 +59,17 @@
           "RS~ok"
         ],
         "minervini": 8,
-        "rsi": 56.4,
-        "adx": 23.5,
-        "price": 133.74,
-        "vol_ratio": 0.45,
-        "atr_ratio": 1.1,
-        "vol_5d_ratio": 1.04,
-        "pivot_high": 139.27,
-        "pct_from_piv": -4.0,
+        "rsi": 56.1,
+        "adx": 17.7,
+        "price": 374.81,
+        "vol_ratio": 1.46,
+        "atr_ratio": 1.09,
+        "vol_5d_ratio": 0.81,
+        "pivot_high": 382.13,
+        "pct_from_piv": -1.9,
         "strategy": "breakout",
-        "company": "CF Industries Holdings, Inc."
+        "rs_vs_spy": -1.2,
+        "company": "Palo Alto Networks, Inc."
       },
       {
         "ticker": "XOM",
@@ -92,27 +93,27 @@
           "RS~ok"
         ],
         "minervini": 8,
-        "rsi": 50.8,
-        "adx": 20.1,
-        "price": 165.58,
-        "vol_ratio": 0.36,
-        "atr_ratio": 0.98,
-        "vol_5d_ratio": 1.07,
-        "pivot_high": 165.58,
-        "pct_from_piv": 0.0,
+        "rsi": 50.2,
+        "adx": 21.0,
+        "price": 164.18,
+        "vol_ratio": 0.56,
+        "atr_ratio": 0.99,
+        "vol_5d_ratio": 1.02,
+        "pivot_high": 165.99,
+        "pct_from_piv": -1.1,
         "strategy": "breakout",
         "company": "ExxonMobil Holdings Corporation"
       },
       {
-        "ticker": "APA",
-        "mkt": "US",
+        "ticker": "CA.PA",
+        "mkt": "FR",
         "score": 4,
         "phase": "COIL",
         "coil_sigs": [
           "NearPiv",
+          "ADXcurl",
           "RSIbase",
-          "RS~ok",
-          "RngTght"
+          "RS~ok"
         ],
         "break_sigs": [],
         "fresh": [
@@ -120,32 +121,33 @@
         ],
         "conf": [
           "NearPiv",
+          "ADXcurl",
           "RSIbase",
-          "RS~ok",
-          "RngTght"
+          "RS~ok"
         ],
         "minervini": 8,
-        "rsi": 56.2,
-        "adx": 26.2,
-        "price": 44.65,
-        "vol_ratio": 0.44,
-        "atr_ratio": 0.98,
-        "vol_5d_ratio": 0.96,
-        "pivot_high": 44.84,
-        "pct_from_piv": -0.4,
+        "rsi": 60.8,
+        "adx": 19.0,
+        "price": 16.61,
+        "vol_ratio": 1.1,
+        "atr_ratio": 1.01,
+        "vol_5d_ratio": 1.04,
+        "pivot_high": 16.66,
+        "pct_from_piv": -0.3,
         "strategy": "breakout",
-        "company": "APA Corporation"
+        "rs_vs_spy": 6.63,
+        "company": "CARREFOUR"
       },
       {
-        "ticker": "OXY",
-        "mkt": "US",
+        "ticker": "BAYN.DE",
+        "mkt": "DE",
         "score": 4,
         "phase": "COIL",
         "coil_sigs": [
           "NearPiv",
+          "ADXcurl",
           "RSIbase",
-          "RS~ok",
-          "RngTght"
+          "RS~ok"
         ],
         "break_sigs": [],
         "fresh": [
@@ -153,60 +155,28 @@
         ],
         "conf": [
           "NearPiv",
+          "ADXcurl",
           "RSIbase",
-          "RS~ok",
-          "RngTght"
+          "RS~ok"
         ],
         "minervini": 8,
-        "rsi": 50.3,
-        "adx": 18.8,
-        "price": 61.06,
-        "vol_ratio": 0.59,
+        "rsi": 56.9,
+        "adx": 19.1,
+        "price": 49.33,
+        "vol_ratio": 1.61,
         "atr_ratio": 0.92,
-        "vol_5d_ratio": 1.08,
-        "pivot_high": 61.16,
+        "vol_5d_ratio": 1.07,
+        "pivot_high": 49.41,
         "pct_from_piv": -0.2,
         "strategy": "breakout",
-        "company": "Occidental Petroleum Corporatio"
-      },
-      {
-        "ticker": "GLEN.L",
-        "mkt": "UK",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 54.5,
-        "adx": 20.6,
-        "price": 605.5,
-        "vol_ratio": 0.42,
-        "atr_ratio": 0.92,
-        "vol_5d_ratio": 0.83,
-        "pivot_high": 629.0,
-        "pct_from_piv": -3.7,
-        "strategy": "breakout",
-        "company": "GLENCORE PLC ORD USD0.01"
+        "rs_vs_spy": 1.25,
+        "company": "Bayer AG                      N"
       }
     ],
     "pocket_pivot": [
       {
-        "ticker": "SHEL.L",
-        "mkt": "UK",
+        "ticker": "CA.PA",
+        "mkt": "FR",
         "score": 5,
         "fresh": [
           "PP"
@@ -218,38 +188,61 @@
           "EMA9>21"
         ],
         "minervini": 8,
-        "rsi": 69.6,
-        "adx": 17.7,
-        "price": 3551.0,
-        "vol_ratio": 0.65,
+        "rsi": 60.8,
+        "adx": 19.0,
+        "price": 16.61,
+        "vol_ratio": 1.1,
         "hold_days": 7,
         "strategy": "pocket_pivot",
-        "company": "SHELL PLC ORD EUR0.07"
-      }
-    ],
-    "connors_rsi2": [
+        "rs_vs_spy": 6.63,
+        "company": "CARREFOUR"
+      },
       {
-        "ticker": "RWE.DE",
+        "ticker": "BAYN.DE",
         "mkt": "DE",
-        "score": 2,
+        "score": 5,
         "fresh": [
-          "RSI2=0.0"
+          "PP"
         ],
         "conf": [
-          "RSI14>40",
-          "Near52H"
+          "RSI45-70",
+          "ADX\u2191",
+          "VOL1.5x",
+          "EMA9>21"
         ],
         "minervini": 8,
-        "rsi": 67.8,
-        "rsi2": 0.0,
-        "adx": 16.2,
-        "price": 59.84,
-        "vol_ratio": 1.5,
-        "hold_days": 5,
-        "strategy": "connors_rsi2",
-        "company": "RWE AG                        I"
+        "rsi": 56.9,
+        "adx": 19.1,
+        "price": 49.33,
+        "vol_ratio": 1.61,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "rs_vs_spy": 1.25,
+        "company": "Bayer AG                      N"
+      },
+      {
+        "ticker": "OXY",
+        "mkt": "US",
+        "score": 4,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "RSI45-70",
+          "ADX\u2191",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 62.2,
+        "adx": 19.3,
+        "price": 61.56,
+        "vol_ratio": 0.98,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "company": "Occidental Petroleum Corporatio"
       }
     ],
+    "connors_rsi2": [],
     "ema_ribbon": [],
     "nr7": [],
     "analyst_upgrade": [],
@@ -265,10 +258,10 @@
           "VEL+10"
         ],
         "minervini": 8,
-        "rsi": 47.9,
-        "adx": 13.4,
-        "price": 351.01,
-        "vol_ratio": 0.5,
+        "rsi": 52.0,
+        "adx": 14.2,
+        "price": 355.48,
+        "vol_ratio": 0.65,
         "net_score": 9,
         "velocity": 10,
         "hold_days": 5,
@@ -277,193 +270,247 @@
         "company": "West Pharmaceutical Services, I"
       },
       {
-        "ticker": "AIZ",
-        "score": 11,
+        "ticker": "EBAY",
+        "score": 10,
+        "fresh": [
+          "SV+11"
+        ],
+        "conf": [
+          "VEL+11"
+        ],
+        "minervini": 8,
+        "rsi": 54.6,
+        "adx": 13.2,
+        "price": 109.05,
+        "vol_ratio": 0.62,
+        "net_score": 7,
+        "velocity": 11,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "eBay Inc."
+      },
+      {
+        "ticker": "ALL",
+        "score": 9,
         "fresh": [
           "SV+9"
         ],
         "conf": [
-          "SCORE:8/15",
           "VEL+9"
         ],
         "minervini": 8,
-        "rsi": 49.6,
-        "adx": 16.8,
-        "price": 282.91,
-        "vol_ratio": 0.26,
-        "net_score": 8,
+        "rsi": 47.9,
+        "adx": 11.6,
+        "price": 257.53,
+        "vol_ratio": 0.56,
+        "net_score": 7,
         "velocity": 9,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "Assurant, Inc."
+        "company": "Allstate Corporation (The)"
       },
       {
-        "ticker": "FANG",
+        "ticker": "GOOGL",
         "score": 9,
         "fresh": [
-          "SV+7"
+          "SV+9"
         ],
         "conf": [
-          "SCORE:9/15"
+          "VEL+9"
         ],
         "minervini": 8,
-        "rsi": 39.5,
-        "adx": 13.7,
-        "price": 204.0,
-        "vol_ratio": 0.36,
-        "net_score": 9,
-        "velocity": 7,
+        "rsi": 49.6,
+        "adx": 7.9,
+        "price": 347.37,
+        "vol_ratio": 1.05,
+        "net_score": 5,
+        "velocity": 9,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "Diamondback Energy, Inc."
+        "company": "Alphabet Inc."
       },
       {
-        "ticker": "NTRS",
-        "score": 7,
+        "ticker": "KO",
+        "score": 8,
         "fresh": [
-          "SV+7"
+          "SV+6"
+        ],
+        "conf": [
+          "SCORE:8/15"
+        ],
+        "minervini": 8,
+        "rsi": 35.2,
+        "adx": 18.4,
+        "price": 89.19,
+        "vol_ratio": 0.6,
+        "net_score": 8,
+        "velocity": 6,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "Coca-Cola Company (The)"
+      },
+      {
+        "ticker": "ABBV",
+        "score": 8,
+        "fresh": [
+          "SV+6"
+        ],
+        "conf": [
+          "SCORE:8/15"
+        ],
+        "minervini": 8,
+        "rsi": 46.6,
+        "adx": 18.6,
+        "price": 261.58,
+        "vol_ratio": 0.56,
+        "net_score": 8,
+        "velocity": 6,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "AbbVie Inc."
+      },
+      {
+        "ticker": "DRI",
+        "score": 8,
+        "fresh": [
+          "SV+8"
+        ],
+        "conf": [
+          "VEL+8",
+          "ADX>20"
+        ],
+        "minervini": 8,
+        "rsi": 43.8,
+        "adx": 20.6,
+        "price": 219.3,
+        "vol_ratio": 0.65,
+        "net_score": 7,
+        "velocity": 8,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "Darden Restaurants, Inc."
+      },
+      {
+        "ticker": "AIZ",
+        "score": 6,
+        "fresh": [
+          "SV+6"
         ],
         "conf": [],
         "minervini": 8,
-        "rsi": 64.4,
-        "adx": 12.5,
-        "price": 189.05,
-        "vol_ratio": 0.23,
-        "net_score": 7,
-        "velocity": 7,
+        "rsi": 43.0,
+        "adx": 15.9,
+        "price": 282.77,
+        "vol_ratio": 0.6,
+        "net_score": 3,
+        "velocity": 6,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "Northern Trust Corporation"
+        "company": "Assurant, Inc."
       }
     ],
     "chokepoint_inflection": [],
     "defensive_rotation": [],
     "cup_handle": [
       {
-        "ticker": "IVZ",
+        "ticker": "CAH",
         "score": 5,
         "fresh": [
           "C&H",
-          "PIV@33.07"
+          "PIV@240.49"
         ],
         "conf": [
-          "CUP32.6%",
-          "HDL3.4%",
+          "CUP26.8%",
+          "HDL2.5%",
           "VOLdry",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 53.7,
-        "adx": 17.9,
-        "vol_ratio": 0.42,
+        "rsi": 52.7,
+        "adx": 24.4,
+        "vol_ratio": 0.59,
         "minervini": 8,
-        "price": 32.46,
-        "cup_depth_pct": 32.6,
+        "price": 234.4,
+        "cup_depth_pct": 26.8,
         "cup_duration": 195,
-        "handle_depth_pct": 3.4,
+        "handle_depth_pct": 2.5,
         "handle_duration": 5,
-        "pivot": 33.07,
+        "pivot": 240.49,
         "vol_drying": true,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "company": "Invesco Ltd"
-      },
-      {
-        "ticker": "BNR.DE",
-        "score": 5,
-        "fresh": [
-          "C&H",
-          "PIV@61.8"
-        ],
-        "conf": [
-          "CUP33.5%",
-          "HDL1.9%",
-          "VOLdry",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 50.8,
-        "adx": 23.6,
-        "vol_ratio": 0.76,
-        "minervini": 8,
-        "price": 60.62,
-        "cup_depth_pct": 33.5,
-        "cup_duration": 195,
-        "handle_depth_pct": 1.9,
-        "handle_duration": 5,
-        "pivot": 61.8,
-        "vol_drying": true,
-        "hold_days": 10,
-        "mkt": "DE",
-        "strategy": "cup_handle",
-        "company": "Brenntag SE                   N"
+        "rs_vs_spy": 0.56,
+        "company": "Cardinal Health, Inc."
       },
       {
         "ticker": "EXPD",
         "score": 4,
         "fresh": [
           "C&H",
-          "PIV@192.07"
+          "PIV@193.23"
         ],
         "conf": [
           "CUP27.7%",
-          "HDL3.2%",
+          "HDL3.8%",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 60.9,
-        "adx": 25.5,
-        "vol_ratio": 0.45,
+        "rsi": 63.0,
+        "adx": 25.9,
+        "vol_ratio": 0.68,
         "minervini": 8,
-        "price": 192.07,
+        "price": 193.23,
         "cup_depth_pct": 27.7,
         "cup_duration": 195,
-        "handle_depth_pct": 3.2,
+        "handle_depth_pct": 3.8,
         "handle_duration": 5,
-        "pivot": 192.07,
+        "pivot": 193.23,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
         "company": "Expeditors International of Was"
-      },
-      {
-        "ticker": "BAC",
-        "score": 4,
-        "fresh": [
-          "C&H",
-          "PIV@62.94"
-        ],
-        "conf": [
-          "CUP28.3%",
-          "HDL0.9%",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 63.7,
-        "adx": 19.6,
-        "vol_ratio": 0.4,
-        "minervini": 8,
-        "price": 62.94,
-        "cup_depth_pct": 28.3,
-        "cup_duration": 195,
-        "handle_depth_pct": 0.9,
-        "handle_duration": 5,
-        "pivot": 62.94,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "company": "Bank of America Corporation"
       }
     ],
     "darvas_box": [],
     "rs_line": [],
-    "vcp": [],
+    "vcp": [
+      {
+        "ticker": "CAH",
+        "score": 4,
+        "fresh": [
+          "VCP-3C"
+        ],
+        "conf": [
+          "TightFinal",
+          "VolDry",
+          "RSI50-65",
+          "M\u22657"
+        ],
+        "minervini": 8,
+        "rsi": 52.7,
+        "adx": 24.4,
+        "price": 234.4,
+        "vol_ratio": 0.59,
+        "n_contractions": 3,
+        "final_pct": 3.06,
+        "base_high": 258.3,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "vcp",
+        "spy_regime": "CHOPPY",
+        "rs_vs_spy": 0.56,
+        "company": "Cardinal Health, Inc."
+      }
+    ],
     "williams_pct_r": [],
     "bollinger_pctb": [],
     "connors_r3": [],
@@ -472,8 +519,57 @@
     "raschke_8020": [],
     "wyckoff_spring": [],
     "weinstein_stage2": [],
-    "momentum_burst": [],
-    "ma50_reclaim": [],
+    "momentum_burst": [
+      {
+        "ticker": "CRWD",
+        "score": 5,
+        "fresh": [
+          "BURST"
+        ],
+        "conf": [
+          "BURST\u22654%",
+          "VOL\u22651.5x",
+          "TI\u22651.03",
+          "M\u22656",
+          "RSI50-70"
+        ],
+        "minervini": 8,
+        "rsi": 65.3,
+        "adx": 17.2,
+        "price": 236.1,
+        "vol_ratio": 1.91,
+        "burst_pct": 14.2,
+        "hold_days": 5,
+        "mkt": "US",
+        "company": "CrowdStrike Holdings, Inc."
+      }
+    ],
+    "ma50_reclaim": [
+      {
+        "ticker": "PANW",
+        "score": 5,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
+          "ADX>15",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 56.1,
+        "adx": 17.7,
+        "price": 374.81,
+        "vol_ratio": 1.46,
+        "dist_50sma": 7.06,
+        "hold_days": 7,
+        "mkt": "US",
+        "rs_vs_spy": -1.2,
+        "company": "Palo Alto Networks, Inc."
+      }
+    ],
     "turnover_momentum": [],
     "three_weeks_tight": [],
     "episodic_pivot": [],
@@ -481,19 +577,19 @@
     "momentum": []
   },
   "sector_excess": {
-    "XLK": 0.43,
-    "XLI": -2.78,
-    "XLV": -2.78,
-    "XLF": -0.41,
-    "XLY": -1.76,
-    "XLP": -1.11,
-    "XLB": -3.44,
-    "XLE": 5.29,
-    "XLC": 1.92,
-    "XLU": -0.68,
-    "XLRE": -1.9
+    "XLK": 0.69,
+    "XLI": -3.03,
+    "XLV": -1.03,
+    "XLF": -1.03,
+    "XLY": -2.71,
+    "XLP": -0.1,
+    "XLB": -3.93,
+    "XLE": 3.45,
+    "XLC": 2.76,
+    "XLU": -0.95,
+    "XLRE": -1.75
   },
-  "spy_ret": -0.67,
+  "spy_ret": -0.96,
   "elder_impulse_count": 2,
   "market_regime": "BEAR",
   "india_mode": false
