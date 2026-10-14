@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-09-14",
+  "scan_date": "2026-10-14",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -38,45 +38,12 @@
   "results_by_strategy": {
     "breakout": [
       {
-        "ticker": "AUROPHARMA.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 59.6,
-        "adx": 26.1,
-        "price": 1679.8,
-        "vol_ratio": 0.6,
-        "atr_ratio": 1.08,
-        "vol_5d_ratio": 0.96,
-        "pivot_high": 1717.0,
-        "pct_from_piv": -2.2,
-        "strategy": "breakout",
-        "rs_vs_spy": 2.75,
-        "company": "AUROBINDO PHARMA LTD"
-      },
-      {
         "ticker": "LALPATHLAB.NS",
         "mkt": "US",
-        "score": 4,
+        "score": 5,
         "phase": "COIL",
         "coil_sigs": [
+          "VOLdry",
           "NearPiv",
           "RSIbase",
           "RS~ok",
@@ -87,63 +54,31 @@
           "COIL"
         ],
         "conf": [
+          "VOLdry",
           "NearPiv",
           "RSIbase",
           "RS~ok",
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 53.3,
-        "adx": 23.3,
-        "price": 1909.0,
-        "vol_ratio": 1.2,
-        "atr_ratio": 0.97,
-        "vol_5d_ratio": 0.98,
-        "pivot_high": 1936.4,
-        "pct_from_piv": -1.4,
+        "rsi": 51.7,
+        "adx": 21.6,
+        "price": 1936.9,
+        "vol_ratio": 0.49,
+        "atr_ratio": 1.11,
+        "vol_5d_ratio": 0.53,
+        "pivot_high": 2005.1,
+        "pct_from_piv": -3.4,
         "strategy": "breakout",
-        "rs_vs_spy": -0.49,
         "company": "DR. LAL PATH LABS LTD."
       },
       {
-        "ticker": "MAHABANK.NS",
+        "ticker": "LGEINDIA.NS",
         "mkt": "US",
-        "score": 4,
+        "score": 5,
         "phase": "COIL",
         "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 61.4,
-        "adx": 20.1,
-        "price": 84.2,
-        "vol_ratio": 1.31,
-        "atr_ratio": 1.09,
-        "vol_5d_ratio": 0.77,
-        "pivot_high": 86.32,
-        "pct_from_piv": -2.5,
-        "strategy": "breakout",
-        "company": "BANK OF MAHARASHTRA"
-      },
-      {
-        "ticker": "FLUOROCHEM.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
+          "VOLdry",
           "NearPiv",
           "RSIbase",
           "RS~ok",
@@ -154,449 +89,369 @@
           "COIL"
         ],
         "conf": [
+          "VOLdry",
           "NearPiv",
           "RSIbase",
           "RS~ok",
           "RngTght"
         ],
-        "minervini": 8,
-        "rsi": 58.8,
-        "adx": 33.5,
-        "price": 4773.2,
-        "vol_ratio": 0.76,
-        "atr_ratio": 1.0,
-        "vol_5d_ratio": 1.17,
-        "pivot_high": 4786.3,
-        "pct_from_piv": -0.3,
-        "strategy": "breakout",
-        "company": "GUJARAT FLUOROCHEM LTD"
-      },
-      {
-        "ticker": "PFOCUS.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
+        "minervini": 6,
         "rsi": 58.7,
-        "adx": 27.4,
-        "price": 310.85,
-        "vol_ratio": 0.29,
-        "atr_ratio": 0.98,
-        "vol_5d_ratio": 1.16,
-        "pivot_high": 316.3,
-        "pct_from_piv": -1.7,
+        "adx": 28.8,
+        "price": 1746.0,
+        "vol_ratio": 0.21,
+        "atr_ratio": 1.13,
+        "vol_5d_ratio": 0.49,
+        "pivot_high": 1780.3,
+        "pct_from_piv": -1.9,
         "strategy": "breakout",
-        "company": "PRIME FOCUS LIMITED"
-      }
-    ],
-    "pocket_pivot": [
+        "rs_vs_spy": -0.68,
+        "company": "LG ELECTRONICS INDIA LTD"
+      },
       {
-        "ticker": "EMCURE.NS",
+        "ticker": "MTARTECH.NS",
         "mkt": "US",
-        "score": 4,
+        "score": 5,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "ADXcurl",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
         "fresh": [
-          "PP"
+          "COIL"
         ],
         "conf": [
-          "ADX\u2191",
-          "Near52H",
-          "EMA9>21"
+          "NearPiv",
+          "ADXcurl",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
         ],
         "minervini": 8,
-        "rsi": 76.7,
-        "adx": 18.6,
-        "price": 1978.9,
-        "vol_ratio": 0.93,
-        "hold_days": 7,
-        "strategy": "pocket_pivot",
-        "company": "EMCURE PHARMACEUTICALS L"
+        "rsi": 60.6,
+        "adx": 19.5,
+        "price": 7681.0,
+        "vol_ratio": 0.32,
+        "atr_ratio": 1.04,
+        "vol_5d_ratio": 0.78,
+        "pivot_high": 7864.5,
+        "pct_from_piv": -2.3,
+        "strategy": "breakout",
+        "company": "MTAR TECHNOLOGIES LIMITED"
+      },
+      {
+        "ticker": "GLAND.NS",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 60.2,
+        "adx": 31.5,
+        "price": 3052.0,
+        "vol_ratio": 0.33,
+        "atr_ratio": 1.07,
+        "vol_5d_ratio": 1.21,
+        "pivot_high": 3150.6,
+        "pct_from_piv": -3.1,
+        "strategy": "breakout",
+        "company": "GLAND PHARMA LIMITED"
+      },
+      {
+        "ticker": "CUPID.NS",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "ADXcurl",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "NearPiv",
+          "ADXcurl",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 79.5,
+        "adx": 24.7,
+        "price": 355.7,
+        "vol_ratio": 0.3,
+        "atr_ratio": 1.19,
+        "vol_5d_ratio": 1.0,
+        "pivot_high": 366.1,
+        "pct_from_piv": -2.8,
+        "strategy": "breakout",
+        "company": "CUPID LIMITED"
+      },
+      {
+        "ticker": "REDINGTON.NS",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "VOLdry",
+          "NearPiv",
+          "RSIbase",
+          "RS~ok"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "VOLdry",
+          "NearPiv",
+          "RSIbase",
+          "RS~ok"
+        ],
+        "minervini": 8,
+        "rsi": 51.9,
+        "adx": 31.0,
+        "price": 404.3,
+        "vol_ratio": 1.01,
+        "atr_ratio": 0.99,
+        "vol_5d_ratio": 0.64,
+        "pivot_high": 412.75,
+        "pct_from_piv": -2.0,
+        "strategy": "breakout",
+        "company": "REDINGTON LIMITED"
       }
     ],
+    "pocket_pivot": [],
     "connors_rsi2": [],
     "ema_ribbon": [],
     "nr7": [],
     "analyst_upgrade": [],
     "signal_velocity": [
       {
-        "ticker": "SAREGAMA.NS",
+        "ticker": "ADANIGREEN.NS",
+        "score": 12,
+        "fresh": [
+          "SV+12"
+        ],
+        "conf": [
+          "SCORE:8/15",
+          "VEL+12"
+        ],
+        "minervini": 8,
+        "rsi": 52.2,
+        "adx": 12.7,
+        "price": 1318.6,
+        "vol_ratio": 0.63,
+        "net_score": 8,
+        "velocity": 12,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "ADANI GREEN ENERGY LTD"
+      },
+      {
+        "ticker": "KPRMILL.NS",
+        "score": 12,
+        "fresh": [
+          "SV+13"
+        ],
+        "conf": [
+          "SCORE:9/15",
+          "VEL+13"
+        ],
+        "minervini": 8,
+        "rsi": 46.8,
+        "adx": 14.0,
+        "price": 1120.2,
+        "vol_ratio": 0.47,
+        "net_score": 9,
+        "velocity": 13,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "KPR MILL LTD."
+      },
+      {
+        "ticker": "SONACOMS.NS",
         "score": 9,
         "fresh": [
           "SV+7"
         ],
         "conf": [
-          "SCORE:9/15"
+          "SCORE:8/15"
         ],
         "minervini": 8,
-        "rsi": 49.5,
-        "adx": 15.2,
-        "price": 505.5,
-        "vol_ratio": 1.1,
-        "net_score": 9,
+        "rsi": 43.7,
+        "adx": 17.3,
+        "price": 809.8,
+        "vol_ratio": 1.06,
+        "net_score": 8,
         "velocity": 7,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "SAREGAMA INDIA LIMITED"
+        "company": "SONA BLW PRECISION FRGS L"
       }
     ],
     "chokepoint_inflection": [],
     "defensive_rotation": [],
     "cup_handle": [
       {
-        "ticker": "GLENMARK.NS",
+        "ticker": "LGEINDIA.NS",
         "score": 5,
         "fresh": [
           "C&H",
-          "PIV@2474.5"
+          "PIV@1758.0"
         ],
         "conf": [
-          "CUP23.6%",
-          "HDL2.4%",
+          "CUP25.9%",
+          "HDL2.0%",
           "VOLdry",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 55.1,
-        "adx": 24.0,
-        "vol_ratio": 0.68,
-        "minervini": 8,
-        "price": 2419.2,
-        "cup_depth_pct": 23.6,
+        "rsi": 58.7,
+        "adx": 28.8,
+        "vol_ratio": 0.21,
+        "minervini": 6,
+        "price": 1746.0,
+        "cup_depth_pct": 25.9,
         "cup_duration": 195,
-        "handle_depth_pct": 2.4,
+        "handle_depth_pct": 2.0,
         "handle_duration": 5,
-        "pivot": 2474.5,
+        "pivot": 1758.0,
         "vol_drying": true,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "company": "GLENMARK PHARMACEUTICALS"
+        "rs_vs_spy": -0.68,
+        "company": "LG ELECTRONICS INDIA LTD"
       },
       {
-        "ticker": "NYKAA.NS",
+        "ticker": "PVRINOX.NS",
         "score": 5,
         "fresh": [
           "C&H",
-          "PIV@344.5"
+          "PIV@1404.5"
         ],
         "conf": [
-          "CUP32.9%",
-          "HDL3.5%",
+          "CUP31.9%",
+          "HDL6.8%",
           "MACD+",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 58.4,
-        "adx": 27.8,
-        "vol_ratio": 0.95,
+        "rsi": 56.9,
+        "adx": 31.1,
+        "vol_ratio": 0.42,
         "minervini": 8,
-        "price": 344.5,
-        "cup_depth_pct": 32.9,
+        "price": 1384.8,
+        "cup_depth_pct": 31.9,
         "cup_duration": 195,
-        "handle_depth_pct": 3.5,
+        "handle_depth_pct": 6.8,
         "handle_duration": 5,
-        "pivot": 344.5,
+        "pivot": 1404.5,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "company": "FSN E COMMERCE VENTURES"
-      },
-      {
-        "ticker": "AUROPHARMA.NS",
-        "score": 5,
-        "fresh": [
-          "C&H",
-          "PIV@1698.9"
-        ],
-        "conf": [
-          "CUP34.7%",
-          "HDL2.7%",
-          "MACD+",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 59.6,
-        "adx": 26.1,
-        "vol_ratio": 0.6,
-        "minervini": 8,
-        "price": 1679.8,
-        "cup_depth_pct": 34.7,
-        "cup_duration": 195,
-        "handle_depth_pct": 2.7,
-        "handle_duration": 5,
-        "pivot": 1698.9,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "rs_vs_spy": 2.75,
-        "company": "AUROBINDO PHARMA LTD"
-      },
-      {
-        "ticker": "LALPATHLAB.NS",
-        "score": 4,
-        "fresh": [
-          "C&H",
-          "PIV@1919.7"
-        ],
-        "conf": [
-          "CUP33.9%",
-          "HDL2.2%",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 53.3,
-        "adx": 23.3,
-        "vol_ratio": 1.2,
-        "minervini": 8,
-        "price": 1909.0,
-        "cup_depth_pct": 33.9,
-        "cup_duration": 195,
-        "handle_depth_pct": 2.2,
-        "handle_duration": 5,
-        "pivot": 1919.7,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "rs_vs_spy": -0.49,
-        "company": "DR. LAL PATH LABS LTD."
+        "company": "PVR INOX LIMITED"
       }
     ],
     "darvas_box": [],
-    "rs_line": [],
-    "vcp": [
+    "rs_line": [
       {
         "ticker": "BHEL.NS",
         "score": 5,
         "fresh": [
-          "VCP-3C"
+          "RS-NEW-HIGH"
         ],
         "conf": [
-          "TightFinal",
-          "VolDry",
-          "NearPivot",
-          "RSI50-65",
-          "M\u22657"
+          "RS_LEADS",
+          "NEAR_HIGH",
+          "VOL\u22651.5x",
+          "RSI45-70",
+          "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 60.9,
-        "adx": 28.2,
-        "price": 431.0,
-        "vol_ratio": 0.96,
-        "n_contractions": 3,
-        "final_pct": 4.7,
-        "base_high": 435.95,
-        "hold_days": 10,
+        "rsi": 65.2,
+        "adx": 14.7,
+        "price": 455.45,
+        "vol_ratio": 2.76,
+        "rs_lead_days": 0,
+        "pct_from_high": 0.0,
+        "hold_days": 7,
+        "strategy": "rs_line",
         "mkt": "US",
-        "strategy": "vcp",
-        "spy_regime": "CHOPPY",
-        "rs_vs_spy": -1.97,
         "company": "BHEL"
-      },
-      {
-        "ticker": "VIJAYA.NS",
-        "score": 5,
-        "fresh": [
-          "VCP-3C"
-        ],
-        "conf": [
-          "TightFinal",
-          "VolDry",
-          "NearPivot",
-          "RSI50-65",
-          "M\u22657"
-        ],
-        "minervini": 8,
-        "rsi": 55.2,
-        "adx": 31.3,
-        "price": 1502.0,
-        "vol_ratio": 0.73,
-        "n_contractions": 3,
-        "final_pct": 4.09,
-        "base_high": 1573.0,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "vcp",
-        "spy_regime": "CHOPPY",
-        "company": "VIJAYA DIAGNOSTIC CEN LTD"
       }
     ],
+    "vcp": [],
     "williams_pct_r": [],
     "bollinger_pctb": [],
-    "connors_r3": [
-      {
-        "ticker": "NSLNISP.NS",
-        "score": 3,
-        "conf": [
-          "RSI2_sub5",
-          "ADX16-35",
-          "M>=5"
-        ],
-        "minervini": 8,
-        "rsi": 0.0,
-        "adx": 27.8,
-        "price": 43.66,
-        "vol_ratio": 0.27,
-        "hold_days": 3,
-        "mkt": "US",
-        "strategy": "connors_r3",
-        "rs_vs_spy": -10.28,
-        "company": "NMDC STEEL LIMITED"
-      }
-    ],
+    "connors_r3": [],
     "connors_tps": [],
     "turtle_soup": [],
     "raschke_8020": [],
     "wyckoff_spring": [],
-    "weinstein_stage2": [
-      {
-        "ticker": "NSLNISP.NS",
-        "company": "NMDC STEEL LIMITED",
-        "mkt": "US",
-        "strategy": "weinstein_stage2",
-        "hold_days": 10,
-        "score": 4,
-        "fresh": [
-          "W2"
-        ],
-        "conf": [
-          "VOL1.5x",
-          "Near52H",
-          "ADX16-35",
-          "M8"
-        ],
-        "minervini": 8,
-        "rsi": 61.9,
-        "adx": 27.8,
-        "price": 43.66,
-        "vol_ratio": 8.25,
-        "ma30w": 42.52,
-        "stage_note": "MA turning \u00b7 week vol 8.3x",
-        "rs_vs_spy": -10.28
-      }
-    ],
-    "momentum_burst": [],
-    "ma50_reclaim": [
+    "weinstein_stage2": [],
+    "momentum_burst": [
       {
         "ticker": "AEGISLOG.NS",
         "score": 5,
         "fresh": [
-          "50SMA_RECLAIM"
+          "BURST"
         ],
         "conf": [
-          "50SMA_RECLAIM",
-          "VOL\u22651.2x",
-          "RSI35-65",
-          "ADX>15",
-          "M\u22656"
+          "BURST\u22654%",
+          "VOL\u22651.5x",
+          "TI\u22651.03",
+          "M\u22656",
+          "RSI50-70"
         ],
         "minervini": 8,
-        "rsi": 51.5,
-        "adx": 19.1,
-        "price": 1353.6,
-        "vol_ratio": 1.35,
-        "dist_50sma": 3.12,
-        "hold_days": 7,
+        "rsi": 57.2,
+        "adx": 24.0,
+        "price": 1500.0,
+        "vol_ratio": 3.54,
+        "burst_pct": 7.76,
+        "hold_days": 5,
         "mkt": "US",
         "company": "AEGIS LOGISTICS LIMITED"
-      },
-      {
-        "ticker": "GRANULES.NS",
-        "score": 4,
-        "fresh": [
-          "50SMA_RECLAIM"
-        ],
-        "conf": [
-          "50SMA_RECLAIM",
-          "VOL\u22651.2x",
-          "ADX>15",
-          "M\u22656"
-        ],
-        "minervini": 8,
-        "rsi": 66.1,
-        "adx": 19.6,
-        "price": 909.3,
-        "vol_ratio": 6.33,
-        "dist_50sma": 5.97,
-        "hold_days": 7,
-        "mkt": "US",
-        "company": "GRANULES INDIA LIMITED"
       }
     ],
+    "ma50_reclaim": [],
     "turnover_momentum": [],
-    "three_weeks_tight": [
-      {
-        "ticker": "BHEL.NS",
-        "mkt": "US",
-        "score": 4,
-        "fresh": [
-          "3WT"
-        ],
-        "conf": [
-          "TIGHT<1%",
-          "VOL_DECLINING",
-          "NEAR_52H",
-          "RSI50-65"
-        ],
-        "minervini": 8,
-        "rsi": 60.9,
-        "adx": 28.2,
-        "price": 431.0,
-        "vol_ratio": 0.96,
-        "spread_pct": 0.06,
-        "hold_days": 7,
-        "strategy": "three_weeks_tight",
-        "rs_vs_spy": -1.97,
-        "company": "BHEL"
-      },
-      {
-        "ticker": "IPCALAB.NS",
-        "mkt": "US",
-        "score": 3,
-        "fresh": [
-          "3WT"
-        ],
-        "conf": [
-          "TIGHT<1%",
-          "VOL_DECLINING",
-          "NEAR_52H"
-        ],
-        "minervini": 8,
-        "rsi": 65.6,
-        "adx": 33.1,
-        "price": 1968.5,
-        "vol_ratio": 0.28,
-        "spread_pct": 0.93,
-        "hold_days": 7,
-        "strategy": "three_weeks_tight",
-        "company": "IPCA LABORATORIES LTD"
-      }
-    ],
+    "three_weeks_tight": [],
     "episodic_pivot": [],
     "combo_pp_ribbon": [],
     "momentum": []
   },
   "sector_excess": {},
-  "spy_ret": -3.2162558966832346,
-  "elder_impulse_count": 0,
-  "market_regime": "BEAR",
+  "spy_ret": -0.42568397036324745,
+  "elder_impulse_count": 5,
+  "market_regime": "NEUTRAL",
   "india_mode": true
 }
