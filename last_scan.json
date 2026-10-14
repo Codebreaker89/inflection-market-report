@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-09-14",
+  "scan_date": "2026-10-14",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -38,78 +38,12 @@
   "results_by_strategy": {
     "breakout": [
       {
-        "ticker": "PANW",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 56.1,
-        "adx": 17.7,
-        "price": 374.81,
-        "vol_ratio": 1.46,
-        "atr_ratio": 1.09,
-        "vol_5d_ratio": 0.81,
-        "pivot_high": 382.13,
-        "pct_from_piv": -1.9,
-        "strategy": "breakout",
-        "rs_vs_spy": -1.2,
-        "company": "Palo Alto Networks, Inc."
-      },
-      {
-        "ticker": "XOM",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 50.2,
-        "adx": 21.0,
-        "price": 164.18,
-        "vol_ratio": 0.56,
-        "atr_ratio": 0.99,
-        "vol_5d_ratio": 1.02,
-        "pivot_high": 165.99,
-        "pct_from_piv": -1.1,
-        "strategy": "breakout",
-        "company": "ExxonMobil Holdings Corporation"
-      },
-      {
-        "ticker": "CA.PA",
+        "ticker": "ERF.PA",
         "mkt": "FR",
-        "score": 4,
+        "score": 5,
         "phase": "COIL",
         "coil_sigs": [
+          "VOLdry",
           "NearPiv",
           "ADXcurl",
           "RSIbase",
@@ -120,34 +54,34 @@
           "COIL"
         ],
         "conf": [
+          "VOLdry",
           "NearPiv",
           "ADXcurl",
           "RSIbase",
           "RS~ok"
         ],
         "minervini": 8,
-        "rsi": 60.8,
-        "adx": 19.0,
-        "price": 16.61,
-        "vol_ratio": 1.1,
-        "atr_ratio": 1.01,
-        "vol_5d_ratio": 1.04,
-        "pivot_high": 16.66,
-        "pct_from_piv": -0.3,
+        "rsi": 50.6,
+        "adx": 18.8,
+        "price": 77.86,
+        "vol_ratio": 1.33,
+        "atr_ratio": 1.02,
+        "vol_5d_ratio": 0.61,
+        "pivot_high": 78.46,
+        "pct_from_piv": -0.8,
         "strategy": "breakout",
-        "rs_vs_spy": 6.63,
-        "company": "CARREFOUR"
+        "company": "EUROFINS SCIENT."
       },
       {
-        "ticker": "BAYN.DE",
-        "mkt": "DE",
+        "ticker": "HUM",
+        "mkt": "US",
         "score": 4,
         "phase": "COIL",
         "coil_sigs": [
           "NearPiv",
           "ADXcurl",
-          "RSIbase",
-          "RS~ok"
+          "RS~ok",
+          "RngTght"
         ],
         "break_sigs": [],
         "fresh": [
@@ -156,90 +90,76 @@
         "conf": [
           "NearPiv",
           "ADXcurl",
-          "RSIbase",
-          "RS~ok"
+          "RS~ok",
+          "RngTght"
         ],
         "minervini": 8,
-        "rsi": 56.9,
-        "adx": 19.1,
-        "price": 49.33,
-        "vol_ratio": 1.61,
-        "atr_ratio": 0.92,
-        "vol_5d_ratio": 1.07,
-        "pivot_high": 49.41,
-        "pct_from_piv": -0.2,
+        "rsi": 66.8,
+        "adx": 23.4,
+        "price": 429.53,
+        "vol_ratio": 0.37,
+        "atr_ratio": 1.28,
+        "vol_5d_ratio": 1.66,
+        "pivot_high": 433.5,
+        "pct_from_piv": -0.9,
         "strategy": "breakout",
-        "rs_vs_spy": 1.25,
-        "company": "Bayer AG                      N"
+        "company": "Humana Inc."
+      },
+      {
+        "ticker": "WST",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 53.0,
+        "adx": 33.8,
+        "price": 377.18,
+        "vol_ratio": 0.39,
+        "atr_ratio": 1.05,
+        "vol_5d_ratio": 0.78,
+        "pivot_high": 377.18,
+        "pct_from_piv": 0.0,
+        "strategy": "breakout",
+        "company": "West Pharmaceutical Services, I"
       }
     ],
     "pocket_pivot": [
       {
-        "ticker": "CA.PA",
+        "ticker": "ENX.PA",
         "mkt": "FR",
-        "score": 5,
+        "score": 4,
         "fresh": [
           "PP"
         ],
         "conf": [
-          "RSI45-70",
           "ADX\u2191",
           "Near52H",
           "EMA9>21"
         ],
         "minervini": 8,
-        "rsi": 60.8,
-        "adx": 19.0,
-        "price": 16.61,
-        "vol_ratio": 1.1,
+        "rsi": 70.5,
+        "adx": 22.3,
+        "price": 166.8,
+        "vol_ratio": 1.22,
         "hold_days": 7,
         "strategy": "pocket_pivot",
-        "rs_vs_spy": 6.63,
-        "company": "CARREFOUR"
-      },
-      {
-        "ticker": "BAYN.DE",
-        "mkt": "DE",
-        "score": 5,
-        "fresh": [
-          "PP"
-        ],
-        "conf": [
-          "RSI45-70",
-          "ADX\u2191",
-          "VOL1.5x",
-          "EMA9>21"
-        ],
-        "minervini": 8,
-        "rsi": 56.9,
-        "adx": 19.1,
-        "price": 49.33,
-        "vol_ratio": 1.61,
-        "hold_days": 7,
-        "strategy": "pocket_pivot",
-        "rs_vs_spy": 1.25,
-        "company": "Bayer AG                      N"
-      },
-      {
-        "ticker": "OXY",
-        "mkt": "US",
-        "score": 4,
-        "fresh": [
-          "PP"
-        ],
-        "conf": [
-          "RSI45-70",
-          "ADX\u2191",
-          "EMA9>21"
-        ],
-        "minervini": 8,
-        "rsi": 62.2,
-        "adx": 19.3,
-        "price": 61.56,
-        "vol_ratio": 0.98,
-        "hold_days": 7,
-        "strategy": "pocket_pivot",
-        "company": "Occidental Petroleum Corporatio"
+        "company": "EURONEXT"
       }
     ],
     "connors_rsi2": [],
@@ -248,269 +168,93 @@
     "analyst_upgrade": [],
     "signal_velocity": [
       {
-        "ticker": "WST",
+        "ticker": "SGRO.L",
         "score": 12,
-        "fresh": [
-          "SV+10"
-        ],
-        "conf": [
-          "SCORE:9/15",
-          "VEL+10"
-        ],
-        "minervini": 8,
-        "rsi": 52.0,
-        "adx": 14.2,
-        "price": 355.48,
-        "vol_ratio": 0.65,
-        "net_score": 9,
-        "velocity": 10,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "West Pharmaceutical Services, I"
-      },
-      {
-        "ticker": "EBAY",
-        "score": 10,
         "fresh": [
           "SV+11"
         ],
         "conf": [
+          "SCORE:9/15",
           "VEL+11"
         ],
         "minervini": 8,
-        "rsi": 54.6,
-        "adx": 13.2,
-        "price": 109.05,
-        "vol_ratio": 0.62,
-        "net_score": 7,
+        "rsi": 48.0,
+        "adx": 15.8,
+        "price": 945.2,
+        "vol_ratio": 0.55,
+        "net_score": 9,
         "velocity": 11,
         "hold_days": 5,
-        "mkt": "US",
+        "mkt": "UK",
         "strategy": "signal_velocity",
-        "company": "eBay Inc."
-      },
-      {
-        "ticker": "ALL",
-        "score": 9,
-        "fresh": [
-          "SV+9"
-        ],
-        "conf": [
-          "VEL+9"
-        ],
-        "minervini": 8,
-        "rsi": 47.9,
-        "adx": 11.6,
-        "price": 257.53,
-        "vol_ratio": 0.56,
-        "net_score": 7,
-        "velocity": 9,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "Allstate Corporation (The)"
-      },
-      {
-        "ticker": "GOOGL",
-        "score": 9,
-        "fresh": [
-          "SV+9"
-        ],
-        "conf": [
-          "VEL+9"
-        ],
-        "minervini": 8,
-        "rsi": 49.6,
-        "adx": 7.9,
-        "price": 347.37,
-        "vol_ratio": 1.05,
-        "net_score": 5,
-        "velocity": 9,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "Alphabet Inc."
-      },
-      {
-        "ticker": "KO",
-        "score": 8,
-        "fresh": [
-          "SV+6"
-        ],
-        "conf": [
-          "SCORE:8/15"
-        ],
-        "minervini": 8,
-        "rsi": 35.2,
-        "adx": 18.4,
-        "price": 89.19,
-        "vol_ratio": 0.6,
-        "net_score": 8,
-        "velocity": 6,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "Coca-Cola Company (The)"
-      },
-      {
-        "ticker": "ABBV",
-        "score": 8,
-        "fresh": [
-          "SV+6"
-        ],
-        "conf": [
-          "SCORE:8/15"
-        ],
-        "minervini": 8,
-        "rsi": 46.6,
-        "adx": 18.6,
-        "price": 261.58,
-        "vol_ratio": 0.56,
-        "net_score": 8,
-        "velocity": 6,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "AbbVie Inc."
-      },
-      {
-        "ticker": "DRI",
-        "score": 8,
-        "fresh": [
-          "SV+8"
-        ],
-        "conf": [
-          "VEL+8",
-          "ADX>20"
-        ],
-        "minervini": 8,
-        "rsi": 43.8,
-        "adx": 20.6,
-        "price": 219.3,
-        "vol_ratio": 0.65,
-        "net_score": 7,
-        "velocity": 8,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "Darden Restaurants, Inc."
-      },
-      {
-        "ticker": "AIZ",
-        "score": 6,
-        "fresh": [
-          "SV+6"
-        ],
-        "conf": [],
-        "minervini": 8,
-        "rsi": 43.0,
-        "adx": 15.9,
-        "price": 282.77,
-        "vol_ratio": 0.6,
-        "net_score": 3,
-        "velocity": 6,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "Assurant, Inc."
+        "company": "SEGRO PLC ORD 10P"
       }
     ],
     "chokepoint_inflection": [],
-    "defensive_rotation": [],
-    "cup_handle": [
+    "defensive_rotation": [
       {
-        "ticker": "CAH",
+        "ticker": "UNA.AS",
+        "sector": "EU Consumer Staples",
+        "sector_etf": "EXH3.DE",
         "score": 5,
         "fresh": [
-          "C&H",
-          "PIV@240.49"
+          "ROT:EXH3.DE",
+          "ETF+4.89%vsS&P"
         ],
         "conf": [
-          "CUP26.8%",
-          "HDL2.5%",
-          "VOLdry",
-          "RSI50-70",
-          "M\u22656"
+          "RS+5.3%",
+          "MACD+",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
         ],
-        "rsi": 52.7,
-        "adx": 24.4,
-        "vol_ratio": 0.59,
-        "minervini": 8,
-        "price": 234.4,
-        "cup_depth_pct": 26.8,
-        "cup_duration": 195,
-        "handle_depth_pct": 2.5,
-        "handle_duration": 5,
-        "pivot": 240.49,
-        "vol_drying": true,
+        "rsi": 66.0,
+        "adx": 15.8,
+        "vol_ratio": 0.92,
+        "minervini": 5,
+        "price": 57.09,
+        "rs_vs_spy": 5.28,
+        "rs_vs_sector": 0.19,
+        "mkt": "NL",
         "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "rs_vs_spy": 0.56,
-        "company": "Cardinal Health, Inc."
-      },
+        "strategy": "defensive_rotation",
+        "company": "UNILEVER PLC"
+      }
+    ],
+    "cup_handle": [
       {
-        "ticker": "EXPD",
+        "ticker": "WAT",
         "score": 4,
         "fresh": [
           "C&H",
-          "PIV@193.23"
+          "PIV@443.26"
         ],
         "conf": [
-          "CUP27.7%",
-          "HDL3.8%",
+          "CUP34.6%",
+          "HDL4.1%",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 63.0,
-        "adx": 25.9,
-        "vol_ratio": 0.68,
+        "rsi": 55.6,
+        "adx": 29.2,
+        "vol_ratio": 0.44,
         "minervini": 8,
-        "price": 193.23,
-        "cup_depth_pct": 27.7,
-        "cup_duration": 195,
-        "handle_depth_pct": 3.8,
-        "handle_duration": 5,
-        "pivot": 193.23,
+        "price": 438.77,
+        "cup_depth_pct": 34.6,
+        "cup_duration": 187,
+        "handle_depth_pct": 4.1,
+        "handle_duration": 13,
+        "pivot": 443.26,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "company": "Expeditors International of Was"
+        "company": "Waters Corporation"
       }
     ],
     "darvas_box": [],
     "rs_line": [],
-    "vcp": [
-      {
-        "ticker": "CAH",
-        "score": 4,
-        "fresh": [
-          "VCP-3C"
-        ],
-        "conf": [
-          "TightFinal",
-          "VolDry",
-          "RSI50-65",
-          "M\u22657"
-        ],
-        "minervini": 8,
-        "rsi": 52.7,
-        "adx": 24.4,
-        "price": 234.4,
-        "vol_ratio": 0.59,
-        "n_contractions": 3,
-        "final_pct": 3.06,
-        "base_high": 258.3,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "vcp",
-        "spy_regime": "CHOPPY",
-        "rs_vs_spy": 0.56,
-        "company": "Cardinal Health, Inc."
-      }
-    ],
+    "vcp": [],
     "williams_pct_r": [],
     "bollinger_pctb": [],
     "connors_r3": [],
@@ -519,78 +263,53 @@
     "raschke_8020": [],
     "wyckoff_spring": [],
     "weinstein_stage2": [],
-    "momentum_burst": [
-      {
-        "ticker": "CRWD",
-        "score": 5,
-        "fresh": [
-          "BURST"
-        ],
-        "conf": [
-          "BURST\u22654%",
-          "VOL\u22651.5x",
-          "TI\u22651.03",
-          "M\u22656",
-          "RSI50-70"
-        ],
-        "minervini": 8,
-        "rsi": 65.3,
-        "adx": 17.2,
-        "price": 236.1,
-        "vol_ratio": 1.91,
-        "burst_pct": 14.2,
-        "hold_days": 5,
-        "mkt": "US",
-        "company": "CrowdStrike Holdings, Inc."
-      }
-    ],
-    "ma50_reclaim": [
-      {
-        "ticker": "PANW",
-        "score": 5,
-        "fresh": [
-          "50SMA_RECLAIM"
-        ],
-        "conf": [
-          "50SMA_RECLAIM",
-          "VOL\u22651.2x",
-          "RSI35-65",
-          "ADX>15",
-          "M\u22656"
-        ],
-        "minervini": 8,
-        "rsi": 56.1,
-        "adx": 17.7,
-        "price": 374.81,
-        "vol_ratio": 1.46,
-        "dist_50sma": 7.06,
-        "hold_days": 7,
-        "mkt": "US",
-        "rs_vs_spy": -1.2,
-        "company": "Palo Alto Networks, Inc."
-      }
-    ],
+    "momentum_burst": [],
+    "ma50_reclaim": [],
     "turnover_momentum": [],
-    "three_weeks_tight": [],
+    "three_weeks_tight": [
+      {
+        "ticker": "VTRS",
+        "mkt": "US",
+        "score": 4,
+        "fresh": [
+          "3WT"
+        ],
+        "conf": [
+          "TIGHT<1%",
+          "VOL_DECLINING",
+          "NEAR_52H",
+          "RSI50-65"
+        ],
+        "minervini": 8,
+        "rsi": 54.8,
+        "adx": 20.5,
+        "price": 17.71,
+        "vol_ratio": 0.53,
+        "spread_pct": 0.62,
+        "hold_days": 7,
+        "strategy": "three_weeks_tight",
+        "company": "Viatris Inc."
+      }
+    ],
     "episodic_pivot": [],
     "combo_pp_ribbon": [],
     "momentum": []
   },
   "sector_excess": {
-    "XLK": 0.69,
-    "XLI": -3.03,
-    "XLV": -1.03,
-    "XLF": -1.03,
-    "XLY": -2.71,
-    "XLP": -0.1,
-    "XLB": -3.93,
-    "XLE": 3.45,
-    "XLC": 2.76,
-    "XLU": -0.95,
-    "XLRE": -1.75
+    "XLK": -3.42,
+    "XLI": -1.25,
+    "XLV": 2.39,
+    "XLF": 0.89,
+    "XLY": 1.24,
+    "XLP": 5.57,
+    "XLB": 0.8,
+    "XLE": 9.15,
+    "XLC": -1.04,
+    "XLU": 4.85,
+    "XLRE": 0.91
   },
-  "spy_ret": -0.96,
-  "elder_impulse_count": 2,
-  "market_regime": "BEAR",
+  "spy_ret": 0.73,
+  "elder_impulse_count": 10,
+  "market_regime": "NEUTRAL",
   "india_mode": false
 }
