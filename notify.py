@@ -2579,9 +2579,18 @@ def send_email(subject: str, html_body: str):
     msg.attach(MIMEText(html_body, "html"))
 
     pw = GMAIL_APP_PASSWORD.replace(" ", "")
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(GMAIL_USER, pw)
-        server.sendmail(GMAIL_USER, NOTIFY_TO, msg.as_string())
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(GMAIL_USER, pw)
+            server.sendmail(GMAIL_USER, NOTIFY_TO, msg.as_string())
+    except (smtplib.SMTPAuthenticationError, smtplib.SMTPServerDisconnected) as e:
+        print(
+            "\n  Gmail app password was rejected or the SMTP connection was closed. "
+            "Create a new one at https://myaccount.google.com/apppasswords "
+            "and update the GMAIL_APP_PASSWORD GitHub secret.",
+            file=sys.stderr,
+        )
+        raise
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 

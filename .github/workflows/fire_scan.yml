@@ -53,15 +53,20 @@ jobs:
           EOF
 
       - name: Run India scan
+        id: scan
         run: python3 scan.py --no-backtest --india
 
       - name: Update scan history (India)
+        id: history
         run: python3 update_scan_history.py --india
 
       - name: Send India email digest
+        id: email
+        continue-on-error: true
         run: python3 notify.py --send --india
 
       - name: Commit India scan data
+        if: steps.scan.outcome == 'success' && steps.history.outcome == 'success'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -78,6 +83,13 @@ jobs:
             git rebase origin/main || { git rebase --abort; exit 1; }
             sleep $((i * 3))
           done
+
+      - name: Fail job if India email did not send
+        if: steps.email.outcome == 'failure'
+        run: |
+          echo "Scan data was committed, but the India email was not sent."
+          echo "Gmail is rejecting GMAIL_APP_PASSWORD. Create a new app password and update the Actions secret."
+          exit 1
 
   # ── Intl scan (14:00 UTC → 16:00 CEST) ──────────────────────────────────────
   scan-intl:
@@ -117,15 +129,20 @@ jobs:
           EOF
 
       - name: Run Intl scan (all strategies)
+        id: scan
         run: python3 scan.py --no-backtest
 
       - name: Update scan history
+        id: history
         run: python3 update_scan_history.py
 
       - name: Send Intl email digest
+        id: email
+        continue-on-error: true
         run: python3 notify.py --send
 
       - name: Commit updated data back to repo
+        if: steps.scan.outcome == 'success' && steps.history.outcome == 'success'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -139,6 +156,13 @@ jobs:
             git rebase origin/main || { git rebase --abort; exit 1; }
             sleep $((i * 3))
           done
+
+      - name: Fail job if Intl email did not send
+        if: steps.email.outcome == 'failure'
+        run: |
+          echo "Scan data was committed, but the Intl email was not sent."
+          echo "Gmail is rejecting GMAIL_APP_PASSWORD. Create a new app password and update the Actions secret."
+          exit 1
 
   # ── Failure / recovery notifier ──────────────────────────────────────────────
   # Runs after every trigger regardless of outcome (needs + if: always()). If
@@ -171,7 +195,7 @@ jobs:
           # CLI or API hiccup here must not crash this step).
           DIAGNOSIS="See the failed step in the run log: $RUN_URL"
           LOG=$(gh run view ${{ github.run_id }} --repo ${{ github.repository }} --log-failed 2>/dev/null || true)
-          if echo "$LOG" | grep -qi "SMTPAuthenticationError\|BadCredentials\|Username and Password not accepted"; then
+          if echo "$LOG" | grep -qi "SMTPAuthenticationError\|BadCredentials\|Username and Password not accepted\|SMTPServerDisconnected\|Gmail app password"; then
             DIAGNOSIS="**Gmail app password has expired or was revoked.**
 
           1. Generate a new one: https://myaccount.google.com/apppasswords
@@ -190,12 +214,27 @@ jobs:
 
           _This issue is updated automatically on each failure and closes itself once a scan succeeds again — no need to close it by hand._"
 
-          # gh issue create fails outright if the label doesn't exist yet — create
-          # it defensively (idempotent: errors if it already exists, which we ignore).
-          gh label create scan-failure --repo ${{ github.repository }} \
-            --color "d73a4a" --description "Auto-filed by fire_scan.yml on failure" 2>/dev/null || true
+          {
+            echo "## Fire Daily Scan failed"
+            echo "$BODY"
+          } >> "$GITHUB_STEP_SUMMARY"
 
-          EXISTING=$(gh issue list --repo ${{ github.repository }} --label scan-failure --state open --json number --jq '.[0].number' 2>/dev/null || true)
+          # Issues are disabled on this public repo, so gh issue create exits 1
+          # and used to fail this job with no useful diagnosis. The scan job is
+          # already red; record the cause in the summary and move on.
+          if ! gh label create scan-failure --repo ${{ github.repository }} \
+              --color "d73a4a" --description "Auto-filed by fire_scan.yml on failure" 2>/tmp/issue_err; then
+            if grep -qi "disabled issues" /tmp/issue_err; then
+              echo "Issues are disabled — diagnosis written to the job summary."
+              exit 0
+            fi
+          fi
+
+          EXISTING=$(gh issue list --repo ${{ github.repository }} --label scan-failure --state open --json number --jq '.[0].number' 2>/tmp/issue_err || true)
+          if grep -qi "disabled issues" /tmp/issue_err; then
+            echo "Issues are disabled — diagnosis written to the job summary."
+            exit 0
+          fi
           if [ -n "$EXISTING" ]; then
             gh issue comment "$EXISTING" --repo ${{ github.repository }} --body "$BODY"
           else
