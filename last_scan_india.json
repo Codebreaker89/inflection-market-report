@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-10-14",
+  "scan_date": "2026-10-15",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -38,51 +38,15 @@
   "results_by_strategy": {
     "breakout": [
       {
-        "ticker": "LALPATHLAB.NS",
-        "mkt": "US",
-        "score": 5,
-        "phase": "COIL",
-        "coil_sigs": [
-          "VOLdry",
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "VOLdry",
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 51.7,
-        "adx": 21.6,
-        "price": 1936.9,
-        "vol_ratio": 0.49,
-        "atr_ratio": 1.11,
-        "vol_5d_ratio": 0.53,
-        "pivot_high": 2005.1,
-        "pct_from_piv": -3.4,
-        "strategy": "breakout",
-        "company": "DR. LAL PATH LABS LTD."
-      },
-      {
         "ticker": "LGEINDIA.NS",
         "mkt": "US",
-        "score": 5,
+        "score": 4,
         "phase": "COIL",
         "coil_sigs": [
           "VOLdry",
           "NearPiv",
           "RSIbase",
-          "RS~ok",
-          "RngTght"
+          "RS~ok"
         ],
         "break_sigs": [],
         "fresh": [
@@ -92,59 +56,23 @@
           "VOLdry",
           "NearPiv",
           "RSIbase",
-          "RS~ok",
-          "RngTght"
+          "RS~ok"
         ],
         "minervini": 6,
-        "rsi": 58.7,
-        "adx": 28.8,
-        "price": 1746.0,
-        "vol_ratio": 0.21,
-        "atr_ratio": 1.13,
-        "vol_5d_ratio": 0.49,
+        "rsi": 54.1,
+        "adx": 26.9,
+        "price": 1724.0,
+        "vol_ratio": 0.28,
+        "atr_ratio": 1.12,
+        "vol_5d_ratio": 0.44,
         "pivot_high": 1780.3,
-        "pct_from_piv": -1.9,
+        "pct_from_piv": -3.2,
         "strategy": "breakout",
-        "rs_vs_spy": -0.68,
+        "rs_vs_spy": -0.53,
         "company": "LG ELECTRONICS INDIA LTD"
       },
       {
-        "ticker": "MTARTECH.NS",
-        "mkt": "US",
-        "score": 5,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 60.6,
-        "adx": 19.5,
-        "price": 7681.0,
-        "vol_ratio": 0.32,
-        "atr_ratio": 1.04,
-        "vol_5d_ratio": 0.78,
-        "pivot_high": 7864.5,
-        "pct_from_piv": -2.3,
-        "strategy": "breakout",
-        "company": "MTAR TECHNOLOGIES LIMITED"
-      },
-      {
-        "ticker": "GLAND.NS",
+        "ticker": "KPIL.NS",
         "mkt": "US",
         "score": 4,
         "phase": "COIL",
@@ -165,25 +93,25 @@
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 60.2,
-        "adx": 31.5,
-        "price": 3052.0,
-        "vol_ratio": 0.33,
-        "atr_ratio": 1.07,
-        "vol_5d_ratio": 1.21,
-        "pivot_high": 3150.6,
+        "rsi": 50.2,
+        "adx": 18.9,
+        "price": 1412.8,
+        "vol_ratio": 0.35,
+        "atr_ratio": 1.12,
+        "vol_5d_ratio": 0.72,
+        "pivot_high": 1458.4,
         "pct_from_piv": -3.1,
         "strategy": "breakout",
-        "company": "GLAND PHARMA LIMITED"
+        "company": "KALPATARU PROJECT INT LTD"
       },
       {
-        "ticker": "CUPID.NS",
+        "ticker": "NYKAA.NS",
         "mkt": "US",
         "score": 4,
         "phase": "COIL",
         "coil_sigs": [
           "NearPiv",
-          "ADXcurl",
+          "RSIbase",
           "RS~ok",
           "RngTght"
         ],
@@ -193,32 +121,32 @@
         ],
         "conf": [
           "NearPiv",
-          "ADXcurl",
+          "RSIbase",
           "RS~ok",
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 79.5,
-        "adx": 24.7,
-        "price": 355.7,
-        "vol_ratio": 0.3,
-        "atr_ratio": 1.19,
-        "vol_5d_ratio": 1.0,
-        "pivot_high": 366.1,
-        "pct_from_piv": -2.8,
+        "rsi": 52.4,
+        "adx": 16.3,
+        "price": 338.75,
+        "vol_ratio": 0.21,
+        "atr_ratio": 1.12,
+        "vol_5d_ratio": 0.9,
+        "pivot_high": 343.0,
+        "pct_from_piv": -1.2,
         "strategy": "breakout",
-        "company": "CUPID LIMITED"
+        "company": "FSN E COMMERCE VENTURES"
       },
       {
-        "ticker": "REDINGTON.NS",
+        "ticker": "SYRMA.NS",
         "mkt": "US",
         "score": 4,
         "phase": "COIL",
         "coil_sigs": [
           "VOLdry",
-          "NearPiv",
           "RSIbase",
-          "RS~ok"
+          "RS~ok",
+          "RngTght"
         ],
         "break_sigs": [],
         "fresh": [
@@ -226,21 +154,22 @@
         ],
         "conf": [
           "VOLdry",
-          "NearPiv",
           "RSIbase",
-          "RS~ok"
+          "RS~ok",
+          "RngTght"
         ],
         "minervini": 8,
-        "rsi": 51.9,
-        "adx": 31.0,
-        "price": 404.3,
-        "vol_ratio": 1.01,
-        "atr_ratio": 0.99,
-        "vol_5d_ratio": 0.64,
-        "pivot_high": 412.75,
-        "pct_from_piv": -2.0,
+        "rsi": 50.1,
+        "adx": 23.7,
+        "price": 1699.4,
+        "vol_ratio": 0.35,
+        "atr_ratio": 1.03,
+        "vol_5d_ratio": 0.36,
+        "pivot_high": 1782.9,
+        "pct_from_piv": -4.7,
         "strategy": "breakout",
-        "company": "REDINGTON LIMITED"
+        "rs_vs_spy": -1.81,
+        "company": "SYRMA SGS TECHNOLOGY LTD"
       }
     ],
     "pocket_pivot": [],
@@ -250,73 +179,55 @@
     "analyst_upgrade": [],
     "signal_velocity": [
       {
-        "ticker": "ADANIGREEN.NS",
-        "score": 12,
+        "ticker": "INDHOTEL.NS",
+        "score": 10,
         "fresh": [
-          "SV+12"
+          "SV+11"
         ],
         "conf": [
-          "SCORE:8/15",
-          "VEL+12"
+          "VEL+11"
         ],
-        "minervini": 8,
-        "rsi": 52.2,
-        "adx": 12.7,
-        "price": 1318.6,
-        "vol_ratio": 0.63,
-        "net_score": 8,
-        "velocity": 12,
+        "minervini": 7,
+        "rsi": 51.2,
+        "adx": 12.0,
+        "price": 747.25,
+        "vol_ratio": 1.09,
+        "net_score": 7,
+        "velocity": 11,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "ADANI GREEN ENERGY LTD"
-      },
-      {
-        "ticker": "KPRMILL.NS",
-        "score": 12,
-        "fresh": [
-          "SV+13"
-        ],
-        "conf": [
-          "SCORE:9/15",
-          "VEL+13"
-        ],
-        "minervini": 8,
-        "rsi": 46.8,
-        "adx": 14.0,
-        "price": 1120.2,
-        "vol_ratio": 0.47,
-        "net_score": 9,
-        "velocity": 13,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "KPR MILL LTD."
-      },
-      {
-        "ticker": "SONACOMS.NS",
-        "score": 9,
-        "fresh": [
-          "SV+7"
-        ],
-        "conf": [
-          "SCORE:8/15"
-        ],
-        "minervini": 8,
-        "rsi": 43.7,
-        "adx": 17.3,
-        "price": 809.8,
-        "vol_ratio": 1.06,
-        "net_score": 8,
-        "velocity": 7,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "SONA BLW PRECISION FRGS L"
+        "company": "THE INDIAN HOTELS CO. LTD"
       }
     ],
     "chokepoint_inflection": [],
-    "defensive_rotation": [],
+    "defensive_rotation": [
+      {
+        "ticker": "ISRG",
+        "sector": "Healthcare",
+        "sector_etf": "XLV",
+        "score": 2,
+        "fresh": [
+          "ROT:XLV",
+          "ETF+2.38%vsS&P"
+        ],
+        "conf": [
+          "RS+2.4%",
+          "MACD+"
+        ],
+        "rsi": 62.2,
+        "adx": 14.6,
+        "vol_ratio": 0.91,
+        "minervini": 2,
+        "price": 420.24,
+        "rs_vs_spy": 2.43,
+        "rs_vs_sector": 0.06,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Intuitive Surgical, Inc."
+      }
+    ],
     "cup_handle": [
       {
         "ticker": "LGEINDIA.NS",
@@ -327,26 +238,26 @@
         ],
         "conf": [
           "CUP25.9%",
-          "HDL2.0%",
+          "HDL1.9%",
           "VOLdry",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 58.7,
-        "adx": 28.8,
-        "vol_ratio": 0.21,
+        "rsi": 54.1,
+        "adx": 26.9,
+        "vol_ratio": 0.28,
         "minervini": 6,
-        "price": 1746.0,
+        "price": 1724.0,
         "cup_depth_pct": 25.9,
         "cup_duration": 195,
-        "handle_depth_pct": 2.0,
+        "handle_depth_pct": 1.9,
         "handle_duration": 5,
         "pivot": 1758.0,
         "vol_drying": true,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "rs_vs_spy": -0.68,
+        "rs_vs_spy": -0.53,
         "company": "LG ELECTRONICS INDIA LTD"
       },
       {
@@ -363,11 +274,11 @@
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 56.9,
+        "rsi": 56.1,
         "adx": 31.1,
-        "vol_ratio": 0.42,
+        "vol_ratio": 0.23,
         "minervini": 8,
-        "price": 1384.8,
+        "price": 1378.0,
         "cup_depth_pct": 31.9,
         "cup_duration": 195,
         "handle_depth_pct": 6.8,
@@ -390,18 +301,18 @@
         ],
         "conf": [
           "RS_LEADS",
-          "NEAR_HIGH",
+          "IN_BASE",
           "VOL\u22651.5x",
           "RSI45-70",
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 65.2,
-        "adx": 14.7,
-        "price": 455.45,
-        "vol_ratio": 2.76,
+        "rsi": 59.6,
+        "adx": 14.8,
+        "price": 440.4,
+        "vol_ratio": 1.58,
         "rs_lead_days": 0,
-        "pct_from_high": 0.0,
+        "pct_from_high": 5.1,
         "hold_days": 7,
         "strategy": "rs_line",
         "mkt": "US",
@@ -417,41 +328,41 @@
     "raschke_8020": [],
     "wyckoff_spring": [],
     "weinstein_stage2": [],
-    "momentum_burst": [
-      {
-        "ticker": "AEGISLOG.NS",
-        "score": 5,
-        "fresh": [
-          "BURST"
-        ],
-        "conf": [
-          "BURST\u22654%",
-          "VOL\u22651.5x",
-          "TI\u22651.03",
-          "M\u22656",
-          "RSI50-70"
-        ],
-        "minervini": 8,
-        "rsi": 57.2,
-        "adx": 24.0,
-        "price": 1500.0,
-        "vol_ratio": 3.54,
-        "burst_pct": 7.76,
-        "hold_days": 5,
-        "mkt": "US",
-        "company": "AEGIS LOGISTICS LIMITED"
-      }
-    ],
+    "momentum_burst": [],
     "ma50_reclaim": [],
     "turnover_momentum": [],
-    "three_weeks_tight": [],
+    "three_weeks_tight": [
+      {
+        "ticker": "SYRMA.NS",
+        "mkt": "US",
+        "score": 3,
+        "fresh": [
+          "3WT"
+        ],
+        "conf": [
+          "VOL_DECLINING",
+          "NEAR_52H",
+          "RSI50-65"
+        ],
+        "minervini": 8,
+        "rsi": 50.1,
+        "adx": 23.7,
+        "price": 1699.4,
+        "vol_ratio": 0.35,
+        "spread_pct": 1.21,
+        "hold_days": 7,
+        "strategy": "three_weeks_tight",
+        "rs_vs_spy": -1.81,
+        "company": "SYRMA SGS TECHNOLOGY LTD"
+      }
+    ],
     "episodic_pivot": [],
     "combo_pp_ribbon": [],
     "momentum": []
   },
   "sector_excess": {},
-  "spy_ret": -0.42568397036324745,
-  "elder_impulse_count": 5,
-  "market_regime": "NEUTRAL",
+  "spy_ret": 1.8859110991765435,
+  "elder_impulse_count": 15,
+  "market_regime": "BULL",
   "india_mode": true
 }
