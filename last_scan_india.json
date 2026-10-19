@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-10-16",
+  "scan_date": "2026-10-19",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -38,6 +38,42 @@
   "results_by_strategy": {
     "breakout": [
       {
+        "ticker": "GLAND.NS",
+        "mkt": "US",
+        "score": 5,
+        "phase": "COIL",
+        "coil_sigs": [
+          "VOLdry",
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "VOLdry",
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 59.6,
+        "adx": 31.1,
+        "price": 3029.0,
+        "vol_ratio": 0.43,
+        "atr_ratio": 1.03,
+        "vol_5d_ratio": 0.55,
+        "pivot_high": 3150.6,
+        "pct_from_piv": -3.9,
+        "strategy": "breakout",
+        "rs_vs_spy": 2.26,
+        "company": "GLAND PHARMA LIMITED"
+      },
+      {
         "ticker": "NYKAA.NS",
         "mkt": "US",
         "score": 4,
@@ -59,94 +95,200 @@
           "RS~ok"
         ],
         "minervini": 8,
-        "rsi": 57.2,
-        "adx": 16.6,
-        "price": 344.5,
-        "vol_ratio": 0.36,
-        "atr_ratio": 1.1,
-        "vol_5d_ratio": 0.82,
-        "pivot_high": 344.5,
-        "pct_from_piv": 0.0,
+        "rsi": 57.7,
+        "adx": 17.4,
+        "price": 337.2,
+        "vol_ratio": 0.71,
+        "atr_ratio": 1.07,
+        "vol_5d_ratio": 0.72,
+        "pivot_high": 345.0,
+        "pct_from_piv": -2.3,
         "strategy": "breakout",
         "company": "FSN E COMMERCE VENTURES"
       }
     ],
-    "pocket_pivot": [],
+    "pocket_pivot": [
+      {
+        "ticker": "FEDERALBNK.NS",
+        "mkt": "US",
+        "score": 5,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "RSI45-70",
+          "ADX\u2191",
+          "VOL1.5x",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 68.8,
+        "adx": 23.1,
+        "price": 348.15,
+        "vol_ratio": 3.3,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "rs_vs_spy": 10.31,
+        "company": "FEDERAL BANK LTD"
+      },
+      {
+        "ticker": "ACUTAAS.NS",
+        "mkt": "US",
+        "score": 2,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "RSI45-70"
+        ],
+        "minervini": 8,
+        "rsi": 53.3,
+        "adx": 16.4,
+        "price": 3266.0,
+        "vol_ratio": 1.41,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "rs_vs_spy": 4.96,
+        "company": "ACUTAAS CHEMICALS LIMITED"
+      }
+    ],
     "connors_rsi2": [],
     "ema_ribbon": [],
     "nr7": [],
     "analyst_upgrade": [],
     "signal_velocity": [
       {
-        "ticker": "ETERNAL.NS",
-        "score": 7,
+        "ticker": "ACUTAAS.NS",
+        "score": 12,
         "fresh": [
-          "SV+7"
+          "SV+12"
         ],
-        "conf": [],
+        "conf": [
+          "SCORE:8/15",
+          "VEL+12"
+        ],
         "minervini": 8,
-        "rsi": 44.2,
-        "adx": 15.6,
-        "price": 327.0,
-        "vol_ratio": 0.6,
-        "net_score": 6,
-        "velocity": 7,
+        "rsi": 53.3,
+        "adx": 16.4,
+        "price": 3266.0,
+        "vol_ratio": 1.41,
+        "net_score": 8,
+        "velocity": 12,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "ETERNAL LIMITED"
+        "rs_vs_spy": 4.96,
+        "company": "ACUTAAS CHEMICALS LIMITED"
       }
     ],
     "chokepoint_inflection": [],
     "defensive_rotation": [
       {
-        "ticker": "TMO",
+        "ticker": "MOH",
         "sector": "Healthcare",
         "sector_etf": "XLV",
         "score": 5,
         "fresh": [
           "ROT:XLV",
-          "ETF+5.59%vsS&P"
+          "ETF+7.17%vsS&P"
         ],
         "conf": [
-          "RS+5.7%",
-          "VOL\u2191",
+          "RS+10.2%",
+          "vsETF+3.1%",
+          "MACD+",
+          ">SMA200",
+          "M\u22653"
+        ],
+        "rsi": 68.9,
+        "adx": 17.6,
+        "vol_ratio": 0.94,
+        "minervini": 5,
+        "price": 207.36,
+        "rs_vs_spy": 10.23,
+        "rs_vs_sector": 3.07,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Molina Healthcare Inc"
+      },
+      {
+        "ticker": "PFE",
+        "sector": "Healthcare",
+        "sector_etf": "XLV",
+        "score": 5,
+        "fresh": [
+          "ROT:XLV",
+          "ETF+7.17%vsS&P"
+        ],
+        "conf": [
+          "RS+7.2%",
+          "MACD+",
           ">SMA200",
           "52wHI",
           "M\u22653"
         ],
-        "rsi": 57.9,
-        "adx": 38.7,
-        "vol_ratio": 1.7,
+        "rsi": 61.0,
+        "adx": 23.7,
+        "vol_ratio": 0.94,
         "minervini": 5,
-        "price": 696.49,
-        "rs_vs_spy": 5.72,
-        "rs_vs_sector": 0.13,
+        "price": 29.58,
+        "rs_vs_spy": 7.23,
+        "rs_vs_sector": 0.07,
         "mkt": "US",
         "hold_days": 10,
         "strategy": "defensive_rotation",
-        "company": "Thermo Fisher Scientific Inc"
+        "company": "Pfizer, Inc."
+      },
+      {
+        "ticker": "HUM",
+        "sector": "Healthcare",
+        "sector_etf": "XLV",
+        "score": 5,
+        "fresh": [
+          "ROT:XLV",
+          "ETF+7.17%vsS&P"
+        ],
+        "conf": [
+          "RS+7.2%",
+          "MACD+",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 58.3,
+        "adx": 23.0,
+        "vol_ratio": 0.88,
+        "minervini": 5,
+        "price": 413.16,
+        "rs_vs_spy": 7.22,
+        "rs_vs_sector": 0.05,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Humana Inc."
       },
       {
         "ticker": "ISRG",
         "sector": "Healthcare",
         "sector_etf": "XLV",
-        "score": 2,
+        "score": 4,
         "fresh": [
           "ROT:XLV",
-          "ETF+5.59%vsS&P"
+          "ETF+7.17%vsS&P"
         ],
         "conf": [
-          "RS+5.6%",
+          "RS+9.7%",
+          "vsETF+2.5%",
+          "VOL\u2191",
           "MACD+"
         ],
-        "rsi": 63.1,
-        "adx": 14.9,
-        "vol_ratio": 0.99,
+        "rsi": 57.6,
+        "adx": 15.7,
+        "vol_ratio": 1.32,
         "minervini": 2,
-        "price": 427.86,
-        "rs_vs_spy": 5.61,
-        "rs_vs_sector": 0.02,
+        "price": 426.7,
+        "rs_vs_spy": 9.7,
+        "rs_vs_sector": 2.53,
         "mkt": "US",
         "hold_days": 10,
         "strategy": "defensive_rotation",
@@ -156,38 +298,119 @@
     "cup_handle": [],
     "darvas_box": [],
     "rs_line": [],
-    "vcp": [],
-    "williams_pct_r": [],
-    "bollinger_pctb": [],
-    "connors_r3": [
+    "vcp": [
       {
-        "ticker": "ENGINERSIN.NS",
-        "score": 3,
+        "ticker": "GLAND.NS",
+        "score": 5,
+        "fresh": [
+          "VCP-3C"
+        ],
         "conf": [
-          "RSI2_sub5",
-          "ADX16-35",
-          "M>=5"
+          "TightFinal",
+          "VolDry",
+          "NearPivot",
+          "RSI50-65",
+          "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 0.0,
-        "adx": 30.8,
-        "price": 276.0,
-        "vol_ratio": 0.19,
-        "hold_days": 3,
+        "rsi": 59.6,
+        "adx": 31.1,
+        "price": 3029.0,
+        "vol_ratio": 0.43,
+        "n_contractions": 3,
+        "final_pct": 3.38,
+        "base_high": 3024.0,
+        "hold_days": 10,
         "mkt": "US",
-        "strategy": "connors_r3",
-        "company": "ENGINEERS INDIA LTD"
+        "strategy": "vcp",
+        "spy_regime": "CHOPPY",
+        "rs_vs_spy": 2.26,
+        "company": "GLAND PHARMA LIMITED"
+      },
+      {
+        "ticker": "COFORGE.NS",
+        "score": 4,
+        "fresh": [
+          "VCP-5C"
+        ],
+        "conf": [
+          "Contractions\u22654",
+          "TightFinal",
+          "VolDry",
+          "M\u22657"
+        ],
+        "minervini": 7,
+        "rsi": 66.6,
+        "adx": 19.4,
+        "price": 1917.3,
+        "vol_ratio": 0.51,
+        "n_contractions": 5,
+        "final_pct": 4.42,
+        "base_high": 2021.2,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "vcp",
+        "spy_regime": "CHOPPY",
+        "company": "COFORGE LIMITED"
       }
     ],
+    "williams_pct_r": [],
+    "bollinger_pctb": [],
+    "connors_r3": [],
     "connors_tps": [],
     "turtle_soup": [],
     "raschke_8020": [],
     "wyckoff_spring": [],
     "weinstein_stage2": [],
-    "momentum_burst": [],
+    "momentum_burst": [
+      {
+        "ticker": "KARURVYSYA.NS",
+        "score": 4,
+        "fresh": [
+          "BURST"
+        ],
+        "conf": [
+          "BURST\u22654%",
+          "VOL\u22651.5x",
+          "TI\u22651.03",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 84.1,
+        "adx": 23.6,
+        "price": 370.05,
+        "vol_ratio": 3.32,
+        "burst_pct": 4.05,
+        "hold_days": 5,
+        "mkt": "US",
+        "company": "KARUR VYSYA BANK LTD"
+      },
+      {
+        "ticker": "HFCL.NS",
+        "score": 4,
+        "fresh": [
+          "BURST"
+        ],
+        "conf": [
+          "BURST\u22654%",
+          "VOL\u22651.5x",
+          "TI\u22651.03",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 73.6,
+        "adx": 17.2,
+        "price": 268.81,
+        "vol_ratio": 2.01,
+        "burst_pct": 5.0,
+        "hold_days": 5,
+        "mkt": "US",
+        "company": "HFCL LIMITED"
+      }
+    ],
     "ma50_reclaim": [
       {
-        "ticker": "AARTIIND.NS",
+        "ticker": "FEDERALBNK.NS",
         "score": 5,
         "fresh": [
           "50SMA_RECLAIM"
@@ -195,73 +418,77 @@
         "conf": [
           "50SMA_RECLAIM",
           "VOL\u22651.2x",
-          "RSI35-65",
+          "ADX>15",
           "M\u22656",
           "TIGHT<3%"
         ],
         "minervini": 8,
-        "rsi": 55.3,
-        "adx": 14.2,
-        "price": 504.0,
-        "vol_ratio": 1.44,
-        "dist_50sma": 0.52,
+        "rsi": 68.8,
+        "adx": 23.1,
+        "price": 348.15,
+        "vol_ratio": 3.3,
+        "dist_50sma": 2.27,
         "hold_days": 7,
         "mkt": "US",
-        "company": "AARTI INDUSTRIES LTD"
-      },
-      {
-        "ticker": "GROWW.NS",
-        "score": 4,
-        "fresh": [
-          "50SMA_RECLAIM"
-        ],
-        "conf": [
-          "50SMA_RECLAIM",
-          "VOL\u22651.2x",
-          "ADX>15",
-          "M\u22656"
-        ],
-        "minervini": 6,
-        "rsi": 66.2,
-        "adx": 16.1,
-        "price": 200.58,
-        "vol_ratio": 1.4,
-        "dist_50sma": 4.01,
-        "hold_days": 7,
-        "mkt": "US",
-        "company": "BILLIONBRAINS GARAGE VN L"
-      },
-      {
-        "ticker": "INDHOTEL.NS",
-        "score": 3,
-        "fresh": [
-          "50SMA_RECLAIM"
-        ],
-        "conf": [
-          "50SMA_RECLAIM",
-          "VOL\u22651.2x",
-          "M\u22656"
-        ],
-        "minervini": 8,
-        "rsi": 65.2,
-        "adx": 13.9,
-        "price": 774.75,
-        "vol_ratio": 1.48,
-        "dist_50sma": 6.76,
-        "hold_days": 7,
-        "mkt": "US",
-        "company": "THE INDIAN HOTELS CO. LTD"
+        "rs_vs_spy": 10.31,
+        "company": "FEDERAL BANK LTD"
       }
     ],
     "turnover_momentum": [],
-    "three_weeks_tight": [],
+    "three_weeks_tight": [
+      {
+        "ticker": "GLAND.NS",
+        "mkt": "US",
+        "score": 3,
+        "fresh": [
+          "3WT"
+        ],
+        "conf": [
+          "VOL_DECLINING",
+          "NEAR_52H",
+          "RSI50-65"
+        ],
+        "minervini": 8,
+        "rsi": 59.6,
+        "adx": 31.1,
+        "price": 3029.0,
+        "vol_ratio": 0.43,
+        "spread_pct": 1.08,
+        "hold_days": 7,
+        "strategy": "three_weeks_tight",
+        "rs_vs_spy": 2.26,
+        "company": "GLAND PHARMA LIMITED"
+      },
+      {
+        "ticker": "LAURUSLABS.NS",
+        "mkt": "US",
+        "score": 3,
+        "fresh": [
+          "3WT"
+        ],
+        "conf": [
+          "VOL_DECLINING",
+          "NEAR_52H",
+          "RSI50-65"
+        ],
+        "minervini": 8,
+        "rsi": 57.4,
+        "adx": 20.6,
+        "price": 2062.9,
+        "vol_ratio": 0.66,
+        "spread_pct": 1.29,
+        "hold_days": 7,
+        "strategy": "three_weeks_tight",
+        "company": "LAURUS LABS LIMITED"
+      }
+    ],
     "episodic_pivot": [],
     "combo_pp_ribbon": [],
     "momentum": []
   },
   "sector_excess": {},
-  "spy_ret": 3.1460261716903726,
-  "elder_impulse_count": 18,
-  "market_regime": "BULL",
+  "spy_ret": 1.3397879420990213,
+  "elder_impulse_count": 10,
+  "market_regime": "NEUTRAL",
   "india_mode": true
 }
