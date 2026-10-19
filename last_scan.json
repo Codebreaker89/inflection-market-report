@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-10-16",
+  "scan_date": "2026-10-19",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -38,14 +38,13 @@
   "results_by_strategy": {
     "breakout": [
       {
-        "ticker": "AMGN",
+        "ticker": "APD",
         "mkt": "US",
-        "score": 5,
+        "score": 4,
         "phase": "COIL",
         "coil_sigs": [
           "NearPiv",
           "ADXcurl",
-          "RSIbase",
           "RS~ok",
           "RngTght"
         ],
@@ -56,31 +55,96 @@
         "conf": [
           "NearPiv",
           "ADXcurl",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 79.9,
+        "adx": 22.3,
+        "price": 299.2,
+        "vol_ratio": 0.48,
+        "atr_ratio": 0.96,
+        "vol_5d_ratio": 0.96,
+        "pivot_high": 299.59,
+        "pct_from_piv": -0.1,
+        "strategy": "breakout",
+        "company": "Air Products and Chemicals, Inc"
+      },
+      {
+        "ticker": "CRL",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "NearPiv",
           "RSIbase",
           "RS~ok",
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 59.6,
-        "adx": 24.0,
-        "price": 433.4,
-        "vol_ratio": 0.39,
+        "rsi": 52.6,
+        "adx": 34.4,
+        "price": 299.48,
+        "vol_ratio": 0.29,
+        "atr_ratio": 1.09,
+        "vol_5d_ratio": 0.8,
+        "pivot_high": 310.77,
+        "pct_from_piv": -3.6,
+        "strategy": "breakout",
+        "rs_vs_spy": -0.38,
+        "company": "Charles River Laboratories Inte"
+      },
+      {
+        "ticker": "AMGN",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "ADXcurl",
+          "RSIbase",
+          "RS~ok"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "NearPiv",
+          "ADXcurl",
+          "RSIbase",
+          "RS~ok"
+        ],
+        "minervini": 8,
+        "rsi": 51.1,
+        "adx": 23.9,
+        "price": 425.41,
+        "vol_ratio": 0.53,
         "atr_ratio": 1.01,
         "vol_5d_ratio": 1.04,
         "pivot_high": 434.03,
-        "pct_from_piv": -0.1,
+        "pct_from_piv": -2.0,
         "strategy": "breakout",
         "company": "Amgen Inc."
       },
       {
-        "ticker": "PFE",
+        "ticker": "DVN",
         "mkt": "US",
-        "score": 5,
+        "score": 4,
         "phase": "COIL",
         "coil_sigs": [
           "NearPiv",
           "ADXcurl",
-          "RSIbase",
           "RS~ok",
           "RngTght"
         ],
@@ -91,25 +155,23 @@
         "conf": [
           "NearPiv",
           "ADXcurl",
-          "RSIbase",
           "RS~ok",
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 60.3,
-        "adx": 23.7,
-        "price": 29.51,
-        "vol_ratio": 0.49,
-        "atr_ratio": 1.07,
-        "vol_5d_ratio": 0.94,
-        "pivot_high": 29.51,
+        "rsi": 73.8,
+        "adx": 16.2,
+        "price": 50.82,
+        "vol_ratio": 0.48,
+        "atr_ratio": 0.96,
+        "vol_5d_ratio": 0.91,
+        "pivot_high": 50.82,
         "pct_from_piv": 0.0,
         "strategy": "breakout",
-        "rs_vs_spy": 9.11,
-        "company": "Pfizer, Inc."
+        "company": "Devon Energy Corporation"
       },
       {
-        "ticker": "AAPL",
+        "ticker": "VTRS",
         "mkt": "US",
         "score": 4,
         "phase": "COIL",
@@ -130,77 +192,22 @@
           "RS~ok"
         ],
         "minervini": 8,
-        "rsi": 55.1,
-        "adx": 18.0,
-        "price": 342.32,
-        "vol_ratio": 0.96,
-        "atr_ratio": 0.96,
-        "vol_5d_ratio": 1.08,
-        "pivot_high": 342.96,
-        "pct_from_piv": -0.2,
+        "rsi": 51.8,
+        "adx": 21.7,
+        "price": 18.25,
+        "vol_ratio": 0.82,
+        "atr_ratio": 1.07,
+        "vol_5d_ratio": 0.91,
+        "pivot_high": 18.66,
+        "pct_from_piv": -2.2,
         "strategy": "breakout",
-        "company": "Apple Inc."
-      },
-      {
-        "ticker": "HUM",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 60.2,
-        "adx": 23.2,
-        "price": 417.62,
-        "vol_ratio": 0.4,
-        "atr_ratio": 1.39,
-        "vol_5d_ratio": 1.38,
-        "pivot_high": 433.5,
-        "pct_from_piv": -3.7,
-        "strategy": "breakout",
-        "company": "Humana Inc."
+        "company": "Viatris Inc."
       }
     ],
     "pocket_pivot": [
       {
         "ticker": "ENX.PA",
         "mkt": "FR",
-        "score": 5,
-        "fresh": [
-          "PP"
-        ],
-        "conf": [
-          "RSI45-70",
-          "ADX\u2191",
-          "Near52H",
-          "EMA9>21"
-        ],
-        "minervini": 8,
-        "rsi": 69.0,
-        "adx": 24.1,
-        "price": 167.2,
-        "vol_ratio": 1.43,
-        "hold_days": 7,
-        "strategy": "pocket_pivot",
-        "company": "EURONEXT"
-      },
-      {
-        "ticker": "BAS.DE",
-        "mkt": "DE",
         "score": 4,
         "fresh": [
           "PP"
@@ -211,162 +218,109 @@
           "EMA9>21"
         ],
         "minervini": 8,
-        "rsi": 73.8,
-        "adx": 16.3,
-        "price": 53.23,
-        "vol_ratio": 1.13,
+        "rsi": 72.2,
+        "adx": 25.7,
+        "price": 169.3,
+        "vol_ratio": 1.22,
         "hold_days": 7,
         "strategy": "pocket_pivot",
-        "company": "BASF SE                       N"
+        "company": "EURONEXT"
       }
     ],
     "connors_rsi2": [],
     "ema_ribbon": [],
     "nr7": [],
     "analyst_upgrade": [],
-    "signal_velocity": [
+    "signal_velocity": [],
+    "chokepoint_inflection": [],
+    "defensive_rotation": [
       {
-        "ticker": "VTRS",
-        "score": 10,
+        "ticker": "ISRG",
+        "sector": "Healthcare",
+        "sector_etf": "XLV",
+        "score": 3,
         "fresh": [
-          "SV+8"
+          "ROT:XLV",
+          "ETF+6.01%vsS&P"
         ],
         "conf": [
-          "SCORE:8/15",
-          "VEL+8",
-          "ADX>20"
+          "RS+7.5%",
+          "vsETF+1.5%",
+          "MACD+"
         ],
-        "minervini": 8,
-        "rsi": 51.7,
-        "adx": 20.8,
-        "price": 18.37,
-        "vol_ratio": 0.45,
-        "net_score": 8,
-        "velocity": 8,
-        "hold_days": 5,
+        "rsi": 62.9,
+        "adx": 16.5,
+        "vol_ratio": 0.98,
+        "minervini": 2,
+        "price": 433.49,
+        "rs_vs_spy": 7.55,
+        "rs_vs_sector": 1.54,
         "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "Viatris Inc."
-      },
-      {
-        "ticker": "SDLF.L",
-        "score": 10,
-        "fresh": [
-          "SV+8"
-        ],
-        "conf": [
-          "SCORE:9/15",
-          "VEL+8",
-          "ADX>20"
-        ],
-        "minervini": 8,
-        "rsi": 55.3,
-        "adx": 21.1,
-        "price": 911.0,
-        "vol_ratio": 0.7,
-        "net_score": 9,
-        "velocity": 8,
-        "hold_days": 5,
-        "mkt": "UK",
-        "strategy": "signal_velocity",
-        "rs_vs_spy": 6.4,
-        "company": "STANDARD LIFE PLC ORD 10P"
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Intuitive Surgical, Inc."
       }
     ],
-    "chokepoint_inflection": [],
-    "defensive_rotation": [],
     "cup_handle": [
       {
-        "ticker": "EXPD",
+        "ticker": "LLY",
         "score": 5,
         "fresh": [
           "C&H",
-          "PIV@198.64"
+          "PIV@1257.03"
         ],
         "conf": [
-          "CUP28.8%",
-          "HDL2.6%",
+          "CUP33.7%",
+          "HDL7.2%",
           "MACD+",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 62.5,
-        "adx": 21.6,
-        "vol_ratio": 0.34,
+        "rsi": 63.3,
+        "adx": 23.6,
+        "vol_ratio": 0.48,
         "minervini": 8,
-        "price": 195.67,
-        "cup_depth_pct": 28.8,
+        "price": 1247.45,
+        "cup_depth_pct": 33.7,
         "cup_duration": 195,
-        "handle_depth_pct": 2.6,
+        "handle_depth_pct": 7.2,
         "handle_duration": 5,
-        "pivot": 198.64,
+        "pivot": 1257.03,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "company": "Expeditors International of Was"
+        "company": "Eli Lilly and Company"
       },
       {
-        "ticker": "PFE",
+        "ticker": "SJM",
         "score": 5,
         "fresh": [
           "C&H",
-          "PIV@29.51"
+          "PIV@127.43"
         ],
         "conf": [
-          "CUP19.8%",
-          "HDL3.9%",
+          "CUP33.7%",
+          "HDL4.8%",
           "MACD+",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 60.3,
-        "adx": 23.7,
-        "vol_ratio": 0.49,
+        "rsi": 64.7,
+        "adx": 17.0,
+        "vol_ratio": 0.79,
         "minervini": 8,
-        "price": 29.51,
-        "cup_depth_pct": 19.8,
+        "price": 126.76,
+        "cup_depth_pct": 33.7,
         "cup_duration": 195,
-        "handle_depth_pct": 3.9,
+        "handle_depth_pct": 4.8,
         "handle_duration": 5,
-        "pivot": 29.51,
+        "pivot": 127.43,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "rs_vs_spy": 9.11,
-        "company": "Pfizer, Inc."
-      },
-      {
-        "ticker": "SDLF.L",
-        "score": 5,
-        "fresh": [
-          "C&H",
-          "PIV@911.0"
-        ],
-        "conf": [
-          "CUP31.4%",
-          "HDL5.8%",
-          "MACD+",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 55.3,
-        "adx": 21.1,
-        "vol_ratio": 0.7,
-        "minervini": 8,
-        "price": 911.0,
-        "cup_depth_pct": 31.4,
-        "cup_duration": 195,
-        "handle_depth_pct": 5.8,
-        "handle_duration": 5,
-        "pivot": 911.0,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "UK",
-        "strategy": "cup_handle",
-        "rs_vs_spy": 6.4,
-        "company": "STANDARD LIFE PLC ORD 10P"
+        "company": "The J.M. Smucker Company"
       }
     ],
     "darvas_box": [],
@@ -385,10 +339,10 @@
           "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 76.4,
-        "adx": 21.3,
-        "price": 224.16,
-        "vol_ratio": 0.55,
+        "rsi": 81.2,
+        "adx": 23.1,
+        "price": 224.8,
+        "vol_ratio": 0.84,
         "n_contractions": 3,
         "final_pct": 2.63,
         "base_high": 217.78,
@@ -400,7 +354,31 @@
       }
     ],
     "williams_pct_r": [],
-    "bollinger_pctb": [],
+    "bollinger_pctb": [
+      {
+        "ticker": "AMD",
+        "score": 3,
+        "fresh": [
+          "BB-OVERSOLD"
+        ],
+        "conf": [
+          "pctB_lt10",
+          "SMAabove",
+          "M\u22655"
+        ],
+        "minervini": 8,
+        "rsi": 33.5,
+        "adx": 22.1,
+        "price": 540.87,
+        "vol_ratio": 0.84,
+        "pct_b": -0.016,
+        "mfi": 29.5,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "bollinger_pctb",
+        "company": "Advanced Micro Devices, Inc."
+      }
+    ],
     "connors_r3": [],
     "connors_tps": [],
     "turtle_soup": [],
@@ -408,74 +386,52 @@
     "wyckoff_spring": [],
     "weinstein_stage2": [],
     "momentum_burst": [],
-    "ma50_reclaim": [
+    "ma50_reclaim": [],
+    "turnover_momentum": [],
+    "three_weeks_tight": [
       {
-        "ticker": "RWE.DE",
-        "score": 5,
+        "ticker": "CRL",
+        "mkt": "US",
+        "score": 4,
         "fresh": [
-          "50SMA_RECLAIM"
+          "3WT"
         ],
         "conf": [
-          "50SMA_RECLAIM",
-          "VOL\u22651.2x",
-          "RSI35-65",
-          "M\u22656",
-          "TIGHT<3%"
+          "TIGHT<1%",
+          "VOL_DECLINING",
+          "NEAR_52H",
+          "RSI50-65"
         ],
         "minervini": 8,
-        "rsi": 49.4,
-        "adx": 12.0,
-        "price": 59.04,
-        "vol_ratio": 1.64,
-        "dist_50sma": 0.61,
+        "rsi": 52.6,
+        "adx": 34.4,
+        "price": 299.48,
+        "vol_ratio": 0.29,
+        "spread_pct": 0.77,
         "hold_days": 7,
-        "mkt": "DE",
-        "company": "RWE AG                        I"
-      },
-      {
-        "ticker": "GLEN.L",
-        "score": 5,
-        "fresh": [
-          "50SMA_RECLAIM"
-        ],
-        "conf": [
-          "50SMA_RECLAIM",
-          "VOL\u22651.2x",
-          "ADX>15",
-          "M\u22656",
-          "TIGHT<3%"
-        ],
-        "minervini": 8,
-        "rsi": 68.5,
-        "adx": 16.7,
-        "price": 583.1,
-        "vol_ratio": 1.51,
-        "dist_50sma": 1.04,
-        "hold_days": 7,
-        "mkt": "UK",
-        "company": "GLENCORE PLC ORD USD0.01"
+        "strategy": "three_weeks_tight",
+        "rs_vs_spy": -0.38,
+        "company": "Charles River Laboratories Inte"
       }
     ],
-    "turnover_momentum": [],
-    "three_weeks_tight": [],
     "episodic_pivot": [],
     "combo_pp_ribbon": [],
     "momentum": []
   },
   "sector_excess": {
-    "XLK": -6.98,
-    "XLI": -0.58,
-    "XLV": 7.04,
-    "XLF": 4.16,
-    "XLY": 2.84,
-    "XLP": 9.25,
-    "XLB": 4.65,
-    "XLE": 9.04,
-    "XLC": 0.83,
-    "XLU": 6.65,
-    "XLRE": 3.79
+    "XLK": -6.3,
+    "XLI": -0.91,
+    "XLV": 6.01,
+    "XLF": 3.12,
+    "XLY": 4.67,
+    "XLP": 8.59,
+    "XLB": 3.88,
+    "XLE": 7.91,
+    "XLC": -0.21,
+    "XLU": 4.32,
+    "XLRE": 3.27
   },
-  "spy_ret": -0.79,
+  "spy_ret": -0.9,
   "elder_impulse_count": 2,
   "market_regime": "BEAR",
   "india_mode": false
