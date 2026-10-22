@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-10-21",
+  "scan_date": "2026-10-22",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -44,70 +44,14 @@
     "analyst_upgrade": [],
     "signal_velocity": [],
     "chokepoint_inflection": [],
-    "defensive_rotation": [
-      {
-        "ticker": "KR",
-        "sector": "Consumer Staples",
-        "sector_etf": "XLP",
-        "score": 5,
-        "fresh": [
-          "ROT:XLP",
-          "ETF+8.56%vsS&P"
-        ],
-        "conf": [
-          "RS+9.1%",
-          "vsETF+0.6%",
-          "MACD+",
-          ">SMA200",
-          "M\u22653"
-        ],
-        "rsi": 67.9,
-        "adx": 21.5,
-        "vol_ratio": 0.95,
-        "minervini": 3,
-        "price": 62.98,
-        "rs_vs_spy": 9.11,
-        "rs_vs_sector": 0.55,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "Kroger Company (The)"
-      },
-      {
-        "ticker": "ISRG",
-        "sector": "Healthcare",
-        "sector_etf": "XLV",
-        "score": 4,
-        "fresh": [
-          "ROT:XLV",
-          "ETF+8.91%vsS&P"
-        ],
-        "conf": [
-          "RS+9.5%",
-          "vsETF+0.6%",
-          "VOL\u2191",
-          "MACD+"
-        ],
-        "rsi": 69.3,
-        "adx": 17.7,
-        "vol_ratio": 1.68,
-        "minervini": 2,
-        "price": 438.0,
-        "rs_vs_spy": 9.5,
-        "rs_vs_sector": 0.59,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "Intuitive Surgical, Inc."
-      }
-    ],
+    "defensive_rotation": [],
     "cup_handle": [],
     "darvas_box": [],
     "rs_line": [],
     "vcp": [
       {
         "ticker": "COFORGE.NS",
-        "score": 5,
+        "score": 4,
         "fresh": [
           "VCP-6C"
         ],
@@ -115,14 +59,13 @@
           "Contractions\u22654",
           "TightFinal",
           "VolDry",
-          "NearPivot",
           "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 78.6,
-        "adx": 19.3,
-        "price": 1954.3,
-        "vol_ratio": 0.83,
+        "rsi": 69.0,
+        "adx": 18.4,
+        "price": 1908.0,
+        "vol_ratio": 1.38,
         "n_contractions": 6,
         "final_pct": 3.52,
         "base_high": 2021.2,
@@ -135,33 +78,63 @@
     ],
     "williams_pct_r": [],
     "bollinger_pctb": [],
-    "connors_r3": [
-      {
-        "ticker": "CUPID.NS",
-        "score": 3,
-        "conf": [
-          "RSI2_sub5",
-          "ADX16-35",
-          "M>=5"
-        ],
-        "minervini": 8,
-        "rsi": 0.0,
-        "adx": 21.1,
-        "price": 335.7,
-        "vol_ratio": 0.6,
-        "hold_days": 3,
-        "mkt": "US",
-        "strategy": "connors_r3",
-        "company": "CUPID LIMITED"
-      }
-    ],
+    "connors_r3": [],
     "connors_tps": [],
     "turtle_soup": [],
     "raschke_8020": [],
     "wyckoff_spring": [],
     "weinstein_stage2": [],
-    "momentum_burst": [],
-    "ma50_reclaim": [],
+    "momentum_burst": [
+      {
+        "ticker": "INDHOTEL.NS",
+        "score": 5,
+        "fresh": [
+          "BURST"
+        ],
+        "conf": [
+          "BURST\u22654%",
+          "VOL\u22651.5x",
+          "TI\u22651.03",
+          "M\u22656",
+          "RSI50-70"
+        ],
+        "minervini": 8,
+        "rsi": 66.8,
+        "adx": 18.3,
+        "price": 787.55,
+        "vol_ratio": 3.66,
+        "burst_pct": 4.59,
+        "hold_days": 5,
+        "mkt": "US",
+        "rs_vs_spy": 10.78,
+        "company": "THE INDIAN HOTELS CO. LTD"
+      }
+    ],
+    "ma50_reclaim": [
+      {
+        "ticker": "INDHOTEL.NS",
+        "score": 4,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "ADX>15",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 66.8,
+        "adx": 18.3,
+        "price": 787.55,
+        "vol_ratio": 3.66,
+        "dist_50sma": 8.22,
+        "hold_days": 7,
+        "mkt": "US",
+        "rs_vs_spy": 10.78,
+        "company": "THE INDIAN HOTELS CO. LTD"
+      }
+    ],
     "turnover_momentum": [],
     "three_weeks_tight": [],
     "episodic_pivot": [],
@@ -169,7 +142,7 @@
     "momentum": []
   },
   "sector_excess": {},
-  "spy_ret": -0.4041465821791158,
+  "spy_ret": 0.08781827536071338,
   "elder_impulse_count": 5,
   "market_regime": "NEUTRAL",
   "india_mode": true

@@ -3064,3 +3064,6 @@ scan_date,ticker,company,strategy,strategies_count,price_at_scan,score,wr,avg,ad
 2026-10-21,APD,"Air Products and Chemicals, Inc",vcp,2,302.97,5,,,23.7,89.8,0.26,,,,,,,,,,,,,
 2026-10-21,CVX,Chevron Corporation,vcp,1,226.73,4,,,26.6,80.3,0.41,,,,,,,,,,,,,
 2026-10-21,ABNB,"Airbnb, Inc.",vcp,1,176.38,4,,,22.0,76.3,0.34,,,,,,,,,,,,,
+2026-10-22,COFORGE.NS,COFORGE LIMITED,vcp,1,1908.0,4,,,18.4,69.0,1.38,,,,,,,,,,,,,
+2026-10-22,INDHOTEL.NS,THE INDIAN HOTELS CO. LTD,momentum_burst,2,787.55,5,,,18.3,66.8,3.66,,,,,,,,,,,,,
+2026-10-22,INDHOTEL.NS,THE INDIAN HOTELS CO. LTD,ma50_reclaim,2,787.55,4,,,18.3,66.8,3.66,,,,,,,,,,,,,
