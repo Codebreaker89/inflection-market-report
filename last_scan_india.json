@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-10-22",
+  "scan_date": "2026-10-23",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -36,7 +36,41 @@
     "combo_pp_ribbon"
   ],
   "results_by_strategy": {
-    "breakout": [],
+    "breakout": [
+      {
+        "ticker": "HFCL.NS",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "ADXcurl",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "ADXcurl",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 52.8,
+        "adx": 17.4,
+        "price": 245.4,
+        "vol_ratio": 0.87,
+        "atr_ratio": 1.14,
+        "vol_5d_ratio": 1.29,
+        "pivot_high": 268.81,
+        "pct_from_piv": -8.7,
+        "strategy": "breakout",
+        "company": "HFCL LIMITED"
+      }
+    ],
     "pocket_pivot": [],
     "connors_rsi2": [],
     "ema_ribbon": [],
@@ -44,50 +78,176 @@
     "analyst_upgrade": [],
     "signal_velocity": [],
     "chokepoint_inflection": [],
-    "defensive_rotation": [],
+    "defensive_rotation": [
+      {
+        "ticker": "CAG",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 5,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+9.16%vsS&P"
+        ],
+        "conf": [
+          "RS+12.3%",
+          "vsETF+3.2%",
+          "MACD+",
+          ">SMA200",
+          "M\u22653"
+        ],
+        "rsi": 69.9,
+        "adx": 26.6,
+        "vol_ratio": 1.12,
+        "minervini": 3,
+        "price": 15.07,
+        "rs_vs_spy": 12.34,
+        "rs_vs_sector": 3.18,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "ConAgra Brands, Inc."
+      },
+      {
+        "ticker": "CPB",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 4,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+9.16%vsS&P"
+        ],
+        "conf": [
+          "RS+11.0%",
+          "vsETF+1.9%",
+          "VOL\u2191",
+          "MACD+"
+        ],
+        "rsi": 64.7,
+        "adx": 27.2,
+        "vol_ratio": 1.21,
+        "minervini": 1,
+        "price": 21.26,
+        "rs_vs_spy": 11.05,
+        "rs_vs_sector": 1.88,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "The Campbell's Company"
+      },
+      {
+        "ticker": "NEE",
+        "sector": "Utilities",
+        "sector_etf": "XLU",
+        "score": 4,
+        "fresh": [
+          "ROT:XLU",
+          "ETF+5.67%vsS&P"
+        ],
+        "conf": [
+          "RS+7.1%",
+          "vsETF+1.5%",
+          "VOL\u2191",
+          "MACD+"
+        ],
+        "rsi": 69.8,
+        "adx": 27.6,
+        "vol_ratio": 1.36,
+        "minervini": 2,
+        "price": 81.9,
+        "rs_vs_spy": 7.14,
+        "rs_vs_sector": 1.47,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "NextEra Energy, Inc."
+      },
+      {
+        "ticker": "HRL",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 3,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+9.16%vsS&P"
+        ],
+        "conf": [
+          "RS+13.0%",
+          "vsETF+3.8%",
+          "MACD+"
+        ],
+        "rsi": 68.9,
+        "adx": 31.1,
+        "vol_ratio": 0.89,
+        "minervini": 2,
+        "price": 21.36,
+        "rs_vs_spy": 12.97,
+        "rs_vs_sector": 3.81,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Hormel Foods Corporation"
+      }
+    ],
     "cup_handle": [],
     "darvas_box": [],
     "rs_line": [],
-    "vcp": [
-      {
-        "ticker": "COFORGE.NS",
-        "score": 4,
-        "fresh": [
-          "VCP-6C"
-        ],
-        "conf": [
-          "Contractions\u22654",
-          "TightFinal",
-          "VolDry",
-          "M\u22657"
-        ],
-        "minervini": 8,
-        "rsi": 69.0,
-        "adx": 18.4,
-        "price": 1908.0,
-        "vol_ratio": 1.38,
-        "n_contractions": 6,
-        "final_pct": 3.52,
-        "base_high": 2021.2,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "vcp",
-        "spy_regime": "CHOPPY",
-        "company": "COFORGE LIMITED"
-      }
-    ],
+    "vcp": [],
     "williams_pct_r": [],
     "bollinger_pctb": [],
     "connors_r3": [],
     "connors_tps": [],
-    "turtle_soup": [],
-    "raschke_8020": [],
+    "turtle_soup": [
+      {
+        "ticker": "STLTECH.NS",
+        "strategy": "turtle_soup",
+        "score": 4,
+        "conf": [
+          "CloseStrong",
+          "VolSurge",
+          "ADX16-35",
+          "M>=5"
+        ],
+        "minervini": 8,
+        "rsi": 33.4,
+        "adx": 27.2,
+        "price": 835.0,
+        "vol_ratio": 1.64,
+        "prior_20d_low": 792.1,
+        "hold_days": 3,
+        "mkt": "US",
+        "rs_vs_spy": -15.87,
+        "company": "STERLITE TECHNOLOGIES LTD"
+      }
+    ],
+    "raschke_8020": [
+      {
+        "ticker": "STLTECH.NS",
+        "strategy": "raschke_8020",
+        "score": 4,
+        "conf": [
+          "StrongClose",
+          "VolAboveAvg",
+          "ADX16-35",
+          "M>=5"
+        ],
+        "minervini": 8,
+        "rsi": 33.4,
+        "adx": 27.2,
+        "price": 835.0,
+        "vol_ratio": 1.64,
+        "yest_high": 845.0,
+        "hold_days": 2,
+        "mkt": "US",
+        "rs_vs_spy": -15.87,
+        "company": "STERLITE TECHNOLOGIES LTD"
+      }
+    ],
     "wyckoff_spring": [],
     "weinstein_stage2": [],
     "momentum_burst": [
       {
-        "ticker": "INDHOTEL.NS",
-        "score": 5,
+        "ticker": "STLTECH.NS",
+        "score": 4,
         "fresh": [
           "BURST"
         ],
@@ -95,19 +255,18 @@
           "BURST\u22654%",
           "VOL\u22651.5x",
           "TI\u22651.03",
-          "M\u22656",
-          "RSI50-70"
+          "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 66.8,
-        "adx": 18.3,
-        "price": 787.55,
-        "vol_ratio": 3.66,
-        "burst_pct": 4.59,
+        "rsi": 33.4,
+        "adx": 27.2,
+        "price": 835.0,
+        "vol_ratio": 1.64,
+        "burst_pct": 4.26,
         "hold_days": 5,
         "mkt": "US",
-        "rs_vs_spy": 10.78,
-        "company": "THE INDIAN HOTELS CO. LTD"
+        "rs_vs_spy": -15.87,
+        "company": "STERLITE TECHNOLOGIES LTD"
       }
     ],
     "ma50_reclaim": [
@@ -124,15 +283,37 @@
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 66.8,
-        "adx": 18.3,
-        "price": 787.55,
-        "vol_ratio": 3.66,
-        "dist_50sma": 8.22,
+        "rsi": 65.5,
+        "adx": 19.9,
+        "price": 771.05,
+        "vol_ratio": 1.67,
+        "dist_50sma": 5.83,
         "hold_days": 7,
         "mkt": "US",
-        "rs_vs_spy": 10.78,
         "company": "THE INDIAN HOTELS CO. LTD"
+      },
+      {
+        "ticker": "STLTECH.NS",
+        "score": 4,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "ADX>15",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 33.4,
+        "adx": 27.2,
+        "price": 835.0,
+        "vol_ratio": 1.64,
+        "dist_50sma": 3.17,
+        "hold_days": 7,
+        "mkt": "US",
+        "rs_vs_spy": -15.87,
+        "company": "STERLITE TECHNOLOGIES LTD"
       }
     ],
     "turnover_momentum": [],
@@ -142,8 +323,8 @@
     "momentum": []
   },
   "sector_excess": {},
-  "spy_ret": 0.08781827536071338,
-  "elder_impulse_count": 5,
+  "spy_ret": 1.4384746933982693,
+  "elder_impulse_count": 10,
   "market_regime": "NEUTRAL",
   "india_mode": true
 }
