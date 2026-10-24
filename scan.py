@@ -143,7 +143,8 @@ from turnover_momentum_scanner     import scan as scan_turnover_momentum
 from three_weeks_tight_scanner     import scan as scan_3wt
 from episodic_pivot_scanner        import scan as scan_ep
 from combo_scanner                 import scan as scan_combo
-from hv_breakout_scanner           import scan as scan_hv_breakout
+# hv_breakout_scanner — DISABLED: 3y WF weak; shorts dragged; long-only still not asymmetrical enough
+# from hv_breakout_scanner           import scan as scan_hv_breakout
 from show_tracker                  import (add_trade_interactive, load_trades, save_trades,
                                            next_id, ticker_ccy, fetch_fx_on_date,
                                            fetch_company_name, fetch_sector, fetch_market_regime,

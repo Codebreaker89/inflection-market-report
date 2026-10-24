@@ -24,6 +24,7 @@ __pycache__/
 .env
 .cache_hv_bt/
 optimize_hv_breakout_results.json
+backtest_range_fade_results.json
 
 # macOS
 .DS_Store
