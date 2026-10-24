@@ -13,6 +13,7 @@
 | **connors_rsi2_scanner.py** | Scanner: Connors RSI(2) mean reversion — deeply oversold dip in uptrend. Hold 5d. |
 | **ema_ribbon_scanner.py** | Scanner: EMA 8/13/21/34/55 stack expansion pullback re-entry. Hold 7d. |
 | **nr7_scanner.py** | Scanner: NR7 (Toby Crabel) — today's range narrowest of last 7 days = volatility compression before expansion. Hold 3d. |
+| **hv_breakout_scanner.py** | Scanner: HV Breakout (Crabel / Raschke / Connors) — top-quartile 100d HV names after HV(6)/HV(100)≤0.50 coil; two-sided range break (long or short). Hold 3d. |
 | **bb_squeeze_scanner.py** | Scanner: BB Squeeze (TTM Squeeze / John Carter) — Bollinger Bands inside Keltner Channels, momentum fires when released. Works in sideways markets. Hold 7d. |
 | **high_tight_flag_scanner.py** | Scanner: High Tight Flag (Minervini / O'Neil) — stock up ≥90% in ≤8 weeks then consolidates ≤25%. Rare, high-conviction. Hold 10d. |
 | **analyst_upgrade_scanner.py** | Scanner: Analyst Upgrade Cluster — ≥3 distinct firms upgrade to Buy-equivalent in 5 days, ≥1 tier-1, no earnings gap-up contamination. Uses yfinance recommendations API. Hold 7d. |
@@ -189,7 +190,8 @@ open ~/Claude/Projects/fire/scan_history.csv    # historical dataset
 - **qty** — Shares purchased (= 1000 EUR × fx_at_entry ÷ buy_price)
 - **investment_eur** — Amount invested in EUR (default €1000, can vary)
 - **trade_type** — `practice` (paper trade) or `real` (actual money)
-- **strategy** — which scanner flagged it: `momentum`, `breakout`, `pocket_pivot`, `connors_rsi2`, `ema_ribbon`, `nr7`, `bb_squeeze`, `high_tight_flag`, `analyst_upgrade`, `signal_velocity`, `chokepoint_inflection`, `stage4_short`, `defensive_rotation`, `cup_handle`, `power_earnings_gap`, `three_weeks_tight`, `episodic_pivot`, `combo_pp_ribbon`
+- **strategy** — which scanner flagged it: `momentum`, `breakout`, `pocket_pivot`, `connors_rsi2`, `ema_ribbon`, `nr7`, `bb_squeeze`, `hv_breakout`, `high_tight_flag`, `analyst_upgrade`, `signal_velocity`, `chokepoint_inflection`, `stage4_short`, `defensive_rotation`, `cup_handle`, `power_earnings_gap`, `three_weeks_tight`, `episodic_pivot`, `combo_pp_ribbon`
+- **side** — `long` / `short` for two-sided strategies (`hv_breakout`); blank otherwise. Short rows flip the sign of `ret_d5` when computing win rate.
 - **hold_days** — planned hold duration in calendar days (varies by strategy)
 - **stop_loss_price** — price at which to exit to limit loss (= buy_price × 0.97)
 - **target_exit_date** — planned exit date (entry + hold_days business days)

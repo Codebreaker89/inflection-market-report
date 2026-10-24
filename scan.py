@@ -143,6 +143,7 @@ from turnover_momentum_scanner     import scan as scan_turnover_momentum
 from three_weeks_tight_scanner     import scan as scan_3wt
 from episodic_pivot_scanner        import scan as scan_ep
 from combo_scanner                 import scan as scan_combo
+from hv_breakout_scanner           import scan as scan_hv_breakout
 from show_tracker                  import (add_trade_interactive, load_trades, save_trades,
                                            next_id, ticker_ccy, fetch_fx_on_date,
                                            fetch_company_name, fetch_sector, fetch_market_regime,
@@ -179,7 +180,8 @@ ALL_STRATEGIES = ["breakout", "pocket_pivot", "connors_rsi2",
                   "connors_r3", "connors_tps", "turtle_soup", "raschke_8020",
                   "wyckoff_spring", "weinstein_stage2",
                   "momentum_burst", "ma50_reclaim", "turnover_momentum",
-                  "three_weeks_tight", "episodic_pivot", "combo_pp_ribbon"]
+                  "three_weeks_tight", "episodic_pivot", "combo_pp_ribbon",
+                  "hv_breakout"]
 
 SCANNER_MAP = {
     # "momentum":        scan_momentum,  # DISABLED: 0% WR, avg -4.40% across 5 signals (Jun 30 backtest)
@@ -218,6 +220,7 @@ SCANNER_MAP = {
     "three_weeks_tight":     scan_3wt,
     "episodic_pivot":        scan_ep,
     "combo_pp_ribbon":       scan_combo,
+    "hv_breakout":           scan_hv_breakout,
 }
 
 STRATEGY_LABELS = {
@@ -256,6 +259,7 @@ STRATEGY_LABELS = {
     "three_weeks_tight":     "🗜  3-WEEKS-TIGHT  (O'Neil/IBD — 3 weekly closes within 1.5% + volume drying = pre-breakout coil)",
     "episodic_pivot":        "⚡  EPISODIC PIVOT  (Gil Morales/Kacher — catalyst gap ≥8% on 2.5× volume, permanently repriced, entry on pullback)",
     "combo_pp_ribbon":       "🏆  COMBO PP+RIBBON  (Premium setup — Pocket Pivot AND EMA Ribbon fire simultaneously; highest-conviction momentum)",
+    "hv_breakout":           "🌊  HV BREAKOUT  (Crabel/Raschke — high-vol names after HV-ratio coil; two-sided range break)",
 }
 
 STRATEGY_DESCRIPTIONS = {
@@ -456,6 +460,13 @@ STRATEGY_DESCRIPTIONS = {
         "  When both align: institutional buyers entering INTO a strengthening trend structure.\n"
         "  Minervini ≥6 required. Hold 7 days. Gil Morales & Kacher's preferred entry combination."
     ),
+    "hv_breakout": (
+        "High-vol names only (100d HV in top quartile of today's list). Yesterday's\n"
+        "  HV(6)/HV(100) ≤ 0.50 (usually wild, quiet now). Today closes above yesterday's\n"
+        "  high → LONG, or below yesterday's low → SHORT. Stop = other side of that range.\n"
+        "  Skip if range > 2×ATR(14). Hold 3 days. Direction-agnostic volatility expansion.\n"
+        "  Source: Crabel NR / Raschke & Connors Street Smarts HV-ratio breakout."
+    ),
 }
 
 HOLD_DAYS_MAP = {
@@ -491,6 +502,10 @@ HOLD_DAYS_MAP = {
     "momentum_burst":        5,
     "ma50_reclaim":          7,
     "turnover_momentum":     5,
+    "three_weeks_tight":     7,
+    "episodic_pivot":        10,
+    "combo_pp_ribbon":       7,
+    "hv_breakout":           3,
 }
 
 # Short display aliases for strategy names (replaces garbled [:6] truncation)
@@ -523,6 +538,10 @@ STRAT_ALIAS = {
     "elder_impulse":         "EIMP",
     "stage4_short":          "S4SH",
     "turnover_momentum":     "TMOM",
+    "hv_breakout":           "HVBR",
+    "three_weeks_tight":     "3WT",
+    "episodic_pivot":        "EPIV",
+    "combo_pp_ribbon":       "COMBO",
 }
 
 W = 110
@@ -1048,6 +1067,9 @@ def _load_hist_stats() -> dict:
                 try:
                     ret = float(row["ret_d5"])
                     if _math.isnan(ret): continue
+                    # Short signals: price UP is a loss — flip the sign for WR/avg.
+                    if (row.get("side") or "").strip().lower() == "short":
+                        ret = -ret
                     stats[strat]["total"] += 1
                     stats[strat]["s"] += ret
                     if ret > 0: stats[strat]["wins"] += 1
@@ -1375,7 +1397,7 @@ def main():
     RSI_FLOOR_EXEMPT = {"connors_rsi2", "connors_3down", "connors_r3", "connors_tps",
                         "williams_pct_r", "bollinger_pctb", "raschke_8020", "turtle_soup",
                         "signal_velocity", "wyckoff_spring", "weinstein_stage2",
-                        "momentum_burst", "ma50_reclaim"}
+                        "momentum_burst", "ma50_reclaim", "hv_breakout"}
     for strat in list(results_by_strategy.keys()):
         if strat in RSI_FLOOR_EXEMPT:
             continue

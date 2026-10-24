@@ -90,7 +90,7 @@ pip install yfinance pandas numpy matplotlib feedparser beautifulsoup4 requests
 | Momentum | `pocket_pivot`, `ema_ribbon`, `elder_impulse`, `momentum` |
 | Breakout | `breakout`, `darvas_box`, `vcp`, `cup_handle` |
 | Mean-reversion | `connors_rsi2`, `connors_3down`, `williams_pct_r`, `bollinger_pctb` |
-| Volatility | `nr7`, `bb_squeeze` |
+| Volatility | `nr7`, `bb_squeeze`, `hv_breakout` |
 | Trend-pullback | `holy_grail`, `rs_line`, `defensive_rotation` |
 | Event-driven | `power_earnings_gap`, `analyst_upgrade` |
 | Short | `stage4_short` |

@@ -39,6 +39,7 @@ def _quiet():
 FIELDNAMES = [
     "scan_date","ticker","company","strategy","strategies_count",
     "price_at_scan","score","wr","avg","adx","rsi","vol_ratio",
+    "side",   # long|short — empty for one-sided strategies; flips WR math for shorts
     # filled later
     "price_d5","ret_d5","r_multiple_d5","spy_ret_d5","excess_ret_d5","hit_stop_loss_d5",
     "price_d10","ret_d10","r_multiple_d10","spy_ret_d10","excess_ret_d10","hit_stop_loss_d10",
@@ -153,7 +154,12 @@ def _safe(v):
 def load_history() -> list[dict]:
     if not HISTORY.exists(): return []
     with open(HISTORY, newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
+        rows = list(csv.DictReader(f))
+    # Pad newly added columns (e.g. side) so re-saves stay schema-clean.
+    for r in rows:
+        for k in FIELDNAMES:
+            r.setdefault(k, "")
+    return rows
 
 def save_history(rows: list[dict]):
     with open(HISTORY, "w", newline="", encoding="utf-8") as f:
@@ -196,6 +202,7 @@ def append_new_rows(rows: list[dict]) -> list[dict]:
             row["adx"]              = _safe(r.get("adx"))
             row["rsi"]              = _safe(r.get("rsi"))
             row["vol_ratio"]        = _safe(r.get("vol_ratio"))
+            row["side"]             = (r.get("side") or "").strip().lower()
             rows.append(row)
             added += 1
 

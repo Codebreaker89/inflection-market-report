@@ -593,6 +593,7 @@ def add_trade_interactive(args: list[str]):
         "nr7", "bb_squeeze", "high_tight_flag", "analyst_upgrade",
         "signal_velocity", "chokepoint_inflection", "stage4_short",
         "defensive_rotation", "cup_handle", "power_earnings_gap",
+        "hv_breakout",
     ]
 
     print("\n  ── Add New Trade ──")
@@ -1242,6 +1243,7 @@ _STRAT_LABEL = {
     "defensive_rotation":   "🛡️   DEFENSIVE ROTATION",
     "cup_handle":           "☕  CUP & HANDLE",
     "power_earnings_gap":   "⚡  POWER EARNINGS GAP",
+    "hv_breakout":          "🌊  HV BREAKOUT",
 }
 
 _THEME_EMOJI_T = {

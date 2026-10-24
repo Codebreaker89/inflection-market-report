@@ -438,6 +438,7 @@ _STRAT_COLORS = {
     "raschke_8020":          ("#3a1a00", "#fff7ed"),
     "wyckoff_spring":        ("#1a3a4a", "#e0f4ff"),
     "weinstein_stage2":      ("#2a004a", "#f3e8ff"),
+    "hv_breakout":           ("#0a3a5c", "#e0f2fe"),
 }
 
 def _c(val, good_if_pos=True):
@@ -600,6 +601,7 @@ STRAT_LABEL = {
     "power_earnings_gap": "Power Earnings Gap",
     "three_weeks_tight": "3-Weeks-Tight", "episodic_pivot": "Episodic Pivot",
     "combo_pp_ribbon": "Combo PP+Ribbon",
+    "hv_breakout": "HV Breakout",
 }
 
 # Compact forms for narrow table cells and chips
@@ -621,6 +623,7 @@ STRAT_SHORT = {
     "power_earnings_gap": "POWER EPS GAP",
     "three_weeks_tight": "3-WEEKS-TIGHT", "episodic_pivot": "EPISODIC PIVOT",
     "combo_pp_ribbon": "COMBO PP+RIB",
+    "hv_breakout": "HV BREAKOUT",
 }
 
 
@@ -645,6 +648,7 @@ _MATRIX_ABBR = {
     "analyst_upgrade": "UPGRD",   "defensive_rotation": "DEFR",
     "power_earnings_gap": "PEG",  "stage4_short": "S4SH",
     "cup_handle": "C&H",          "breakout": "BREAK",
+    "hv_breakout": "HVBR",
 }
 
 
@@ -1011,6 +1015,7 @@ HOLD_DAYS_MAP = {
     "raschke_8020": 5,      "holy_grail": 7,       "weinstein_stage2": 10,
     "defensive_rotation": 10, "stage4_short": 5,   "momentum": 5,
     "power_earnings_gap": 10, "turnover_momentum": 5, "analyst_upgrade": 5,
+    "hv_breakout": 3,
 }
 
 
@@ -1270,6 +1275,10 @@ def _load_strategy_stats() -> dict:
                     ret = float(row["ret_d5"])
                     if _math.isnan(ret) or _is_suspect_row(row):
                         continue
+                    # Short signals: price UP is a loss — flip for WR/avg/excess.
+                    is_short = (row.get("side") or "").strip().lower() == "short"
+                    if is_short:
+                        ret = -ret
                     stats[strat]["total"] += 1
                     stats[strat]["sum"]   += ret
                     if ret > 0:
@@ -1280,12 +1289,16 @@ def _load_strategy_stats() -> dict:
                     if rm_raw:
                         rm = float(rm_raw)
                         if not _math.isnan(rm):
+                            if is_short:
+                                rm = -rm
                             stats[strat]["r_sum"] += rm
                             stats[strat]["r_n"]   += 1
                     ex_raw = row.get("excess_ret_d5", "")
                     if ex_raw:
                         ex = float(ex_raw)
                         if not _math.isnan(ex):
+                            if is_short:
+                                ex = -ex
                             stats[strat]["ex_sum"] += ex
                             stats[strat]["ex_n"]   += 1
                 except (ValueError, TypeError, KeyError):
@@ -1564,6 +1577,7 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
         "three_weeks_tight":  "3 consecutive weekly closes within 1.5% of each other, volume declining week-over-week. Stock digesting a prior move under institutional holding. Entry near the weekly high. Hold 7d. (O'Neil / IBD — classic continuation setup)",
         "episodic_pivot":     "Catalyst gap ≥8% on ≥2.5× volume, gap holds for 3+ days (no fill), stock not extended >25% from gap. Enter on the first pullback. Hold 10d. Historical WR ~70% when gap holds. (Gil Morales & Kacher — 'Trade Like an O'Neil Disciple' 2010)",
         "combo_pp_ribbon":    "PREMIUM SETUP: Pocket Pivot AND EMA Ribbon fire simultaneously. PP = institutional accumulation signal. Ribbon = 8/13/21/34/55 EMAs stacked + expanding + pullback bounce. When both align: institutions buying INTO a strengthening trend. Minervini ≥6. Hold 7d. (Morales & Kacher's preferred entry combination)",
+        "hv_breakout":        "High-vol names (100d HV top quartile) after HV(6)/HV(100)≤0.50 coil. Close above yesterday high → LONG, below low → SHORT. Stop = other side of range. Skip if range>2×ATR. Hold 3d. (Crabel / Raschke & Connors Street Smarts)",
     }
 
     hist_stats = _load_strategy_stats()
@@ -2166,6 +2180,9 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
             if r.get("compression"):              sigs.append(f"NR{r['compression']:.0f}%")
             if r.get("squeeze_intensity"):        sigs.append(f"sq{r['squeeze_intensity']:.2f}")
             if r.get("net_score") is not None:    sigs.append(f"net{r['net_score']:+d}")
+            if r.get("hv_ratio") is not None:     sigs.append(f"hvr{r['hv_ratio']:.2f}")
+            if r.get("hv100") is not None:        sigs.append(f"hv{r['hv100']:.0f}%")
+            if r.get("side"):                     sigs.append(str(r["side"]).upper())
             for sig in fresh[:3]:
                 if sig not in sigs: sigs.append(sig)
             if not sigs:
@@ -2176,7 +2193,8 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
             rsi_c   = (_C_WARN if rsi_v and rsi_v > 70
                        else (_C_POS if rsi_v and rsi_v < 40 else _C_BODY))
             vol_c   = _C_POS if (vol_v or 0) >= 1.5 else _C_DIM
-            tick_c  = _C_NEG if is_short else _C_BODY
+            row_short = is_short or (r.get("side") or "").lower() == "short"
+            tick_c  = _C_NEG if row_short else _C_BODY
             company_s = _company_label(r, 22) or "─"
 
             rows += "<tr>"
