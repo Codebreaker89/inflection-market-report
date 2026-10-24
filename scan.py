@@ -221,7 +221,7 @@ SCANNER_MAP = {
     "three_weeks_tight":     scan_3wt,
     "episodic_pivot":        scan_ep,
     "combo_pp_ribbon":       scan_combo,
-    "hv_breakout":           scan_hv_breakout,
+    # "hv_breakout":         scan_hv_breakout,  # DISABLED: no durable asymmetrical edge
 }
 
 STRATEGY_LABELS = {
