@@ -13,7 +13,8 @@
 | **connors_rsi2_scanner.py** | Scanner: Connors RSI(2) mean reversion — deeply oversold dip in uptrend. Hold 5d. |
 | **ema_ribbon_scanner.py** | Scanner: EMA 8/13/21/34/55 stack expansion pullback re-entry. Hold 7d. |
 | **nr7_scanner.py** | Scanner: NR7 (Toby Crabel) — today's range narrowest of last 7 days = volatility compression before expansion. Hold 3d. |
-| **hv_breakout_scanner.py** | Scanner: HV Breakout (Crabel / Raschke / Connors) — top-quartile 100d HV names after HV(6)/HV(100)≤0.50 coil; two-sided range break (long or short). Hold 3d. |
+| **hv_breakout_scanner.py** | Scanner: HV Breakout (Crabel / Raschke / Connors) — HV≥70th pct after HV(6)/HV(100)≤0.45 coil; long range break only (shorts cut after 3y WF). Hold 5d. |
+| **optimize_hv_breakout.py** | 3y walk-forward grid search for `hv_breakout` params. Run with `--apply` to rewrite scanner defaults. |
 | **bb_squeeze_scanner.py** | Scanner: BB Squeeze (TTM Squeeze / John Carter) — Bollinger Bands inside Keltner Channels, momentum fires when released. Works in sideways markets. Hold 7d. |
 | **high_tight_flag_scanner.py** | Scanner: High Tight Flag (Minervini / O'Neil) — stock up ≥90% in ≤8 weeks then consolidates ≤25%. Rare, high-conviction. Hold 10d. |
 | **analyst_upgrade_scanner.py** | Scanner: Analyst Upgrade Cluster — ≥3 distinct firms upgrade to Buy-equivalent in 5 days, ≥1 tier-1, no earnings gap-up contamination. Uses yfinance recommendations API. Hold 7d. |

@@ -259,7 +259,7 @@ STRATEGY_LABELS = {
     "three_weeks_tight":     "🗜  3-WEEKS-TIGHT  (O'Neil/IBD — 3 weekly closes within 1.5% + volume drying = pre-breakout coil)",
     "episodic_pivot":        "⚡  EPISODIC PIVOT  (Gil Morales/Kacher — catalyst gap ≥8% on 2.5× volume, permanently repriced, entry on pullback)",
     "combo_pp_ribbon":       "🏆  COMBO PP+RIBBON  (Premium setup — Pocket Pivot AND EMA Ribbon fire simultaneously; highest-conviction momentum)",
-    "hv_breakout":           "🌊  HV BREAKOUT  (Crabel/Raschke — high-vol names after HV-ratio coil; two-sided range break)",
+    "hv_breakout":           "🌊  HV BREAKOUT  (Crabel/Raschke — high-vol coil → long range break; tuned 3y WF)",
 }
 
 STRATEGY_DESCRIPTIONS = {
@@ -461,11 +461,11 @@ STRATEGY_DESCRIPTIONS = {
         "  Minervini ≥6 required. Hold 7 days. Gil Morales & Kacher's preferred entry combination."
     ),
     "hv_breakout": (
-        "High-vol names only (100d HV in top quartile of today's list). Yesterday's\n"
-        "  HV(6)/HV(100) ≤ 0.50 (usually wild, quiet now). Today closes above yesterday's\n"
-        "  high → LONG, or below yesterday's low → SHORT. Stop = other side of that range.\n"
-        "  Skip if range > 2×ATR(14). Hold 3 days. Direction-agnostic volatility expansion.\n"
-        "  Source: Crabel NR / Raschke & Connors Street Smarts HV-ratio breakout."
+        "High-vol names (100d HV ≥ 70th pct of today's list). Yesterday's HV(6)/HV(100)\n"
+        "  ≤ 0.45 (usually wild, quiet now). Today closes above yesterday's high → LONG.\n"
+        "  Skip if range > 1.5×ATR(14), risk > 8%, or volume < 20d avg. Hold 5 days.\n"
+        "  Shorts disabled after 3y walk-forward (short leg avg −0.66%).\n"
+        "  Source: Crabel / Raschke & Connors Street Smarts; params from optimize_hv_breakout.py."
     ),
 }
 
@@ -505,7 +505,7 @@ HOLD_DAYS_MAP = {
     "three_weeks_tight":     7,
     "episodic_pivot":        10,
     "combo_pp_ribbon":       7,
-    "hv_breakout":           3,
+    "hv_breakout":           5,
 }
 
 # Short display aliases for strategy names (replaces garbled [:6] truncation)

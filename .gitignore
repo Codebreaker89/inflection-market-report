@@ -22,6 +22,8 @@ __pycache__/
 *.pyc
 *.pyo
 .env
+.cache_hv_bt/
+optimize_hv_breakout_results.json
 
 # macOS
 .DS_Store

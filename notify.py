@@ -1015,7 +1015,7 @@ HOLD_DAYS_MAP = {
     "raschke_8020": 5,      "holy_grail": 7,       "weinstein_stage2": 10,
     "defensive_rotation": 10, "stage4_short": 5,   "momentum": 5,
     "power_earnings_gap": 10, "turnover_momentum": 5, "analyst_upgrade": 5,
-    "hv_breakout": 3,
+    "hv_breakout": 5,
 }
 
 
@@ -1577,7 +1577,7 @@ def _build_scanner_results_html(india_mode: bool = False) -> str:
         "three_weeks_tight":  "3 consecutive weekly closes within 1.5% of each other, volume declining week-over-week. Stock digesting a prior move under institutional holding. Entry near the weekly high. Hold 7d. (O'Neil / IBD — classic continuation setup)",
         "episodic_pivot":     "Catalyst gap ≥8% on ≥2.5× volume, gap holds for 3+ days (no fill), stock not extended >25% from gap. Enter on the first pullback. Hold 10d. Historical WR ~70% when gap holds. (Gil Morales & Kacher — 'Trade Like an O'Neil Disciple' 2010)",
         "combo_pp_ribbon":    "PREMIUM SETUP: Pocket Pivot AND EMA Ribbon fire simultaneously. PP = institutional accumulation signal. Ribbon = 8/13/21/34/55 EMAs stacked + expanding + pullback bounce. When both align: institutions buying INTO a strengthening trend. Minervini ≥6. Hold 7d. (Morales & Kacher's preferred entry combination)",
-        "hv_breakout":        "High-vol names (100d HV top quartile) after HV(6)/HV(100)≤0.50 coil. Close above yesterday high → LONG, below low → SHORT. Stop = other side of range. Skip if range>2×ATR. Hold 3d. (Crabel / Raschke & Connors Street Smarts)",
+        "hv_breakout":        "High-vol names (100d HV ≥70th pct) after HV(6)/HV(100)≤0.45 coil. Close above yesterday high → LONG. Skip if range>1.5×ATR, risk>8%, or vol soft. Hold 5d. Shorts off (3y WF). (Crabel / Raschke & Connors; tuned)",
     }
 
     hist_stats = _load_strategy_stats()

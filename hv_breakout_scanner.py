@@ -2,15 +2,14 @@
 """
 HV-Ratio Volatility Breakout  |  Crabel / Raschke / Connors (Street Smarts)
 ──────────────────────────────────────────────────────────────────────────
-Universe: 100-day historical volatility in the top quartile of today's list
-          (structurally high-vol names only).
-Coil:     HV(6) / HV(100) ≤ 0.50 on YESTERDAY — usually wild, quiet now.
+Universe: 100-day HV ≥ 70th percentile of today's list (structurally lively).
+Coil:     HV(6) / HV(100) ≤ 0.45 on YESTERDAY — usually wild, quiet now.
 Trigger:  TODAY closes above yesterday's high → LONG
-          TODAY closes below yesterday's low  → SHORT
-          (two-sided; first filled side wins — at EOD only one can fire)
-Skip:     yesterday's range > 2 × ATR(14) (stop too wide)
+          (shorts dropped after 3y walk-forward: short avg −0.66%)
+Skip:     yesterday's range > 1.5× ATR(14), or risk > 8% of price,
+          or breakout-day volume < 20d average.
 
-Hold 3 trading days. Direction-agnostic by design.
+Hold 5 trading days. Tuned by optimize_hv_breakout.py (train→test WR 58%).
 
 python3 hv_breakout_scanner.py --no-backtest
 python3 hv_breakout_scanner.py
@@ -28,13 +27,17 @@ warnings.filterwarnings("ignore")
 logging.getLogger("yfinance").setLevel(logging.CRITICAL)
 logging.getLogger("peewee").setLevel(logging.CRITICAL)
 
-# ── CONFIG ────────────────────────────────────────────────────────────────────
-HOLD_DAYS       = 3
+# ── CONFIG (tuned by optimize_hv_breakout.py on ~3y walk-forward) ─────────────
+HOLD_DAYS       = 5
 MAX_WORKERS     = 25
 HV_SHORT        = 6
 HV_LONG         = 100
-HV_RATIO_MAX    = 0.50      # coil: short HV ≤ half of long HV
-RANGE_ATR_MAX   = 2.0       # skip if yesterday range > 2× ATR(14)
+HV_RATIO_MAX    = 0.45      # coil: short HV ≤ fraction of long HV
+HV_PCT_MIN      = 0.70      # cross-sectional HV100 floor
+RANGE_ATR_MAX   = 1.5       # skip if yesterday range > N× ATR(14)
+MAX_RISK_PCT    = 8.0       # skip if |entry-stop|/entry > this %
+REQUIRE_VOL     = True     # require vol_ratio ≥ 1.0 on breakout day
+LONG_ONLY       = True    # drop short breakouts if True
 MIN_PRICE       = 1.0
 MIN_VOL_MA      = 100_000
 LOOKBACK_PERIOD = "400d"
@@ -118,6 +121,8 @@ def _score(df: pd.DataFrame, idx: int, side: str) -> Optional[dict]:
     vol_ma = float(row["vol_ma20"]) if not pd.isna(row["vol_ma20"]) else 0
     if vol_ma < MIN_VOL_MA:
         return None
+    if LONG_ONLY and side == "short":
+        return None
     if not _coil_yesterday(df, idx):
         return None
     if not _range_ok(df, idx):
@@ -133,13 +138,17 @@ def _score(df: pd.DataFrame, idx: int, side: str) -> Optional[dict]:
     y_lo   = float(yday["Low"])
     stop   = y_lo if side == "long" else y_hi
     risk_pct = abs(c - stop) / c * 100 if c else 0
+    if MAX_RISK_PCT is not None and risk_pct > MAX_RISK_PCT:
+        return None
 
     vol_ratio = float(row["Volume"]) / vol_ma if vol_ma > 0 else 0
+    if REQUIRE_VOL and vol_ratio < 1.0:
+        return None
     conf = {
         "VOL>avg":   vol_ratio >= 1.0,
         "ADX≥16":    adx >= 16,
-        "COIL≤0.5":  hv_rat <= HV_RATIO_MAX,
-        "RISK≤2ATR": True,   # already gated by _range_ok
+        "COIL":      hv_rat <= HV_RATIO_MAX,
+        "RISK≤ATR":  True,   # already gated by _range_ok
     }
     # Directional RSI sanity: longs prefer not-overbought; shorts not-oversold
     if side == "long":
@@ -272,11 +281,14 @@ def scan(universe: dict, bench_returns: dict, with_backtest: bool = True) -> lis
     if len(hv_map) < 8:
         return []
 
-    cutoff = float(np.percentile(list(hv_map.values()), 75))
+    # Cross-sectional floor: keep names at/above HV_PCT_MIN of today's universe.
+    cutoff = float(np.quantile(list(hv_map.values()), HV_PCT_MIN))
     results = []
     for r in candidates:
         hv = hv_map.get(r["ticker"])
         if hv is None or hv < cutoff:
+            continue
+        if LONG_ONLY and r.get("side") == "short":
             continue
         r["strategy"] = "hv_breakout"
         r["hv100"] = round(hv * 100, 1)
