@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-10-23",
+  "scan_date": "2026-10-26",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -33,77 +33,11 @@
     "turnover_momentum",
     "three_weeks_tight",
     "episodic_pivot",
-    "combo_pp_ribbon"
+    "combo_pp_ribbon",
+    "hv_breakout"
   ],
   "results_by_strategy": {
     "breakout": [
-      {
-        "ticker": "ABNB",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 63.9,
-        "adx": 22.6,
-        "price": 173.48,
-        "vol_ratio": 0.39,
-        "atr_ratio": 0.93,
-        "vol_5d_ratio": 0.98,
-        "pivot_high": 176.94,
-        "pct_from_piv": -2.0,
-        "strategy": "breakout",
-        "rs_vs_spy": 8.34,
-        "company": "Airbnb, Inc."
-      },
-      {
-        "ticker": "CNC",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 75.1,
-        "adx": 18.6,
-        "price": 70.88,
-        "vol_ratio": 0.52,
-        "atr_ratio": 1.01,
-        "vol_5d_ratio": 0.89,
-        "pivot_high": 71.24,
-        "pct_from_piv": -0.5,
-        "strategy": "breakout",
-        "company": "Centene Corporation"
-      },
       {
         "ticker": "BAX",
         "mkt": "US",
@@ -126,26 +60,25 @@
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 59.6,
-        "adx": 22.0,
-        "price": 25.26,
-        "vol_ratio": 0.39,
-        "atr_ratio": 1.04,
-        "vol_5d_ratio": 1.09,
+        "rsi": 58.5,
+        "adx": 21.7,
+        "price": 25.25,
+        "vol_ratio": 0.47,
+        "atr_ratio": 1.05,
+        "vol_5d_ratio": 1.12,
         "pivot_high": 25.76,
-        "pct_from_piv": -1.9,
+        "pct_from_piv": -2.0,
         "strategy": "breakout",
-        "rs_vs_spy": 4.26,
         "company": "Baxter International Inc."
       },
       {
-        "ticker": "HUM",
+        "ticker": "GRMN",
         "mkt": "US",
         "score": 4,
         "phase": "COIL",
         "coil_sigs": [
           "NearPiv",
-          "RSIbase",
+          "ADXcurl",
           "RS~ok",
           "RngTght"
         ],
@@ -155,21 +88,21 @@
         ],
         "conf": [
           "NearPiv",
-          "RSIbase",
+          "ADXcurl",
           "RS~ok",
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 57.1,
-        "adx": 19.4,
-        "price": 422.66,
-        "vol_ratio": 0.28,
-        "atr_ratio": 1.15,
-        "vol_5d_ratio": 0.96,
-        "pivot_high": 433.5,
-        "pct_from_piv": -2.5,
+        "rsi": 65.9,
+        "adx": 19.6,
+        "price": 293.21,
+        "vol_ratio": 0.46,
+        "atr_ratio": 1.02,
+        "vol_5d_ratio": 0.88,
+        "pivot_high": 295.4,
+        "pct_from_piv": -0.7,
         "strategy": "breakout",
-        "company": "Humana Inc."
+        "company": "Garmin Ltd."
       },
       {
         "ticker": "VTRS",
@@ -178,9 +111,9 @@
         "phase": "COIL",
         "coil_sigs": [
           "NearPiv",
-          "ADXcurl",
           "RSIbase",
-          "RS~ok"
+          "RS~ok",
+          "RngTght"
         ],
         "break_sigs": [],
         "fresh": [
@@ -188,120 +121,118 @@
         ],
         "conf": [
           "NearPiv",
-          "ADXcurl",
           "RSIbase",
-          "RS~ok"
+          "RS~ok",
+          "RngTght"
         ],
         "minervini": 8,
-        "rsi": 55.7,
-        "adx": 22.2,
-        "price": 18.03,
-        "vol_ratio": 0.35,
-        "atr_ratio": 1.05,
-        "vol_5d_ratio": 1.1,
+        "rsi": 59.3,
+        "adx": 21.0,
+        "price": 18.25,
+        "vol_ratio": 0.45,
+        "atr_ratio": 1.04,
+        "vol_5d_ratio": 1.08,
         "pivot_high": 18.66,
-        "pct_from_piv": -3.3,
+        "pct_from_piv": -2.2,
         "strategy": "breakout",
         "company": "Viatris Inc."
-      },
-      {
-        "ticker": "WAT",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 56.9,
-        "adx": 32.0,
-        "price": 450.53,
-        "vol_ratio": 0.58,
-        "atr_ratio": 1.08,
-        "vol_5d_ratio": 1.0,
-        "pivot_high": 457.47,
-        "pct_from_piv": -1.5,
-        "strategy": "breakout",
-        "rs_vs_spy": 6.46,
-        "company": "Waters Corporation"
       }
     ],
     "pocket_pivot": [],
     "connors_rsi2": [],
-    "ema_ribbon": [],
+    "ema_ribbon": [
+      {
+        "ticker": "CRDA.L",
+        "mkt": "UK",
+        "score": 2,
+        "fresh": [
+          "EMA-RIBBON"
+        ],
+        "conf": [
+          "MACD+",
+          "ADX>25"
+        ],
+        "minervini": 8,
+        "rsi": 82.3,
+        "adx": 33.3,
+        "price": 3609.0,
+        "vol_ratio": 1.14,
+        "hold_days": 7,
+        "strategy": "ema_ribbon",
+        "company": "CRODA INTERNATIONAL PLC ORD 10."
+      }
+    ],
     "nr7": [],
     "analyst_upgrade": [],
     "signal_velocity": [
       {
-        "ticker": "BAX",
-        "score": 8,
+        "ticker": "FTNT",
+        "score": 9,
+        "fresh": [
+          "SV+7"
+        ],
+        "conf": [
+          "SCORE:8/15",
+          "ADX>20"
+        ],
+        "minervini": 8,
+        "rsi": 42.5,
+        "adx": 25.1,
+        "price": 183.59,
+        "vol_ratio": 0.61,
+        "net_score": 8,
+        "velocity": 7,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "Fortinet, Inc."
+      },
+      {
+        "ticker": "PANW",
+        "score": 9,
+        "fresh": [
+          "SV+7"
+        ],
+        "conf": [
+          "SCORE:8/15"
+        ],
+        "minervini": 8,
+        "rsi": 42.2,
+        "adx": 17.6,
+        "price": 391.47,
+        "vol_ratio": 0.78,
+        "net_score": 8,
+        "velocity": 7,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "Palo Alto Networks, Inc."
+      },
+      {
+        "ticker": "CSCO",
+        "score": 6,
         "fresh": [
           "SV+6"
         ],
         "conf": [
-          "SCORE:10/15",
           "ADX>20"
         ],
         "minervini": 8,
-        "rsi": 59.6,
-        "adx": 22.0,
-        "price": 25.26,
-        "vol_ratio": 0.39,
-        "net_score": 10,
+        "rsi": 35.3,
+        "adx": 21.4,
+        "price": 110.08,
+        "vol_ratio": 0.62,
+        "net_score": 3,
         "velocity": 6,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "rs_vs_spy": 4.26,
-        "company": "Baxter International Inc."
+        "company": "Cisco Systems, Inc."
       }
     ],
     "chokepoint_inflection": [],
     "defensive_rotation": [],
     "cup_handle": [
-      {
-        "ticker": "EXPD",
-        "score": 5,
-        "fresh": [
-          "C&H",
-          "PIV@198.41"
-        ],
-        "conf": [
-          "CUP30.5%",
-          "HDL1.3%",
-          "MACD+",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 54.6,
-        "adx": 25.5,
-        "vol_ratio": 0.43,
-        "minervini": 8,
-        "price": 195.92,
-        "cup_depth_pct": 30.5,
-        "cup_duration": 195,
-        "handle_depth_pct": 1.3,
-        "handle_duration": 5,
-        "pivot": 198.41,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "company": "Expeditors International of Was"
-      },
       {
         "ticker": "WAT",
         "score": 5,
@@ -316,55 +247,114 @@
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 56.9,
-        "adx": 32.0,
-        "vol_ratio": 0.58,
+        "rsi": 63.7,
+        "adx": 32.9,
+        "vol_ratio": 0.83,
         "minervini": 8,
-        "price": 450.53,
+        "price": 455.76,
         "cup_depth_pct": 34.6,
-        "cup_duration": 180,
+        "cup_duration": 179,
         "handle_depth_pct": 7.1,
-        "handle_duration": 20,
+        "handle_duration": 21,
         "pivot": 457.47,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "rs_vs_spy": 6.46,
         "company": "Waters Corporation"
+      },
+      {
+        "ticker": "MSFT",
+        "score": 4,
+        "fresh": [
+          "C&H",
+          "PIV@543.45"
+        ],
+        "conf": [
+          "CUP34.9%",
+          "HDL4.1%",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 51.9,
+        "adx": 27.4,
+        "vol_ratio": 0.57,
+        "minervini": 8,
+        "price": 532.48,
+        "cup_depth_pct": 34.9,
+        "cup_duration": 190,
+        "handle_depth_pct": 4.1,
+        "handle_duration": 10,
+        "pivot": 543.45,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "company": "Microsoft Corporation"
+      },
+      {
+        "ticker": "EXPD",
+        "score": 4,
+        "fresh": [
+          "C&H",
+          "PIV@198.41"
+        ],
+        "conf": [
+          "CUP30.5%",
+          "HDL1.2%",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 62.4,
+        "adx": 25.5,
+        "vol_ratio": 0.48,
+        "minervini": 8,
+        "price": 196.1,
+        "cup_depth_pct": 30.5,
+        "cup_duration": 195,
+        "handle_depth_pct": 1.2,
+        "handle_duration": 5,
+        "pivot": 198.41,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "rs_vs_spy": 2.23,
+        "company": "Expeditors International of Was"
+      },
+      {
+        "ticker": "BNR.DE",
+        "score": 4,
+        "fresh": [
+          "C&H",
+          "PIV@62.68"
+        ],
+        "conf": [
+          "CUP33.9%",
+          "HDL1.1%",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 59.3,
+        "adx": 17.4,
+        "vol_ratio": 0.76,
+        "minervini": 8,
+        "price": 62.68,
+        "cup_depth_pct": 33.9,
+        "cup_duration": 195,
+        "handle_depth_pct": 1.1,
+        "handle_duration": 5,
+        "pivot": 62.68,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "DE",
+        "strategy": "cup_handle",
+        "company": "Brenntag SE                   N"
       }
     ],
     "darvas_box": [],
     "rs_line": [],
     "vcp": [
-      {
-        "ticker": "ABNB",
-        "score": 5,
-        "fresh": [
-          "VCP-3C"
-        ],
-        "conf": [
-          "TightFinal",
-          "VolDry",
-          "NearPivot",
-          "RSI50-65",
-          "M\u22657"
-        ],
-        "minervini": 8,
-        "rsi": 63.9,
-        "adx": 22.6,
-        "price": 173.48,
-        "vol_ratio": 0.39,
-        "n_contractions": 3,
-        "final_pct": 3.79,
-        "base_high": 173.51,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "vcp",
-        "spy_regime": "CHOPPY",
-        "rs_vs_spy": 8.34,
-        "company": "Airbnb, Inc."
-      },
       {
         "ticker": "APD",
         "score": 5,
@@ -379,10 +369,10 @@
           "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 87.2,
-        "adx": 26.2,
-        "price": 307.24,
-        "vol_ratio": 0.41,
+        "rsi": 82.9,
+        "adx": 27.4,
+        "price": 305.63,
+        "vol_ratio": 0.56,
         "n_contractions": 4,
         "final_pct": 2.64,
         "base_high": 311.89,
@@ -405,10 +395,10 @@
           "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 84.5,
-        "adx": 29.7,
-        "price": 232.65,
-        "vol_ratio": 0.69,
+        "rsi": 80.9,
+        "adx": 31.5,
+        "price": 231.63,
+        "vol_ratio": 0.65,
         "n_contractions": 3,
         "final_pct": 2.63,
         "base_high": 217.78,
@@ -427,52 +417,98 @@
     "raschke_8020": [],
     "wyckoff_spring": [],
     "weinstein_stage2": [],
-    "momentum_burst": [
-      {
-        "ticker": "BP.L",
-        "score": 4,
-        "fresh": [
-          "BURST"
-        ],
-        "conf": [
-          "BURST\u22654%",
-          "VOL\u22651.5x",
-          "TI\u22651.03",
-          "M\u22656"
-        ],
-        "minervini": 8,
-        "rsi": 81.7,
-        "adx": 19.0,
-        "price": 638.5,
-        "vol_ratio": 1.51,
-        "burst_pct": 4.35,
-        "hold_days": 5,
-        "mkt": "UK",
-        "company": "BP PLC $0.25"
-      }
-    ],
+    "momentum_burst": [],
     "ma50_reclaim": [],
     "turnover_momentum": [],
-    "three_weeks_tight": [],
+    "three_weeks_tight": [
+      {
+        "ticker": "EXPD",
+        "mkt": "US",
+        "score": 4,
+        "fresh": [
+          "3WT"
+        ],
+        "conf": [
+          "TIGHT<1%",
+          "VOL_DECLINING",
+          "NEAR_52H",
+          "RSI50-65"
+        ],
+        "minervini": 8,
+        "rsi": 62.4,
+        "adx": 25.5,
+        "price": 196.1,
+        "vol_ratio": 0.48,
+        "spread_pct": 0.15,
+        "hold_days": 7,
+        "strategy": "three_weeks_tight",
+        "rs_vs_spy": 2.23,
+        "company": "Expeditors International of Was"
+      },
+      {
+        "ticker": "AAPL",
+        "mkt": "US",
+        "score": 3,
+        "fresh": [
+          "3WT"
+        ],
+        "conf": [
+          "VOL_DECLINING",
+          "NEAR_52H",
+          "RSI50-65"
+        ],
+        "minervini": 8,
+        "rsi": 65.0,
+        "adx": 19.9,
+        "price": 344.36,
+        "vol_ratio": 0.62,
+        "spread_pct": 1.24,
+        "hold_days": 7,
+        "strategy": "three_weeks_tight",
+        "company": "Apple Inc."
+      },
+      {
+        "ticker": "WSM",
+        "mkt": "US",
+        "score": 3,
+        "fresh": [
+          "3WT"
+        ],
+        "conf": [
+          "VOL_DECLINING",
+          "NEAR_52H",
+          "RSI50-65"
+        ],
+        "minervini": 8,
+        "rsi": 58.6,
+        "adx": 18.9,
+        "price": 249.71,
+        "vol_ratio": 0.48,
+        "spread_pct": 1.11,
+        "hold_days": 7,
+        "strategy": "three_weeks_tight",
+        "company": "Williams-Sonoma, Inc."
+      }
+    ],
     "episodic_pivot": [],
     "combo_pp_ribbon": [],
     "momentum": []
   },
   "sector_excess": {
-    "XLK": -5.4,
-    "XLI": -0.14,
-    "XLV": 7.09,
-    "XLF": 4.53,
-    "XLY": 2.66,
-    "XLP": 7.95,
-    "XLB": 6.58,
-    "XLE": 8.88,
-    "XLC": -1.47,
-    "XLU": 4.77,
-    "XLRE": 4.32
+    "XLK": -3.33,
+    "XLI": 0.3,
+    "XLV": 5.68,
+    "XLF": 3.4,
+    "XLY": 3.39,
+    "XLP": 5.8,
+    "XLB": 5.65,
+    "XLE": 7.0,
+    "XLC": -5.15,
+    "XLU": 3.74,
+    "XLRE": 3.62
   },
-  "spy_ret": -2.29,
-  "elder_impulse_count": 0,
+  "spy_ret": -1.65,
+  "elder_impulse_count": 2,
   "market_regime": "BEAR",
   "india_mode": false
 }
