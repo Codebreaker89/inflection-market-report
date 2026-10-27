@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-10-26",
+  "scan_date": "2026-10-27",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -39,209 +39,371 @@
   "results_by_strategy": {
     "breakout": [
       {
-        "ticker": "ETERNAL.NS",
+        "ticker": "KARURVYSYA.NS",
         "mkt": "US",
         "score": 4,
         "phase": "COIL",
         "coil_sigs": [
-          "NearPiv",
           "ADXcurl",
           "RSIbase",
-          "RS~ok"
+          "RS~ok",
+          "RngTght"
         ],
         "break_sigs": [],
         "fresh": [
           "COIL"
         ],
         "conf": [
-          "NearPiv",
           "ADXcurl",
           "RSIbase",
-          "RS~ok"
+          "RS~ok",
+          "RngTght"
         ],
         "minervini": 8,
-        "rsi": 53.0,
-        "adx": 17.9,
-        "price": 325.6,
-        "vol_ratio": 1.06,
-        "atr_ratio": 1.09,
-        "vol_5d_ratio": 1.49,
-        "pivot_high": 325.6,
-        "pct_from_piv": 0.0,
+        "rsi": 59.8,
+        "adx": 24.2,
+        "price": 345.6,
+        "vol_ratio": 0.37,
+        "atr_ratio": 1.41,
+        "vol_5d_ratio": 1.59,
+        "pivot_high": 370.05,
+        "pct_from_piv": -6.6,
         "strategy": "breakout",
-        "company": "ETERNAL LIMITED"
-      },
-      {
-        "ticker": "CHENNPETRO.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 59.3,
-        "adx": 21.5,
-        "price": 1534.0,
-        "vol_ratio": 1.02,
-        "atr_ratio": 1.09,
-        "vol_5d_ratio": 0.91,
-        "pivot_high": 1546.1,
-        "pct_from_piv": -0.8,
-        "strategy": "breakout",
-        "company": "CHENNAI PETROLEUM CORP LT"
+        "company": "KARUR VYSYA BANK LTD"
       }
     ],
-    "pocket_pivot": [],
+    "pocket_pivot": [
+      {
+        "ticker": "LAURUSLABS.NS",
+        "mkt": "US",
+        "score": 5,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "RSI45-70",
+          "VOL1.5x",
+          "Near52H",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 58.5,
+        "adx": 18.2,
+        "price": 2133.7,
+        "vol_ratio": 1.79,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "rs_vs_spy": 5.23,
+        "company": "LAURUS LABS LIMITED"
+      }
+    ],
     "connors_rsi2": [],
     "ema_ribbon": [],
     "nr7": [],
     "analyst_upgrade": [],
     "signal_velocity": [
       {
-        "ticker": "LAURUSLABS.NS",
-        "score": 11,
+        "ticker": "MANKIND.NS",
+        "score": 13,
         "fresh": [
-          "SV+9"
+          "SV+14"
         ],
         "conf": [
           "SCORE:9/15",
-          "VEL+9"
+          "VEL+14",
+          "VOL1.5x",
+          "ADX>20"
         ],
         "minervini": 8,
-        "rsi": 58.3,
-        "adx": 18.4,
-        "price": 2052.7,
-        "vol_ratio": 1.12,
+        "rsi": 51.4,
+        "adx": 23.8,
+        "price": 2520.7,
+        "vol_ratio": 3.46,
         "net_score": 9,
-        "velocity": 9,
+        "velocity": 14,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "LAURUS LABS LIMITED"
+        "rs_vs_spy": 7.84,
+        "company": "MANKIND PHARMA LIMITED"
+      },
+      {
+        "ticker": "NYKAA.NS",
+        "score": 12,
+        "fresh": [
+          "SV+10"
+        ],
+        "conf": [
+          "SCORE:9/15",
+          "VEL+10"
+        ],
+        "minervini": 8,
+        "rsi": 48.5,
+        "adx": 14.4,
+        "price": 335.8,
+        "vol_ratio": 0.83,
+        "net_score": 9,
+        "velocity": 10,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "FSN E COMMERCE VENTURES"
+      },
+      {
+        "ticker": "GABRIEL.NS",
+        "score": 12,
+        "fresh": [
+          "SV+12"
+        ],
+        "conf": [
+          "SCORE:9/15",
+          "VEL+12"
+        ],
+        "minervini": 8,
+        "rsi": 60.9,
+        "adx": 14.6,
+        "price": 1435.4,
+        "vol_ratio": 0.47,
+        "net_score": 9,
+        "velocity": 12,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "GABRIEL INDIA LTD"
+      },
+      {
+        "ticker": "PRIVISCL.NS",
+        "score": 12,
+        "fresh": [
+          "SV+11"
+        ],
+        "conf": [
+          "SCORE:9/15",
+          "VEL+11",
+          "ADX>20"
+        ],
+        "minervini": 8,
+        "rsi": 52.5,
+        "adx": 24.3,
+        "price": 3542.9,
+        "vol_ratio": 1.31,
+        "net_score": 9,
+        "velocity": 11,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "PRIVI SPECIALITY CHE LTD"
       },
       {
         "ticker": "ATHERENERG.NS",
-        "score": 10,
+        "score": 11,
         "fresh": [
-          "SV+9"
+          "SV+12"
         ],
         "conf": [
-          "VEL+9",
+          "VEL+12",
           "VOL1.5x"
         ],
         "minervini": 8,
-        "rsi": 61.4,
-        "adx": 16.0,
-        "price": 1518.0,
-        "vol_ratio": 1.5,
+        "rsi": 69.3,
+        "adx": 18.6,
+        "price": 1675.8,
+        "vol_ratio": 3.22,
         "net_score": 7,
-        "velocity": 9,
+        "velocity": 12,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
+        "rs_vs_spy": 13.75,
         "company": "ATHER ENERGY LIMITED"
       },
       {
-        "ticker": "IPCALAB.NS",
+        "ticker": "LENSKART.NS",
+        "score": 9,
+        "fresh": [
+          "SV+7"
+        ],
+        "conf": [
+          "SCORE:9/15",
+          "ADX>20"
+        ],
+        "minervini": 6,
+        "rsi": 45.8,
+        "adx": 26.4,
+        "price": 669.8,
+        "vol_ratio": 0.66,
+        "net_score": 9,
+        "velocity": 7,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "LENSKART SOLUTIONS LTD"
+      },
+      {
+        "ticker": "DIVISLAB.NS",
+        "score": 9,
+        "fresh": [
+          "SV+7"
+        ],
+        "conf": [
+          "SCORE:9/15",
+          "ADX>20"
+        ],
+        "minervini": 8,
+        "rsi": 48.2,
+        "adx": 20.5,
+        "price": 9485.5,
+        "vol_ratio": 1.18,
+        "net_score": 9,
+        "velocity": 7,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "DIVI S LABORATORIES LTD"
+      },
+      {
+        "ticker": "GLAND.NS",
         "score": 8,
+        "fresh": [
+          "SV+8"
+        ],
+        "conf": [
+          "VEL+8",
+          "ADX>20"
+        ],
+        "minervini": 8,
+        "rsi": 47.6,
+        "adx": 25.5,
+        "price": 2972.0,
+        "vol_ratio": 0.71,
+        "net_score": 6,
+        "velocity": 8,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "GLAND PHARMA LIMITED"
+      },
+      {
+        "ticker": "CPPLUS.NS",
+        "score": 6,
         "fresh": [
           "SV+6"
         ],
         "conf": [
-          "SCORE:10/15"
+          "ADX>20"
         ],
         "minervini": 8,
-        "rsi": 49.3,
-        "adx": 19.9,
-        "price": 1946.5,
-        "vol_ratio": 1.04,
-        "net_score": 10,
+        "rsi": 50.8,
+        "adx": 20.5,
+        "price": 4000.8,
+        "vol_ratio": 0.33,
+        "net_score": 7,
         "velocity": 6,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "IPCA LABORATORIES LTD"
+        "company": "ADITYA INFOTECH LIMITED"
       }
     ],
     "chokepoint_inflection": [],
     "defensive_rotation": [],
     "cup_handle": [],
     "darvas_box": [],
-    "rs_line": [],
-    "vcp": [],
+    "rs_line": [
+      {
+        "ticker": "SONACOMS.NS",
+        "score": 5,
+        "fresh": [
+          "RS-NEW-HIGH"
+        ],
+        "conf": [
+          "RS_LEADS",
+          "NEAR_HIGH",
+          "VOL\u22651.5x",
+          "RSI45-70",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 57.1,
+        "adx": 17.5,
+        "price": 849.85,
+        "vol_ratio": 5.74,
+        "rs_lead_days": 0,
+        "pct_from_high": 0.0,
+        "hold_days": 7,
+        "strategy": "rs_line",
+        "mkt": "US",
+        "rs_vs_spy": 7.47,
+        "company": "SONA BLW PRECISION FRGS L"
+      },
+      {
+        "ticker": "LAURUSLABS.NS",
+        "score": 5,
+        "fresh": [
+          "RS-NEW-HIGH"
+        ],
+        "conf": [
+          "RS_LEADS",
+          "NEAR_HIGH",
+          "VOL\u22651.5x",
+          "RSI45-70",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 58.5,
+        "adx": 18.2,
+        "price": 2133.7,
+        "vol_ratio": 1.79,
+        "rs_lead_days": 0,
+        "pct_from_high": 0.0,
+        "hold_days": 7,
+        "strategy": "rs_line",
+        "mkt": "US",
+        "rs_vs_spy": 5.23,
+        "company": "LAURUS LABS LIMITED"
+      }
+    ],
+    "vcp": [
+      {
+        "ticker": "ATHERENERG.NS",
+        "score": 4,
+        "fresh": [
+          "VCP-3C"
+        ],
+        "conf": [
+          "TightFinal",
+          "VolDry",
+          "NearPivot",
+          "M\u22657"
+        ],
+        "minervini": 8,
+        "rsi": 69.3,
+        "adx": 18.6,
+        "price": 1675.8,
+        "vol_ratio": 3.22,
+        "n_contractions": 3,
+        "final_pct": 4.3,
+        "base_high": 1640.0,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "vcp",
+        "spy_regime": "CHOPPY",
+        "rs_vs_spy": 13.75,
+        "company": "ATHER ENERGY LIMITED"
+      }
+    ],
     "williams_pct_r": [],
     "bollinger_pctb": [],
     "connors_r3": [],
     "connors_tps": [],
     "turtle_soup": [],
-    "raschke_8020": [
-      {
-        "ticker": "COFORGE.NS",
-        "strategy": "raschke_8020",
-        "score": 4,
-        "conf": [
-          "StrongClose",
-          "VolAboveAvg",
-          "ADX16-35",
-          "M>=5"
-        ],
-        "minervini": 8,
-        "rsi": 65.8,
-        "adx": 17.4,
-        "price": 1978.6,
-        "vol_ratio": 1.73,
-        "yest_high": 1992.4,
-        "hold_days": 2,
-        "mkt": "US",
-        "rs_vs_spy": 9.54,
-        "company": "COFORGE LIMITED"
-      }
-    ],
+    "raschke_8020": [],
     "wyckoff_spring": [],
     "weinstein_stage2": [],
-    "momentum_burst": [
-      {
-        "ticker": "COFORGE.NS",
-        "score": 5,
-        "fresh": [
-          "BURST"
-        ],
-        "conf": [
-          "BURST\u22654%",
-          "VOL\u22651.5x",
-          "TI\u22651.03",
-          "M\u22656",
-          "RSI50-70"
-        ],
-        "minervini": 8,
-        "rsi": 65.8,
-        "adx": 17.4,
-        "price": 1978.6,
-        "vol_ratio": 1.73,
-        "burst_pct": 4.11,
-        "hold_days": 5,
-        "mkt": "US",
-        "rs_vs_spy": 9.54,
-        "company": "COFORGE LIMITED"
-      }
-    ],
+    "momentum_burst": [],
     "ma50_reclaim": [
       {
-        "ticker": "ACUTAAS.NS",
+        "ticker": "SONACOMS.NS",
         "score": 5,
         "fresh": [
           "50SMA_RECLAIM"
@@ -254,17 +416,42 @@
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 61.9,
-        "adx": 15.7,
-        "price": 3345.5,
-        "vol_ratio": 2.99,
-        "dist_50sma": 3.55,
+        "rsi": 57.1,
+        "adx": 17.5,
+        "price": 849.85,
+        "vol_ratio": 5.74,
+        "dist_50sma": 5.93,
         "hold_days": 7,
         "mkt": "US",
-        "company": "ACUTAAS CHEMICALS LIMITED"
+        "rs_vs_spy": 7.47,
+        "company": "SONA BLW PRECISION FRGS L"
       },
       {
-        "ticker": "STLTECH.NS",
+        "ticker": "MANKIND.NS",
+        "score": 5,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
+          "ADX>15",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 51.4,
+        "adx": 23.8,
+        "price": 2520.7,
+        "vol_ratio": 3.46,
+        "dist_50sma": 6.02,
+        "hold_days": 7,
+        "mkt": "US",
+        "rs_vs_spy": 7.84,
+        "company": "MANKIND PHARMA LIMITED"
+      },
+      {
+        "ticker": "ATHERENERG.NS",
         "score": 4,
         "fresh": [
           "50SMA_RECLAIM"
@@ -276,14 +463,15 @@
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 30.7,
-        "adx": 26.1,
-        "price": 867.25,
-        "vol_ratio": 1.26,
-        "dist_50sma": 6.61,
+        "rsi": 69.3,
+        "adx": 18.6,
+        "price": 1675.8,
+        "vol_ratio": 3.22,
+        "dist_50sma": 10.38,
         "hold_days": 7,
         "mkt": "US",
-        "company": "STERLITE TECHNOLOGIES LTD"
+        "rs_vs_spy": 13.75,
+        "company": "ATHER ENERGY LIMITED"
       }
     ],
     "turnover_momentum": [],
@@ -293,8 +481,8 @@
     "momentum": []
   },
   "sector_excess": {},
-  "spy_ret": 0.7617555919229658,
-  "elder_impulse_count": 10,
-  "market_regime": "NEUTRAL",
+  "spy_ret": 1.6298989479071464,
+  "elder_impulse_count": 15,
+  "market_regime": "BULL",
   "india_mode": true
 }
