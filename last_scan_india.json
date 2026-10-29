@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-10-28",
+  "scan_date": "2026-10-29",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -39,13 +39,13 @@
   "results_by_strategy": {
     "breakout": [
       {
-        "ticker": "SANSERA.NS",
+        "ticker": "COFORGE.NS",
         "mkt": "US",
         "score": 4,
         "phase": "COIL",
         "coil_sigs": [
           "NearPiv",
-          "RSIbase",
+          "ADXcurl",
           "RS~ok",
           "RngTght"
         ],
@@ -55,21 +55,87 @@
         ],
         "conf": [
           "NearPiv",
+          "ADXcurl",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 67.7,
+        "adx": 19.4,
+        "price": 1962.0,
+        "vol_ratio": 0.59,
+        "atr_ratio": 1.12,
+        "vol_5d_ratio": 1.36,
+        "pivot_high": 1997.0,
+        "pct_from_piv": -1.8,
+        "strategy": "breakout",
+        "company": "COFORGE LIMITED"
+      },
+      {
+        "ticker": "KARURVYSYA.NS",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "ADXcurl",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "ADXcurl",
           "RSIbase",
           "RS~ok",
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 51.8,
-        "adx": 18.7,
-        "price": 4302.5,
-        "vol_ratio": 0.45,
-        "atr_ratio": 0.96,
-        "vol_5d_ratio": 0.95,
-        "pivot_high": 4302.5,
-        "pct_from_piv": 0.0,
+        "rsi": 61.7,
+        "adx": 24.4,
+        "price": 354.5,
+        "vol_ratio": 0.48,
+        "atr_ratio": 1.42,
+        "vol_5d_ratio": 0.68,
+        "pivot_high": 370.05,
+        "pct_from_piv": -4.2,
         "strategy": "breakout",
-        "company": "SANSERA ENGINEERING LTD"
+        "company": "KARUR VYSYA BANK LTD"
+      },
+      {
+        "ticker": "SHYAMMETL.NS",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "VOLdry",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "VOLdry",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 61.6,
+        "adx": 23.9,
+        "price": 1141.6,
+        "vol_ratio": 0.56,
+        "atr_ratio": 1.26,
+        "vol_5d_ratio": 0.5,
+        "pivot_high": 1226.6,
+        "pct_from_piv": -6.9,
+        "strategy": "breakout",
+        "company": "SHYAM METALICS AND ENGY L"
       }
     ],
     "pocket_pivot": [],
@@ -79,221 +145,78 @@
     "analyst_upgrade": [],
     "signal_velocity": [
       {
-        "ticker": "DIVISLAB.NS",
-        "score": 11,
-        "fresh": [
-          "SV+9"
-        ],
-        "conf": [
-          "SCORE:8/15",
-          "VEL+9",
-          "ADX>20"
-        ],
-        "minervini": 8,
-        "rsi": 49.9,
-        "adx": 20.7,
-        "price": 9584.0,
-        "vol_ratio": 1.22,
-        "net_score": 8,
-        "velocity": 9,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "DIVI S LABORATORIES LTD"
-      },
-      {
-        "ticker": "PPLPHARMA.NS",
-        "score": 11,
-        "fresh": [
-          "SV+10"
-        ],
-        "conf": [
-          "VEL+10",
-          "VOL1.5x",
-          "ADX>20"
-        ],
-        "minervini": 8,
-        "rsi": 71.1,
-        "adx": 24.4,
-        "price": 232.2,
-        "vol_ratio": 14.49,
-        "net_score": 7,
-        "velocity": 10,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "PIRAMAL PHARMA LIMITED"
-      },
-      {
-        "ticker": "GLAND.NS",
-        "score": 11,
-        "fresh": [
-          "SV+9"
-        ],
-        "conf": [
-          "SCORE:8/15",
-          "VEL+9",
-          "ADX>20"
-        ],
-        "minervini": 8,
-        "rsi": 42.0,
-        "adx": 24.8,
-        "price": 3049.2,
-        "vol_ratio": 0.63,
-        "net_score": 8,
-        "velocity": 9,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "GLAND PHARMA LIMITED"
-      },
-      {
-        "ticker": "NAVINFLUOR.NS",
-        "score": 11,
-        "fresh": [
-          "SV+10"
-        ],
-        "conf": [
-          "VEL+10",
-          "VOL1.5x"
-        ],
-        "minervini": 8,
-        "rsi": 50.3,
-        "adx": 18.8,
-        "price": 8501.0,
-        "vol_ratio": 2.64,
-        "net_score": 7,
-        "velocity": 10,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "NAVIN FLUORINE INT. LTD"
-      },
-      {
         "ticker": "NUVAMA.NS",
-        "score": 10,
+        "score": 12,
         "fresh": [
-          "SV+11"
+          "SV+14"
         ],
         "conf": [
-          "VEL+11"
+          "SCORE:11/15",
+          "VEL+14"
         ],
         "minervini": 8,
-        "rsi": 42.1,
+        "rsi": 54.7,
         "adx": 13.8,
-        "price": 1741.3,
-        "vol_ratio": 0.51,
-        "net_score": 7,
-        "velocity": 11,
+        "price": 1783.9,
+        "vol_ratio": 0.47,
+        "net_score": 11,
+        "velocity": 14,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
         "company": "NUVAMA WEALTH MANAGE LTD"
       },
       {
-        "ticker": "LALPATHLAB.NS",
-        "score": 10,
+        "ticker": "SYRMA.NS",
+        "score": 12,
         "fresh": [
-          "SV+8"
+          "SV+9"
         ],
         "conf": [
-          "SCORE:9/15",
-          "VEL+8"
-        ],
-        "minervini": 8,
-        "rsi": 47.2,
-        "adx": 18.4,
-        "price": 1922.5,
-        "vol_ratio": 0.43,
-        "net_score": 9,
-        "velocity": 8,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "DR. LAL PATH LABS LTD."
-      },
-      {
-        "ticker": "WELCORP.NS",
-        "score": 8,
-        "fresh": [
-          "SV+8"
-        ],
-        "conf": [
-          "VEL+8",
+          "SCORE:8/15",
+          "VEL+9",
+          "VOL1.5x",
           "ADX>20"
         ],
         "minervini": 8,
-        "rsi": 43.8,
-        "adx": 21.1,
-        "price": 2567.1,
-        "vol_ratio": 0.88,
-        "net_score": 6,
-        "velocity": 8,
+        "rsi": 49.1,
+        "adx": 22.2,
+        "price": 1669.0,
+        "vol_ratio": 2.17,
+        "net_score": 8,
+        "velocity": 9,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "WELSPUN CORP LIMITED"
+        "company": "SYRMA SGS TECHNOLOGY LTD"
+      },
+      {
+        "ticker": "LLOYDSME.NS",
+        "score": 10,
+        "fresh": [
+          "SV+10"
+        ],
+        "conf": [
+          "VEL+10"
+        ],
+        "minervini": 8,
+        "rsi": 55.4,
+        "adx": 14.0,
+        "price": 1826.9,
+        "vol_ratio": 0.65,
+        "net_score": 7,
+        "velocity": 10,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "LLOYDS METALS N ENERGY L"
       }
     ],
     "chokepoint_inflection": [],
-    "defensive_rotation": [
-      {
-        "ticker": "FE",
-        "sector": "Utilities",
-        "sector_etf": "XLU",
-        "score": 3,
-        "fresh": [
-          "ROT:XLU",
-          "ETF+3.41%vsS&P"
-        ],
-        "conf": [
-          "RS+3.4%",
-          "MACD+",
-          "52wHI"
-        ],
-        "rsi": 67.0,
-        "adx": 23.5,
-        "vol_ratio": 0.84,
-        "minervini": 2,
-        "price": 46.27,
-        "rs_vs_spy": 3.42,
-        "rs_vs_sector": 0.0,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "FirstEnergy Corp."
-      }
-    ],
+    "defensive_rotation": [],
     "cup_handle": [],
     "darvas_box": [],
-    "rs_line": [
-      {
-        "ticker": "SONACOMS.NS",
-        "score": 5,
-        "fresh": [
-          "RS-NEW-HIGH"
-        ],
-        "conf": [
-          "RS_LEADS",
-          "NEAR_HIGH",
-          "VOL\u22651.5x",
-          "RSI45-70",
-          "M\u22656"
-        ],
-        "minervini": 8,
-        "rsi": 65.0,
-        "adx": 18.8,
-        "price": 880.0,
-        "vol_ratio": 1.89,
-        "rs_lead_days": 0,
-        "pct_from_high": 0.0,
-        "hold_days": 7,
-        "strategy": "rs_line",
-        "mkt": "US",
-        "rs_vs_spy": 9.04,
-        "company": "SONA BLW PRECISION FRGS L"
-      }
-    ],
+    "rs_line": [],
     "vcp": [],
     "williams_pct_r": [],
     "bollinger_pctb": [],
@@ -303,99 +226,99 @@
     "raschke_8020": [],
     "wyckoff_spring": [],
     "weinstein_stage2": [],
-    "momentum_burst": [],
-    "ma50_reclaim": [
-      {
-        "ticker": "LENSKART.NS",
-        "score": 5,
-        "fresh": [
-          "50SMA_RECLAIM"
-        ],
-        "conf": [
-          "50SMA_RECLAIM",
-          "VOL\u22651.2x",
-          "RSI35-65",
-          "ADX>15",
-          "M\u22656"
-        ],
-        "minervini": 6,
-        "rsi": 52.1,
-        "adx": 26.1,
-        "price": 689.65,
-        "vol_ratio": 1.89,
-        "dist_50sma": 3.57,
-        "hold_days": 7,
-        "mkt": "US",
-        "company": "LENSKART SOLUTIONS LTD"
-      },
-      {
-        "ticker": "SONACOMS.NS",
-        "score": 5,
-        "fresh": [
-          "50SMA_RECLAIM"
-        ],
-        "conf": [
-          "50SMA_RECLAIM",
-          "VOL\u22651.2x",
-          "RSI35-65",
-          "ADX>15",
-          "M\u22656"
-        ],
-        "minervini": 8,
-        "rsi": 65.0,
-        "adx": 18.8,
-        "price": 880.0,
-        "vol_ratio": 1.89,
-        "dist_50sma": 9.44,
-        "hold_days": 7,
-        "mkt": "US",
-        "rs_vs_spy": 9.04,
-        "company": "SONA BLW PRECISION FRGS L"
-      },
-      {
-        "ticker": "DIVISLAB.NS",
-        "score": 5,
-        "fresh": [
-          "50SMA_RECLAIM"
-        ],
-        "conf": [
-          "50SMA_RECLAIM",
-          "VOL\u22651.2x",
-          "RSI35-65",
-          "ADX>15",
-          "M\u22656"
-        ],
-        "minervini": 8,
-        "rsi": 49.9,
-        "adx": 20.7,
-        "price": 9584.0,
-        "vol_ratio": 1.22,
-        "dist_50sma": 4.09,
-        "hold_days": 7,
-        "mkt": "US",
-        "company": "DIVI S LABORATORIES LTD"
-      },
+    "momentum_burst": [
       {
         "ticker": "ACUTAAS.NS",
         "score": 4,
         "fresh": [
+          "BURST"
+        ],
+        "conf": [
+          "BURST\u22654%",
+          "VOL\u22651.5x",
+          "TI\u22651.03",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 79.4,
+        "adx": 21.6,
+        "price": 3976.7,
+        "vol_ratio": 3.58,
+        "burst_pct": 7.19,
+        "hold_days": 5,
+        "mkt": "US",
+        "company": "ACUTAAS CHEMICALS LIMITED"
+      }
+    ],
+    "ma50_reclaim": [
+      {
+        "ticker": "CUB.NS",
+        "score": 5,
+        "fresh": [
           "50SMA_RECLAIM"
         ],
         "conf": [
           "50SMA_RECLAIM",
           "VOL\u22651.2x",
+          "RSI35-65",
+          "M\u22656",
+          "TIGHT<3%"
+        ],
+        "minervini": 8,
+        "rsi": 54.6,
+        "adx": 11.9,
+        "price": 226.9,
+        "vol_ratio": 2.76,
+        "dist_50sma": 0.42,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "CITY UNION BANK LTD"
+      },
+      {
+        "ticker": "SYRMA.NS",
+        "score": 5,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
           "ADX>15",
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 69.8,
-        "adx": 19.6,
-        "price": 3727.0,
-        "vol_ratio": 3.07,
-        "dist_50sma": 14.52,
+        "rsi": 49.1,
+        "adx": 22.2,
+        "price": 1669.0,
+        "vol_ratio": 2.17,
+        "dist_50sma": 4.83,
         "hold_days": 7,
         "mkt": "US",
-        "company": "ACUTAAS CHEMICALS LIMITED"
+        "company": "SYRMA SGS TECHNOLOGY LTD"
+      },
+      {
+        "ticker": "NYKAA.NS",
+        "score": 5,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
+          "ADX>15",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 62.1,
+        "adx": 15.6,
+        "price": 352.9,
+        "vol_ratio": 1.44,
+        "dist_50sma": 5.38,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "FSN E COMMERCE VENTURES"
       }
     ],
     "turnover_momentum": [],
@@ -405,8 +328,8 @@
     "momentum": []
   },
   "sector_excess": {},
-  "spy_ret": -0.06666874111090615,
-  "elder_impulse_count": 5,
+  "spy_ret": 1.388210921310886,
+  "elder_impulse_count": 10,
   "market_regime": "NEUTRAL",
   "india_mode": true
 }
