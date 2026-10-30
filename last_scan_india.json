@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-10-29",
+  "scan_date": "2026-10-30",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -39,45 +39,13 @@
   "results_by_strategy": {
     "breakout": [
       {
-        "ticker": "COFORGE.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 67.7,
-        "adx": 19.4,
-        "price": 1962.0,
-        "vol_ratio": 0.59,
-        "atr_ratio": 1.12,
-        "vol_5d_ratio": 1.36,
-        "pivot_high": 1997.0,
-        "pct_from_piv": -1.8,
-        "strategy": "breakout",
-        "company": "COFORGE LIMITED"
-      },
-      {
         "ticker": "KARURVYSYA.NS",
         "mkt": "US",
-        "score": 4,
+        "score": 5,
         "phase": "COIL",
         "coil_sigs": [
-          "ADXcurl",
+          "VOLdry",
+          "NearPiv",
           "RSIbase",
           "RS~ok",
           "RngTght"
@@ -87,55 +55,56 @@
           "COIL"
         ],
         "conf": [
-          "ADXcurl",
+          "VOLdry",
+          "NearPiv",
           "RSIbase",
           "RS~ok",
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 61.7,
-        "adx": 24.4,
-        "price": 354.5,
-        "vol_ratio": 0.48,
-        "atr_ratio": 1.42,
-        "vol_5d_ratio": 0.68,
+        "rsi": 58.2,
+        "adx": 24.2,
+        "price": 356.1,
+        "vol_ratio": 0.62,
+        "atr_ratio": 1.39,
+        "vol_5d_ratio": 0.64,
         "pivot_high": 370.05,
-        "pct_from_piv": -4.2,
+        "pct_from_piv": -3.8,
         "strategy": "breakout",
         "company": "KARUR VYSYA BANK LTD"
       },
       {
-        "ticker": "SHYAMMETL.NS",
+        "ticker": "CHENNPETRO.NS",
         "mkt": "US",
         "score": 4,
         "phase": "COIL",
         "coil_sigs": [
-          "VOLdry",
+          "NearPiv",
+          "ADXcurl",
           "RSIbase",
-          "RS~ok",
-          "RngTght"
+          "RS~ok"
         ],
         "break_sigs": [],
         "fresh": [
           "COIL"
         ],
         "conf": [
-          "VOLdry",
+          "NearPiv",
+          "ADXcurl",
           "RSIbase",
-          "RS~ok",
-          "RngTght"
+          "RS~ok"
         ],
         "minervini": 8,
-        "rsi": 61.6,
-        "adx": 23.9,
-        "price": 1141.6,
-        "vol_ratio": 0.56,
-        "atr_ratio": 1.26,
-        "vol_5d_ratio": 0.5,
-        "pivot_high": 1226.6,
-        "pct_from_piv": -6.9,
+        "rsi": 54.8,
+        "adx": 21.4,
+        "price": 1511.5,
+        "vol_ratio": 0.33,
+        "atr_ratio": 1.07,
+        "vol_5d_ratio": 0.89,
+        "pivot_high": 1547.77,
+        "pct_from_piv": -2.3,
         "strategy": "breakout",
-        "company": "SHYAM METALICS AND ENGY L"
+        "company": "CHENNAI PETROLEUM CORP LT"
       }
     ],
     "pocket_pivot": [],
@@ -145,71 +114,27 @@
     "analyst_upgrade": [],
     "signal_velocity": [
       {
-        "ticker": "NUVAMA.NS",
+        "ticker": "AUROPHARMA.NS",
         "score": 12,
         "fresh": [
-          "SV+14"
+          "SV+13"
         ],
         "conf": [
           "SCORE:11/15",
-          "VEL+14"
-        ],
-        "minervini": 8,
-        "rsi": 54.7,
-        "adx": 13.8,
-        "price": 1783.9,
-        "vol_ratio": 0.47,
-        "net_score": 11,
-        "velocity": 14,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "NUVAMA WEALTH MANAGE LTD"
-      },
-      {
-        "ticker": "SYRMA.NS",
-        "score": 12,
-        "fresh": [
-          "SV+9"
-        ],
-        "conf": [
-          "SCORE:8/15",
-          "VEL+9",
-          "VOL1.5x",
+          "VEL+13",
           "ADX>20"
         ],
         "minervini": 8,
-        "rsi": 49.1,
-        "adx": 22.2,
-        "price": 1669.0,
-        "vol_ratio": 2.17,
-        "net_score": 8,
-        "velocity": 9,
+        "rsi": 48.4,
+        "adx": 21.2,
+        "price": 1681.4,
+        "vol_ratio": 1.15,
+        "net_score": 11,
+        "velocity": 13,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "SYRMA SGS TECHNOLOGY LTD"
-      },
-      {
-        "ticker": "LLOYDSME.NS",
-        "score": 10,
-        "fresh": [
-          "SV+10"
-        ],
-        "conf": [
-          "VEL+10"
-        ],
-        "minervini": 8,
-        "rsi": 55.4,
-        "adx": 14.0,
-        "price": 1826.9,
-        "vol_ratio": 0.65,
-        "net_score": 7,
-        "velocity": 10,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "LLOYDS METALS N ENERGY L"
+        "company": "AUROBINDO PHARMA LTD"
       }
     ],
     "chokepoint_inflection": [],
@@ -217,18 +142,90 @@
     "cup_handle": [],
     "darvas_box": [],
     "rs_line": [],
-    "vcp": [],
+    "vcp": [
+      {
+        "ticker": "GLAND.NS",
+        "score": 5,
+        "fresh": [
+          "VCP-3C"
+        ],
+        "conf": [
+          "TightFinal",
+          "VolDry",
+          "NearPivot",
+          "RSI50-65",
+          "M\u22657"
+        ],
+        "minervini": 8,
+        "rsi": 52.9,
+        "adx": 24.5,
+        "price": 3095.9,
+        "vol_ratio": 0.76,
+        "n_contractions": 3,
+        "final_pct": 3.38,
+        "base_high": 3024.0,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "vcp",
+        "spy_regime": "CHOPPY",
+        "company": "GLAND PHARMA LIMITED"
+      }
+    ],
     "williams_pct_r": [],
     "bollinger_pctb": [],
     "connors_r3": [],
     "connors_tps": [],
     "turtle_soup": [],
-    "raschke_8020": [],
+    "raschke_8020": [
+      {
+        "ticker": "NAVINFLUOR.NS",
+        "strategy": "raschke_8020",
+        "score": 4,
+        "conf": [
+          "StrongClose",
+          "VolAboveAvg",
+          "ADX16-35",
+          "M>=5"
+        ],
+        "minervini": 8,
+        "rsi": 56.3,
+        "adx": 18.4,
+        "price": 8680.0,
+        "vol_ratio": 2.83,
+        "yest_high": 8564.5,
+        "hold_days": 2,
+        "mkt": "US",
+        "company": "NAVIN FLUORINE INT. LTD"
+      }
+    ],
     "wyckoff_spring": [],
     "weinstein_stage2": [],
     "momentum_burst": [
       {
-        "ticker": "ACUTAAS.NS",
+        "ticker": "COFORGE.NS",
+        "score": 5,
+        "fresh": [
+          "BURST"
+        ],
+        "conf": [
+          "BURST\u22654%",
+          "VOL\u22651.5x",
+          "TI\u22651.03",
+          "M\u22656",
+          "RSI50-70"
+        ],
+        "minervini": 8,
+        "rsi": 69.8,
+        "adx": 18.1,
+        "price": 2045.0,
+        "vol_ratio": 2.2,
+        "burst_pct": 4.23,
+        "hold_days": 5,
+        "mkt": "US",
+        "company": "COFORGE LIMITED"
+      },
+      {
+        "ticker": "ATHERENERG.NS",
         "score": 4,
         "fresh": [
           "BURST"
@@ -240,42 +237,19 @@
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 79.4,
-        "adx": 21.6,
-        "price": 3976.7,
-        "vol_ratio": 3.58,
-        "burst_pct": 7.19,
+        "rsi": 75.2,
+        "adx": 22.7,
+        "price": 1756.0,
+        "vol_ratio": 2.07,
+        "burst_pct": 5.59,
         "hold_days": 5,
         "mkt": "US",
-        "company": "ACUTAAS CHEMICALS LIMITED"
+        "company": "ATHER ENERGY LIMITED"
       }
     ],
     "ma50_reclaim": [
       {
-        "ticker": "CUB.NS",
-        "score": 5,
-        "fresh": [
-          "50SMA_RECLAIM"
-        ],
-        "conf": [
-          "50SMA_RECLAIM",
-          "VOL\u22651.2x",
-          "RSI35-65",
-          "M\u22656",
-          "TIGHT<3%"
-        ],
-        "minervini": 8,
-        "rsi": 54.6,
-        "adx": 11.9,
-        "price": 226.9,
-        "vol_ratio": 2.76,
-        "dist_50sma": 0.42,
-        "hold_days": 7,
-        "mkt": "US",
-        "company": "CITY UNION BANK LTD"
-      },
-      {
-        "ticker": "SYRMA.NS",
+        "ticker": "DIVISLAB.NS",
         "score": 5,
         "fresh": [
           "50SMA_RECLAIM"
@@ -288,17 +262,17 @@
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 49.1,
-        "adx": 22.2,
-        "price": 1669.0,
-        "vol_ratio": 2.17,
-        "dist_50sma": 4.83,
+        "rsi": 62.0,
+        "adx": 21.4,
+        "price": 9780.0,
+        "vol_ratio": 1.67,
+        "dist_50sma": 5.68,
         "hold_days": 7,
         "mkt": "US",
-        "company": "SYRMA SGS TECHNOLOGY LTD"
+        "company": "DIVI S LABORATORIES LTD"
       },
       {
-        "ticker": "NYKAA.NS",
+        "ticker": "ETERNAL.NS",
         "score": 5,
         "fresh": [
           "50SMA_RECLAIM"
@@ -311,14 +285,14 @@
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 62.1,
-        "adx": 15.6,
-        "price": 352.9,
-        "vol_ratio": 1.44,
-        "dist_50sma": 5.38,
+        "rsi": 61.6,
+        "adx": 15.8,
+        "price": 343.65,
+        "vol_ratio": 1.36,
+        "dist_50sma": 5.62,
         "hold_days": 7,
         "mkt": "US",
-        "company": "FSN E COMMERCE VENTURES"
+        "company": "ETERNAL LIMITED"
       }
     ],
     "turnover_momentum": [],
@@ -328,8 +302,8 @@
     "momentum": []
   },
   "sector_excess": {},
-  "spy_ret": 1.388210921310886,
-  "elder_impulse_count": 10,
+  "spy_ret": 0.24241923937736373,
+  "elder_impulse_count": 5,
   "market_regime": "NEUTRAL",
   "india_mode": true
 }
