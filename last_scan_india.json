@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-10-30",
+  "scan_date": "2026-11-02",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -39,16 +39,16 @@
   "results_by_strategy": {
     "breakout": [
       {
-        "ticker": "KARURVYSYA.NS",
+        "ticker": "CHENNPETRO.NS",
         "mkt": "US",
         "score": 5,
         "phase": "COIL",
         "coil_sigs": [
           "VOLdry",
           "NearPiv",
+          "ADXcurl",
           "RSIbase",
-          "RS~ok",
-          "RngTght"
+          "RS~ok"
         ],
         "break_sigs": [],
         "fresh": [
@@ -57,152 +57,303 @@
         "conf": [
           "VOLdry",
           "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 58.2,
-        "adx": 24.2,
-        "price": 356.1,
-        "vol_ratio": 0.62,
-        "atr_ratio": 1.39,
-        "vol_5d_ratio": 0.64,
-        "pivot_high": 370.05,
-        "pct_from_piv": -3.8,
-        "strategy": "breakout",
-        "company": "KARUR VYSYA BANK LTD"
-      },
-      {
-        "ticker": "CHENNPETRO.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
           "ADXcurl",
           "RSIbase",
           "RS~ok"
         ],
         "minervini": 8,
-        "rsi": 54.8,
-        "adx": 21.4,
-        "price": 1511.5,
-        "vol_ratio": 0.33,
-        "atr_ratio": 1.07,
-        "vol_5d_ratio": 0.89,
+        "rsi": 60.1,
+        "adx": 21.9,
+        "price": 1546.0,
+        "vol_ratio": 0.53,
+        "atr_ratio": 1.05,
+        "vol_5d_ratio": 0.58,
         "pivot_high": 1547.77,
-        "pct_from_piv": -2.3,
+        "pct_from_piv": -0.1,
         "strategy": "breakout",
         "company": "CHENNAI PETROLEUM CORP LT"
       }
     ],
-    "pocket_pivot": [],
+    "pocket_pivot": [
+      {
+        "ticker": "GAIL.NS",
+        "mkt": "US",
+        "score": 5,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "RSI45-70",
+          "VOL1.5x",
+          "Near52H",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 65.2,
+        "adx": 25.3,
+        "price": 177.0,
+        "vol_ratio": 1.7,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "rs_vs_spy": 7.2,
+        "company": "GAIL (INDIA) LTD"
+      }
+    ],
     "connors_rsi2": [],
     "ema_ribbon": [],
     "nr7": [],
     "analyst_upgrade": [],
     "signal_velocity": [
       {
-        "ticker": "AUROPHARMA.NS",
-        "score": 12,
+        "ticker": "GAIL.NS",
+        "score": 11,
         "fresh": [
-          "SV+13"
+          "SV+15"
         ],
         "conf": [
-          "SCORE:11/15",
-          "VEL+13",
+          "VEL+15",
+          "VOL1.5x",
           "ADX>20"
         ],
         "minervini": 8,
-        "rsi": 48.4,
-        "adx": 21.2,
-        "price": 1681.4,
-        "vol_ratio": 1.15,
-        "net_score": 11,
-        "velocity": 13,
+        "rsi": 65.2,
+        "adx": 25.3,
+        "price": 177.0,
+        "vol_ratio": 1.7,
+        "net_score": 7,
+        "velocity": 15,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "AUROBINDO PHARMA LTD"
+        "rs_vs_spy": 7.2,
+        "company": "GAIL (INDIA) LTD"
+      },
+      {
+        "ticker": "CUPID.NS",
+        "score": 8,
+        "fresh": [
+          "SV+6"
+        ],
+        "conf": [
+          "SCORE:8/15"
+        ],
+        "minervini": 8,
+        "rsi": 40.1,
+        "adx": 19.0,
+        "price": 340.5,
+        "vol_ratio": 0.92,
+        "net_score": 8,
+        "velocity": 6,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "CUPID LIMITED"
       }
     ],
     "chokepoint_inflection": [],
-    "defensive_rotation": [],
+    "defensive_rotation": [
+      {
+        "ticker": "KR",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 5,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+3.04%vsS&P"
+        ],
+        "conf": [
+          "RS+5.9%",
+          "vsETF+2.9%",
+          "MACD+",
+          ">SMA200",
+          "M\u22653"
+        ],
+        "rsi": 63.5,
+        "adx": 35.5,
+        "vol_ratio": 0.82,
+        "minervini": 4,
+        "price": 66.76,
+        "rs_vs_spy": 5.91,
+        "rs_vs_sector": 2.86,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Kroger Company (The)"
+      },
+      {
+        "ticker": "PG",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 5,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+3.04%vsS&P"
+        ],
+        "conf": [
+          "RS+3.1%",
+          "MACD+",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 65.4,
+        "adx": 38.1,
+        "vol_ratio": 1.14,
+        "minervini": 5,
+        "price": 161.57,
+        "rs_vs_spy": 3.05,
+        "rs_vs_sector": 0.01,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Procter & Gamble Company (The)"
+      },
+      {
+        "ticker": "NEE",
+        "sector": "Utilities",
+        "sector_etf": "XLU",
+        "score": 4,
+        "fresh": [
+          "ROT:XLU",
+          "ETF+3.88%vsS&P"
+        ],
+        "conf": [
+          "RS+5.9%",
+          "vsETF+2.0%",
+          "VOL\u2191",
+          "MACD+"
+        ],
+        "rsi": 69.8,
+        "adx": 27.6,
+        "vol_ratio": 2.0,
+        "minervini": 2,
+        "price": 83.71,
+        "rs_vs_spy": 5.89,
+        "rs_vs_sector": 2.01,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "NextEra Energy, Inc."
+      },
+      {
+        "ticker": "TSN",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 3,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+3.04%vsS&P"
+        ],
+        "conf": [
+          "RS+4.9%",
+          "vsETF+1.8%",
+          "MACD+"
+        ],
+        "rsi": 69.2,
+        "adx": 29.4,
+        "vol_ratio": 1.11,
+        "minervini": 2,
+        "price": 57.04,
+        "rs_vs_spy": 4.88,
+        "rs_vs_sector": 1.84,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Tyson Foods, Inc."
+      },
+      {
+        "ticker": "PEG",
+        "sector": "Utilities",
+        "sector_etf": "XLU",
+        "score": 3,
+        "fresh": [
+          "ROT:XLU",
+          "ETF+3.88%vsS&P"
+        ],
+        "conf": [
+          "RS+4.9%",
+          "vsETF+1.0%",
+          "MACD+"
+        ],
+        "rsi": 69.1,
+        "adx": 22.2,
+        "vol_ratio": 1.04,
+        "minervini": 2,
+        "price": 74.29,
+        "rs_vs_spy": 4.9,
+        "rs_vs_sector": 1.03,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Public Service Enterprise Group"
+      },
+      {
+        "ticker": "CLX",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 3,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+3.04%vsS&P"
+        ],
+        "conf": [
+          "RS+3.5%",
+          "VOL\u2191",
+          "MACD+"
+        ],
+        "rsi": 62.8,
+        "adx": 22.7,
+        "vol_ratio": 1.56,
+        "minervini": 1,
+        "price": 88.0,
+        "rs_vs_spy": 3.5,
+        "rs_vs_sector": 0.46,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Clorox Company (The)"
+      },
+      {
+        "ticker": "SRE",
+        "sector": "Utilities",
+        "sector_etf": "XLU",
+        "score": 2,
+        "fresh": [
+          "ROT:XLU",
+          "ETF+3.88%vsS&P"
+        ],
+        "conf": [
+          "RS+4.2%",
+          "MACD+"
+        ],
+        "rsi": 69.9,
+        "adx": 28.7,
+        "vol_ratio": 0.95,
+        "minervini": 2,
+        "price": 86.06,
+        "rs_vs_spy": 4.16,
+        "rs_vs_sector": 0.29,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "DBA Sempra"
+      }
+    ],
     "cup_handle": [],
     "darvas_box": [],
     "rs_line": [],
-    "vcp": [
-      {
-        "ticker": "GLAND.NS",
-        "score": 5,
-        "fresh": [
-          "VCP-3C"
-        ],
-        "conf": [
-          "TightFinal",
-          "VolDry",
-          "NearPivot",
-          "RSI50-65",
-          "M\u22657"
-        ],
-        "minervini": 8,
-        "rsi": 52.9,
-        "adx": 24.5,
-        "price": 3095.9,
-        "vol_ratio": 0.76,
-        "n_contractions": 3,
-        "final_pct": 3.38,
-        "base_high": 3024.0,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "vcp",
-        "spy_regime": "CHOPPY",
-        "company": "GLAND PHARMA LIMITED"
-      }
-    ],
+    "vcp": [],
     "williams_pct_r": [],
     "bollinger_pctb": [],
     "connors_r3": [],
     "connors_tps": [],
     "turtle_soup": [],
-    "raschke_8020": [
-      {
-        "ticker": "NAVINFLUOR.NS",
-        "strategy": "raschke_8020",
-        "score": 4,
-        "conf": [
-          "StrongClose",
-          "VolAboveAvg",
-          "ADX16-35",
-          "M>=5"
-        ],
-        "minervini": 8,
-        "rsi": 56.3,
-        "adx": 18.4,
-        "price": 8680.0,
-        "vol_ratio": 2.83,
-        "yest_high": 8564.5,
-        "hold_days": 2,
-        "mkt": "US",
-        "company": "NAVIN FLUORINE INT. LTD"
-      }
-    ],
+    "raschke_8020": [],
     "wyckoff_spring": [],
     "weinstein_stage2": [],
     "momentum_burst": [
       {
-        "ticker": "COFORGE.NS",
+        "ticker": "WELSPUNLIV.NS",
         "score": 5,
         "fresh": [
           "BURST"
@@ -215,39 +366,40 @@
           "RSI50-70"
         ],
         "minervini": 8,
-        "rsi": 69.8,
-        "adx": 18.1,
-        "price": 2045.0,
-        "vol_ratio": 2.2,
-        "burst_pct": 4.23,
+        "rsi": 60.6,
+        "adx": 26.5,
+        "price": 242.34,
+        "vol_ratio": 8.54,
+        "burst_pct": 10.62,
         "hold_days": 5,
         "mkt": "US",
-        "company": "COFORGE LIMITED"
-      },
-      {
-        "ticker": "ATHERENERG.NS",
-        "score": 4,
-        "fresh": [
-          "BURST"
-        ],
-        "conf": [
-          "BURST\u22654%",
-          "VOL\u22651.5x",
-          "TI\u22651.03",
-          "M\u22656"
-        ],
-        "minervini": 8,
-        "rsi": 75.2,
-        "adx": 22.7,
-        "price": 1756.0,
-        "vol_ratio": 2.07,
-        "burst_pct": 5.59,
-        "hold_days": 5,
-        "mkt": "US",
-        "company": "ATHER ENERGY LIMITED"
+        "company": "WELSPUN LIVING LIMITED"
       }
     ],
     "ma50_reclaim": [
+      {
+        "ticker": "ENGINERSIN.NS",
+        "score": 5,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
+          "ADX>15",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 47.2,
+        "adx": 32.0,
+        "price": 289.65,
+        "vol_ratio": 6.63,
+        "dist_50sma": 5.28,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "ENGINEERS INDIA LTD"
+      },
       {
         "ticker": "DIVISLAB.NS",
         "score": 5,
@@ -262,37 +414,37 @@
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 62.0,
-        "adx": 21.4,
-        "price": 9780.0,
-        "vol_ratio": 1.67,
-        "dist_50sma": 5.68,
+        "rsi": 63.5,
+        "adx": 22.4,
+        "price": 9945.5,
+        "vol_ratio": 1.45,
+        "dist_50sma": 7.15,
         "hold_days": 7,
         "mkt": "US",
         "company": "DIVI S LABORATORIES LTD"
       },
       {
-        "ticker": "ETERNAL.NS",
-        "score": 5,
+        "ticker": "GAIL.NS",
+        "score": 4,
         "fresh": [
           "50SMA_RECLAIM"
         ],
         "conf": [
           "50SMA_RECLAIM",
           "VOL\u22651.2x",
-          "RSI35-65",
           "ADX>15",
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 61.6,
-        "adx": 15.8,
-        "price": 343.65,
-        "vol_ratio": 1.36,
-        "dist_50sma": 5.62,
+        "rsi": 65.2,
+        "adx": 25.3,
+        "price": 177.0,
+        "vol_ratio": 1.7,
+        "dist_50sma": 3.53,
         "hold_days": 7,
         "mkt": "US",
-        "company": "ETERNAL LIMITED"
+        "rs_vs_spy": 7.2,
+        "company": "GAIL (INDIA) LTD"
       }
     ],
     "turnover_momentum": [],
@@ -302,8 +454,8 @@
     "momentum": []
   },
   "sector_excess": {},
-  "spy_ret": 0.24241923937736373,
-  "elder_impulse_count": 5,
+  "spy_ret": 1.2729995513394041,
+  "elder_impulse_count": 10,
   "market_regime": "NEUTRAL",
   "india_mode": true
 }
