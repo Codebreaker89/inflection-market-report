@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-10-30",
+  "scan_date": "2026-11-02",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -39,12 +39,11 @@
   "results_by_strategy": {
     "breakout": [
       {
-        "ticker": "BNZL.L",
-        "mkt": "UK",
-        "score": 5,
+        "ticker": "DGX",
+        "mkt": "US",
+        "score": 4,
         "phase": "COIL",
         "coil_sigs": [
-          "VOLdry",
           "NearPiv",
           "ADXcurl",
           "RS~ok",
@@ -55,95 +54,26 @@
           "COIL"
         ],
         "conf": [
-          "VOLdry",
           "NearPiv",
           "ADXcurl",
           "RS~ok",
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 64.9,
-        "adx": 22.0,
-        "price": 2864.0,
-        "vol_ratio": 0.73,
-        "atr_ratio": 1.11,
-        "vol_5d_ratio": 0.59,
-        "pivot_high": 2874.0,
-        "pct_from_piv": -0.3,
-        "strategy": "breakout",
-        "rs_vs_spy": 3.82,
-        "company": "BUNZL PLC ORD 32 1/7P"
-      },
-      {
-        "ticker": "AAPL",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 52.9,
-        "adx": 20.1,
-        "price": 343.18,
-        "vol_ratio": 0.95,
-        "atr_ratio": 0.95,
-        "vol_5d_ratio": 1.03,
-        "pivot_high": 348.91,
-        "pct_from_piv": -1.6,
-        "strategy": "breakout",
-        "company": "Apple Inc."
-      },
-      {
-        "ticker": "WSM",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 61.9,
-        "adx": 21.6,
-        "price": 251.78,
-        "vol_ratio": 0.28,
-        "atr_ratio": 1.01,
+        "rsi": 77.8,
+        "adx": 17.6,
+        "price": 250.81,
+        "vol_ratio": 0.96,
+        "atr_ratio": 1.17,
         "vol_5d_ratio": 0.9,
-        "pivot_high": 260.8,
-        "pct_from_piv": -3.5,
+        "pivot_high": 252.92,
+        "pct_from_piv": -0.8,
         "strategy": "breakout",
-        "rs_vs_spy": 2.84,
-        "company": "Williams-Sonoma, Inc."
+        "company": "Quest Diagnostics Incorporated"
       },
       {
-        "ticker": "DHL.DE",
-        "mkt": "DE",
+        "ticker": "GWW",
+        "mkt": "US",
         "score": 4,
         "phase": "COIL",
         "coil_sigs": [
@@ -163,23 +93,135 @@
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 63.7,
-        "adx": 18.0,
-        "price": 58.68,
-        "vol_ratio": 1.17,
-        "atr_ratio": 1.0,
-        "vol_5d_ratio": 0.91,
-        "pivot_high": 58.82,
-        "pct_from_piv": -0.2,
+        "rsi": 66.6,
+        "adx": 19.2,
+        "price": 1377.66,
+        "vol_ratio": 1.14,
+        "atr_ratio": 1.05,
+        "vol_5d_ratio": 0.82,
+        "pivot_high": 1377.66,
+        "pct_from_piv": 0.0,
         "strategy": "breakout",
-        "rs_vs_spy": 3.6,
-        "company": "DHL AG                        N"
+        "rs_vs_spy": 5.33,
+        "company": "W.W. Grainger, Inc."
       }
     ],
     "pocket_pivot": [
       {
-        "ticker": "CPG.L",
+        "ticker": "HSIC",
+        "mkt": "US",
+        "score": 5,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "RSI45-70",
+          "VOL1.5x",
+          "Near52H",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 55.6,
+        "adx": 17.4,
+        "price": 86.62,
+        "vol_ratio": 1.97,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "company": "Henry Schein, Inc."
+      },
+      {
+        "ticker": "MDLZ",
+        "mkt": "US",
+        "score": 5,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "RSI45-70",
+          "ADX\u2191",
+          "Near52H",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 66.1,
+        "adx": 25.8,
+        "price": 66.38,
+        "vol_ratio": 1.14,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "company": "Mondelez International, Inc."
+      },
+      {
+        "ticker": "PFE",
+        "mkt": "US",
+        "score": 5,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "ADX\u2191",
+          "VOL1.5x",
+          "Near52H",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 72.7,
+        "adx": 30.1,
+        "price": 30.67,
+        "vol_ratio": 1.63,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "company": "Pfizer, Inc."
+      },
+      {
+        "ticker": "MKS.L",
         "mkt": "UK",
+        "score": 5,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "RSI45-70",
+          "ADX\u2191",
+          "Near52H",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 54.8,
+        "adx": 27.7,
+        "price": 416.3,
+        "vol_ratio": 1.31,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "rs_vs_spy": 1.13,
+        "company": "MARKS AND SPENCER GROUP PLC ORD"
+      },
+      {
+        "ticker": "GWW",
+        "mkt": "US",
+        "score": 5,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "RSI45-70",
+          "ADX\u2191",
+          "Near52H",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 66.6,
+        "adx": 19.2,
+        "price": 1377.66,
+        "vol_ratio": 1.14,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "rs_vs_spy": 5.33,
+        "company": "W.W. Grainger, Inc."
+      },
+      {
+        "ticker": "AIZ",
+        "mkt": "US",
         "score": 4,
         "fresh": [
           "PP"
@@ -190,150 +232,428 @@
           "EMA9>21"
         ],
         "minervini": 8,
-        "rsi": 74.4,
-        "adx": 34.8,
-        "price": 33.71,
-        "vol_ratio": 1.19,
+        "rsi": 79.6,
+        "adx": 32.8,
+        "price": 297.23,
+        "vol_ratio": 1.38,
         "hold_days": 7,
         "strategy": "pocket_pivot",
-        "rs_vs_spy": 4.15,
-        "company": "COMPASS GROUP PLC ORD 11 1/20P"
+        "company": "Assurant, Inc."
+      },
+      {
+        "ticker": "MNST",
+        "mkt": "US",
+        "score": 4,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "ADX\u2191",
+          "Near52H",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 74.2,
+        "adx": 24.9,
+        "price": 48.02,
+        "vol_ratio": 1.15,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "company": "Monster Beverage Corporation"
       }
     ],
-    "connors_rsi2": [],
+    "connors_rsi2": [
+      {
+        "ticker": "CSX",
+        "mkt": "US",
+        "score": 3,
+        "fresh": [
+          "RSI2=0.0"
+        ],
+        "conf": [
+          "RSI14>40",
+          "ADX>20",
+          "Near52H"
+        ],
+        "minervini": 8,
+        "rsi": 71.3,
+        "rsi2": 0.0,
+        "adx": 27.2,
+        "price": 51.62,
+        "vol_ratio": 1.5,
+        "hold_days": 5,
+        "strategy": "connors_rsi2",
+        "rs_vs_spy": 9.57,
+        "company": "CSX Corporation"
+      },
+      {
+        "ticker": "WAT",
+        "mkt": "US",
+        "score": 3,
+        "fresh": [
+          "RSI2=0.0"
+        ],
+        "conf": [
+          "RSI14>40",
+          "ADX>20",
+          "Near52H"
+        ],
+        "minervini": 8,
+        "rsi": 59.4,
+        "rsi2": 0.0,
+        "adx": 35.5,
+        "price": 449.53,
+        "vol_ratio": 1.95,
+        "hold_days": 5,
+        "strategy": "connors_rsi2",
+        "company": "Waters Corporation"
+      }
+    ],
     "ema_ribbon": [
       {
-        "ticker": "JD.L",
-        "mkt": "UK",
-        "score": 3,
+        "ticker": "ABBV",
+        "mkt": "US",
+        "score": 4,
         "fresh": [
           "EMA-RIBBON"
         ],
         "conf": [
+          "VOL1.5x",
           "RSI50-70",
           "MACD+",
           "ADX>25"
         ],
         "minervini": 8,
-        "rsi": 66.1,
-        "adx": 29.1,
-        "price": 91.94,
-        "vol_ratio": 1.32,
+        "rsi": 68.4,
+        "adx": 33.8,
+        "price": 288.84,
+        "vol_ratio": 1.65,
         "hold_days": 7,
         "strategy": "ema_ribbon",
-        "company": "JD SPORTS FASHION PLC ORD 0.05P"
+        "company": "AbbVie Inc."
       },
       {
-        "ticker": "CPG.L",
-        "mkt": "UK",
-        "score": 2,
+        "ticker": "CSX",
+        "mkt": "US",
+        "score": 3,
         "fresh": [
           "EMA-RIBBON"
         ],
         "conf": [
+          "VOL1.5x",
           "MACD+",
           "ADX>25"
         ],
         "minervini": 8,
-        "rsi": 74.4,
-        "adx": 34.8,
-        "price": 33.71,
-        "vol_ratio": 1.19,
+        "rsi": 71.3,
+        "adx": 27.2,
+        "price": 51.62,
+        "vol_ratio": 1.5,
         "hold_days": 7,
         "strategy": "ema_ribbon",
-        "rs_vs_spy": 4.15,
-        "company": "COMPASS GROUP PLC ORD 11 1/20P"
+        "rs_vs_spy": 9.57,
+        "company": "CSX Corporation"
       }
     ],
     "nr7": [],
     "analyst_upgrade": [],
     "signal_velocity": [
       {
-        "ticker": "HSX.L",
-        "score": 12,
+        "ticker": "ABNB",
+        "score": 13,
         "fresh": [
           "SV+13"
         ],
         "conf": [
           "SCORE:8/15",
-          "VEL+13"
+          "VEL+13",
+          "VOL1.5x"
         ],
         "minervini": 8,
-        "rsi": 53.2,
-        "adx": 16.6,
-        "price": 1879.0,
-        "vol_ratio": 0.46,
+        "rsi": 57.5,
+        "adx": 17.1,
+        "price": 171.11,
+        "vol_ratio": 1.79,
         "net_score": 8,
         "velocity": 13,
         "hold_days": 5,
-        "mkt": "UK",
+        "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "HISCOX LTD ORD 6.5P (DI)"
+        "rs_vs_spy": -1.09,
+        "company": "Airbnb, Inc."
+      },
+      {
+        "ticker": "TGT",
+        "score": 9,
+        "fresh": [
+          "SV+9"
+        ],
+        "conf": [
+          "VEL+9"
+        ],
+        "minervini": 8,
+        "rsi": 58.8,
+        "adx": 11.9,
+        "price": 158.38,
+        "vol_ratio": 1.09,
+        "net_score": 7,
+        "velocity": 9,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "Target Corporation"
       }
     ],
     "chokepoint_inflection": [],
-    "defensive_rotation": [],
+    "defensive_rotation": [
+      {
+        "ticker": "ABT",
+        "sector": "Healthcare",
+        "sector_etf": "XLV",
+        "score": 5,
+        "fresh": [
+          "ROT:XLV",
+          "ETF+6.97%vsS&P"
+        ],
+        "conf": [
+          "RS+7.7%",
+          "vsETF+0.8%",
+          "MACD+",
+          ">SMA200",
+          "M\u22653"
+        ],
+        "rsi": 69.1,
+        "adx": 17.6,
+        "vol_ratio": 0.9,
+        "minervini": 5,
+        "price": 110.16,
+        "rs_vs_spy": 7.74,
+        "rs_vs_sector": 0.77,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Abbott Laboratories"
+      },
+      {
+        "ticker": "EVRG",
+        "sector": "Utilities",
+        "sector_etf": "XLU",
+        "score": 5,
+        "fresh": [
+          "ROT:XLU",
+          "ETF+7.46%vsS&P"
+        ],
+        "conf": [
+          "RS+7.8%",
+          "MACD+",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 67.0,
+        "adx": 33.2,
+        "vol_ratio": 1.11,
+        "minervini": 5,
+        "price": 86.55,
+        "rs_vs_spy": 7.83,
+        "rs_vs_sector": 0.36,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Evergy, Inc."
+      },
+      {
+        "ticker": "PG",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 5,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+6.03%vsS&P"
+        ],
+        "conf": [
+          "RS+6.3%",
+          "MACD+",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 67.9,
+        "adx": 39.2,
+        "vol_ratio": 0.94,
+        "minervini": 5,
+        "price": 163.56,
+        "rs_vs_spy": 6.29,
+        "rs_vs_sector": 0.26,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Procter & Gamble Company (The)"
+      },
+      {
+        "ticker": "CLX",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 4,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+6.03%vsS&P"
+        ],
+        "conf": [
+          "RS+8.5%",
+          "vsETF+2.4%",
+          "VOL\u2191",
+          "MACD+"
+        ],
+        "rsi": 66.0,
+        "adx": 23.5,
+        "vol_ratio": 1.44,
+        "minervini": 1,
+        "price": 89.9,
+        "rs_vs_spy": 8.47,
+        "rs_vs_sector": 2.45,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Clorox Company (The)"
+      },
+      {
+        "ticker": "CAG",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 4,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+6.03%vsS&P"
+        ],
+        "conf": [
+          "RS+7.3%",
+          "vsETF+1.3%",
+          "VOL\u2191",
+          "MACD+"
+        ],
+        "rsi": 60.7,
+        "adx": 19.7,
+        "vol_ratio": 1.35,
+        "minervini": 1,
+        "price": 14.79,
+        "rs_vs_spy": 7.29,
+        "rs_vs_sector": 1.27,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "ConAgra Brands, Inc."
+      },
+      {
+        "ticker": "AVA",
+        "sector": "Utilities",
+        "sector_etf": "XLU",
+        "score": 4,
+        "fresh": [
+          "ROT:XLU",
+          "ETF+7.46%vsS&P"
+        ],
+        "conf": [
+          "RS+8.1%",
+          "vsETF+0.6%",
+          "MACD+",
+          "52wHI"
+        ],
+        "rsi": 68.5,
+        "adx": 28.5,
+        "vol_ratio": 1.16,
+        "minervini": 2,
+        "price": 38.37,
+        "rs_vs_spy": 8.11,
+        "rs_vs_sector": 0.64,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Avista Corporation"
+      },
+      {
+        "ticker": "MKC",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 3,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+6.03%vsS&P"
+        ],
+        "conf": [
+          "RS+8.3%",
+          "vsETF+2.3%",
+          "MACD+"
+        ],
+        "rsi": 66.2,
+        "adx": 20.6,
+        "vol_ratio": 0.83,
+        "minervini": 1,
+        "price": 48.82,
+        "rs_vs_spy": 8.33,
+        "rs_vs_sector": 2.3,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "McCormick & Company, Incorporat"
+      },
+      {
+        "ticker": "TSN",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 3,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+6.03%vsS&P"
+        ],
+        "conf": [
+          "RS+7.6%",
+          "vsETF+1.6%",
+          "MACD+"
+        ],
+        "rsi": 68.5,
+        "adx": 30.4,
+        "vol_ratio": 0.91,
+        "minervini": 2,
+        "price": 57.08,
+        "rs_vs_spy": 7.58,
+        "rs_vs_sector": 1.55,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Tyson Foods, Inc."
+      }
+    ],
     "cup_handle": [
       {
-        "ticker": "EXPD",
+        "ticker": "PFG",
         "score": 5,
         "fresh": [
           "C&H",
-          "PIV@199.64"
+          "PIV@113.65"
         ],
         "conf": [
-          "CUP28.8%",
-          "HDL4.4%",
+          "CUP29.3%",
+          "HDL1.8%",
           "MACD+",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 63.9,
-        "adx": 23.1,
-        "vol_ratio": 0.46,
+        "rsi": 64.7,
+        "adx": 19.9,
+        "vol_ratio": 0.92,
         "minervini": 8,
-        "price": 199.13,
-        "cup_depth_pct": 28.8,
-        "cup_duration": 179,
-        "handle_depth_pct": 4.4,
-        "handle_duration": 21,
-        "pivot": 199.64,
+        "price": 112.81,
+        "cup_depth_pct": 29.3,
+        "cup_duration": 195,
+        "handle_depth_pct": 1.8,
+        "handle_duration": 5,
+        "pivot": 113.65,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "company": "Expeditors International of Was"
-      },
-      {
-        "ticker": "DHL.DE",
-        "score": 5,
-        "fresh": [
-          "C&H",
-          "PIV@58.82"
-        ],
-        "conf": [
-          "CUP28.1%",
-          "HDL1.4%",
-          "MACD+",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 63.7,
-        "adx": 18.0,
-        "vol_ratio": 1.17,
-        "minervini": 8,
-        "price": 58.68,
-        "cup_depth_pct": 28.1,
-        "cup_duration": 195,
-        "handle_depth_pct": 1.4,
-        "handle_duration": 5,
-        "pivot": 58.82,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "DE",
-        "strategy": "cup_handle",
-        "rs_vs_spy": 3.6,
-        "company": "DHL AG                        N"
+        "company": "Principal Financial Group Inc"
       },
       {
         "ticker": "MKS.L",
@@ -349,27 +669,81 @@
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 58.1,
-        "adx": 27.6,
-        "vol_ratio": 0.88,
+        "rsi": 54.8,
+        "adx": 27.7,
+        "vol_ratio": 1.31,
         "minervini": 8,
-        "price": 412.0,
+        "price": 416.3,
         "cup_depth_pct": 26.9,
-        "cup_duration": 195,
+        "cup_duration": 194,
         "handle_depth_pct": 3.6,
-        "handle_duration": 5,
+        "handle_duration": 6,
         "pivot": 419.1,
         "vol_drying": true,
         "hold_days": 10,
         "mkt": "UK",
         "strategy": "cup_handle",
-        "rs_vs_spy": 0.07,
+        "rs_vs_spy": 1.13,
         "company": "MARKS AND SPENCER GROUP PLC ORD"
       }
     ],
     "darvas_box": [],
-    "rs_line": [],
+    "rs_line": [
+      {
+        "ticker": "TRGP",
+        "score": 5,
+        "fresh": [
+          "RS-NEW-HIGH"
+        ],
+        "conf": [
+          "RS_LEADS",
+          "IN_BASE",
+          "VOL\u22651.5x",
+          "RSI45-70",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 51.7,
+        "adx": 10.1,
+        "price": 294.73,
+        "vol_ratio": 1.62,
+        "rs_lead_days": 0,
+        "pct_from_high": 6.4,
+        "hold_days": 7,
+        "strategy": "rs_line",
+        "mkt": "US",
+        "company": "Targa Resources, Inc."
+      }
+    ],
     "vcp": [
+      {
+        "ticker": "ABNB",
+        "score": 5,
+        "fresh": [
+          "VCP-3C"
+        ],
+        "conf": [
+          "TightFinal",
+          "VolDry",
+          "NearPivot",
+          "RSI50-65",
+          "M\u22657"
+        ],
+        "minervini": 8,
+        "rsi": 57.5,
+        "adx": 17.1,
+        "price": 171.11,
+        "vol_ratio": 1.79,
+        "n_contractions": 3,
+        "final_pct": 3.79,
+        "base_high": 173.51,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "vcp",
+        "spy_regime": "CHOPPY",
+        "rs_vs_spy": -1.09,
+        "company": "Airbnb, Inc."
+      },
       {
         "ticker": "APD",
         "score": 5,
@@ -384,10 +758,10 @@
           "M\u22657"
         ],
         "minervini": 8,
-        "rsi": 90.7,
-        "adx": 30.7,
-        "price": 314.02,
-        "vol_ratio": 0.65,
+        "rsi": 88.9,
+        "adx": 32.4,
+        "price": 316.03,
+        "vol_ratio": 1.39,
         "n_contractions": 5,
         "final_pct": 2.3,
         "base_high": 311.89,
@@ -396,57 +770,32 @@
         "strategy": "vcp",
         "spy_regime": "CHOPPY",
         "company": "Air Products and Chemicals, Inc"
-      },
-      {
-        "ticker": "AIZ",
-        "score": 4,
-        "fresh": [
-          "VCP-3C"
-        ],
-        "conf": [
-          "TightFinal",
-          "VolDry",
-          "NearPivot",
-          "M\u22657"
-        ],
-        "minervini": 8,
-        "rsi": 78.8,
-        "adx": 31.3,
-        "price": 293.05,
-        "vol_ratio": 0.35,
-        "n_contractions": 3,
-        "final_pct": 2.07,
-        "base_high": 287.44,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "vcp",
-        "spy_regime": "CHOPPY",
-        "company": "Assurant, Inc."
       }
     ],
     "williams_pct_r": [
       {
-        "ticker": "MKS.L",
-        "score": 3,
+        "ticker": "ABNB",
+        "score": 4,
         "fresh": [
           "WR-CROSS"
         ],
         "conf": [
           "DeepOversold",
-          "ADX>20",
-          "M\u22655"
+          "VOL>avg",
+          "M\u22655",
+          "NearSMA50"
         ],
         "minervini": 8,
-        "rsi": 58.1,
-        "adx": 27.6,
-        "price": 412.0,
-        "vol_ratio": 0.88,
-        "williams_r": -68.5,
+        "rsi": 57.5,
+        "adx": 17.1,
+        "price": 171.11,
+        "vol_ratio": 1.79,
+        "williams_r": -53.4,
         "hold_days": 3,
-        "mkt": "UK",
+        "mkt": "US",
         "strategy": "williams_pct_r",
-        "rs_vs_spy": 0.07,
-        "company": "MARKS AND SPENCER GROUP PLC ORD"
+        "rs_vs_spy": -1.09,
+        "company": "Airbnb, Inc."
       }
     ],
     "bollinger_pctb": [],
@@ -455,58 +804,60 @@
     "turtle_soup": [],
     "raschke_8020": [],
     "wyckoff_spring": [],
-    "weinstein_stage2": [],
-    "momentum_burst": [],
-    "ma50_reclaim": [],
-    "turnover_momentum": [],
-    "three_weeks_tight": [
+    "weinstein_stage2": [
       {
-        "ticker": "WSM",
+        "ticker": "GM",
+        "company": "General Motors Company",
         "mkt": "US",
+        "strategy": "weinstein_stage2",
+        "hold_days": 10,
         "score": 4,
         "fresh": [
-          "3WT"
+          "W2"
         ],
         "conf": [
-          "TIGHT<1%",
-          "VOL_DECLINING",
-          "NEAR_52H",
-          "RSI50-65"
+          "RS\u2191",
+          "Near52H",
+          "ADX16-35",
+          "M8"
         ],
         "minervini": 8,
-        "rsi": 61.9,
+        "rsi": 61.4,
         "adx": 21.6,
-        "price": 251.78,
-        "vol_ratio": 0.28,
-        "spread_pct": 0.92,
-        "hold_days": 7,
-        "strategy": "three_weeks_tight",
-        "rs_vs_spy": 2.84,
-        "company": "Williams-Sonoma, Inc."
-      },
+        "price": 89.94,
+        "vol_ratio": 1.4,
+        "ma30w": 81.79,
+        "stage_note": "MA turning \u00b7 week vol 1.4x \u00b7 RS\u2191"
+      }
+    ],
+    "momentum_burst": [],
+    "ma50_reclaim": [
       {
-        "ticker": "BNZL.L",
-        "mkt": "UK",
-        "score": 3,
+        "ticker": "LYV",
+        "score": 5,
         "fresh": [
-          "3WT"
+          "50SMA_RECLAIM"
         ],
         "conf": [
-          "VOL_DECLINING",
-          "NEAR_52H",
-          "RSI50-65"
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
+          "M\u22656",
+          "TIGHT<3%"
         ],
         "minervini": 8,
-        "rsi": 64.9,
-        "adx": 22.0,
-        "price": 2864.0,
-        "vol_ratio": 0.73,
-        "spread_pct": 1.49,
+        "rsi": 63.1,
+        "adx": 9.3,
+        "price": 177.15,
+        "vol_ratio": 1.87,
+        "dist_50sma": 2.32,
         "hold_days": 7,
-        "strategy": "three_weeks_tight",
-        "rs_vs_spy": 3.82,
-        "company": "BUNZL PLC ORD 32 1/7P"
-      },
+        "mkt": "US",
+        "company": "Live Nation Entertainment, Inc."
+      }
+    ],
+    "turnover_momentum": [],
+    "three_weeks_tight": [
       {
         "ticker": "MKS.L",
         "mkt": "UK",
@@ -520,14 +871,14 @@
           "RSI50-65"
         ],
         "minervini": 8,
-        "rsi": 58.1,
-        "adx": 27.6,
-        "price": 412.0,
-        "vol_ratio": 0.88,
-        "spread_pct": 1.41,
+        "rsi": 54.8,
+        "adx": 27.7,
+        "price": 416.3,
+        "vol_ratio": 1.31,
+        "spread_pct": 1.07,
         "hold_days": 7,
         "strategy": "three_weeks_tight",
-        "rs_vs_spy": 0.07,
+        "rs_vs_spy": 1.13,
         "company": "MARKS AND SPENCER GROUP PLC ORD"
       }
     ],
@@ -536,19 +887,19 @@
     "momentum": []
   },
   "sector_excess": {
-    "XLK": -1.58,
-    "XLI": 1.16,
-    "XLV": 6.17,
-    "XLF": 3.15,
-    "XLY": 4.1,
-    "XLP": 3.71,
-    "XLB": 4.43,
-    "XLE": 3.74,
-    "XLC": -8.25,
-    "XLU": 4.73,
-    "XLRE": 3.97
+    "XLK": -4.44,
+    "XLI": 3.69,
+    "XLV": 6.97,
+    "XLF": 6.42,
+    "XLY": 5.11,
+    "XLP": 6.03,
+    "XLB": 7.21,
+    "XLE": 1.06,
+    "XLC": -7.05,
+    "XLU": 7.46,
+    "XLRE": 6.6
   },
-  "spy_ret": -1.49,
+  "spy_ret": -1.88,
   "elder_impulse_count": 2,
   "market_regime": "BEAR",
   "india_mode": false
