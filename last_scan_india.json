@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-11-02",
+  "scan_date": "2026-11-03",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -62,123 +62,185 @@
           "RS~ok"
         ],
         "minervini": 8,
-        "rsi": 60.1,
-        "adx": 21.9,
-        "price": 1546.0,
-        "vol_ratio": 0.53,
-        "atr_ratio": 1.05,
-        "vol_5d_ratio": 0.58,
+        "rsi": 60.2,
+        "adx": 22.6,
+        "price": 1540.6,
+        "vol_ratio": 0.41,
+        "atr_ratio": 1.02,
+        "vol_5d_ratio": 0.46,
         "pivot_high": 1547.77,
-        "pct_from_piv": -0.1,
+        "pct_from_piv": -0.5,
         "strategy": "breakout",
         "company": "CHENNAI PETROLEUM CORP LT"
-      }
-    ],
-    "pocket_pivot": [
+      },
       {
-        "ticker": "GAIL.NS",
+        "ticker": "LENSKART.NS",
         "mkt": "US",
-        "score": 5,
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
         "fresh": [
-          "PP"
+          "COIL"
         ],
         "conf": [
-          "RSI45-70",
-          "VOL1.5x",
-          "Near52H",
-          "EMA9>21"
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
         ],
-        "minervini": 8,
-        "rsi": 65.2,
-        "adx": 25.3,
-        "price": 177.0,
-        "vol_ratio": 1.7,
-        "hold_days": 7,
-        "strategy": "pocket_pivot",
-        "rs_vs_spy": 7.2,
-        "company": "GAIL (INDIA) LTD"
+        "minervini": 6,
+        "rsi": 55.0,
+        "adx": 22.2,
+        "price": 671.05,
+        "vol_ratio": 1.07,
+        "atr_ratio": 1.02,
+        "vol_5d_ratio": 1.06,
+        "pivot_high": 689.7,
+        "pct_from_piv": -2.7,
+        "strategy": "breakout",
+        "rs_vs_spy": 8.49,
+        "company": "LENSKART SOLUTIONS LTD"
       }
     ],
-    "connors_rsi2": [],
-    "ema_ribbon": [],
+    "pocket_pivot": [],
+    "connors_rsi2": [
+      {
+        "ticker": "LAURUSLABS.NS",
+        "mkt": "US",
+        "score": 3,
+        "fresh": [
+          "RSI2=0.0"
+        ],
+        "conf": [
+          "RSI14>40",
+          "ADX>20",
+          "Near52H"
+        ],
+        "minervini": 8,
+        "rsi": 68.6,
+        "rsi2": 0.0,
+        "adx": 25.4,
+        "price": 2323.0,
+        "vol_ratio": 1.84,
+        "hold_days": 5,
+        "strategy": "connors_rsi2",
+        "company": "LAURUS LABS LIMITED"
+      }
+    ],
+    "ema_ribbon": [
+      {
+        "ticker": "LENSKART.NS",
+        "mkt": "US",
+        "score": 2,
+        "fresh": [
+          "EMA-RIBBON"
+        ],
+        "conf": [
+          "RSI50-70",
+          "MACD+"
+        ],
+        "minervini": 6,
+        "rsi": 55.0,
+        "adx": 22.2,
+        "price": 671.05,
+        "vol_ratio": 1.07,
+        "hold_days": 7,
+        "strategy": "ema_ribbon",
+        "rs_vs_spy": 8.49,
+        "company": "LENSKART SOLUTIONS LTD"
+      }
+    ],
     "nr7": [],
     "analyst_upgrade": [],
     "signal_velocity": [
       {
-        "ticker": "GAIL.NS",
-        "score": 11,
+        "ticker": "ENGINERSIN.NS",
+        "score": 12,
         "fresh": [
-          "SV+15"
+          "SV+11"
         ],
         "conf": [
-          "VEL+15",
-          "VOL1.5x",
+          "SCORE:9/15",
+          "VEL+11",
           "ADX>20"
         ],
         "minervini": 8,
-        "rsi": 65.2,
-        "adx": 25.3,
-        "price": 177.0,
-        "vol_ratio": 1.7,
-        "net_score": 7,
-        "velocity": 15,
+        "rsi": 50.3,
+        "adx": 30.7,
+        "price": 289.25,
+        "vol_ratio": 1.48,
+        "net_score": 9,
+        "velocity": 11,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "rs_vs_spy": 7.2,
-        "company": "GAIL (INDIA) LTD"
-      },
-      {
-        "ticker": "CUPID.NS",
-        "score": 8,
-        "fresh": [
-          "SV+6"
-        ],
-        "conf": [
-          "SCORE:8/15"
-        ],
-        "minervini": 8,
-        "rsi": 40.1,
-        "adx": 19.0,
-        "price": 340.5,
-        "vol_ratio": 0.92,
-        "net_score": 8,
-        "velocity": 6,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "CUPID LIMITED"
+        "rs_vs_spy": 13.48,
+        "company": "ENGINEERS INDIA LTD"
       }
     ],
     "chokepoint_inflection": [],
     "defensive_rotation": [
       {
-        "ticker": "KR",
-        "sector": "Consumer Staples",
-        "sector_etf": "XLP",
+        "ticker": "ABT",
+        "sector": "Healthcare",
+        "sector_etf": "XLV",
         "score": 5,
         "fresh": [
-          "ROT:XLP",
-          "ETF+3.04%vsS&P"
+          "ROT:XLV",
+          "ETF+6.97%vsS&P"
         ],
         "conf": [
-          "RS+5.9%",
-          "vsETF+2.9%",
+          "RS+7.7%",
+          "vsETF+0.8%",
           "MACD+",
           ">SMA200",
           "M\u22653"
         ],
-        "rsi": 63.5,
-        "adx": 35.5,
-        "vol_ratio": 0.82,
-        "minervini": 4,
-        "price": 66.76,
-        "rs_vs_spy": 5.91,
-        "rs_vs_sector": 2.86,
+        "rsi": 69.1,
+        "adx": 17.6,
+        "vol_ratio": 0.9,
+        "minervini": 5,
+        "price": 110.16,
+        "rs_vs_spy": 7.74,
+        "rs_vs_sector": 0.77,
         "mkt": "US",
         "hold_days": 10,
         "strategy": "defensive_rotation",
-        "company": "Kroger Company (The)"
+        "company": "Abbott Laboratories"
+      },
+      {
+        "ticker": "EVRG",
+        "sector": "Utilities",
+        "sector_etf": "XLU",
+        "score": 5,
+        "fresh": [
+          "ROT:XLU",
+          "ETF+7.46%vsS&P"
+        ],
+        "conf": [
+          "RS+7.8%",
+          "MACD+",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 67.0,
+        "adx": 33.2,
+        "vol_ratio": 1.11,
+        "minervini": 5,
+        "price": 86.55,
+        "rs_vs_spy": 7.83,
+        "rs_vs_sector": 0.36,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Evergy, Inc."
       },
       {
         "ticker": "PG",
@@ -187,53 +249,161 @@
         "score": 5,
         "fresh": [
           "ROT:XLP",
-          "ETF+3.04%vsS&P"
+          "ETF+6.03%vsS&P"
         ],
         "conf": [
-          "RS+3.1%",
+          "RS+6.3%",
           "MACD+",
           ">SMA200",
           "52wHI",
           "M\u22653"
         ],
-        "rsi": 65.4,
-        "adx": 38.1,
-        "vol_ratio": 1.14,
+        "rsi": 67.9,
+        "adx": 39.2,
+        "vol_ratio": 0.94,
         "minervini": 5,
-        "price": 161.57,
-        "rs_vs_spy": 3.05,
-        "rs_vs_sector": 0.01,
+        "price": 163.56,
+        "rs_vs_spy": 6.29,
+        "rs_vs_sector": 0.26,
         "mkt": "US",
         "hold_days": 10,
         "strategy": "defensive_rotation",
         "company": "Procter & Gamble Company (The)"
       },
       {
-        "ticker": "NEE",
+        "ticker": "PNW",
+        "sector": "Utilities",
+        "sector_etf": "XLU",
+        "score": 5,
+        "fresh": [
+          "ROT:XLU",
+          "ETF+7.46%vsS&P"
+        ],
+        "conf": [
+          "RS+7.5%",
+          "MACD+",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 65.7,
+        "adx": 34.5,
+        "vol_ratio": 1.2,
+        "minervini": 4,
+        "price": 105.95,
+        "rs_vs_spy": 7.52,
+        "rs_vs_sector": 0.06,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Pinnacle West Capital Corporati"
+      },
+      {
+        "ticker": "CLX",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 4,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+6.03%vsS&P"
+        ],
+        "conf": [
+          "RS+8.5%",
+          "vsETF+2.4%",
+          "VOL\u2191",
+          "MACD+"
+        ],
+        "rsi": 66.0,
+        "adx": 23.5,
+        "vol_ratio": 1.44,
+        "minervini": 1,
+        "price": 89.9,
+        "rs_vs_spy": 8.47,
+        "rs_vs_sector": 2.45,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Clorox Company (The)"
+      },
+      {
+        "ticker": "CAG",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 4,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+6.03%vsS&P"
+        ],
+        "conf": [
+          "RS+7.3%",
+          "vsETF+1.3%",
+          "VOL\u2191",
+          "MACD+"
+        ],
+        "rsi": 60.7,
+        "adx": 19.7,
+        "vol_ratio": 1.35,
+        "minervini": 1,
+        "price": 14.79,
+        "rs_vs_spy": 7.29,
+        "rs_vs_sector": 1.27,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "ConAgra Brands, Inc."
+      },
+      {
+        "ticker": "AVA",
         "sector": "Utilities",
         "sector_etf": "XLU",
         "score": 4,
         "fresh": [
           "ROT:XLU",
-          "ETF+3.88%vsS&P"
+          "ETF+7.46%vsS&P"
         ],
         "conf": [
-          "RS+5.9%",
-          "vsETF+2.0%",
-          "VOL\u2191",
-          "MACD+"
+          "RS+8.1%",
+          "vsETF+0.6%",
+          "MACD+",
+          "52wHI"
         ],
-        "rsi": 69.8,
-        "adx": 27.6,
-        "vol_ratio": 2.0,
+        "rsi": 68.5,
+        "adx": 28.6,
+        "vol_ratio": 1.16,
         "minervini": 2,
-        "price": 83.71,
-        "rs_vs_spy": 5.89,
-        "rs_vs_sector": 2.01,
+        "price": 38.37,
+        "rs_vs_spy": 8.11,
+        "rs_vs_sector": 0.64,
         "mkt": "US",
         "hold_days": 10,
         "strategy": "defensive_rotation",
-        "company": "NextEra Energy, Inc."
+        "company": "Avista Corporation"
+      },
+      {
+        "ticker": "MKC",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 3,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+6.03%vsS&P"
+        ],
+        "conf": [
+          "RS+8.3%",
+          "vsETF+2.3%",
+          "MACD+"
+        ],
+        "rsi": 66.2,
+        "adx": 20.6,
+        "vol_ratio": 0.83,
+        "minervini": 1,
+        "price": 48.82,
+        "rs_vs_spy": 8.33,
+        "rs_vs_sector": 2.3,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "McCormick & Company, Incorporat"
       },
       {
         "ticker": "TSN",
@@ -242,107 +412,59 @@
         "score": 3,
         "fresh": [
           "ROT:XLP",
-          "ETF+3.04%vsS&P"
+          "ETF+6.03%vsS&P"
         ],
         "conf": [
-          "RS+4.9%",
-          "vsETF+1.8%",
+          "RS+7.6%",
+          "vsETF+1.6%",
           "MACD+"
         ],
-        "rsi": 69.2,
-        "adx": 29.4,
-        "vol_ratio": 1.11,
+        "rsi": 68.5,
+        "adx": 30.2,
+        "vol_ratio": 0.91,
         "minervini": 2,
-        "price": 57.04,
-        "rs_vs_spy": 4.88,
-        "rs_vs_sector": 1.84,
+        "price": 57.08,
+        "rs_vs_spy": 7.58,
+        "rs_vs_sector": 1.55,
         "mkt": "US",
         "hold_days": 10,
         "strategy": "defensive_rotation",
         "company": "Tyson Foods, Inc."
-      },
-      {
-        "ticker": "PEG",
-        "sector": "Utilities",
-        "sector_etf": "XLU",
-        "score": 3,
-        "fresh": [
-          "ROT:XLU",
-          "ETF+3.88%vsS&P"
-        ],
-        "conf": [
-          "RS+4.9%",
-          "vsETF+1.0%",
-          "MACD+"
-        ],
-        "rsi": 69.1,
-        "adx": 22.2,
-        "vol_ratio": 1.04,
-        "minervini": 2,
-        "price": 74.29,
-        "rs_vs_spy": 4.9,
-        "rs_vs_sector": 1.03,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "Public Service Enterprise Group"
-      },
-      {
-        "ticker": "CLX",
-        "sector": "Consumer Staples",
-        "sector_etf": "XLP",
-        "score": 3,
-        "fresh": [
-          "ROT:XLP",
-          "ETF+3.04%vsS&P"
-        ],
-        "conf": [
-          "RS+3.5%",
-          "VOL\u2191",
-          "MACD+"
-        ],
-        "rsi": 62.8,
-        "adx": 22.7,
-        "vol_ratio": 1.56,
-        "minervini": 1,
-        "price": 88.0,
-        "rs_vs_spy": 3.5,
-        "rs_vs_sector": 0.46,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "Clorox Company (The)"
-      },
-      {
-        "ticker": "SRE",
-        "sector": "Utilities",
-        "sector_etf": "XLU",
-        "score": 2,
-        "fresh": [
-          "ROT:XLU",
-          "ETF+3.88%vsS&P"
-        ],
-        "conf": [
-          "RS+4.2%",
-          "MACD+"
-        ],
-        "rsi": 69.9,
-        "adx": 28.7,
-        "vol_ratio": 0.95,
-        "minervini": 2,
-        "price": 86.06,
-        "rs_vs_spy": 4.16,
-        "rs_vs_sector": 0.29,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "DBA Sempra"
       }
     ],
     "cup_handle": [],
     "darvas_box": [],
     "rs_line": [],
-    "vcp": [],
+    "vcp": [
+      {
+        "ticker": "GLAND.NS",
+        "score": 5,
+        "fresh": [
+          "VCP-3C"
+        ],
+        "conf": [
+          "TightFinal",
+          "VolDry",
+          "NearPivot",
+          "RSI50-65",
+          "M\u22657"
+        ],
+        "minervini": 8,
+        "rsi": 55.0,
+        "adx": 24.3,
+        "price": 3158.9,
+        "vol_ratio": 1.4,
+        "n_contractions": 3,
+        "final_pct": 3.38,
+        "base_high": 3024.0,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "vcp",
+        "spy_regime": "CHOPPY",
+        "rs_vs_spy": 9.83,
+        "company": "GLAND PHARMA LIMITED"
+      }
+    ],
     "williams_pct_r": [],
     "bollinger_pctb": [],
     "connors_r3": [],
@@ -366,17 +488,63 @@
           "RSI50-70"
         ],
         "minervini": 8,
-        "rsi": 60.6,
-        "adx": 26.5,
-        "price": 242.34,
-        "vol_ratio": 8.54,
-        "burst_pct": 10.62,
+        "rsi": 66.1,
+        "adx": 28.4,
+        "price": 253.09,
+        "vol_ratio": 4.83,
+        "burst_pct": 4.44,
         "hold_days": 5,
         "mkt": "US",
         "company": "WELSPUN LIVING LIMITED"
       }
     ],
     "ma50_reclaim": [
+      {
+        "ticker": "MCX.NS",
+        "score": 5,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
+          "ADX>15",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 59.6,
+        "adx": 17.5,
+        "price": 3490.1,
+        "vol_ratio": 2.82,
+        "dist_50sma": 7.07,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "MULTI COMMODITY EXCHANGE"
+      },
+      {
+        "ticker": "GLENMARK.NS",
+        "score": 5,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "ADX>15",
+          "M\u22656",
+          "TIGHT<3%"
+        ],
+        "minervini": 8,
+        "rsi": 66.3,
+        "adx": 29.0,
+        "price": 2408.0,
+        "vol_ratio": 1.55,
+        "dist_50sma": 2.1,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "GLENMARK PHARMACEUTICALS"
+      },
       {
         "ticker": "ENGINERSIN.NS",
         "score": 5,
@@ -391,17 +559,41 @@
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 47.2,
-        "adx": 32.0,
-        "price": 289.65,
-        "vol_ratio": 6.63,
-        "dist_50sma": 5.28,
+        "rsi": 50.3,
+        "adx": 30.7,
+        "price": 289.25,
+        "vol_ratio": 1.48,
+        "dist_50sma": 4.73,
         "hold_days": 7,
         "mkt": "US",
+        "rs_vs_spy": 13.48,
         "company": "ENGINEERS INDIA LTD"
       },
       {
-        "ticker": "DIVISLAB.NS",
+        "ticker": "IPCALAB.NS",
+        "score": 5,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
+          "M\u22656",
+          "TIGHT<3%"
+        ],
+        "minervini": 8,
+        "rsi": 53.7,
+        "adx": 14.2,
+        "price": 1950.1,
+        "vol_ratio": 1.46,
+        "dist_50sma": 0.34,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "IPCA LABORATORIES LTD"
+      },
+      {
+        "ticker": "GLAND.NS",
         "score": 5,
         "fresh": [
           "50SMA_RECLAIM"
@@ -414,14 +606,15 @@
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 63.5,
-        "adx": 22.4,
-        "price": 9945.5,
-        "vol_ratio": 1.45,
-        "dist_50sma": 7.15,
+        "rsi": 55.0,
+        "adx": 24.3,
+        "price": 3158.9,
+        "vol_ratio": 1.4,
+        "dist_50sma": 6.96,
         "hold_days": 7,
         "mkt": "US",
-        "company": "DIVI S LABORATORIES LTD"
+        "rs_vs_spy": 9.83,
+        "company": "GLAND PHARMA LIMITED"
       },
       {
         "ticker": "GAIL.NS",
@@ -436,15 +629,36 @@
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 65.2,
-        "adx": 25.3,
-        "price": 177.0,
-        "vol_ratio": 1.7,
-        "dist_50sma": 3.53,
+        "rsi": 68.4,
+        "adx": 25.9,
+        "price": 181.75,
+        "vol_ratio": 1.89,
+        "dist_50sma": 6.19,
         "hold_days": 7,
         "mkt": "US",
-        "rs_vs_spy": 7.2,
         "company": "GAIL (INDIA) LTD"
+      },
+      {
+        "ticker": "NUVAMA.NS",
+        "score": 4,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 56.1,
+        "adx": 14.4,
+        "price": 1866.2,
+        "vol_ratio": 1.2,
+        "dist_50sma": 6.92,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "NUVAMA WEALTH MANAGE LTD"
       }
     ],
     "turnover_momentum": [],
@@ -454,8 +668,8 @@
     "momentum": []
   },
   "sector_excess": {},
-  "spy_ret": 1.2729995513394041,
-  "elder_impulse_count": 10,
-  "market_regime": "NEUTRAL",
+  "spy_ret": 4.027709537097511,
+  "elder_impulse_count": 18,
+  "market_regime": "BULL",
   "india_mode": true
 }
