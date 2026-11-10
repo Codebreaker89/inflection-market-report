@@ -2589,18 +2589,23 @@ def build_email(trades: list[dict], india_mode: bool = False) -> str:
 
 # ── Send email ────────────────────────────────────────────────────────────────
 
+def _recipients() -> list[str]:
+    """NOTIFY_TO may hold several comma-separated addresses."""
+    return [addr.strip() for addr in NOTIFY_TO.split(",") if addr.strip()]
+
 def send_email(subject: str, html_body: str):
+    recipients = _recipients()
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"]    = GMAIL_USER
-    msg["To"]      = NOTIFY_TO
+    msg["To"]      = ", ".join(recipients)
     msg.attach(MIMEText(html_body, "html"))
 
     pw = GMAIL_APP_PASSWORD.replace(" ", "")
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
             server.login(GMAIL_USER, pw)
-            server.sendmail(GMAIL_USER, NOTIFY_TO, msg.as_string())
+            server.sendmail(GMAIL_USER, recipients, msg.as_string())
     except (smtplib.SMTPAuthenticationError, smtplib.SMTPServerDisconnected) as e:
         print(
             "\n  Gmail app password was rejected or the SMTP connection was closed. "

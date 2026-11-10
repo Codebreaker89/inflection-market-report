@@ -44,7 +44,7 @@ jobs:
           cat > config.py << EOF
           GMAIL_USER         = "${{ secrets.GMAIL_USER }}"
           GMAIL_APP_PASSWORD = "${{ secrets.GMAIL_APP_PASSWORD }}"
-          NOTIFY_TO          = "${{ secrets.GMAIL_USER }}"
+          NOTIFY_TO          = "${{ secrets.GMAIL_USER }},${{ secrets.NOTIFY_EXTRA }}"
           STOP_LOSS_PCT      = 0.03
           PROFIT_TARGET      = 0.08
           EARNINGS_WARN      = 7
@@ -120,7 +120,7 @@ jobs:
           cat > config.py << EOF
           GMAIL_USER         = "${{ secrets.GMAIL_USER }}"
           GMAIL_APP_PASSWORD = "${{ secrets.GMAIL_APP_PASSWORD }}"
-          NOTIFY_TO          = "${{ secrets.GMAIL_USER }}"
+          NOTIFY_TO          = "${{ secrets.GMAIL_USER }},${{ secrets.NOTIFY_EXTRA }}"
           STOP_LOSS_PCT      = 0.03
           PROFIT_TARGET      = 0.08
           EARNINGS_WARN      = 7
