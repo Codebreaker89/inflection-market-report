@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-11-09",
+  "scan_date": "2026-11-10",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -194,32 +194,60 @@
     "chokepoint_inflection": [],
     "defensive_rotation": [
       {
-        "ticker": "NEM",
+        "ticker": "WPM",
         "sector": "Gold",
         "sector_etf": "GLD",
         "score": 5,
         "fresh": [
           "ROT:GLD",
-          "ETF+4.86%vsS&P"
+          "ETF+4.84%vsS&P"
         ],
         "conf": [
-          "RS+14.3%",
-          "vsETF+9.4%",
+          "RS+19.3%",
+          "vsETF+14.4%",
           "MACD+",
           ">SMA200",
           "M\u22653"
         ],
-        "rsi": 53.6,
-        "adx": 18.7,
-        "vol_ratio": 1.16,
+        "rsi": 60.8,
+        "adx": 25.7,
+        "vol_ratio": 0.98,
         "minervini": 5,
-        "price": 120.91,
-        "rs_vs_spy": 14.31,
-        "rs_vs_sector": 9.45,
+        "price": 143.94,
+        "rs_vs_spy": 19.28,
+        "rs_vs_sector": 14.44,
         "mkt": "US",
         "hold_days": 10,
         "strategy": "defensive_rotation",
-        "company": "Newmont Corporation"
+        "company": "Wheaton Precious Metals Corp"
+      },
+      {
+        "ticker": "AU",
+        "sector": "Gold",
+        "sector_etf": "GLD",
+        "score": 5,
+        "fresh": [
+          "ROT:GLD",
+          "ETF+4.84%vsS&P"
+        ],
+        "conf": [
+          "RS+18.5%",
+          "vsETF+13.6%",
+          "MACD+",
+          ">SMA200",
+          "M\u22653"
+        ],
+        "rsi": 60.4,
+        "adx": 27.1,
+        "vol_ratio": 1.19,
+        "minervini": 5,
+        "price": 99.37,
+        "rs_vs_spy": 18.47,
+        "rs_vs_sector": 13.63,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "AngloGold Ashanti PLC"
       },
       {
         "ticker": "AEM",
@@ -228,239 +256,136 @@
         "score": 5,
         "fresh": [
           "ROT:GLD",
-          "ETF+4.86%vsS&P"
+          "ETF+4.84%vsS&P"
         ],
         "conf": [
-          "RS+13.4%",
-          "vsETF+8.5%",
+          "RS+15.9%",
+          "vsETF+11.1%",
           "MACD+",
           ">SMA200",
           "M\u22653"
         ],
-        "rsi": 52.6,
-        "adx": 18.3,
-        "vol_ratio": 0.87,
+        "rsi": 58.8,
+        "adx": 18.5,
+        "vol_ratio": 1.02,
         "minervini": 4,
-        "price": 191.57,
-        "rs_vs_spy": 13.38,
-        "rs_vs_sector": 8.52,
+        "price": 200.8,
+        "rs_vs_spy": 15.95,
+        "rs_vs_sector": 11.11,
         "mkt": "US",
         "hold_days": 10,
         "strategy": "defensive_rotation",
         "company": "Agnico Eagle Mines Limited"
       },
       {
-        "ticker": "CAG",
-        "sector": "Consumer Staples",
-        "sector_etf": "XLP",
-        "score": 5,
-        "fresh": [
-          "ROT:XLP",
-          "ETF+5.31%vsS&P"
-        ],
-        "conf": [
-          "RS+7.0%",
-          "vsETF+1.7%",
-          "MACD+",
-          ">SMA200",
-          "M\u22653"
-        ],
-        "rsi": 62.0,
-        "adx": 21.4,
-        "vol_ratio": 0.95,
-        "minervini": 3,
-        "price": 15.24,
-        "rs_vs_spy": 6.99,
-        "rs_vs_sector": 1.68,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "ConAgra Brands, Inc."
-      },
-      {
-        "ticker": "MO",
-        "sector": "Consumer Staples",
-        "sector_etf": "XLP",
-        "score": 5,
-        "fresh": [
-          "ROT:XLP",
-          "ETF+5.31%vsS&P"
-        ],
-        "conf": [
-          "RS+5.7%",
-          "MACD+",
-          ">SMA200",
-          "52wHI",
-          "M\u22653"
-        ],
-        "rsi": 56.4,
-        "adx": 30.0,
-        "vol_ratio": 0.82,
-        "minervini": 5,
-        "price": 76.12,
-        "rs_vs_spy": 5.68,
-        "rs_vs_sector": 0.37,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "Altria Group, Inc."
-      },
-      {
-        "ticker": "GFI",
-        "sector": "Gold",
-        "sector_etf": "GLD",
-        "score": 4,
-        "fresh": [
-          "ROT:GLD",
-          "ETF+4.86%vsS&P"
-        ],
-        "conf": [
-          "RS+16.5%",
-          "vsETF+11.6%",
-          "VOL\u2191",
-          "MACD+"
-        ],
-        "rsi": 58.4,
-        "adx": 18.7,
-        "vol_ratio": 1.27,
-        "minervini": 2,
-        "price": 39.17,
-        "rs_vs_spy": 16.49,
-        "rs_vs_sector": 11.63,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "Gold Fields Limited"
-      },
-      {
         "ticker": "OR",
         "sector": "Gold",
         "sector_etf": "GLD",
-        "score": 3,
+        "score": 5,
         "fresh": [
           "ROT:GLD",
-          "ETF+4.86%vsS&P"
+          "ETF+4.84%vsS&P"
         ],
         "conf": [
-          "RS+13.5%",
-          "vsETF+8.6%",
-          "MACD+"
+          "RS+14.9%",
+          "vsETF+10.0%",
+          "MACD+",
+          ">SMA200",
+          "M\u22653"
         ],
-        "rsi": 56.4,
-        "adx": 13.8,
-        "vol_ratio": 1.14,
-        "minervini": 2,
-        "price": 36.22,
-        "rs_vs_spy": 13.51,
-        "rs_vs_sector": 8.65,
+        "rsi": 61.9,
+        "adx": 15.0,
+        "vol_ratio": 1.16,
+        "minervini": 3,
+        "price": 37.82,
+        "rs_vs_spy": 14.89,
+        "rs_vs_sector": 10.05,
         "mkt": "US",
         "hold_days": 10,
         "strategy": "defensive_rotation",
         "company": "OR Royalties Inc."
       },
       {
+        "ticker": "HMY",
+        "sector": "Gold",
+        "sector_etf": "GLD",
+        "score": 5,
+        "fresh": [
+          "ROT:GLD",
+          "ETF+4.84%vsS&P"
+        ],
+        "conf": [
+          "RS+12.3%",
+          "vsETF+7.5%",
+          "MACD+",
+          ">SMA200",
+          "M\u22653"
+        ],
+        "rsi": 56.5,
+        "adx": 19.6,
+        "vol_ratio": 1.01,
+        "minervini": 4,
+        "price": 17.6,
+        "rs_vs_spy": 12.35,
+        "rs_vs_sector": 7.51,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Harmony Gold Mining Company Lim"
+      },
+      {
         "ticker": "DRD",
         "sector": "Gold",
         "sector_etf": "GLD",
-        "score": 3,
+        "score": 5,
         "fresh": [
           "ROT:GLD",
-          "ETF+4.86%vsS&P"
+          "ETF+4.84%vsS&P"
         ],
         "conf": [
-          "RS+9.5%",
-          "vsETF+4.7%",
-          "MACD+"
+          "RS+10.0%",
+          "vsETF+5.2%",
+          "MACD+",
+          ">SMA200",
+          "M\u22653"
         ],
-        "rsi": 53.3,
-        "adx": 13.3,
-        "vol_ratio": 1.11,
-        "minervini": 2,
-        "price": 25.48,
-        "rs_vs_spy": 9.55,
-        "rs_vs_sector": 4.69,
+        "rsi": 55.8,
+        "adx": 13.7,
+        "vol_ratio": 1.1,
+        "minervini": 3,
+        "price": 26.58,
+        "rs_vs_spy": 10.01,
+        "rs_vs_sector": 5.17,
         "mkt": "US",
         "hold_days": 10,
         "strategy": "defensive_rotation",
         "company": "DRDGOLD Limited"
       },
       {
-        "ticker": "HRL",
-        "sector": "Consumer Staples",
-        "sector_etf": "XLP",
+        "ticker": "GFI",
+        "sector": "Gold",
+        "sector_etf": "GLD",
         "score": 3,
         "fresh": [
-          "ROT:XLP",
-          "ETF+5.31%vsS&P"
+          "ROT:GLD",
+          "ETF+4.84%vsS&P"
         ],
         "conf": [
-          "RS+7.5%",
-          "vsETF+2.2%",
+          "RS+18.2%",
+          "vsETF+13.4%",
           "MACD+"
         ],
-        "rsi": 65.2,
-        "adx": 31.2,
-        "vol_ratio": 1.13,
+        "rsi": 64.8,
+        "adx": 19.5,
+        "vol_ratio": 1.05,
         "minervini": 2,
-        "price": 21.95,
-        "rs_vs_spy": 7.47,
-        "rs_vs_sector": 2.16,
+        "price": 41.04,
+        "rs_vs_spy": 18.25,
+        "rs_vs_sector": 13.41,
         "mkt": "US",
         "hold_days": 10,
         "strategy": "defensive_rotation",
-        "company": "Hormel Foods Corporation"
-      },
-      {
-        "ticker": "PEP",
-        "sector": "Consumer Staples",
-        "sector_etf": "XLP",
-        "score": 3,
-        "fresh": [
-          "ROT:XLP",
-          "ETF+5.31%vsS&P"
-        ],
-        "conf": [
-          "RS+7.4%",
-          "vsETF+2.0%",
-          "MACD+"
-        ],
-        "rsi": 63.3,
-        "adx": 37.1,
-        "vol_ratio": 0.89,
-        "minervini": 2,
-        "price": 141.34,
-        "rs_vs_spy": 7.35,
-        "rs_vs_sector": 2.04,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "Pepsico, Inc."
-      },
-      {
-        "ticker": "GIS",
-        "sector": "Consumer Staples",
-        "sector_etf": "XLP",
-        "score": 3,
-        "fresh": [
-          "ROT:XLP",
-          "ETF+5.31%vsS&P"
-        ],
-        "conf": [
-          "RS+6.5%",
-          "vsETF+1.2%",
-          "MACD+"
-        ],
-        "rsi": 62.1,
-        "adx": 25.9,
-        "vol_ratio": 0.98,
-        "minervini": 1,
-        "price": 35.51,
-        "rs_vs_spy": 6.5,
-        "rs_vs_sector": 1.19,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "General Mills, Inc."
+        "company": "Gold Fields Limited"
       }
     ],
     "cup_handle": [
@@ -492,7 +417,7 @@
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "rs_vs_spy": 10.84,
+        "rs_vs_spy": 9.12,
         "company": "LG ELECTRONICS INDIA LTD"
       }
     ],
@@ -606,7 +531,7 @@
         "adx": 30.7,
         "price": 188.0,
         "vol_ratio": 2.01,
-        "ma30w": 169.79,
+        "ma30w": 170.81,
         "stage_note": "MA turning \u00b7 week vol 2.0x \u00b7 RS\u2191"
       }
     ],
@@ -769,7 +694,7 @@
         "dist_50sma": 5.83,
         "hold_days": 7,
         "mkt": "US",
-        "rs_vs_spy": 10.84,
+        "rs_vs_spy": 9.12,
         "company": "LG ELECTRONICS INDIA LTD"
       },
       {
