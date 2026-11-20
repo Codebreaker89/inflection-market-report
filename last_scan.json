@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-11-19",
+  "scan_date": "2026-11-20",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -39,76 +39,8 @@
   "results_by_strategy": {
     "breakout": [
       {
-        "ticker": "BNZL.L",
+        "ticker": "DGE.L",
         "mkt": "UK",
-        "score": 5,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "ADXcurl",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 51.6,
-        "adx": 23.9,
-        "price": 2876.0,
-        "vol_ratio": 1.09,
-        "atr_ratio": 0.97,
-        "vol_5d_ratio": 0.95,
-        "pivot_high": 2936.0,
-        "pct_from_piv": -2.0,
-        "strategy": "breakout",
-        "company": "BUNZL PLC ORD 32 1/7P"
-      },
-      {
-        "ticker": "AJG",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "VOLdry",
-          "NearPiv",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "VOLdry",
-          "NearPiv",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 51.3,
-        "adx": 33.0,
-        "price": 277.62,
-        "vol_ratio": 0.8,
-        "atr_ratio": 1.07,
-        "vol_5d_ratio": 0.65,
-        "pivot_high": 288.11,
-        "pct_from_piv": -3.6,
-        "strategy": "breakout",
-        "company": "Arthur J. Gallagher & Co."
-      },
-      {
-        "ticker": "DGX",
-        "mkt": "US",
         "score": 4,
         "phase": "COIL",
         "coil_sigs": [
@@ -128,117 +60,156 @@
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 60.6,
-        "adx": 16.0,
-        "price": 259.09,
-        "vol_ratio": 1.19,
-        "atr_ratio": 0.91,
-        "vol_5d_ratio": 0.96,
-        "pivot_high": 262.21,
-        "pct_from_piv": -1.2,
+        "rsi": 60.5,
+        "adx": 25.7,
+        "price": 1880.0,
+        "vol_ratio": 0.93,
+        "atr_ratio": 1.01,
+        "vol_5d_ratio": 1.03,
+        "pivot_high": 1940.5,
+        "pct_from_piv": -3.1,
         "strategy": "breakout",
-        "rs_vs_spy": 3.99,
-        "company": "Quest Diagnostics Incorporated"
-      },
-      {
-        "ticker": "DB1.DE",
-        "mkt": "DE",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 50.3,
-        "adx": 33.8,
-        "price": 320.8,
-        "vol_ratio": 0.66,
-        "atr_ratio": 1.04,
-        "vol_5d_ratio": 0.9,
-        "pivot_high": 330.4,
-        "pct_from_piv": -2.9,
-        "strategy": "breakout",
-        "company": "DEUTSCHE BOERSE AG            N"
-      },
-      {
-        "ticker": "ZAL.DE",
-        "mkt": "DE",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 60.4,
-        "adx": 25.4,
-        "price": 28.82,
-        "vol_ratio": 0.79,
-        "atr_ratio": 1.18,
-        "vol_5d_ratio": 0.9,
-        "pivot_high": 29.13,
-        "pct_from_piv": -1.1,
-        "strategy": "breakout",
-        "company": "Zalando SE                    I"
+        "company": "DIAGEO PLC ORD 28 101/108P"
       }
     ],
-    "pocket_pivot": [],
+    "pocket_pivot": [
+      {
+        "ticker": "SJM",
+        "mkt": "US",
+        "score": 5,
+        "fresh": [
+          "PP"
+        ],
+        "conf": [
+          "RSI45-70",
+          "ADX\u2191",
+          "Near52H",
+          "EMA9>21"
+        ],
+        "minervini": 8,
+        "rsi": 56.1,
+        "adx": 29.1,
+        "price": 133.68,
+        "vol_ratio": 1.04,
+        "hold_days": 7,
+        "strategy": "pocket_pivot",
+        "rs_vs_spy": 9.53,
+        "company": "The J.M. Smucker Company"
+      }
+    ],
     "connors_rsi2": [],
-    "ema_ribbon": [],
+    "ema_ribbon": [
+      {
+        "ticker": "SJM",
+        "mkt": "US",
+        "score": 2,
+        "fresh": [
+          "EMA-RIBBON"
+        ],
+        "conf": [
+          "RSI50-70",
+          "ADX>25"
+        ],
+        "minervini": 8,
+        "rsi": 56.1,
+        "adx": 29.1,
+        "price": 133.68,
+        "vol_ratio": 1.04,
+        "hold_days": 7,
+        "strategy": "ema_ribbon",
+        "rs_vs_spy": 9.53,
+        "company": "The J.M. Smucker Company"
+      }
+    ],
     "nr7": [],
     "analyst_upgrade": [],
-    "signal_velocity": [
-      {
-        "ticker": "OKTA",
-        "score": 12,
-        "fresh": [
-          "SV+11"
-        ],
-        "conf": [
-          "SCORE:9/15",
-          "VEL+11",
-          "ADX>20"
-        ],
-        "minervini": 8,
-        "rsi": 49.3,
-        "adx": 23.8,
-        "price": 206.85,
-        "vol_ratio": 1.2,
-        "net_score": 9,
-        "velocity": 11,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "Okta, Inc."
-      }
-    ],
+    "signal_velocity": [],
     "chokepoint_inflection": [],
     "defensive_rotation": [
+      {
+        "ticker": "SAN.PA",
+        "sector": "Healthcare",
+        "sector_etf": "XLV",
+        "score": 5,
+        "fresh": [
+          "ROT:XLV",
+          "ETF+2.09%vsS&P"
+        ],
+        "conf": [
+          "RS+7.6%",
+          "vsETF+5.5%",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 63.7,
+        "adx": 36.2,
+        "vol_ratio": 0.94,
+        "minervini": 5,
+        "price": 84.92,
+        "rs_vs_spy": 7.59,
+        "rs_vs_sector": 5.5,
+        "mkt": "FR",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "SANOFI"
+      },
+      {
+        "ticker": "BDX",
+        "sector": "Healthcare",
+        "sector_etf": "XLV",
+        "score": 5,
+        "fresh": [
+          "ROT:XLV",
+          "ETF+2.09%vsS&P"
+        ],
+        "conf": [
+          "RS+6.6%",
+          "vsETF+4.5%",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 69.9,
+        "adx": 48.1,
+        "vol_ratio": 0.91,
+        "minervini": 5,
+        "price": 212.78,
+        "rs_vs_spy": 6.61,
+        "rs_vs_sector": 4.52,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Becton, Dickinson and Company"
+      },
+      {
+        "ticker": "LH",
+        "sector": "Healthcare",
+        "sector_etf": "XLV",
+        "score": 5,
+        "fresh": [
+          "ROT:XLV",
+          "ETF+2.09%vsS&P"
+        ],
+        "conf": [
+          "RS+6.3%",
+          "vsETF+4.2%",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 62.8,
+        "adx": 37.6,
+        "vol_ratio": 1.11,
+        "minervini": 5,
+        "price": 367.13,
+        "rs_vs_spy": 6.34,
+        "rs_vs_sector": 4.24,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Labcorp Holdings Inc."
+      },
       {
         "ticker": "DUK",
         "sector": "Utilities",
@@ -246,168 +217,406 @@
         "score": 5,
         "fresh": [
           "ROT:XLU",
-          "ETF+1.67%vsS&P"
+          "ETF+5.17%vsS&P"
         ],
         "conf": [
-          "RS+2.2%",
-          "vsETF+0.6%",
+          "RS+8.6%",
+          "vsETF+3.4%",
           ">SMA200",
           "52wHI",
           "M\u22653"
         ],
-        "rsi": 58.3,
-        "adx": 46.3,
-        "vol_ratio": 0.88,
+        "rsi": 58.1,
+        "adx": 45.8,
+        "vol_ratio": 1.09,
         "minervini": 3,
-        "price": 128.86,
-        "rs_vs_spy": 2.24,
-        "rs_vs_sector": 0.57,
+        "price": 129.78,
+        "rs_vs_spy": 8.61,
+        "rs_vs_sector": 3.45,
         "mkt": "US",
         "hold_days": 10,
         "strategy": "defensive_rotation",
         "company": "Duke Energy Corporation (Holdin"
+      },
+      {
+        "ticker": "SJM",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 5,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+6.61%vsS&P"
+        ],
+        "conf": [
+          "RS+9.5%",
+          "vsETF+2.9%",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 56.1,
+        "adx": 29.1,
+        "vol_ratio": 1.04,
+        "minervini": 5,
+        "price": 133.68,
+        "rs_vs_spy": 9.53,
+        "rs_vs_sector": 2.85,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "The J.M. Smucker Company"
+      },
+      {
+        "ticker": "PG",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 5,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+6.61%vsS&P"
+        ],
+        "conf": [
+          "RS+8.6%",
+          "vsETF+2.0%",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 61.6,
+        "adx": 40.2,
+        "vol_ratio": 1.17,
+        "minervini": 5,
+        "price": 169.37,
+        "rs_vs_spy": 8.59,
+        "rs_vs_sector": 1.98,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Procter & Gamble Company (The)"
+      },
+      {
+        "ticker": "CL",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 5,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+6.61%vsS&P"
+        ],
+        "conf": [
+          "RS+8.4%",
+          "vsETF+1.8%",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 53.6,
+        "adx": 36.3,
+        "vol_ratio": 1.18,
+        "minervini": 5,
+        "price": 98.71,
+        "rs_vs_spy": 8.41,
+        "rs_vs_sector": 1.8,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Colgate-Palmolive Company"
+      },
+      {
+        "ticker": "CHD",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 5,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+6.61%vsS&P"
+        ],
+        "conf": [
+          "RS+7.8%",
+          "vsETF+1.2%",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 51.8,
+        "adx": 42.4,
+        "vol_ratio": 1.01,
+        "minervini": 5,
+        "price": 110.84,
+        "rs_vs_spy": 7.85,
+        "rs_vs_sector": 1.24,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Church & Dwight Company, Inc."
+      },
+      {
+        "ticker": "GIS",
+        "sector": "Consumer Staples",
+        "sector_etf": "XLP",
+        "score": 4,
+        "fresh": [
+          "ROT:XLP",
+          "ETF+6.61%vsS&P"
+        ],
+        "conf": [
+          "RS+6.8%",
+          "VOL\u2191",
+          "MACD+",
+          ">SMA200"
+        ],
+        "rsi": 55.1,
+        "adx": 21.0,
+        "vol_ratio": 1.72,
+        "minervini": 2,
+        "price": 35.74,
+        "rs_vs_spy": 6.83,
+        "rs_vs_sector": 0.23,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "General Mills, Inc."
+      },
+      {
+        "ticker": "AEE",
+        "sector": "Utilities",
+        "sector_etf": "XLU",
+        "score": 4,
+        "fresh": [
+          "ROT:XLU",
+          "ETF+5.17%vsS&P"
+        ],
+        "conf": [
+          "RS+5.4%",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 52.0,
+        "adx": 44.9,
+        "vol_ratio": 1.12,
+        "minervini": 3,
+        "price": 111.93,
+        "rs_vs_spy": 5.37,
+        "rs_vs_sector": 0.2,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Ameren Corporation"
+      },
+      {
+        "ticker": "AVA",
+        "sector": "Utilities",
+        "sector_etf": "XLU",
+        "score": 4,
+        "fresh": [
+          "ROT:XLU",
+          "ETF+5.17%vsS&P"
+        ],
+        "conf": [
+          "RS+5.2%",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 61.1,
+        "adx": 37.3,
+        "vol_ratio": 0.86,
+        "minervini": 3,
+        "price": 39.85,
+        "rs_vs_spy": 5.24,
+        "rs_vs_sector": 0.08,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Avista Corporation"
+      },
+      {
+        "ticker": "HCA",
+        "sector": "Healthcare",
+        "sector_etf": "XLV",
+        "score": 3,
+        "fresh": [
+          "ROT:XLV",
+          "ETF+2.09%vsS&P"
+        ],
+        "conf": [
+          "RS+2.3%",
+          ">SMA200",
+          "M\u22653"
+        ],
+        "rsi": 52.3,
+        "adx": 24.0,
+        "vol_ratio": 1.05,
+        "minervini": 5,
+        "price": 475.57,
+        "rs_vs_spy": 2.26,
+        "rs_vs_sector": 0.17,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "HCA Healthcare, Inc."
       }
     ],
     "cup_handle": [
       {
-        "ticker": "DGX",
-        "score": 4,
+        "ticker": "AJG",
+        "score": 5,
         "fresh": [
           "C&H",
-          "PIV@262.21"
+          "PIV@287.0"
         ],
         "conf": [
-          "CUP28.7%",
-          "HDL2.2%",
+          "CUP33.8%",
+          "HDL3.3%",
+          "VOLdry",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 60.6,
-        "adx": 16.0,
-        "vol_ratio": 1.19,
+        "rsi": 50.3,
+        "adx": 32.5,
+        "vol_ratio": 0.97,
         "minervini": 8,
-        "price": 259.09,
-        "cup_depth_pct": 28.7,
+        "price": 279.26,
+        "cup_depth_pct": 33.8,
         "cup_duration": 195,
-        "handle_depth_pct": 2.2,
+        "handle_depth_pct": 3.3,
         "handle_duration": 5,
-        "pivot": 262.21,
+        "pivot": 287.0,
+        "vol_drying": true,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "rs_vs_spy": 7.88,
+        "company": "Arthur J. Gallagher & Co."
+      },
+      {
+        "ticker": "DCC.L",
+        "score": 5,
+        "fresh": [
+          "C&H",
+          "PIV@6460.0"
+        ],
+        "conf": [
+          "CUP30.2%",
+          "HDL0.1%",
+          "VOLdry",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 54.5,
+        "adx": 33.6,
+        "vol_ratio": 1.47,
+        "minervini": 8,
+        "price": 6455.0,
+        "cup_depth_pct": 30.2,
+        "cup_duration": 195,
+        "handle_depth_pct": 0.1,
+        "handle_duration": 5,
+        "pivot": 6460.0,
+        "vol_drying": true,
+        "hold_days": 10,
+        "mkt": "UK",
+        "strategy": "cup_handle",
+        "company": "DCC ENERGY PLC ORD EUR0.25 (CDI"
+      },
+      {
+        "ticker": "BIIB",
+        "score": 4,
+        "fresh": [
+          "C&H",
+          "PIV@251.65"
+        ],
+        "conf": [
+          "CUP32.4%",
+          "HDL1.8%",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 50.6,
+        "adx": 22.6,
+        "vol_ratio": 0.96,
+        "minervini": 8,
+        "price": 249.59,
+        "cup_depth_pct": 32.4,
+        "cup_duration": 195,
+        "handle_depth_pct": 1.8,
+        "handle_duration": 5,
+        "pivot": 251.65,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "rs_vs_spy": 3.99,
-        "company": "Quest Diagnostics Incorporated"
+        "company": "Biogen Inc."
+      },
+      {
+        "ticker": "SJM",
+        "score": 4,
+        "fresh": [
+          "C&H",
+          "PIV@135.54"
+        ],
+        "conf": [
+          "CUP34.4%",
+          "HDL3.1%",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 56.1,
+        "adx": 29.1,
+        "vol_ratio": 1.04,
+        "minervini": 8,
+        "price": 133.68,
+        "cup_depth_pct": 34.4,
+        "cup_duration": 195,
+        "handle_depth_pct": 3.1,
+        "handle_duration": 5,
+        "pivot": 135.54,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "rs_vs_spy": 9.53,
+        "company": "The J.M. Smucker Company"
       }
     ],
     "darvas_box": [],
-    "rs_line": [
-      {
-        "ticker": "DIS",
-        "score": 5,
-        "fresh": [
-          "RS-NEW-HIGH"
-        ],
-        "conf": [
-          "NEAR_HIGH",
-          "VOL\u22651.5x",
-          "RSI45-70",
-          "ADX>20",
-          "M\u22656"
-        ],
-        "minervini": 8,
-        "rsi": 68.7,
-        "adx": 40.4,
-        "price": 120.25,
-        "vol_ratio": 1.55,
-        "rs_lead_days": -1,
-        "pct_from_high": 1.7,
-        "hold_days": 7,
-        "strategy": "rs_line",
-        "mkt": "US",
-        "company": "Walt Disney Company (The)"
-      }
-    ],
+    "rs_line": [],
     "vcp": [],
     "williams_pct_r": [],
     "bollinger_pctb": [],
     "connors_r3": [],
     "connors_tps": [],
     "turtle_soup": [],
-    "raschke_8020": [
-      {
-        "ticker": "ERF.PA",
-        "strategy": "raschke_8020",
-        "score": 4,
-        "conf": [
-          "StrongClose",
-          "VolAboveAvg",
-          "ADX16-35",
-          "M>=5"
-        ],
-        "minervini": 8,
-        "rsi": 38.6,
-        "adx": 33.6,
-        "price": 85.66,
-        "vol_ratio": 1.5,
-        "yest_high": 86.23,
-        "hold_days": 2,
-        "mkt": "FR",
-        "company": "EUROFINS SCIENT."
-      }
-    ],
+    "raschke_8020": [],
     "wyckoff_spring": [],
     "weinstein_stage2": [],
     "momentum_burst": [],
-    "ma50_reclaim": [
-      {
-        "ticker": "OKTA",
-        "score": 5,
-        "fresh": [
-          "50SMA_RECLAIM"
-        ],
-        "conf": [
-          "50SMA_RECLAIM",
-          "VOL\u22651.2x",
-          "RSI35-65",
-          "ADX>15",
-          "M\u22656"
-        ],
-        "minervini": 8,
-        "rsi": 49.3,
-        "adx": 23.8,
-        "price": 206.85,
-        "vol_ratio": 1.2,
-        "dist_50sma": 3.65,
-        "hold_days": 7,
-        "mkt": "US",
-        "company": "Okta, Inc."
-      }
-    ],
+    "ma50_reclaim": [],
     "turnover_momentum": [],
     "three_weeks_tight": [
       {
-        "ticker": "DCC.L",
-        "mkt": "UK",
-        "score": 4,
+        "ticker": "AJG",
+        "mkt": "US",
+        "score": 3,
         "fresh": [
           "3WT"
         ],
         "conf": [
-          "TIGHT<1%",
           "VOL_DECLINING",
           "NEAR_52H",
           "RSI50-65"
         ],
         "minervini": 8,
-        "rsi": 58.3,
-        "adx": 33.2,
-        "price": 6455.0,
-        "vol_ratio": 1.84,
-        "spread_pct": 0.08,
+        "rsi": 50.3,
+        "adx": 32.5,
+        "price": 279.26,
+        "vol_ratio": 0.97,
+        "spread_pct": 1.32,
         "hold_days": 7,
         "strategy": "three_weeks_tight",
-        "company": "DCC ENERGY PLC ORD EUR0.25 (CDI"
+        "rs_vs_spy": 7.88,
+        "company": "Arthur J. Gallagher & Co."
       }
     ],
     "episodic_pivot": [],
@@ -415,19 +624,19 @@
     "momentum": []
   },
   "sector_excess": {
-    "XLK": 1.3,
-    "XLI": 1.65,
-    "XLV": -1.69,
-    "XLF": -1.0,
-    "XLY": 0.84,
-    "XLP": 0.81,
-    "XLB": -3.22,
-    "XLE": 1.14,
-    "XLC": 0.82,
-    "XLU": 1.67,
-    "XLRE": -0.87
+    "XLK": -3.36,
+    "XLI": 2.31,
+    "XLV": 2.09,
+    "XLF": 1.65,
+    "XLY": 1.83,
+    "XLP": 6.61,
+    "XLB": -0.76,
+    "XLE": 4.38,
+    "XLC": 1.64,
+    "XLU": 5.17,
+    "XLRE": 2.69
   },
-  "spy_ret": -2.34,
+  "spy_ret": -6.19,
   "elder_impulse_count": 0,
   "market_regime": "BEAR",
   "india_mode": false
