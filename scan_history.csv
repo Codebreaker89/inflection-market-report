@@ -3595,11 +3595,11 @@ scan_date,ticker,company,strategy,strategies_count,price_at_scan,score,wr,avg,ad
 2026-11-09,LGEN.L,LEGAL & GENERAL GROUP PLC ORD 2,three_weeks_tight,2,308.3,2,,,20.8,66.1,0.8,,307.9,-0.13,-0.04,,,0,298.4,-3.21,-1.07,,,1,-3.5
 2026-11-09,XYZ,"Block, Inc.",episodic_pivot,2,88.56,5,,,21.7,67.3,1.21,,82.96,-6.32,-2.11,-1.69,-4.63,1,74.23,-16.18,-5.39,-4.89,-11.29,1,-16.37
 2026-11-09,CPAY,"Corpay, Inc.",episodic_pivot,1,457.97,4,,,21.7,76.1,1.08,,461.73,0.82,0.27,-1.69,2.51,0,434.29,-5.17,-1.72,-4.89,-0.28,1,-5.27
-2026-11-10,PAYTM.NS,ONE 97 COMMUNICATIONS LTD,breakout,1,1788.0,5,,,21.7,61.0,0.56,,1890.8,5.75,1.92,,,0,,,,,,,
-2026-11-10,ACE.NS,ACTION CONST EQUIP LTD,breakout,1,1166.65,4,,,26.2,57.9,0.52,,1176.3,0.83,0.28,,,0,,,,,,,
-2026-11-10,KARURVYSYA.NS,KARUR VYSYA BANK LTD,breakout,1,370.0,4,,,22.7,50.0,0.36,,390.25,5.47,1.82,,,0,,,,,,,
-2026-11-10,FEDERALBNK.NS,FEDERAL BANK LTD,signal_velocity,1,344.1,12,,,19.0,45.5,0.61,,362.0,5.2,1.73,,,0,,,,,,,
-2026-11-10,PRIVISCL.NS,PRIVI SPECIALITY CHE LTD,signal_velocity,1,3491.9,10,,,21.8,60.3,1.37,,3363.8999,-3.67,-1.22,,,1,,,,,,,
+2026-11-10,PAYTM.NS,ONE 97 COMMUNICATIONS LTD,breakout,1,1788.0,5,,,21.7,61.0,0.56,,1890.8,5.75,1.92,,,0,1740.0,-2.68,-0.89,,,1,-6.92
+2026-11-10,ACE.NS,ACTION CONST EQUIP LTD,breakout,1,1166.65,4,,,26.2,57.9,0.52,,1176.3,0.83,0.28,,,0,1170.35,0.32,0.11,,,0,-0.9
+2026-11-10,KARURVYSYA.NS,KARUR VYSYA BANK LTD,breakout,1,370.0,4,,,22.7,50.0,0.36,,390.25,5.47,1.82,,,0,377.0,1.89,0.63,,,0,0.2
+2026-11-10,FEDERALBNK.NS,FEDERAL BANK LTD,signal_velocity,1,344.1,12,,,19.0,45.5,0.61,,362.0,5.2,1.73,,,0,373.5,8.54,2.85,,,0,-0.03
+2026-11-10,PRIVISCL.NS,PRIVI SPECIALITY CHE LTD,signal_velocity,1,3491.9,10,,,21.8,60.3,1.37,,3363.8999,-3.67,-1.22,,,1,3565.5,2.11,0.7,,,1,-4.92
 2026-11-10,WPM,Wheaton Precious Metals Corp,defensive_rotation,1,143.94,5,,,25.7,60.8,0.98,,126.68,-11.99,-4.0,-1.33,-10.66,1,,,,,,,
 2026-11-10,AU,AngloGold Ashanti PLC,defensive_rotation,1,99.37,5,,,27.1,60.4,1.19,,84.37,-15.1,-5.03,-1.33,-13.77,1,,,,,,,
 2026-11-10,AEM,Agnico Eagle Mines Limited,defensive_rotation,1,200.8,5,,,18.5,58.8,1.02,,170.81,-14.94,-4.98,-1.33,-13.61,1,,,,,,,
@@ -3607,24 +3607,24 @@ scan_date,ticker,company,strategy,strategies_count,price_at_scan,score,wr,avg,ad
 2026-11-10,HMY,Harmony Gold Mining Company Lim,defensive_rotation,1,17.6,5,,,19.6,56.5,1.01,,14.65,-16.76,-5.59,-1.33,-15.43,1,,,,,,,
 2026-11-10,DRD,DRDGOLD Limited,defensive_rotation,1,26.58,5,,,13.7,55.8,1.1,,22.04,-17.08,-5.69,-1.33,-15.75,1,,,,,,,
 2026-11-10,GFI,Gold Fields Limited,defensive_rotation,1,41.04,3,,,19.5,64.8,1.05,,35.16,-14.33,-4.78,-1.33,-13.0,1,,,,,,,
-2026-11-10,LGEINDIA.NS,LG ELECTRONICS INDIA LTD,cup_handle,2,1793.8,5,,,23.1,61.5,1.41,,1722.9,-3.95,-1.32,,,1,,,,,,,
-2026-11-10,ANTHEM.NS,ANTHEM BIOSCIENCES LTD,rs_line,1,958.15,5,,,24.9,91.1,3.55,,931.45,-2.79,-0.93,,,0,,,,,,,
-2026-11-10,CHENNPETRO.NS,CHENNAI PETROLEUM CORP LT,vcp,1,1460.9,4,,,19.1,55.4,0.37,,1424.0,-2.53,-0.84,,,0,,,,,,,
-2026-11-10,LENSKART.NS,LENSKART SOLUTIONS LTD,vcp,1,718.8,2,,,25.5,72.7,0.67,,734.7,2.21,0.74,,,0,,,,,,,
-2026-11-10,GAIL.NS,GAIL (INDIA) LTD,weinstein_stage2,1,188.0,5,,,30.7,77.4,2.01,,187.0,-0.53,-0.18,,,0,,,,,,,
-2026-11-10,GLAND.NS,GLAND PHARMA LIMITED,momentum_burst,1,3302.4,5,,,27.5,68.7,5.21,,3385.8999,2.53,0.84,,,0,,,,,,,
-2026-11-10,DIVISLAB.NS,DIVI S LABORATORIES LTD,momentum_burst,1,11565.5,4,,,30.8,91.2,3.25,,11080.0,-4.2,-1.4,,,1,,,,,,,
-2026-11-10,MANKIND.NS,MANKIND PHARMA LIMITED,momentum_burst,1,2668.3,4,,,27.1,79.5,1.9,,2626.6001,-1.56,-0.52,,,0,,,,,,,
-2026-11-10,LAURUSLABS.NS,LAURUS LABS LIMITED,momentum_burst,1,2454.0,4,,,28.4,75.4,1.7,,2220.0,-9.54,-3.18,,,1,,,,,,,
-2026-11-10,KALYANKJIL.NS,KALYAN JEWELLERS IND LTD,ma50_reclaim,1,611.0,5,,,26.2,64.4,2.33,,708.15,15.9,5.3,,,0,,,,,,,
-2026-11-10,MAHABANK.NS,BANK OF MAHARASHTRA,ma50_reclaim,1,87.68,5,,,16.4,63.5,1.55,,92.0,4.93,1.64,,,0,,,,,,,
-2026-11-10,LGEINDIA.NS,LG ELECTRONICS INDIA LTD,ma50_reclaim,2,1793.8,5,,,23.1,61.5,1.41,,1722.9,-3.95,-1.32,,,1,,,,,,,
-2026-11-10,IPCALAB.NS,IPCA LABORATORIES LTD,ma50_reclaim,1,1959.7,4,,,14.4,69.4,1.32,,1865.5,-4.81,-1.6,,,1,,,,,,,
-2026-11-10,HONASA.NS,HONASA CONSUMER LIMITED,ma50_reclaim,1,484.05,3,,,14.7,68.6,5.85,,501.25,3.55,1.18,,,0,,,,,,,
-2026-11-10,SANSERA.NS,SANSERA ENGINEERING LTD,ma50_reclaim,1,4653.4,3,,,14.7,66.5,2.8,,4763.6001,2.37,0.79,,,0,,,,,,,
+2026-11-10,LGEINDIA.NS,LG ELECTRONICS INDIA LTD,cup_handle,2,1793.8,5,,,23.1,61.5,1.41,,1722.9,-3.95,-1.32,,,1,1740.7,-2.96,-0.99,,,1,-6.79
+2026-11-10,ANTHEM.NS,ANTHEM BIOSCIENCES LTD,rs_line,1,958.15,5,,,24.9,91.1,3.55,,931.45,-2.79,-0.93,,,0,951.05,-0.74,-0.25,,,1,-5.28
+2026-11-10,CHENNPETRO.NS,CHENNAI PETROLEUM CORP LT,vcp,1,1460.9,4,,,19.1,55.4,0.37,,1424.0,-2.53,-0.84,,,0,1426.1,-2.38,-0.79,,,1,-5.01
+2026-11-10,LENSKART.NS,LENSKART SOLUTIONS LTD,vcp,1,718.8,2,,,25.5,72.7,0.67,,734.7,2.21,0.74,,,0,744.35,3.55,1.18,,,0,-2.41
+2026-11-10,GAIL.NS,GAIL (INDIA) LTD,weinstein_stage2,1,188.0,5,,,30.7,77.4,2.01,,187.0,-0.53,-0.18,,,0,191.44,1.83,0.61,,,0,-1.32
+2026-11-10,GLAND.NS,GLAND PHARMA LIMITED,momentum_burst,1,3302.4,5,,,27.5,68.7,5.21,,3385.8999,2.53,0.84,,,0,3331.8999,0.89,0.3,,,0,-2.84
+2026-11-10,DIVISLAB.NS,DIVI S LABORATORIES LTD,momentum_burst,1,11565.5,4,,,30.8,91.2,3.25,,11080.0,-4.2,-1.4,,,1,11180.5,-3.33,-1.11,,,1,-5.29
+2026-11-10,MANKIND.NS,MANKIND PHARMA LIMITED,momentum_burst,1,2668.3,4,,,27.1,79.5,1.9,,2626.6001,-1.56,-0.52,,,0,2665.0,-0.12,-0.04,,,1,-3.16
+2026-11-10,LAURUSLABS.NS,LAURUS LABS LIMITED,momentum_burst,1,2454.0,4,,,28.4,75.4,1.7,,2220.0,-9.54,-3.18,,,1,2294.6001,-6.5,-2.17,,,1,-10.76
+2026-11-10,KALYANKJIL.NS,KALYAN JEWELLERS IND LTD,ma50_reclaim,1,611.0,5,,,26.2,64.4,2.33,,708.15,15.9,5.3,,,0,638.7,4.53,1.51,,,0,0.98
+2026-11-10,MAHABANK.NS,BANK OF MAHARASHTRA,ma50_reclaim,1,87.68,5,,,16.4,63.5,1.55,,92.0,4.93,1.64,,,0,99.45,13.42,4.47,,,0,1.45
+2026-11-10,LGEINDIA.NS,LG ELECTRONICS INDIA LTD,ma50_reclaim,2,1793.8,5,,,23.1,61.5,1.41,,1722.9,-3.95,-1.32,,,1,1740.7,-2.96,-0.99,,,1,-6.79
+2026-11-10,IPCALAB.NS,IPCA LABORATORIES LTD,ma50_reclaim,1,1959.7,4,,,14.4,69.4,1.32,,1865.5,-4.81,-1.6,,,1,1843.8,-5.91,-1.97,,,1,-7.03
+2026-11-10,HONASA.NS,HONASA CONSUMER LIMITED,ma50_reclaim,1,484.05,3,,,14.7,68.6,5.85,,501.25,3.55,1.18,,,0,525.4,8.54,2.85,,,0,-2.27
+2026-11-10,SANSERA.NS,SANSERA ENGINEERING LTD,ma50_reclaim,1,4653.4,3,,,14.7,66.5,2.8,,4763.6001,2.37,0.79,,,0,4798.3999,3.12,1.04,,,1,-4.95
 2026-11-10,BLK,"BlackRock, Inc.",breakout,2,1217.44,5,,,22.9,61.0,0.51,,1197.97,-1.6,-0.53,-1.33,-0.27,0,,,,,,,
 2026-11-10,WSM,"Williams-Sonoma, Inc.",breakout,1,261.06,5,,,24.1,54.3,0.37,,252.05,-3.45,-1.15,-1.33,-2.12,1,,,,,,,
-2026-11-10,HSX.L,HISCOX LTD ORD 6.5P (DI),breakout,1,1926.0,5,,,17.4,61.4,0.73,,1966.0,2.08,0.69,,,0,,,,,,,
+2026-11-10,HSX.L,HISCOX LTD ORD 6.5P (DI),breakout,1,1926.0,5,,,17.4,61.4,0.73,,1966.0,2.08,0.69,,,0,1939.0,0.67,0.22,,,0,-0.73
 2026-11-10,ABBV,AbbVie Inc.,breakout,2,294.19,4,,,31.5,61.2,0.38,,294.55,0.12,0.04,-1.33,1.45,0,,,,,,,
 2026-11-10,BIIB,Biogen Inc.,breakout,2,253.71,4,,,29.2,59.2,0.32,,251.65,-0.81,-0.27,-1.33,0.52,0,,,,,,,
 2026-11-10,BBY,"Best Buy Co., Inc.",breakout,1,104.14,4,,,22.4,62.8,0.59,,103.35,-0.76,-0.25,-1.33,0.57,0,,,,,,,
@@ -3632,10 +3632,10 @@ scan_date,ticker,company,strategy,strategies_count,price_at_scan,score,wr,avg,ad
 2026-11-10,NTRS,Northern Trust Corporation,breakout,1,177.56,4,,,22.7,65.8,0.36,,175.45,-1.19,-0.4,-1.33,0.14,0,,,,,,,
 2026-11-10,MDLZ,"Mondelez International, Inc.",breakout,2,66.4,4,,,30.4,61.7,0.49,,67.54,1.72,0.57,-1.33,3.05,0,,,,,,,
 2026-11-10,RVTY,"Revvity, Inc.",breakout,2,159.77,4,,,24.3,52.7,0.39,,148.85,-6.83,-2.28,-1.33,-5.5,1,,,,,,,
-2026-11-10,DB1.DE,DEUTSCHE BOERSE AG            N,pocket_pivot,1,320.8,4,,,34.6,60.5,1.1,,329.4,2.68,0.89,,,0,,,,,,,
-2026-11-10,ML.PA,MICHELIN,pocket_pivot,1,33.72,4,,,17.0,82.1,1.05,,33.67,-0.15,-0.05,,,0,,,,,,,
-2026-11-10,LGEN.L,LEGAL & GENERAL GROUP PLC ORD 2,ema_ribbon,3,308.7,2,,,21.4,64.1,1.04,,307.9,-0.26,-0.09,,,0,,,,,,,
-2026-11-10,UU.L,UNITED UTILITIES GROUP PLC ORD ,ema_ribbon,1,1542.0,2,,,27.5,66.9,1.38,,1562.0,1.3,0.43,,,0,,,,,,,
+2026-11-10,DB1.DE,DEUTSCHE BOERSE AG            N,pocket_pivot,1,320.8,4,,,34.6,60.5,1.1,,329.4,2.68,0.89,,,0,316.5,-1.34,-0.45,,,0,-2.49
+2026-11-10,ML.PA,MICHELIN,pocket_pivot,1,33.72,4,,,17.0,82.1,1.05,,33.67,-0.15,-0.05,,,0,31.18,-7.53,-2.51,,,1,-8.07
+2026-11-10,LGEN.L,LEGAL & GENERAL GROUP PLC ORD 2,ema_ribbon,3,308.7,2,,,21.4,64.1,1.04,,307.9,-0.26,-0.09,,,0,292.285,-5.32,-1.77,,,1,-5.9
+2026-11-10,UU.L,UNITED UTILITIES GROUP PLC ORD ,ema_ribbon,1,1542.0,2,,,27.5,66.9,1.38,,1562.0,1.3,0.43,,,0,1518.0,-1.56,-0.52,,,0,-2.66
 2026-11-10,NDSN,Nordson Corporation,signal_velocity,1,324.86,12,,,13.8,45.5,0.44,,322.56,-0.71,-0.24,-1.33,0.62,0,,,,,,,
 2026-11-10,MET,"MetLife, Inc.",signal_velocity,2,102.66,11,,,18.1,52.4,0.56,,101.45,-1.18,-0.39,-1.33,0.15,0,,,,,,,
 2026-11-10,EMR,Emerson Electric Company,signal_velocity,1,167.96,10,,,9.7,55.9,0.46,,160.65,-4.35,-1.45,-1.33,-3.02,1,,,,,,,
@@ -3649,14 +3649,14 @@ scan_date,ticker,company,strategy,strategies_count,price_at_scan,score,wr,avg,ad
 2026-11-10,MET,"MetLife, Inc.",cup_handle,2,102.66,5,,,18.1,52.4,0.56,,101.45,-1.18,-0.39,-1.33,0.15,0,,,,,,,
 2026-11-10,PKG,Packaging Corporation of Americ,cup_handle,1,254.49,5,,,24.2,63.5,0.37,,250.47,-1.58,-0.53,-1.33,-0.25,0,,,,,,,
 2026-11-10,MDLZ,"Mondelez International, Inc.",cup_handle,2,66.4,5,,,30.4,61.7,0.49,,67.54,1.72,0.57,-1.33,3.05,0,,,,,,,
-2026-11-10,LGEN.L,LEGAL & GENERAL GROUP PLC ORD 2,cup_handle,3,308.7,5,,,21.4,64.1,1.04,,307.9,-0.26,-0.09,,,0,,,,,,,
+2026-11-10,LGEN.L,LEGAL & GENERAL GROUP PLC ORD 2,cup_handle,3,308.7,5,,,21.4,64.1,1.04,,307.9,-0.26,-0.09,,,0,292.285,-5.32,-1.77,,,1,-5.9
 2026-11-10,ABBV,AbbVie Inc.,cup_handle,2,294.19,4,,,31.5,61.2,0.38,,294.55,0.12,0.04,-1.33,1.45,0,,,,,,,
-2026-11-10,DCC.L,DCC ENERGY PLC ORD EUR0.25 (CDI,cup_handle,2,6460.0,4,,,25.9,61.1,0.49,,6455.0,-0.08,-0.03,,,0,,,,,,,
-2026-11-10,LGEN.L,LEGAL & GENERAL GROUP PLC ORD 2,vcp,3,308.7,5,,,21.4,64.1,1.04,,307.9,-0.26,-0.09,,,0,,,,,,,
+2026-11-10,DCC.L,DCC ENERGY PLC ORD EUR0.25 (CDI,cup_handle,2,6460.0,4,,,25.9,61.1,0.49,,6455.0,-0.08,-0.03,,,0,6455.0,-0.08,-0.03,,,0,-0.15
+2026-11-10,LGEN.L,LEGAL & GENERAL GROUP PLC ORD 2,vcp,3,308.7,5,,,21.4,64.1,1.04,,307.9,-0.26,-0.09,,,0,292.285,-5.32,-1.77,,,1,-5.9
 2026-11-10,GM,General Motors Company,weinstein_stage2,1,88.68,4,,,26.4,69.2,1.4,,83.67,-5.65,-1.88,-1.33,-4.32,1,,,,,,,
-2026-11-10,MKS.L,MARKS AND SPENCER GROUP PLC ORD,momentum_burst,1,455.4,5,,,31.6,66.4,1.5,,471.4,3.51,1.17,,,0,,,,,,,
-2026-11-10,BNR.DE,Brenntag SE                   N,ma50_reclaim,1,61.6,5,,,14.7,43.6,1.2,,57.92,-5.97,-1.99,,,1,,,,,,,
-2026-11-10,DCC.L,DCC ENERGY PLC ORD EUR0.25 (CDI,three_weeks_tight,2,6460.0,4,,,25.9,61.1,0.49,,6455.0,-0.08,-0.03,,,0,,,,,,,
+2026-11-10,MKS.L,MARKS AND SPENCER GROUP PLC ORD,momentum_burst,1,455.4,5,,,31.6,66.4,1.5,,471.4,3.51,1.17,,,0,458.4,0.66,0.22,,,1,-4.9
+2026-11-10,BNR.DE,Brenntag SE                   N,ma50_reclaim,1,61.6,5,,,14.7,43.6,1.2,,57.92,-5.97,-1.99,,,1,57.36,-6.88,-2.29,,,1,-7.82
+2026-11-10,DCC.L,DCC ENERGY PLC ORD EUR0.25 (CDI,three_weeks_tight,2,6460.0,4,,,25.9,61.1,0.49,,6455.0,-0.08,-0.03,,,0,6455.0,-0.08,-0.03,,,0,-0.15
 2026-11-10,XYZ,"Block, Inc.",episodic_pivot,1,85.22,5,,,22.6,60.5,0.61,,82.96,-2.65,-0.88,-1.33,-1.32,0,,,,,,,
 2026-11-10,CPAY,"Corpay, Inc.",episodic_pivot,1,460.13,4,,,23.5,77.3,0.45,,461.73,0.35,0.12,-1.33,1.68,0,,,,,,,
 2026-11-11,ACUTAAS.NS,ACUTAAS CHEMICALS LIMITED,breakout,1,3916.9,4,,,26.3,74.3,0.57,,3947.3,0.78,0.26,,,0,,,,,,,
@@ -3974,3 +3974,24 @@ scan_date,ticker,company,strategy,strategies_count,price_at_scan,score,wr,avg,ad
 2026-11-19,ERF.PA,EUROFINS SCIENT.,raschke_8020,1,85.66,4,,,33.6,38.6,1.5,,,,,,,,,,,,,,
 2026-11-19,OKTA,"Okta, Inc.",ma50_reclaim,2,206.85,5,,,23.8,49.3,1.2,,,,,,,,,,,,,,
 2026-11-19,DCC.L,DCC ENERGY PLC ORD EUR0.25 (CDI,three_weeks_tight,1,6455.0,4,,,33.2,58.3,1.84,,,,,,,,,,,,,,
+2026-11-20,GLAND.NS,GLAND PHARMA LIMITED,breakout,1,3331.9,4,,,33.3,66.6,0.66,,,,,,,,,,,,,,
+2026-11-20,NUVAMA.NS,NUVAMA WEALTH MANAGE LTD,breakout,1,1820.8,4,,,18.4,59.6,0.49,,,,,,,,,,,,,,
+2026-11-20,SONACOMS.NS,SONA BLW PRECISION FRGS L,breakout,1,892.5,4,,,24.7,50.7,0.34,,,,,,,,,,,,,,
+2026-11-20,LALPATHLAB.NS,DR. LAL PATH LABS LTD.,pocket_pivot,1,2006.0,5,,,25.1,62.6,0.89,,,,,,,,,,,,,,
+2026-11-20,MEDANTA.NS,GLOBAL HEALTH LIMITED,pocket_pivot,1,1480.2,4,,,33.5,85.6,0.88,,,,,,,,,,,,,,
+2026-11-20,KPRMILL.NS,KPR MILL LTD.,ema_ribbon,1,1191.3,3,,,30.1,70.9,1.69,,,,,,,,,,,,,,
+2026-11-20,KAJARIACER.NS,KAJARIA CERAMICS LTD,signal_velocity,1,1200.5,12,,,15.3,69.3,0.45,,,,,,,,,,,,,,
+2026-11-20,DUK,Duke Energy Corporation (Holdin,defensive_rotation,1,128.86,5,,,46.3,58.3,0.88,,,,,,,,,,,,,,
+2026-11-20,LGEINDIA.NS,LG ELECTRONICS INDIA LTD,cup_handle,1,1740.7,5,,,21.2,60.2,2.59,,,,,,,,,,,,,,
+2026-11-20,VIJAYA.NS,VIJAYA DIAGNOSTIC CEN LTD,rs_line,3,1572.3,5,,,18.1,65.3,2.65,,,,,,,,,,,,,,
+2026-11-20,PAYTM.NS,ONE 97 COMMUNICATIONS LTD,rs_line,1,1740.0,5,,,27.1,59.2,1.6,,,,,,,,,,,,,,
+2026-11-20,HONASA.NS,HONASA CONSUMER LIMITED,vcp,1,525.4,4,,,28.2,83.6,0.75,,,,,,,,,,,,,,
+2026-11-20,MEESHO.NS,MEESHO LIMITED,vcp,1,259.92,3,,,29.2,86.6,2.05,,,,,,,,,,,,,,
+2026-11-20,VIJAYA.NS,VIJAYA DIAGNOSTIC CEN LTD,raschke_8020,3,1572.3,4,,,18.1,65.3,2.65,,,,,,,,,,,,,,
+2026-11-20,WELSPUNLIV.NS,WELSPUN LIVING LIMITED,raschke_8020,2,268.78,4,,,34.8,67.1,1.78,,,,,,,,,,,,,,
+2026-11-20,GAIL.NS,GAIL (INDIA) LTD,weinstein_stage2,1,191.44,4,,,37.4,87.1,2.01,,,,,,,,,,,,,,
+2026-11-20,BAJFINANCE.NS,BAJAJ FINANCE LIMITED,weinstein_stage2,1,1122.0,4,,,36.9,80.6,2.1,,,,,,,,,,,,,,
+2026-11-20,CUB.NS,CITY UNION BANK LTD,momentum_burst,1,248.8,4,,,17.4,79.8,4.27,,,,,,,,,,,,,,
+2026-11-20,WELSPUNLIV.NS,WELSPUN LIVING LIMITED,momentum_burst,2,268.78,5,,,34.8,67.1,1.78,,,,,,,,,,,,,,
+2026-11-20,PWL.NS,PHYSICSWALLAH LIMITED,ma50_reclaim,1,136.6,5,,,15.8,62.3,1.62,,,,,,,,,,,,,,
+2026-11-20,VIJAYA.NS,VIJAYA DIAGNOSTIC CEN LTD,ma50_reclaim,3,1572.3,4,,,18.1,65.3,2.65,,,,,,,,,,,,,,
