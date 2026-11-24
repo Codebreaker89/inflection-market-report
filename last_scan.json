@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-11-20",
+  "scan_date": "2026-11-24",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -37,41 +37,7 @@
     "hv_breakout"
   ],
   "results_by_strategy": {
-    "breakout": [
-      {
-        "ticker": "DGE.L",
-        "mkt": "UK",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "NearPiv",
-          "RSIbase",
-          "RS~ok",
-          "RngTght"
-        ],
-        "minervini": 8,
-        "rsi": 60.5,
-        "adx": 25.7,
-        "price": 1880.0,
-        "vol_ratio": 0.93,
-        "atr_ratio": 1.01,
-        "vol_5d_ratio": 1.03,
-        "pivot_high": 1940.5,
-        "pct_from_piv": -3.1,
-        "strategy": "breakout",
-        "company": "DIAGEO PLC ORD 28 101/108P"
-      }
-    ],
+    "breakout": [],
     "pocket_pivot": [
       {
         "ticker": "SJM",
@@ -90,10 +56,10 @@
         "rsi": 56.1,
         "adx": 29.1,
         "price": 133.68,
-        "vol_ratio": 1.04,
+        "vol_ratio": 1.07,
         "hold_days": 7,
         "strategy": "pocket_pivot",
-        "rs_vs_spy": 9.53,
+        "rs_vs_spy": null,
         "company": "The J.M. Smucker Company"
       }
     ],
@@ -114,10 +80,10 @@
         "rsi": 56.1,
         "adx": 29.1,
         "price": 133.68,
-        "vol_ratio": 1.04,
+        "vol_ratio": 1.07,
         "hold_days": 7,
         "strategy": "ema_ribbon",
-        "rs_vs_spy": 9.53,
+        "rs_vs_spy": null,
         "company": "The J.M. Smucker Company"
       }
     ],
@@ -172,7 +138,7 @@
         ],
         "rsi": 69.9,
         "adx": 48.1,
-        "vol_ratio": 0.91,
+        "vol_ratio": 0.92,
         "minervini": 5,
         "price": 212.78,
         "rs_vs_spy": 6.61,
@@ -200,7 +166,7 @@
         ],
         "rsi": 62.8,
         "adx": 37.6,
-        "vol_ratio": 1.11,
+        "vol_ratio": 1.13,
         "minervini": 5,
         "price": 367.13,
         "rs_vs_spy": 6.34,
@@ -256,43 +222,15 @@
         ],
         "rsi": 56.1,
         "adx": 29.1,
-        "vol_ratio": 1.04,
+        "vol_ratio": 1.07,
         "minervini": 5,
         "price": 133.68,
-        "rs_vs_spy": 9.53,
+        "rs_vs_spy": null,
         "rs_vs_sector": 2.85,
         "mkt": "US",
         "hold_days": 10,
         "strategy": "defensive_rotation",
         "company": "The J.M. Smucker Company"
-      },
-      {
-        "ticker": "PG",
-        "sector": "Consumer Staples",
-        "sector_etf": "XLP",
-        "score": 5,
-        "fresh": [
-          "ROT:XLP",
-          "ETF+6.61%vsS&P"
-        ],
-        "conf": [
-          "RS+8.6%",
-          "vsETF+2.0%",
-          ">SMA200",
-          "52wHI",
-          "M\u22653"
-        ],
-        "rsi": 61.6,
-        "adx": 40.2,
-        "vol_ratio": 1.17,
-        "minervini": 5,
-        "price": 169.37,
-        "rs_vs_spy": 8.59,
-        "rs_vs_sector": 1.98,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "Procter & Gamble Company (The)"
       },
       {
         "ticker": "CL",
@@ -432,6 +370,33 @@
         "company": "Avista Corporation"
       },
       {
+        "ticker": "EVRG",
+        "sector": "Utilities",
+        "sector_etf": "XLU",
+        "score": 4,
+        "fresh": [
+          "ROT:XLU",
+          "ETF+5.17%vsS&P"
+        ],
+        "conf": [
+          "RS+5.2%",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 50.7,
+        "adx": 23.9,
+        "vol_ratio": 0.95,
+        "minervini": 5,
+        "price": 85.93,
+        "rs_vs_spy": 5.17,
+        "rs_vs_sector": 0.01,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "Evergy, Inc."
+      },
+      {
         "ticker": "HCA",
         "sector": "Healthcare",
         "sector_etf": "XLV",
@@ -487,7 +452,7 @@
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "rs_vs_spy": 7.88,
+        "rs_vs_spy": null,
         "company": "Arthur J. Gallagher & Co."
       },
       {
@@ -535,7 +500,7 @@
         ],
         "rsi": 50.6,
         "adx": 22.6,
-        "vol_ratio": 0.96,
+        "vol_ratio": 0.97,
         "minervini": 8,
         "price": 249.59,
         "cup_depth_pct": 32.4,
@@ -564,7 +529,7 @@
         ],
         "rsi": 56.1,
         "adx": 29.1,
-        "vol_ratio": 1.04,
+        "vol_ratio": 1.07,
         "minervini": 8,
         "price": 133.68,
         "cup_depth_pct": 34.4,
@@ -576,7 +541,7 @@
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "rs_vs_spy": 9.53,
+        "rs_vs_spy": null,
         "company": "The J.M. Smucker Company"
       }
     ],
@@ -615,7 +580,7 @@
         "spread_pct": 1.32,
         "hold_days": 7,
         "strategy": "three_weeks_tight",
-        "rs_vs_spy": 7.88,
+        "rs_vs_spy": null,
         "company": "Arthur J. Gallagher & Co."
       }
     ],
