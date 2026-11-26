@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-11-25",
+  "scan_date": "2026-11-26",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -39,6 +39,42 @@
   "results_by_strategy": {
     "breakout": [
       {
+        "ticker": "EZJ.L",
+        "mkt": "UK",
+        "score": 5,
+        "phase": "COIL",
+        "coil_sigs": [
+          "VOLdry",
+          "NearPiv",
+          "ADXcurl",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "VOLdry",
+          "NearPiv",
+          "ADXcurl",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 73.2,
+        "adx": 23.3,
+        "price": 691.0,
+        "vol_ratio": 1.54,
+        "atr_ratio": 0.92,
+        "vol_5d_ratio": 0.59,
+        "pivot_high": 691.0,
+        "pct_from_piv": 0.0,
+        "strategy": "breakout",
+        "rs_vs_spy": 5.48,
+        "company": "EASYJET PLC ORD 27 2/7P"
+      },
+      {
         "ticker": "ABBV",
         "mkt": "US",
         "score": 4,
@@ -71,6 +107,40 @@
         "strategy": "breakout",
         "rs_vs_spy": 5.35,
         "company": "AbbVie Inc."
+      },
+      {
+        "ticker": "UU.L",
+        "mkt": "UK",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "ADXcurl",
+          "RSIbase",
+          "RS~ok"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "NearPiv",
+          "ADXcurl",
+          "RSIbase",
+          "RS~ok"
+        ],
+        "minervini": 8,
+        "rsi": 57.8,
+        "adx": 23.4,
+        "price": 1572.0,
+        "vol_ratio": 0.61,
+        "atr_ratio": 0.98,
+        "vol_5d_ratio": 1.05,
+        "pivot_high": 1581.0,
+        "pct_from_piv": -0.6,
+        "strategy": "breakout",
+        "rs_vs_spy": 4.77,
+        "company": "UNITED UTILITIES GROUP PLC ORD "
       }
     ],
     "pocket_pivot": [
@@ -98,7 +168,7 @@
         "company": "Arthur J. Gallagher & Co."
       },
       {
-        "ticker": "DGE.L",
+        "ticker": "REL.L",
         "mkt": "UK",
         "score": 5,
         "fresh": [
@@ -106,92 +176,66 @@
         ],
         "conf": [
           "RSI45-70",
-          "VOL1.5x",
+          "ADX\u2191",
           "Near52H",
           "EMA9>21"
         ],
         "minervini": 8,
-        "rsi": 61.0,
-        "adx": 22.9,
-        "price": 1934.0,
-        "vol_ratio": 2.41,
+        "rsi": 59.2,
+        "adx": 20.6,
+        "price": 3103.0,
+        "vol_ratio": 1.37,
         "hold_days": 7,
         "strategy": "pocket_pivot",
-        "rs_vs_spy": 7.15,
-        "company": "DIAGEO PLC ORD 28 101/108P"
+        "company": "RELX PLC ORD 14 51/116P"
       },
       {
-        "ticker": "ZAL.DE",
-        "mkt": "DE",
+        "ticker": "EZJ.L",
+        "mkt": "UK",
         "score": 4,
         "fresh": [
           "PP"
         ],
         "conf": [
-          "RSI45-70",
+          "VOL1.5x",
           "Near52H",
           "EMA9>21"
         ],
         "minervini": 8,
-        "rsi": 60.9,
-        "adx": 23.5,
-        "price": 29.07,
-        "vol_ratio": 0.84,
+        "rsi": 73.2,
+        "adx": 23.3,
+        "price": 691.0,
+        "vol_ratio": 1.54,
         "hold_days": 7,
         "strategy": "pocket_pivot",
-        "company": "Zalando SE                    I"
+        "rs_vs_spy": 5.48,
+        "company": "EASYJET PLC ORD 27 2/7P"
       }
     ],
     "connors_rsi2": [
       {
-        "ticker": "CRDA.L",
-        "mkt": "UK",
-        "score": 3,
+        "ticker": "HAS",
+        "mkt": "US",
+        "score": 1,
         "fresh": [
           "RSI2=0.0"
         ],
         "conf": [
-          "RSI14>40",
-          "ADX>20",
-          "Near52H"
+          "ADX>20"
         ],
         "minervini": 8,
-        "rsi": 59.9,
+        "rsi": 32.5,
         "rsi2": 0.0,
-        "adx": 41.9,
-        "price": 3775.0,
-        "vol_ratio": 1.96,
+        "adx": 42.1,
+        "price": 110.58,
+        "vol_ratio": 1.5,
         "hold_days": 5,
         "strategy": "connors_rsi2",
-        "company": "CRODA INTERNATIONAL PLC ORD 10."
+        "company": "Hasbro, Inc."
       }
     ],
     "ema_ribbon": [],
-    "nr7": [
-      {
-        "ticker": "CPG.L",
-        "score": 4,
-        "fresh": [
-          "NR7"
-        ],
-        "conf": [
-          "VOL>avg",
-          "RSI50-70",
-          "ADX>20",
-          "M\u22656"
-        ],
-        "minervini": 8,
-        "rsi": 66.2,
-        "adx": 29.5,
-        "price": 35.79,
-        "vol_ratio": 1.69,
-        "compression": 0.031,
-        "hold_days": 3,
-        "mkt": "UK",
-        "strategy": "nr7",
-        "company": "COMPASS GROUP PLC ORD 11 1/20P"
-      }
-    ],
+    "nr7": [],
     "analyst_upgrade": [],
     "signal_velocity": [
       {
@@ -208,7 +252,7 @@
         "rsi": 51.5,
         "adx": 19.9,
         "price": 51.16,
-        "vol_ratio": 1.03,
+        "vol_ratio": 1.04,
         "net_score": 8,
         "velocity": 11,
         "hold_days": 5,
@@ -319,7 +363,7 @@
         "rsi": 54.3,
         "adx": 21.6,
         "price": 314.26,
-        "vol_ratio": 0.73,
+        "vol_ratio": 0.76,
         "net_score": 7,
         "velocity": 8,
         "hold_days": 5,
@@ -353,6 +397,34 @@
     "chokepoint_inflection": [],
     "defensive_rotation": [
       {
+        "ticker": "DGE.L",
+        "sector": "EU Consumer Staples",
+        "sector_etf": "EXH3.DE",
+        "score": 5,
+        "fresh": [
+          "ROT:EXH3.DE",
+          "ETF+5.9%vsS&P"
+        ],
+        "conf": [
+          "RS+8.8%",
+          "vsETF+2.2%",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 61.4,
+        "adx": 22.6,
+        "vol_ratio": 1.16,
+        "minervini": 5,
+        "price": 1948.0,
+        "rs_vs_spy": 6.72,
+        "rs_vs_sector": 2.2,
+        "mkt": "UK",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "DIAGEO PLC ORD 28 101/108P"
+      },
+      {
         "ticker": "JNJ",
         "sector": "Healthcare",
         "sector_etf": "XLV",
@@ -370,7 +442,7 @@
         ],
         "rsi": 53.0,
         "adx": 19.1,
-        "vol_ratio": 1.01,
+        "vol_ratio": 1.09,
         "minervini": 5,
         "price": 273.94,
         "rs_vs_spy": 3.85,
@@ -379,6 +451,34 @@
         "hold_days": 10,
         "strategy": "defensive_rotation",
         "company": "Johnson & Johnson"
+      },
+      {
+        "ticker": "NESN.SW",
+        "sector": "EU Consumer Staples",
+        "sector_etf": "EXH3.DE",
+        "score": 5,
+        "fresh": [
+          "ROT:EXH3.DE",
+          "ETF+5.9%vsS&P"
+        ],
+        "conf": [
+          "RS+7.1%",
+          "vsETF+0.5%",
+          ">SMA200",
+          "52wHI",
+          "M\u22653"
+        ],
+        "rsi": 57.8,
+        "adx": 34.0,
+        "vol_ratio": 0.89,
+        "minervini": 5,
+        "price": 87.65,
+        "rs_vs_spy": 7.12,
+        "rs_vs_sector": 0.55,
+        "mkt": "US",
+        "hold_days": 10,
+        "strategy": "defensive_rotation",
+        "company": "NESTLE N"
       },
       {
         "ticker": "BSX",
@@ -405,31 +505,6 @@
         "hold_days": 10,
         "strategy": "defensive_rotation",
         "company": "Boston Scientific Corporation"
-      },
-      {
-        "ticker": "GSK.L",
-        "sector": "Healthcare",
-        "sector_etf": "XLV",
-        "score": 2,
-        "fresh": [
-          "ROT:XLV",
-          "ETF+2.88%vsS&P"
-        ],
-        "conf": [
-          "RS+7.4%",
-          "vsETF+4.5%"
-        ],
-        "rsi": 55.0,
-        "adx": 20.6,
-        "vol_ratio": 0.82,
-        "minervini": 2,
-        "price": 1919.5,
-        "rs_vs_spy": 7.41,
-        "rs_vs_sector": 4.52,
-        "mkt": "UK",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "GSK PLC ORD 31 1/4P"
       }
     ],
     "cup_handle": [
@@ -465,65 +540,63 @@
         "company": "Arthur J. Gallagher & Co."
       },
       {
-        "ticker": "DGE.L",
-        "score": 5,
-        "fresh": [
-          "C&H",
-          "PIV@1940.5"
-        ],
-        "conf": [
-          "CUP29.1%",
-          "HDL3.9%",
-          "RSI50-70",
-          "M\u22656",
-          "VOL1.5x"
-        ],
-        "rsi": 61.0,
-        "adx": 22.9,
-        "vol_ratio": 2.41,
-        "minervini": 8,
-        "price": 1934.0,
-        "cup_depth_pct": 29.1,
-        "cup_duration": 192,
-        "handle_depth_pct": 3.9,
-        "handle_duration": 8,
-        "pivot": 1940.5,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "UK",
-        "strategy": "cup_handle",
-        "rs_vs_spy": 7.15,
-        "company": "DIAGEO PLC ORD 28 101/108P"
-      },
-      {
-        "ticker": "CSX",
+        "ticker": "DHR",
         "score": 4,
         "fresh": [
           "C&H",
-          "PIV@52.4"
+          "PIV@229.09"
         ],
         "conf": [
-          "CUP28.5%",
-          "HDL6.3%",
+          "CUP31.9%",
+          "HDL3.8%",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 51.5,
-        "adx": 19.9,
-        "vol_ratio": 1.03,
+        "rsi": 51.2,
+        "adx": 18.5,
+        "vol_ratio": 0.73,
         "minervini": 8,
-        "price": 51.16,
-        "cup_depth_pct": 28.5,
-        "cup_duration": 179,
-        "handle_depth_pct": 6.3,
-        "handle_duration": 21,
-        "pivot": 52.4,
+        "price": 227.35,
+        "cup_depth_pct": 31.9,
+        "cup_duration": 195,
+        "handle_depth_pct": 3.8,
+        "handle_duration": 5,
+        "pivot": 229.09,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "rs_vs_spy": 2.97,
-        "company": "CSX Corporation"
+        "rs_vs_spy": 3.27,
+        "company": "Danaher Corporation"
+      },
+      {
+        "ticker": "MA",
+        "score": 4,
+        "fresh": [
+          "C&H",
+          "PIV@659.97"
+        ],
+        "conf": [
+          "CUP30.1%",
+          "HDL5.2%",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 52.0,
+        "adx": 29.0,
+        "vol_ratio": 1.08,
+        "minervini": 8,
+        "price": 659.97,
+        "cup_depth_pct": 30.1,
+        "cup_duration": 195,
+        "handle_depth_pct": 5.2,
+        "handle_duration": 5,
+        "pivot": 659.97,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "company": "Mastercard Incorporated"
       },
       {
         "ticker": "ABBV",
@@ -556,94 +629,6 @@
         "company": "AbbVie Inc."
       },
       {
-        "ticker": "AMGN",
-        "score": 4,
-        "fresh": [
-          "C&H",
-          "PIV@473.94"
-        ],
-        "conf": [
-          "CUP33.2%",
-          "HDL8.1%",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 57.2,
-        "adx": 28.5,
-        "vol_ratio": 1.15,
-        "minervini": 8,
-        "price": 469.24,
-        "cup_depth_pct": 33.2,
-        "cup_duration": 195,
-        "handle_depth_pct": 8.1,
-        "handle_duration": 5,
-        "pivot": 473.94,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "company": "Amgen Inc."
-      },
-      {
-        "ticker": "MMM",
-        "score": 4,
-        "fresh": [
-          "C&H",
-          "PIV@193.14"
-        ],
-        "conf": [
-          "CUP23.6%",
-          "HDL10.9%",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 54.8,
-        "adx": 29.7,
-        "vol_ratio": 1.18,
-        "minervini": 8,
-        "price": 189.83,
-        "cup_depth_pct": 23.6,
-        "cup_duration": 179,
-        "handle_depth_pct": 10.9,
-        "handle_duration": 21,
-        "pivot": 193.14,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "company": "3M Company"
-      },
-      {
-        "ticker": "DHR",
-        "score": 4,
-        "fresh": [
-          "C&H",
-          "PIV@229.09"
-        ],
-        "conf": [
-          "CUP31.9%",
-          "HDL3.8%",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 51.2,
-        "adx": 18.5,
-        "vol_ratio": 0.73,
-        "minervini": 8,
-        "price": 227.35,
-        "cup_depth_pct": 31.9,
-        "cup_duration": 195,
-        "handle_depth_pct": 3.8,
-        "handle_duration": 5,
-        "pivot": 229.09,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "rs_vs_spy": 3.27,
-        "company": "Danaher Corporation"
-      },
-      {
         "ticker": "FAST",
         "score": 4,
         "fresh": [
@@ -673,33 +658,33 @@
         "company": "Fastenal Company"
       },
       {
-        "ticker": "MA",
+        "ticker": "MMM",
         "score": 4,
         "fresh": [
           "C&H",
-          "PIV@659.97"
+          "PIV@193.14"
         ],
         "conf": [
-          "CUP30.1%",
-          "HDL5.2%",
+          "CUP23.6%",
+          "HDL10.9%",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 52.0,
-        "adx": 29.0,
-        "vol_ratio": 1.08,
+        "rsi": 54.8,
+        "adx": 29.7,
+        "vol_ratio": 1.19,
         "minervini": 8,
-        "price": 659.97,
-        "cup_depth_pct": 30.1,
-        "cup_duration": 195,
-        "handle_depth_pct": 5.2,
-        "handle_duration": 5,
-        "pivot": 659.97,
+        "price": 189.83,
+        "cup_depth_pct": 23.6,
+        "cup_duration": 179,
+        "handle_depth_pct": 10.9,
+        "handle_duration": 21,
+        "pivot": 193.14,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "company": "Mastercard Incorporated"
+        "company": "3M Company"
       },
       {
         "ticker": "NDAQ",
@@ -731,6 +716,65 @@
         "company": "Nasdaq, Inc."
       },
       {
+        "ticker": "CSX",
+        "score": 4,
+        "fresh": [
+          "C&H",
+          "PIV@52.4"
+        ],
+        "conf": [
+          "CUP28.5%",
+          "HDL6.3%",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 51.5,
+        "adx": 19.9,
+        "vol_ratio": 1.04,
+        "minervini": 8,
+        "price": 51.16,
+        "cup_depth_pct": 28.5,
+        "cup_duration": 179,
+        "handle_depth_pct": 6.3,
+        "handle_duration": 21,
+        "pivot": 52.4,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "rs_vs_spy": 2.97,
+        "company": "CSX Corporation"
+      },
+      {
+        "ticker": "AMGN",
+        "score": 4,
+        "fresh": [
+          "C&H",
+          "PIV@473.94"
+        ],
+        "conf": [
+          "CUP33.2%",
+          "HDL8.1%",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 57.2,
+        "adx": 28.5,
+        "vol_ratio": 1.16,
+        "minervini": 8,
+        "price": 469.24,
+        "cup_depth_pct": 33.2,
+        "cup_duration": 195,
+        "handle_depth_pct": 8.1,
+        "handle_duration": 5,
+        "pivot": 473.94,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "company": "Amgen Inc."
+      },
+      {
         "ticker": "V",
         "score": 4,
         "fresh": [
@@ -745,7 +789,7 @@
         ],
         "rsi": 52.0,
         "adx": 27.6,
-        "vol_ratio": 0.89,
+        "vol_ratio": 0.9,
         "minervini": 8,
         "price": 424.39,
         "cup_depth_pct": 32.6,
@@ -760,37 +804,95 @@
         "company": "Visa Inc."
       },
       {
-        "ticker": "LAND.L",
+        "ticker": "DGE.L",
         "score": 4,
         "fresh": [
           "C&H",
-          "PIV@697.0"
+          "PIV@1948.0"
         ],
         "conf": [
-          "CUP26.3%",
-          "HDL0.9%",
+          "CUP27.3%",
+          "HDL4.3%",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 56.6,
-        "adx": 31.1,
-        "vol_ratio": 0.64,
+        "rsi": 61.4,
+        "adx": 22.6,
+        "vol_ratio": 1.16,
         "minervini": 8,
-        "price": 697.0,
-        "cup_depth_pct": 26.3,
-        "cup_duration": 195,
-        "handle_depth_pct": 0.9,
-        "handle_duration": 5,
-        "pivot": 697.0,
+        "price": 1948.0,
+        "cup_depth_pct": 27.3,
+        "cup_duration": 185,
+        "handle_depth_pct": 4.3,
+        "handle_duration": 15,
+        "pivot": 1948.0,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "UK",
         "strategy": "cup_handle",
-        "company": "LAND SECURITIES GROUP PLC ORD 1"
+        "rs_vs_spy": 6.72,
+        "company": "DIAGEO PLC ORD 28 101/108P"
+      },
+      {
+        "ticker": "UU.L",
+        "score": 4,
+        "fresh": [
+          "C&H",
+          "PIV@1581.0"
+        ],
+        "conf": [
+          "CUP19.9%",
+          "HDL4.6%",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 57.8,
+        "adx": 23.4,
+        "vol_ratio": 0.61,
+        "minervini": 8,
+        "price": 1572.0,
+        "cup_depth_pct": 19.9,
+        "cup_duration": 185,
+        "handle_depth_pct": 4.6,
+        "handle_duration": 15,
+        "pivot": 1581.0,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "UK",
+        "strategy": "cup_handle",
+        "rs_vs_spy": 4.77,
+        "company": "UNITED UTILITIES GROUP PLC ORD "
       }
     ],
     "darvas_box": [],
-    "rs_line": [],
+    "rs_line": [
+      {
+        "ticker": "EZJ.L",
+        "score": 5,
+        "fresh": [
+          "RS-NEW-HIGH"
+        ],
+        "conf": [
+          "RS_LEADS",
+          "NEAR_HIGH",
+          "VOL\u22651.5x",
+          "ADX>20",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 73.2,
+        "adx": 23.3,
+        "price": 691.0,
+        "vol_ratio": 1.54,
+        "rs_lead_days": 4,
+        "pct_from_high": 0.0,
+        "hold_days": 7,
+        "strategy": "rs_line",
+        "mkt": "UK",
+        "rs_vs_spy": 5.48,
+        "company": "EASYJET PLC ORD 27 2/7P"
+      }
+    ],
     "vcp": [
       {
         "ticker": "DHR",
@@ -838,7 +940,7 @@
         "rsi": 48.0,
         "adx": 24.8,
         "price": 1664.55,
-        "vol_ratio": 1.43,
+        "vol_ratio": 1.44,
         "prior_20d_low": 1660.08,
         "hold_days": 3,
         "mkt": "US",
