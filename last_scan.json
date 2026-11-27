@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-11-26",
+  "scan_date": "2026-11-27",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -39,14 +39,13 @@
   "results_by_strategy": {
     "breakout": [
       {
-        "ticker": "EZJ.L",
-        "mkt": "UK",
-        "score": 5,
+        "ticker": "ABBV",
+        "mkt": "US",
+        "score": 4,
         "phase": "COIL",
         "coil_sigs": [
-          "VOLdry",
           "NearPiv",
-          "ADXcurl",
+          "RSIbase",
           "RS~ok",
           "RngTght"
         ],
@@ -55,27 +54,26 @@
           "COIL"
         ],
         "conf": [
-          "VOLdry",
           "NearPiv",
-          "ADXcurl",
+          "RSIbase",
           "RS~ok",
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 73.2,
-        "adx": 23.3,
-        "price": 691.0,
-        "vol_ratio": 1.54,
-        "atr_ratio": 0.92,
-        "vol_5d_ratio": 0.59,
-        "pivot_high": 691.0,
-        "pct_from_piv": 0.0,
+        "rsi": 50.7,
+        "adx": 24.5,
+        "price": 291.88,
+        "vol_ratio": 0.73,
+        "atr_ratio": 0.99,
+        "vol_5d_ratio": 1.14,
+        "pivot_high": 300.28,
+        "pct_from_piv": -2.8,
         "strategy": "breakout",
-        "rs_vs_spy": 5.48,
-        "company": "EASYJET PLC ORD 27 2/7P"
+        "rs_vs_spy": 2.39,
+        "company": "AbbVie Inc."
       },
       {
-        "ticker": "ABBV",
+        "ticker": "BBY",
         "mkt": "US",
         "score": 4,
         "phase": "COIL",
@@ -96,17 +94,318 @@
           "RS~ok"
         ],
         "minervini": 8,
-        "rsi": 57.4,
-        "adx": 25.0,
-        "price": 294.48,
-        "vol_ratio": 1.08,
-        "atr_ratio": 0.98,
-        "vol_5d_ratio": 1.09,
-        "pivot_high": 300.28,
-        "pct_from_piv": -1.9,
+        "rsi": 57.5,
+        "adx": 18.8,
+        "price": 104.18,
+        "vol_ratio": 0.49,
+        "atr_ratio": 1.04,
+        "vol_5d_ratio": 1.4,
+        "pivot_high": 104.18,
+        "pct_from_piv": 0.0,
         "strategy": "breakout",
-        "rs_vs_spy": 5.35,
-        "company": "AbbVie Inc."
+        "company": "Best Buy Co., Inc."
+      },
+      {
+        "ticker": "AMGN",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 59.6,
+        "adx": 28.6,
+        "price": 474.08,
+        "vol_ratio": 0.4,
+        "atr_ratio": 1.03,
+        "vol_5d_ratio": 1.24,
+        "pivot_high": 474.08,
+        "pct_from_piv": 0.0,
+        "strategy": "breakout",
+        "rs_vs_spy": 5.85,
+        "company": "Amgen Inc."
+      },
+      {
+        "ticker": "AJG",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 60.7,
+        "adx": 31.9,
+        "price": 292.5,
+        "vol_ratio": 0.38,
+        "atr_ratio": 0.98,
+        "vol_5d_ratio": 0.99,
+        "pivot_high": 292.5,
+        "pct_from_piv": 0.0,
+        "strategy": "breakout",
+        "rs_vs_spy": 6.83,
+        "company": "Arthur J. Gallagher & Co."
+      },
+      {
+        "ticker": "BEN",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "ADXcurl",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "ADXcurl",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 52.3,
+        "adx": 18.7,
+        "price": 34.18,
+        "vol_ratio": 0.26,
+        "atr_ratio": 1.18,
+        "vol_5d_ratio": 0.84,
+        "pivot_high": 36.02,
+        "pct_from_piv": -5.1,
+        "strategy": "breakout",
+        "rs_vs_spy": -1.66,
+        "company": "Franklin Templeton, Inc."
+      },
+      {
+        "ticker": "CPAY",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 51.8,
+        "adx": 21.0,
+        "price": 458.3,
+        "vol_ratio": 0.28,
+        "atr_ratio": 1.09,
+        "vol_5d_ratio": 1.13,
+        "pivot_high": 462.22,
+        "pct_from_piv": -0.8,
+        "strategy": "breakout",
+        "company": "Corpay, Inc."
+      },
+      {
+        "ticker": "GEN",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 55.6,
+        "adx": 34.8,
+        "price": 30.47,
+        "vol_ratio": 0.59,
+        "atr_ratio": 1.02,
+        "vol_5d_ratio": 1.12,
+        "pivot_high": 30.47,
+        "pct_from_piv": 0.0,
+        "strategy": "breakout",
+        "company": "Gen Digital Inc."
+      },
+      {
+        "ticker": "LLY",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 57.1,
+        "adx": 29.3,
+        "price": 1392.38,
+        "vol_ratio": 0.55,
+        "atr_ratio": 0.94,
+        "vol_5d_ratio": 0.98,
+        "pivot_high": 1443.5,
+        "pct_from_piv": -3.5,
+        "strategy": "breakout",
+        "company": "Eli Lilly and Company"
+      },
+      {
+        "ticker": "NDAQ",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 55.8,
+        "adx": 29.5,
+        "price": 109.14,
+        "vol_ratio": 0.51,
+        "atr_ratio": 1.06,
+        "vol_5d_ratio": 0.97,
+        "pivot_high": 109.14,
+        "pct_from_piv": 0.0,
+        "strategy": "breakout",
+        "rs_vs_spy": 4.07,
+        "company": "Nasdaq, Inc."
+      },
+      {
+        "ticker": "MET",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 57.4,
+        "adx": 16.8,
+        "price": 101.07,
+        "vol_ratio": 0.42,
+        "atr_ratio": 1.11,
+        "vol_5d_ratio": 1.03,
+        "pivot_high": 102.65,
+        "pct_from_piv": -1.5,
+        "strategy": "breakout",
+        "rs_vs_spy": 1.91,
+        "company": "MetLife, Inc."
+      },
+      {
+        "ticker": "UNP",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "NearPiv",
+          "RSIbase",
+          "RS~ok",
+          "RngTght"
+        ],
+        "minervini": 8,
+        "rsi": 57.3,
+        "adx": 25.0,
+        "price": 297.89,
+        "vol_ratio": 0.41,
+        "atr_ratio": 1.11,
+        "vol_5d_ratio": 1.17,
+        "pivot_high": 304.2,
+        "pct_from_piv": -2.1,
+        "strategy": "breakout",
+        "company": "Union Pacific Corporation"
       },
       {
         "ticker": "UU.L",
@@ -130,161 +429,71 @@
           "RS~ok"
         ],
         "minervini": 8,
-        "rsi": 57.8,
-        "adx": 23.4,
-        "price": 1572.0,
-        "vol_ratio": 0.61,
-        "atr_ratio": 0.98,
-        "vol_5d_ratio": 1.05,
+        "rsi": 58.1,
+        "adx": 24.0,
+        "price": 1576.0,
+        "vol_ratio": 0.42,
+        "atr_ratio": 0.99,
+        "vol_5d_ratio": 1.01,
         "pivot_high": 1581.0,
-        "pct_from_piv": -0.6,
+        "pct_from_piv": -0.3,
         "strategy": "breakout",
-        "rs_vs_spy": 4.77,
+        "rs_vs_spy": 3.96,
         "company": "UNITED UTILITIES GROUP PLC ORD "
       }
     ],
     "pocket_pivot": [
       {
-        "ticker": "AJG",
-        "mkt": "US",
-        "score": 5,
-        "fresh": [
-          "PP"
-        ],
-        "conf": [
-          "RSI45-70",
-          "ADX\u2191",
-          "Near52H",
-          "EMA9>21"
-        ],
-        "minervini": 8,
-        "rsi": 53.7,
-        "adx": 31.5,
-        "price": 292.39,
-        "vol_ratio": 1.3,
-        "hold_days": 7,
-        "strategy": "pocket_pivot",
-        "rs_vs_spy": 10.79,
-        "company": "Arthur J. Gallagher & Co."
-      },
-      {
-        "ticker": "REL.L",
-        "mkt": "UK",
-        "score": 5,
-        "fresh": [
-          "PP"
-        ],
-        "conf": [
-          "RSI45-70",
-          "ADX\u2191",
-          "Near52H",
-          "EMA9>21"
-        ],
-        "minervini": 8,
-        "rsi": 59.2,
-        "adx": 20.6,
-        "price": 3103.0,
-        "vol_ratio": 1.37,
-        "hold_days": 7,
-        "strategy": "pocket_pivot",
-        "company": "RELX PLC ORD 14 51/116P"
-      },
-      {
-        "ticker": "EZJ.L",
-        "mkt": "UK",
+        "ticker": "ZAL.DE",
+        "mkt": "DE",
         "score": 4,
         "fresh": [
           "PP"
         ],
         "conf": [
-          "VOL1.5x",
+          "RSI45-70",
           "Near52H",
           "EMA9>21"
         ],
         "minervini": 8,
-        "rsi": 73.2,
-        "adx": 23.3,
-        "price": 691.0,
-        "vol_ratio": 1.54,
+        "rsi": 66.7,
+        "adx": 21.5,
+        "price": 29.83,
+        "vol_ratio": 0.88,
         "hold_days": 7,
         "strategy": "pocket_pivot",
-        "rs_vs_spy": 5.48,
-        "company": "EASYJET PLC ORD 27 2/7P"
+        "company": "Zalando SE                    I"
       }
     ],
-    "connors_rsi2": [
-      {
-        "ticker": "HAS",
-        "mkt": "US",
-        "score": 1,
-        "fresh": [
-          "RSI2=0.0"
-        ],
-        "conf": [
-          "ADX>20"
-        ],
-        "minervini": 8,
-        "rsi": 32.5,
-        "rsi2": 0.0,
-        "adx": 42.1,
-        "price": 110.58,
-        "vol_ratio": 1.5,
-        "hold_days": 5,
-        "strategy": "connors_rsi2",
-        "company": "Hasbro, Inc."
-      }
-    ],
+    "connors_rsi2": [],
     "ema_ribbon": [],
     "nr7": [],
     "analyst_upgrade": [],
     "signal_velocity": [
       {
-        "ticker": "CSX",
+        "ticker": "WAB",
         "score": 12,
         "fresh": [
-          "SV+11"
+          "SV+14"
         ],
         "conf": [
-          "SCORE:8/15",
-          "VEL+11"
+          "SCORE:9/15",
+          "VEL+14"
         ],
         "minervini": 8,
-        "rsi": 51.5,
-        "adx": 19.9,
-        "price": 51.16,
-        "vol_ratio": 1.04,
-        "net_score": 8,
-        "velocity": 11,
+        "rsi": 57.2,
+        "adx": 15.0,
+        "price": 296.15,
+        "vol_ratio": 0.92,
+        "net_score": 9,
+        "velocity": 14,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "rs_vs_spy": 2.97,
-        "company": "CSX Corporation"
+        "company": "Westinghouse Air Brake Technolo"
       },
       {
-        "ticker": "LYV",
-        "score": 12,
-        "fresh": [
-          "SV+16"
-        ],
-        "conf": [
-          "SCORE:11/15",
-          "VEL+16"
-        ],
-        "minervini": 8,
-        "rsi": 50.6,
-        "adx": 8.8,
-        "price": 181.73,
-        "vol_ratio": 0.64,
-        "net_score": 11,
-        "velocity": 16,
-        "hold_days": 5,
-        "mkt": "US",
-        "strategy": "signal_velocity",
-        "company": "Live Nation Entertainment, Inc."
-      },
-      {
-        "ticker": "BBY",
+        "ticker": "PKG",
         "score": 11,
         "fresh": [
           "SV+9"
@@ -294,85 +503,106 @@
           "VEL+9"
         ],
         "minervini": 8,
-        "rsi": 55.5,
-        "adx": 18.7,
-        "price": 102.58,
-        "vol_ratio": 0.94,
+        "rsi": 51.8,
+        "adx": 18.3,
+        "price": 251.23,
+        "vol_ratio": 0.63,
         "net_score": 8,
         "velocity": 9,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "Best Buy Co., Inc."
+        "company": "Packaging Corporation of Americ"
       },
       {
-        "ticker": "CPAY",
-        "score": 11,
+        "ticker": "AMGN",
+        "score": 9,
         "fresh": [
-          "SV+9"
+          "SV+7"
         ],
         "conf": [
           "SCORE:8/15",
-          "VEL+9",
           "ADX>20"
         ],
         "minervini": 8,
-        "rsi": 54.1,
-        "adx": 21.3,
-        "price": 454.33,
-        "vol_ratio": 0.89,
+        "rsi": 59.6,
+        "adx": 28.6,
+        "price": 474.08,
+        "vol_ratio": 0.4,
         "net_score": 8,
-        "velocity": 9,
+        "velocity": 7,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "Corpay, Inc."
+        "rs_vs_spy": 5.85,
+        "company": "Amgen Inc."
       },
       {
-        "ticker": "INCY",
-        "score": 10,
+        "ticker": "BEN",
+        "score": 9,
         "fresh": [
-          "SV+11"
+          "SV+7"
         ],
         "conf": [
-          "VEL+11"
+          "SCORE:8/15"
         ],
         "minervini": 8,
-        "rsi": 58.6,
-        "adx": 11.6,
-        "price": 122.35,
-        "vol_ratio": 0.82,
-        "net_score": 7,
-        "velocity": 11,
+        "rsi": 52.3,
+        "adx": 18.7,
+        "price": 34.18,
+        "vol_ratio": 0.26,
+        "net_score": 8,
+        "velocity": 7,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "Incyte Corporation"
+        "rs_vs_spy": -1.66,
+        "company": "Franklin Templeton, Inc."
       },
       {
-        "ticker": "APD",
+        "ticker": "HLT",
         "score": 8,
         "fresh": [
-          "SV+8"
+          "SV+6"
         ],
         "conf": [
-          "VEL+8",
+          "SCORE:9/15",
           "ADX>20"
         ],
         "minervini": 8,
-        "rsi": 54.3,
-        "adx": 21.6,
-        "price": 314.26,
-        "vol_ratio": 0.76,
-        "net_score": 7,
-        "velocity": 8,
+        "rsi": 49.5,
+        "adx": 29.1,
+        "price": 369.94,
+        "vol_ratio": 0.34,
+        "net_score": 9,
+        "velocity": 6,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "Air Products and Chemicals, Inc"
+        "company": "Hilton Worldwide Holdings Inc."
       },
       {
-        "ticker": "ABBV",
+        "ticker": "MET",
+        "score": 6,
+        "fresh": [
+          "SV+6"
+        ],
+        "conf": [],
+        "minervini": 8,
+        "rsi": 57.4,
+        "adx": 16.8,
+        "price": 101.07,
+        "vol_ratio": 0.42,
+        "net_score": 7,
+        "velocity": 6,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "rs_vs_spy": 1.91,
+        "company": "MetLife, Inc."
+      },
+      {
+        "ticker": "DB1.DE",
         "score": 6,
         "fresh": [
           "SV+6"
@@ -381,222 +611,112 @@
           "ADX>20"
         ],
         "minervini": 8,
-        "rsi": 57.4,
-        "adx": 25.0,
-        "price": 294.48,
-        "vol_ratio": 1.08,
+        "rsi": 54.6,
+        "adx": 23.1,
+        "price": 319.8,
+        "vol_ratio": 0.89,
         "net_score": 7,
         "velocity": 6,
         "hold_days": 5,
-        "mkt": "US",
+        "mkt": "DE",
         "strategy": "signal_velocity",
-        "rs_vs_spy": 5.35,
-        "company": "AbbVie Inc."
+        "company": "DEUTSCHE BOERSE AG            N"
       }
     ],
     "chokepoint_inflection": [],
-    "defensive_rotation": [
-      {
-        "ticker": "DGE.L",
-        "sector": "EU Consumer Staples",
-        "sector_etf": "EXH3.DE",
-        "score": 5,
-        "fresh": [
-          "ROT:EXH3.DE",
-          "ETF+5.9%vsS&P"
-        ],
-        "conf": [
-          "RS+8.8%",
-          "vsETF+2.2%",
-          ">SMA200",
-          "52wHI",
-          "M\u22653"
-        ],
-        "rsi": 61.4,
-        "adx": 22.6,
-        "vol_ratio": 1.16,
-        "minervini": 5,
-        "price": 1948.0,
-        "rs_vs_spy": 6.72,
-        "rs_vs_sector": 2.2,
-        "mkt": "UK",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "DIAGEO PLC ORD 28 101/108P"
-      },
-      {
-        "ticker": "JNJ",
-        "sector": "Healthcare",
-        "sector_etf": "XLV",
-        "score": 5,
-        "fresh": [
-          "ROT:XLV",
-          "ETF+2.88%vsS&P"
-        ],
-        "conf": [
-          "RS+3.9%",
-          "vsETF+1.0%",
-          ">SMA200",
-          "52wHI",
-          "M\u22653"
-        ],
-        "rsi": 53.0,
-        "adx": 19.1,
-        "vol_ratio": 1.09,
-        "minervini": 5,
-        "price": 273.94,
-        "rs_vs_spy": 3.85,
-        "rs_vs_sector": 0.97,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "Johnson & Johnson"
-      },
-      {
-        "ticker": "NESN.SW",
-        "sector": "EU Consumer Staples",
-        "sector_etf": "EXH3.DE",
-        "score": 5,
-        "fresh": [
-          "ROT:EXH3.DE",
-          "ETF+5.9%vsS&P"
-        ],
-        "conf": [
-          "RS+7.1%",
-          "vsETF+0.5%",
-          ">SMA200",
-          "52wHI",
-          "M\u22653"
-        ],
-        "rsi": 57.8,
-        "adx": 34.0,
-        "vol_ratio": 0.89,
-        "minervini": 5,
-        "price": 87.65,
-        "rs_vs_spy": 7.12,
-        "rs_vs_sector": 0.55,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "NESTLE N"
-      },
-      {
-        "ticker": "BSX",
-        "sector": "Healthcare",
-        "sector_etf": "XLV",
-        "score": 3,
-        "fresh": [
-          "ROT:XLV",
-          "ETF+2.88%vsS&P"
-        ],
-        "conf": [
-          "RS+5.7%",
-          "vsETF+2.8%",
-          "MACD+"
-        ],
-        "rsi": 52.0,
-        "adx": 12.8,
-        "vol_ratio": 0.8,
-        "minervini": 1,
-        "price": 45.12,
-        "rs_vs_spy": 5.65,
-        "rs_vs_sector": 2.77,
-        "mkt": "US",
-        "hold_days": 10,
-        "strategy": "defensive_rotation",
-        "company": "Boston Scientific Corporation"
-      }
-    ],
+    "defensive_rotation": [],
     "cup_handle": [
+      {
+        "ticker": "AMGN",
+        "score": 5,
+        "fresh": [
+          "C&H",
+          "PIV@474.08"
+        ],
+        "conf": [
+          "CUP33.2%",
+          "HDL8.1%",
+          "MACD+",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 59.6,
+        "adx": 28.6,
+        "vol_ratio": 0.4,
+        "minervini": 8,
+        "price": 474.08,
+        "cup_depth_pct": 33.2,
+        "cup_duration": 195,
+        "handle_depth_pct": 8.1,
+        "handle_duration": 5,
+        "pivot": 474.08,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "rs_vs_spy": 5.85,
+        "company": "Amgen Inc."
+      },
+      {
+        "ticker": "BIIB",
+        "score": 5,
+        "fresh": [
+          "C&H",
+          "PIV@269.11"
+        ],
+        "conf": [
+          "CUP32.4%",
+          "HDL7.3%",
+          "MACD+",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 64.7,
+        "adx": 25.2,
+        "vol_ratio": 0.44,
+        "minervini": 8,
+        "price": 264.2,
+        "cup_depth_pct": 32.4,
+        "cup_duration": 195,
+        "handle_depth_pct": 7.3,
+        "handle_duration": 5,
+        "pivot": 269.11,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "company": "Biogen Inc."
+      },
       {
         "ticker": "AJG",
         "score": 5,
         "fresh": [
           "C&H",
-          "PIV@292.39"
+          "PIV@292.5"
         ],
         "conf": [
           "CUP33.8%",
-          "HDL5.9%",
+          "HDL6.0%",
           "VOLdry",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 53.7,
-        "adx": 31.5,
-        "vol_ratio": 1.3,
+        "rsi": 60.7,
+        "adx": 31.9,
+        "vol_ratio": 0.38,
         "minervini": 8,
-        "price": 292.39,
+        "price": 292.5,
         "cup_depth_pct": 33.8,
-        "cup_duration": 193,
-        "handle_depth_pct": 5.9,
-        "handle_duration": 7,
-        "pivot": 292.39,
+        "cup_duration": 192,
+        "handle_depth_pct": 6.0,
+        "handle_duration": 8,
+        "pivot": 292.5,
         "vol_drying": true,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "rs_vs_spy": 10.79,
+        "rs_vs_spy": 6.83,
         "company": "Arthur J. Gallagher & Co."
-      },
-      {
-        "ticker": "DHR",
-        "score": 4,
-        "fresh": [
-          "C&H",
-          "PIV@229.09"
-        ],
-        "conf": [
-          "CUP31.9%",
-          "HDL3.8%",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 51.2,
-        "adx": 18.5,
-        "vol_ratio": 0.73,
-        "minervini": 8,
-        "price": 227.35,
-        "cup_depth_pct": 31.9,
-        "cup_duration": 195,
-        "handle_depth_pct": 3.8,
-        "handle_duration": 5,
-        "pivot": 229.09,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "rs_vs_spy": 3.27,
-        "company": "Danaher Corporation"
-      },
-      {
-        "ticker": "MA",
-        "score": 4,
-        "fresh": [
-          "C&H",
-          "PIV@659.97"
-        ],
-        "conf": [
-          "CUP30.1%",
-          "HDL5.2%",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 52.0,
-        "adx": 29.0,
-        "vol_ratio": 1.08,
-        "minervini": 8,
-        "price": 659.97,
-        "cup_depth_pct": 30.1,
-        "cup_duration": 195,
-        "handle_depth_pct": 5.2,
-        "handle_duration": 5,
-        "pivot": 659.97,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "company": "Mastercard Incorporated"
       },
       {
         "ticker": "ABBV",
@@ -607,50 +727,109 @@
         ],
         "conf": [
           "CUP34.0%",
-          "HDL5.6%",
+          "HDL4.7%",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 57.4,
-        "adx": 25.0,
-        "vol_ratio": 1.08,
+        "rsi": 50.7,
+        "adx": 24.5,
+        "vol_ratio": 0.73,
         "minervini": 8,
-        "price": 294.48,
+        "price": 291.88,
         "cup_depth_pct": 34.0,
         "cup_duration": 195,
-        "handle_depth_pct": 5.6,
+        "handle_depth_pct": 4.7,
         "handle_duration": 5,
         "pivot": 300.28,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
-        "rs_vs_spy": 5.35,
+        "rs_vs_spy": 2.39,
         "company": "AbbVie Inc."
+      },
+      {
+        "ticker": "MA",
+        "score": 4,
+        "fresh": [
+          "C&H",
+          "PIV@666.96"
+        ],
+        "conf": [
+          "CUP30.1%",
+          "HDL6.2%",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 56.9,
+        "adx": 29.0,
+        "vol_ratio": 0.53,
+        "minervini": 8,
+        "price": 666.96,
+        "cup_depth_pct": 30.1,
+        "cup_duration": 195,
+        "handle_depth_pct": 6.2,
+        "handle_duration": 5,
+        "pivot": 666.96,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "company": "Mastercard Incorporated"
+      },
+      {
+        "ticker": "NDAQ",
+        "score": 4,
+        "fresh": [
+          "C&H",
+          "PIV@109.14"
+        ],
+        "conf": [
+          "CUP30.4%",
+          "HDL5.7%",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 55.8,
+        "adx": 29.5,
+        "vol_ratio": 0.51,
+        "minervini": 8,
+        "price": 109.14,
+        "cup_depth_pct": 30.4,
+        "cup_duration": 195,
+        "handle_depth_pct": 5.7,
+        "handle_duration": 5,
+        "pivot": 109.14,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "rs_vs_spy": 4.07,
+        "company": "Nasdaq, Inc."
       },
       {
         "ticker": "FAST",
         "score": 4,
         "fresh": [
           "C&H",
-          "PIV@52.93"
+          "PIV@53.41"
         ],
         "conf": [
           "CUP22.9%",
-          "HDL4.4%",
+          "HDL5.2%",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 50.2,
-        "adx": 18.5,
-        "vol_ratio": 0.98,
+        "rsi": 52.0,
+        "adx": 17.5,
+        "vol_ratio": 0.33,
         "minervini": 8,
-        "price": 52.93,
+        "price": 53.41,
         "cup_depth_pct": 22.9,
         "cup_duration": 195,
-        "handle_depth_pct": 4.4,
+        "handle_depth_pct": 5.2,
         "handle_duration": 5,
-        "pivot": 52.93,
+        "pivot": 53.41,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
@@ -658,150 +837,62 @@
         "company": "Fastenal Company"
       },
       {
-        "ticker": "MMM",
-        "score": 4,
-        "fresh": [
-          "C&H",
-          "PIV@193.14"
-        ],
-        "conf": [
-          "CUP23.6%",
-          "HDL10.9%",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 54.8,
-        "adx": 29.7,
-        "vol_ratio": 1.19,
-        "minervini": 8,
-        "price": 189.83,
-        "cup_depth_pct": 23.6,
-        "cup_duration": 179,
-        "handle_depth_pct": 10.9,
-        "handle_duration": 21,
-        "pivot": 193.14,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "company": "3M Company"
-      },
-      {
-        "ticker": "NDAQ",
-        "score": 4,
-        "fresh": [
-          "C&H",
-          "PIV@107.07"
-        ],
-        "conf": [
-          "CUP30.4%",
-          "HDL3.9%",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 50.8,
-        "adx": 30.1,
-        "vol_ratio": 0.76,
-        "minervini": 8,
-        "price": 107.07,
-        "cup_depth_pct": 30.4,
-        "cup_duration": 195,
-        "handle_depth_pct": 3.9,
-        "handle_duration": 5,
-        "pivot": 107.07,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "company": "Nasdaq, Inc."
-      },
-      {
-        "ticker": "CSX",
-        "score": 4,
-        "fresh": [
-          "C&H",
-          "PIV@52.4"
-        ],
-        "conf": [
-          "CUP28.5%",
-          "HDL6.3%",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 51.5,
-        "adx": 19.9,
-        "vol_ratio": 1.04,
-        "minervini": 8,
-        "price": 51.16,
-        "cup_depth_pct": 28.5,
-        "cup_duration": 179,
-        "handle_depth_pct": 6.3,
-        "handle_duration": 21,
-        "pivot": 52.4,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "rs_vs_spy": 2.97,
-        "company": "CSX Corporation"
-      },
-      {
-        "ticker": "AMGN",
-        "score": 4,
-        "fresh": [
-          "C&H",
-          "PIV@473.94"
-        ],
-        "conf": [
-          "CUP33.2%",
-          "HDL8.1%",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 57.2,
-        "adx": 28.5,
-        "vol_ratio": 1.16,
-        "minervini": 8,
-        "price": 469.24,
-        "cup_depth_pct": 33.2,
-        "cup_duration": 195,
-        "handle_depth_pct": 8.1,
-        "handle_duration": 5,
-        "pivot": 473.94,
-        "vol_drying": false,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "company": "Amgen Inc."
-      },
-      {
         "ticker": "V",
         "score": 4,
         "fresh": [
           "C&H",
-          "PIV@424.39"
+          "PIV@429.56"
         ],
         "conf": [
           "CUP32.6%",
-          "HDL5.3%",
+          "HDL6.4%",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 52.0,
+        "rsi": 55.6,
         "adx": 27.6,
-        "vol_ratio": 0.9,
+        "vol_ratio": 0.51,
         "minervini": 8,
-        "price": 424.39,
+        "price": 429.56,
         "cup_depth_pct": 32.6,
         "cup_duration": 195,
-        "handle_depth_pct": 5.3,
+        "handle_depth_pct": 6.4,
         "handle_duration": 5,
-        "pivot": 424.39,
+        "pivot": 429.56,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
         "company": "Visa Inc."
+      },
+      {
+        "ticker": "DGX",
+        "score": 4,
+        "fresh": [
+          "C&H",
+          "PIV@265.64"
+        ],
+        "conf": [
+          "CUP29.4%",
+          "HDL2.8%",
+          "RSI50-70",
+          "M\u22656"
+        ],
+        "rsi": 63.0,
+        "adx": 16.3,
+        "vol_ratio": 0.44,
+        "minervini": 8,
+        "price": 263.29,
+        "cup_depth_pct": 29.4,
+        "cup_duration": 195,
+        "handle_depth_pct": 2.8,
+        "handle_duration": 5,
+        "pivot": 265.64,
+        "vol_drying": false,
+        "hold_days": 10,
+        "mkt": "US",
+        "strategy": "cup_handle",
+        "company": "Quest Diagnostics Incorporated"
       },
       {
         "ticker": "DGE.L",
@@ -812,25 +903,24 @@
         ],
         "conf": [
           "CUP27.3%",
-          "HDL4.3%",
+          "HDL9.8%",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 61.4,
-        "adx": 22.6,
-        "vol_ratio": 1.16,
+        "rsi": 59.7,
+        "adx": 22.3,
+        "vol_ratio": 0.5,
         "minervini": 8,
-        "price": 1948.0,
+        "price": 1937.0,
         "cup_depth_pct": 27.3,
-        "cup_duration": 185,
-        "handle_depth_pct": 4.3,
-        "handle_duration": 15,
+        "cup_duration": 179,
+        "handle_depth_pct": 9.8,
+        "handle_duration": 21,
         "pivot": 1948.0,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "UK",
         "strategy": "cup_handle",
-        "rs_vs_spy": 6.72,
         "company": "DIAGEO PLC ORD 28 101/108P"
       },
       {
@@ -841,112 +931,62 @@
           "PIV@1581.0"
         ],
         "conf": [
-          "CUP19.9%",
+          "CUP17.8%",
           "HDL4.6%",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 57.8,
-        "adx": 23.4,
-        "vol_ratio": 0.61,
+        "rsi": 58.1,
+        "adx": 24.0,
+        "vol_ratio": 0.42,
         "minervini": 8,
-        "price": 1572.0,
-        "cup_depth_pct": 19.9,
-        "cup_duration": 185,
+        "price": 1576.0,
+        "cup_depth_pct": 17.8,
+        "cup_duration": 179,
         "handle_depth_pct": 4.6,
-        "handle_duration": 15,
+        "handle_duration": 21,
         "pivot": 1581.0,
         "vol_drying": false,
         "hold_days": 10,
         "mkt": "UK",
         "strategy": "cup_handle",
-        "rs_vs_spy": 4.77,
+        "rs_vs_spy": 3.96,
         "company": "UNITED UTILITIES GROUP PLC ORD "
       }
     ],
     "darvas_box": [],
-    "rs_line": [
-      {
-        "ticker": "EZJ.L",
-        "score": 5,
-        "fresh": [
-          "RS-NEW-HIGH"
-        ],
-        "conf": [
-          "RS_LEADS",
-          "NEAR_HIGH",
-          "VOL\u22651.5x",
-          "ADX>20",
-          "M\u22656"
-        ],
-        "minervini": 8,
-        "rsi": 73.2,
-        "adx": 23.3,
-        "price": 691.0,
-        "vol_ratio": 1.54,
-        "rs_lead_days": 4,
-        "pct_from_high": 0.0,
-        "hold_days": 7,
-        "strategy": "rs_line",
-        "mkt": "UK",
-        "rs_vs_spy": 5.48,
-        "company": "EASYJET PLC ORD 27 2/7P"
-      }
-    ],
-    "vcp": [
-      {
-        "ticker": "DHR",
-        "score": 5,
-        "fresh": [
-          "VCP-3C"
-        ],
-        "conf": [
-          "TightFinal",
-          "VolDry",
-          "NearPivot",
-          "RSI50-65",
-          "M\u22657"
-        ],
-        "minervini": 8,
-        "rsi": 51.2,
-        "adx": 18.5,
-        "price": 227.35,
-        "vol_ratio": 0.73,
-        "n_contractions": 3,
-        "final_pct": 5.41,
-        "base_high": 238.46,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "vcp",
-        "spy_regime": "CHOPPY",
-        "rs_vs_spy": 3.27,
-        "company": "Danaher Corporation"
-      }
-    ],
+    "rs_line": [],
+    "vcp": [],
     "williams_pct_r": [],
-    "bollinger_pctb": [],
+    "bollinger_pctb": [
+      {
+        "ticker": "HAS",
+        "score": 4,
+        "fresh": [
+          "BB-OVERSOLD"
+        ],
+        "conf": [
+          "MFI_lt25",
+          "pctB_lt10",
+          "SMAabove",
+          "M\u22655"
+        ],
+        "minervini": 8,
+        "rsi": 31.3,
+        "adx": 40.3,
+        "price": 109.09,
+        "vol_ratio": 0.67,
+        "pct_b": -0.039,
+        "mfi": 24.4,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "bollinger_pctb",
+        "company": "Hasbro, Inc."
+      }
+    ],
     "connors_r3": [],
     "connors_tps": [],
-    "turtle_soup": [
-      {
-        "ticker": "MTD",
-        "strategy": "turtle_soup",
-        "score": 2,
-        "conf": [
-          "ADX16-35",
-          "M>=5"
-        ],
-        "minervini": 8,
-        "rsi": 48.0,
-        "adx": 24.8,
-        "price": 1664.55,
-        "vol_ratio": 1.44,
-        "prior_20d_low": 1660.08,
-        "hold_days": 3,
-        "mkt": "US",
-        "company": "Mettler-Toledo International, I"
-      }
-    ],
+    "turtle_soup": [],
     "raschke_8020": [],
     "wyckoff_spring": [],
     "weinstein_stage2": [],
@@ -959,19 +999,19 @@
     "momentum": []
   },
   "sector_excess": {
-    "XLK": -4.98,
-    "XLI": 0.98,
-    "XLV": 2.88,
-    "XLF": 2.06,
-    "XLY": 2.78,
-    "XLP": 6.6,
-    "XLB": 2.26,
-    "XLE": 1.78,
-    "XLC": 2.71,
-    "XLU": 5.19,
-    "XLRE": 4.04
+    "XLK": -4.03,
+    "XLI": 1.51,
+    "XLV": 1.87,
+    "XLF": 2.0,
+    "XLY": 3.4,
+    "XLP": 5.58,
+    "XLB": 3.44,
+    "XLE": -0.33,
+    "XLC": 3.73,
+    "XLU": 3.62,
+    "XLRE": 3.31
   },
-  "spy_ret": -5.67,
+  "spy_ret": -3.8,
   "elder_impulse_count": 0,
   "market_regime": "BEAR",
   "india_mode": false
