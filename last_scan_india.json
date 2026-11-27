@@ -1,5 +1,5 @@
 {
-  "scan_date": "2026-11-26",
+  "scan_date": "2026-11-27",
   "strategies": [
     "breakout",
     "pocket_pivot",
@@ -39,7 +39,7 @@
   "results_by_strategy": {
     "breakout": [
       {
-        "ticker": "CUPID.NS",
+        "ticker": "GESHIP.NS",
         "mkt": "US",
         "score": 5,
         "phase": "COIL",
@@ -62,23 +62,24 @@
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 67.7,
-        "adx": 20.7,
-        "price": 371.1,
-        "vol_ratio": 0.66,
-        "atr_ratio": 1.0,
-        "vol_5d_ratio": 0.6,
-        "pivot_high": 384.8,
-        "pct_from_piv": -3.6,
+        "rsi": 68.2,
+        "adx": 21.8,
+        "price": 1550.6,
+        "vol_ratio": 0.32,
+        "atr_ratio": 0.96,
+        "vol_5d_ratio": 0.48,
+        "pivot_high": 1555.1,
+        "pct_from_piv": -0.3,
         "strategy": "breakout",
-        "company": "CUPID LIMITED"
+        "company": "THE GE SHPG.LTD"
       },
       {
-        "ticker": "GABRIEL.NS",
+        "ticker": "LAURUSLABS.NS",
         "mkt": "US",
-        "score": 4,
+        "score": 5,
         "phase": "COIL",
         "coil_sigs": [
+          "NearPiv",
           "ADXcurl",
           "RSIbase",
           "RS~ok",
@@ -89,23 +90,56 @@
           "COIL"
         ],
         "conf": [
+          "NearPiv",
           "ADXcurl",
           "RSIbase",
           "RS~ok",
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 60.4,
-        "adx": 21.1,
-        "price": 1537.3,
-        "vol_ratio": 0.28,
-        "atr_ratio": 1.14,
-        "vol_5d_ratio": 0.7,
-        "pivot_high": 1641.2,
-        "pct_from_piv": -6.3,
+        "rsi": 60.3,
+        "adx": 21.6,
+        "price": 2504.4,
+        "vol_ratio": 0.7,
+        "atr_ratio": 1.09,
+        "vol_5d_ratio": 0.69,
+        "pivot_high": 2505.0,
+        "pct_from_piv": -0.0,
         "strategy": "breakout",
-        "rs_vs_spy": -0.99,
-        "company": "GABRIEL INDIA LTD"
+        "company": "LAURUS LABS LIMITED"
+      },
+      {
+        "ticker": "ENGINERSIN.NS",
+        "mkt": "US",
+        "score": 4,
+        "phase": "COIL",
+        "coil_sigs": [
+          "VOLdry",
+          "NearPiv",
+          "RSIbase",
+          "RS~ok"
+        ],
+        "break_sigs": [],
+        "fresh": [
+          "COIL"
+        ],
+        "conf": [
+          "VOLdry",
+          "NearPiv",
+          "RSIbase",
+          "RS~ok"
+        ],
+        "minervini": 8,
+        "rsi": 51.4,
+        "adx": 23.2,
+        "price": 300.75,
+        "vol_ratio": 0.36,
+        "atr_ratio": 0.93,
+        "vol_5d_ratio": 0.29,
+        "pivot_high": 312.9,
+        "pct_from_piv": -3.9,
+        "strategy": "breakout",
+        "company": "ENGINEERS INDIA LTD"
       },
       {
         "ticker": "FLUOROCHEM.NS",
@@ -129,25 +163,25 @@
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 56.5,
-        "adx": 20.1,
-        "price": 4781.2,
-        "vol_ratio": 0.43,
+        "rsi": 54.6,
+        "adx": 19.1,
+        "price": 4824.5,
+        "vol_ratio": 0.33,
         "atr_ratio": 1.1,
-        "vol_5d_ratio": 1.28,
+        "vol_5d_ratio": 1.2,
         "pivot_high": 4978.6,
-        "pct_from_piv": -4.0,
+        "pct_from_piv": -3.1,
         "strategy": "breakout",
         "company": "GUJARAT FLUOROCHEM LTD"
       },
       {
-        "ticker": "KPRMILL.NS",
+        "ticker": "GLAND.NS",
         "mkt": "US",
         "score": 4,
         "phase": "COIL",
         "coil_sigs": [
+          "VOLdry",
           "NearPiv",
-          "RSIbase",
           "RS~ok",
           "RngTght"
         ],
@@ -156,115 +190,26 @@
           "COIL"
         ],
         "conf": [
+          "VOLdry",
           "NearPiv",
-          "RSIbase",
           "RS~ok",
           "RngTght"
         ],
         "minervini": 8,
-        "rsi": 54.1,
-        "adx": 29.6,
-        "price": 1190.5,
-        "vol_ratio": 1.04,
-        "atr_ratio": 1.01,
-        "vol_5d_ratio": 1.36,
-        "pivot_high": 1217.1,
-        "pct_from_piv": -2.2,
+        "rsi": 65.7,
+        "adx": 35.0,
+        "price": 3362.0,
+        "vol_ratio": 0.67,
+        "atr_ratio": 0.96,
+        "vol_5d_ratio": 0.47,
+        "pivot_high": 3385.9,
+        "pct_from_piv": -0.7,
         "strategy": "breakout",
-        "company": "KPR MILL LTD."
-      },
-      {
-        "ticker": "NUVAMA.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "VOLdry",
-          "NearPiv",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "VOLdry",
-          "NearPiv",
-          "RSIbase",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 50.9,
-        "adx": 16.1,
-        "price": 1854.8,
-        "vol_ratio": 0.94,
-        "atr_ratio": 1.02,
-        "vol_5d_ratio": 0.63,
-        "pivot_high": 1888.3,
-        "pct_from_piv": -1.8,
-        "strategy": "breakout",
-        "rs_vs_spy": 3.67,
-        "company": "NUVAMA WEALTH MANAGE LTD"
-      },
-      {
-        "ticker": "RKFORGE.NS",
-        "mkt": "US",
-        "score": 4,
-        "phase": "COIL",
-        "coil_sigs": [
-          "VOLdry",
-          "NearPiv",
-          "ADXcurl",
-          "RS~ok"
-        ],
-        "break_sigs": [],
-        "fresh": [
-          "COIL"
-        ],
-        "conf": [
-          "VOLdry",
-          "NearPiv",
-          "ADXcurl",
-          "RS~ok"
-        ],
-        "minervini": 8,
-        "rsi": 67.2,
-        "adx": 23.3,
-        "price": 787.85,
-        "vol_ratio": 1.04,
-        "atr_ratio": 0.98,
-        "vol_5d_ratio": 0.32,
-        "pivot_high": 791.85,
-        "pct_from_piv": -0.5,
-        "strategy": "breakout",
-        "company": "RAMKRISHNA FORGINGS LTD"
+        "rs_vs_spy": 6.18,
+        "company": "GLAND PHARMA LIMITED"
       }
     ],
     "pocket_pivot": [
-      {
-        "ticker": "LODHA.NS",
-        "mkt": "US",
-        "score": 5,
-        "fresh": [
-          "PP"
-        ],
-        "conf": [
-          "ADX\u2191",
-          "VOL1.5x",
-          "Near52H",
-          "EMA9>21"
-        ],
-        "minervini": 8,
-        "rsi": 73.8,
-        "adx": 27.9,
-        "price": 1261.2,
-        "vol_ratio": 1.84,
-        "hold_days": 7,
-        "strategy": "pocket_pivot",
-        "rs_vs_spy": 8.21,
-        "company": "LODHA DEVELOPERS LIMITED"
-      },
       {
         "ticker": "ANTHEM.NS",
         "mkt": "US",
@@ -278,105 +223,107 @@
           "EMA9>21"
         ],
         "minervini": 8,
-        "rsi": 74.9,
-        "adx": 31.9,
-        "price": 975.5,
-        "vol_ratio": 0.9,
+        "rsi": 72.3,
+        "adx": 33.1,
+        "price": 984.15,
+        "vol_ratio": 0.87,
         "hold_days": 7,
         "strategy": "pocket_pivot",
         "company": "ANTHEM BIOSCIENCES LTD"
-      },
-      {
-        "ticker": "GLAXO.NS",
-        "mkt": "US",
-        "score": 4,
-        "fresh": [
-          "PP"
-        ],
-        "conf": [
-          "RSI45-70",
-          "ADX\u2191",
-          "EMA9>21"
-        ],
-        "minervini": 8,
-        "rsi": 69.1,
-        "adx": 19.9,
-        "price": 2779.8,
-        "vol_ratio": 0.82,
-        "hold_days": 7,
-        "strategy": "pocket_pivot",
-        "company": "GLAXOSMITHKLINE PHARMA LT"
       }
     ],
-    "connors_rsi2": [],
-    "ema_ribbon": [
+    "connors_rsi2": [
       {
-        "ticker": "LGEINDIA.NS",
+        "ticker": "ABCAPITAL.NS",
         "mkt": "US",
         "score": 3,
         "fresh": [
-          "EMA-RIBBON"
+          "RSI2=0.0"
         ],
         "conf": [
-          "VOL1.5x",
-          "RSI50-70",
-          "MACD+"
+          "RSI14>40",
+          "ADX>20",
+          "Near52H"
         ],
         "minervini": 8,
-        "rsi": 56.6,
-        "adx": 22.9,
-        "price": 1758.1,
-        "vol_ratio": 10.62,
-        "hold_days": 7,
-        "strategy": "ema_ribbon",
-        "company": "LG ELECTRONICS INDIA LTD"
+        "rsi": 58.2,
+        "rsi2": 0.0,
+        "adx": 32.8,
+        "price": 410.3,
+        "vol_ratio": 1.68,
+        "hold_days": 5,
+        "strategy": "connors_rsi2",
+        "company": "ADITYA BIRLA CAPITAL LTD."
       }
     ],
+    "ema_ribbon": [],
     "nr7": [],
     "analyst_upgrade": [],
     "signal_velocity": [
       {
-        "ticker": "NUVAMA.NS",
-        "score": 9,
+        "ticker": "BALRAMCHIN.NS",
+        "score": 12,
         "fresh": [
-          "SV+7"
+          "SV+15"
         ],
         "conf": [
-          "SCORE:8/15"
+          "SCORE:8/15",
+          "VEL+15"
         ],
         "minervini": 8,
-        "rsi": 50.9,
-        "adx": 16.1,
-        "price": 1854.8,
-        "vol_ratio": 0.94,
+        "rsi": 50.3,
+        "adx": 13.5,
+        "price": 675.45,
+        "vol_ratio": 1.5,
         "net_score": 8,
-        "velocity": 7,
+        "velocity": 15,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "rs_vs_spy": 3.67,
-        "company": "NUVAMA WEALTH MANAGE LTD"
+        "rs_vs_spy": 8.49,
+        "company": "BALRAMPUR CHINI MILLS LTD"
       },
       {
-        "ticker": "CPPLUS.NS",
-        "score": 8,
+        "ticker": "AEGISLOG.NS",
+        "score": 10,
         "fresh": [
-          "SV+6"
+          "SV+10"
         ],
         "conf": [
-          "SCORE:10/15"
+          "VEL+10"
         ],
         "minervini": 8,
-        "rsi": 62.6,
-        "adx": 13.6,
-        "price": 4235.0,
-        "vol_ratio": 0.5,
-        "net_score": 10,
-        "velocity": 6,
+        "rsi": 63.9,
+        "adx": 16.4,
+        "price": 1297.9,
+        "vol_ratio": 1.1,
+        "net_score": 5,
+        "velocity": 10,
         "hold_days": 5,
         "mkt": "US",
         "strategy": "signal_velocity",
-        "company": "ADITYA INFOTECH LIMITED"
+        "company": "AEGIS LOGISTICS LIMITED"
+      },
+      {
+        "ticker": "BHEL.NS",
+        "score": 10,
+        "fresh": [
+          "SV+10"
+        ],
+        "conf": [
+          "VEL+10"
+        ],
+        "minervini": 8,
+        "rsi": 52.4,
+        "adx": 10.8,
+        "price": 421.95,
+        "vol_ratio": 0.71,
+        "net_score": 6,
+        "velocity": 10,
+        "hold_days": 5,
+        "mkt": "US",
+        "strategy": "signal_velocity",
+        "company": "BHEL"
       }
     ],
     "chokepoint_inflection": [],
@@ -438,37 +385,6 @@
     ],
     "cup_handle": [
       {
-        "ticker": "GAIL.NS",
-        "score": 5,
-        "fresh": [
-          "C&H",
-          "PIV@192.1"
-        ],
-        "conf": [
-          "CUP28.9%",
-          "HDL3.4%",
-          "VOLdry",
-          "RSI50-70",
-          "M\u22656"
-        ],
-        "rsi": 54.1,
-        "adx": 34.5,
-        "vol_ratio": 0.89,
-        "minervini": 8,
-        "price": 188.0,
-        "cup_depth_pct": 28.9,
-        "cup_duration": 195,
-        "handle_depth_pct": 3.4,
-        "handle_duration": 5,
-        "pivot": 192.1,
-        "vol_drying": true,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "cup_handle",
-        "rs_vs_spy": 5.39,
-        "company": "GAIL (INDIA) LTD"
-      },
-      {
         "ticker": "TVSMOTOR.NS",
         "score": 5,
         "fresh": [
@@ -476,23 +392,23 @@
           "PIV@4610.0"
         ],
         "conf": [
-          "CUP28.0%",
+          "CUP28.6%",
           "HDL1.8%",
-          "MACD+",
+          "VOLdry",
           "RSI50-70",
           "M\u22656"
         ],
-        "rsi": 62.2,
-        "adx": 22.9,
-        "vol_ratio": 0.68,
+        "rsi": 54.8,
+        "adx": 22.0,
+        "vol_ratio": 0.67,
         "minervini": 8,
-        "price": 4550.1,
-        "cup_depth_pct": 28.0,
+        "price": 4526.5,
+        "cup_depth_pct": 28.6,
         "cup_duration": 195,
         "handle_depth_pct": 1.8,
         "handle_duration": 5,
         "pivot": 4610.0,
-        "vol_drying": false,
+        "vol_drying": true,
         "hold_days": 10,
         "mkt": "US",
         "strategy": "cup_handle",
@@ -501,60 +417,7 @@
     ],
     "darvas_box": [],
     "rs_line": [],
-    "vcp": [
-      {
-        "ticker": "HONASA.NS",
-        "score": 5,
-        "fresh": [
-          "VCP-4C"
-        ],
-        "conf": [
-          "Contractions\u22654",
-          "TightFinal",
-          "VolDry",
-          "NearPivot",
-          "M\u22657"
-        ],
-        "minervini": 8,
-        "rsi": 78.6,
-        "adx": 33.6,
-        "price": 533.25,
-        "vol_ratio": 0.37,
-        "n_contractions": 4,
-        "final_pct": 3.36,
-        "base_high": 492.0,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "vcp",
-        "spy_regime": "CHOPPY",
-        "company": "HONASA CONSUMER LIMITED"
-      },
-      {
-        "ticker": "MEESHO.NS",
-        "score": 3,
-        "fresh": [
-          "VCP-3C"
-        ],
-        "conf": [
-          "TightFinal",
-          "VolDry",
-          "NearPivot"
-        ],
-        "minervini": 6,
-        "rsi": 73.9,
-        "adx": 29.9,
-        "price": 251.3,
-        "vol_ratio": 0.78,
-        "n_contractions": 3,
-        "final_pct": 4.62,
-        "base_high": 230.3,
-        "hold_days": 10,
-        "mkt": "US",
-        "strategy": "vcp",
-        "spy_regime": "CHOPPY",
-        "company": "MEESHO LIMITED"
-      }
-    ],
+    "vcp": [],
     "williams_pct_r": [],
     "bollinger_pctb": [],
     "connors_r3": [],
@@ -581,13 +444,12 @@
           "M8"
         ],
         "minervini": 8,
-        "rsi": 54.1,
-        "adx": 34.5,
-        "price": 188.0,
+        "rsi": 48.0,
+        "adx": 32.9,
+        "price": 185.0,
         "vol_ratio": 2.01,
-        "ma30w": 172.53,
-        "stage_note": "MA turning \u00b7 week vol 2.0x \u00b7 RS\u2191",
-        "rs_vs_spy": 5.39
+        "ma30w": 172.43,
+        "stage_note": "MA turning \u00b7 week vol 2.0x \u00b7 RS\u2191"
       },
       {
         "ticker": "BAJFINANCE.NS",
@@ -606,11 +468,11 @@
           "M8"
         ],
         "minervini": 8,
-        "rsi": 65.3,
-        "adx": 39.3,
-        "price": 1097.85,
+        "rsi": 51.8,
+        "adx": 38.6,
+        "price": 1080.0,
         "vol_ratio": 2.1,
-        "ma30w": 1010.21,
+        "ma30w": 1009.62,
         "stage_note": "MA turning \u00b7 week vol 2.1x \u00b7 RS\u2191"
       },
       {
@@ -630,17 +492,41 @@
           "M8"
         ],
         "minervini": 8,
-        "rsi": 67.2,
-        "adx": 40.9,
-        "price": 939.1,
+        "rsi": 61.0,
+        "adx": 41.4,
+        "price": 922.3,
         "vol_ratio": 3.52,
-        "ma30w": 834.05,
+        "ma30w": 833.49,
         "stage_note": "MA turning \u00b7 week vol 3.5x \u00b7 RS\u2191"
+      },
+      {
+        "ticker": "UNOMINDA.NS",
+        "company": "UNO MINDA LIMITED",
+        "mkt": "US",
+        "strategy": "weinstein_stage2",
+        "hold_days": 10,
+        "score": 4,
+        "fresh": [
+          "W2"
+        ],
+        "conf": [
+          "VOL1.5x",
+          "RS\u2191",
+          "Near52H",
+          "M8"
+        ],
+        "minervini": 8,
+        "rsi": 53.4,
+        "adx": 41.5,
+        "price": 1354.0,
+        "vol_ratio": 4.93,
+        "ma30w": 1185.51,
+        "stage_note": "MA turning \u00b7 week vol 4.9x \u00b7 RS\u2191"
       }
     ],
     "momentum_burst": [
       {
-        "ticker": "ACE.NS",
+        "ticker": "CUPID.NS",
         "score": 4,
         "fresh": [
           "BURST"
@@ -652,66 +538,113 @@
           "M\u22656"
         ],
         "minervini": 8,
-        "rsi": 88.8,
-        "adx": 31.9,
-        "price": 1295.0,
-        "vol_ratio": 6.7,
-        "burst_pct": 8.79,
+        "rsi": 71.6,
+        "adx": 21.9,
+        "price": 389.5,
+        "vol_ratio": 1.61,
+        "burst_pct": 4.96,
         "hold_days": 5,
         "mkt": "US",
-        "company": "ACTION CONST EQUIP LTD"
-      },
-      {
-        "ticker": "LODHA.NS",
-        "score": 4,
-        "fresh": [
-          "BURST"
-        ],
-        "conf": [
-          "BURST\u22654%",
-          "VOL\u22651.5x",
-          "TI\u22651.03",
-          "M\u22656"
-        ],
-        "minervini": 8,
-        "rsi": 73.8,
-        "adx": 27.9,
-        "price": 1261.2,
-        "vol_ratio": 1.84,
-        "burst_pct": 4.93,
-        "hold_days": 5,
-        "mkt": "US",
-        "rs_vs_spy": 8.21,
-        "company": "LODHA DEVELOPERS LIMITED"
-      },
-      {
-        "ticker": "MCX.NS",
-        "score": 4,
-        "fresh": [
-          "BURST"
-        ],
-        "conf": [
-          "BURST\u22654%",
-          "VOL\u22651.5x",
-          "TI\u22651.03",
-          "M\u22656"
-        ],
-        "minervini": 8,
-        "rsi": 76.1,
-        "adx": 29.9,
-        "price": 3835.0,
-        "vol_ratio": 1.77,
-        "burst_pct": 7.57,
-        "hold_days": 5,
-        "mkt": "US",
-        "company": "MULTI COMMODITY EXCHANGE"
+        "company": "CUPID LIMITED"
       }
     ],
-    "ma50_reclaim": [],
+    "ma50_reclaim": [
+      {
+        "ticker": "ACMESOLAR.NS",
+        "score": 5,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
+          "M\u22656",
+          "TIGHT<3%"
+        ],
+        "minervini": 8,
+        "rsi": 60.5,
+        "adx": 9.6,
+        "price": 426.35,
+        "vol_ratio": 2.63,
+        "dist_50sma": 1.81,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "ACME SOLAR HOLDINGS LTD"
+      },
+      {
+        "ticker": "BALRAMCHIN.NS",
+        "score": 5,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
+          "M\u22656",
+          "TIGHT<3%"
+        ],
+        "minervini": 8,
+        "rsi": 50.3,
+        "adx": 13.5,
+        "price": 675.45,
+        "vol_ratio": 1.5,
+        "dist_50sma": 2.27,
+        "hold_days": 7,
+        "mkt": "US",
+        "rs_vs_spy": 8.49,
+        "company": "BALRAMPUR CHINI MILLS LTD"
+      },
+      {
+        "ticker": "HAL.NS",
+        "score": 4,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "RSI35-65",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 51.7,
+        "adx": 14.0,
+        "price": 5074.0,
+        "vol_ratio": 2.67,
+        "dist_50sma": 5.19,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "HINDUSTAN AERONAUTICS LTD"
+      },
+      {
+        "ticker": "AETHER.NS",
+        "score": 4,
+        "fresh": [
+          "50SMA_RECLAIM"
+        ],
+        "conf": [
+          "50SMA_RECLAIM",
+          "VOL\u22651.2x",
+          "ADX>15",
+          "M\u22656"
+        ],
+        "minervini": 8,
+        "rsi": 68.9,
+        "adx": 21.4,
+        "price": 1761.4,
+        "vol_ratio": 1.21,
+        "dist_50sma": 7.93,
+        "hold_days": 7,
+        "mkt": "US",
+        "company": "AETHER INDUSTRIES LIMITED"
+      }
+    ],
     "turnover_momentum": [],
     "three_weeks_tight": [
       {
-        "ticker": "INDIGO.NS",
+        "ticker": "GLAND.NS",
         "mkt": "US",
         "score": 3,
         "fresh": [
@@ -723,11 +656,34 @@
           "NEAR_52H"
         ],
         "minervini": 8,
-        "rsi": 67.2,
-        "adx": 30.5,
-        "price": 5625.0,
+        "rsi": 65.7,
+        "adx": 35.0,
+        "price": 3362.0,
         "vol_ratio": 0.67,
-        "spread_pct": 0.67,
+        "spread_pct": 0.9,
+        "hold_days": 7,
+        "strategy": "three_weeks_tight",
+        "rs_vs_spy": 6.18,
+        "company": "GLAND PHARMA LIMITED"
+      },
+      {
+        "ticker": "INDIGO.NS",
+        "mkt": "US",
+        "score": 3,
+        "fresh": [
+          "3WT"
+        ],
+        "conf": [
+          "VOL_DECLINING",
+          "NEAR_52H",
+          "RSI50-65"
+        ],
+        "minervini": 8,
+        "rsi": 60.3,
+        "adx": 30.3,
+        "price": 5659.6,
+        "vol_ratio": 0.85,
+        "spread_pct": 1.29,
         "hold_days": 7,
         "strategy": "three_weeks_tight",
         "company": "INTERGLOBE AVIATION LTD"
@@ -735,84 +691,43 @@
       {
         "ticker": "GABRIEL.NS",
         "mkt": "US",
-        "score": 2,
+        "score": 3,
         "fresh": [
           "3WT"
         ],
         "conf": [
+          "TIGHT<1%",
           "VOL_DECLINING",
           "RSI50-65"
         ],
         "minervini": 8,
-        "rsi": 60.4,
-        "adx": 21.1,
-        "price": 1537.3,
-        "vol_ratio": 0.28,
-        "spread_pct": 1.46,
+        "rsi": 60.1,
+        "adx": 21.6,
+        "price": 1546.8,
+        "vol_ratio": 0.31,
+        "spread_pct": 0.84,
         "hold_days": 7,
         "strategy": "three_weeks_tight",
-        "rs_vs_spy": -0.99,
         "company": "GABRIEL INDIA LTD"
-      },
-      {
-        "ticker": "GLAND.NS",
-        "mkt": "US",
-        "score": 2,
-        "fresh": [
-          "3WT"
-        ],
-        "conf": [
-          "VOL_DECLINING",
-          "NEAR_52H"
-        ],
-        "minervini": 8,
-        "rsi": 65.2,
-        "adx": 34.4,
-        "price": 3370.8,
-        "vol_ratio": 0.46,
-        "spread_pct": 1.17,
-        "hold_days": 7,
-        "strategy": "three_weeks_tight",
-        "company": "GLAND PHARMA LIMITED"
-      },
-      {
-        "ticker": "AUROPHARMA.NS",
-        "mkt": "US",
-        "score": 2,
-        "fresh": [
-          "3WT"
-        ],
-        "conf": [
-          "VOL_DECLINING",
-          "NEAR_52H"
-        ],
-        "minervini": 8,
-        "rsi": 66.8,
-        "adx": 31.8,
-        "price": 1811.0,
-        "vol_ratio": 0.72,
-        "spread_pct": 1.35,
-        "hold_days": 7,
-        "strategy": "three_weeks_tight",
-        "company": "AUROBINDO PHARMA LTD"
       },
       {
         "ticker": "RADICO.NS",
         "mkt": "US",
-        "score": 2,
+        "score": 3,
         "fresh": [
           "3WT"
         ],
         "conf": [
           "VOL_DECLINING",
-          "NEAR_52H"
+          "NEAR_52H",
+          "RSI50-65"
         ],
         "minervini": 8,
-        "rsi": 68.8,
-        "adx": 18.6,
-        "price": 4671.0,
-        "vol_ratio": 0.68,
-        "spread_pct": 1.43,
+        "rsi": 59.7,
+        "adx": 18.0,
+        "price": 4646.6,
+        "vol_ratio": 0.53,
+        "spread_pct": 1.3,
         "hold_days": 7,
         "strategy": "three_weeks_tight",
         "company": "RADICO KHAITAN LTD"
@@ -823,8 +738,8 @@
     "momentum": []
   },
   "sector_excess": {},
-  "spy_ret": 2.4923696420255044,
-  "elder_impulse_count": 15,
-  "market_regime": "BULL",
+  "spy_ret": 1.2168281561709489,
+  "elder_impulse_count": 10,
+  "market_regime": "NEUTRAL",
   "india_mode": true
 }
